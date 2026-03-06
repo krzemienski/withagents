@@ -13,40 +13,49 @@ See DESIGN.md for full specification. Key tokens:
 
 ## File Architecture
 ```
-site/public/          — Production HTML pages
-posts/                — Blog post source (MDX with frontmatter)
-stitch.json           — Stitch MCP project ID
-DESIGN.md             — Visual design system
+site/                     — Next.js 16 website (App Router, TypeScript, Tailwind v4)
+site/posts/               — Deployed blog posts (MDX with frontmatter)
+posts/                    — Blog post source (all posts, including drafts)
+stitch.json               — Stitch MCP project ID (5577890677756270199)
+DESIGN.md                 — Visual design system ("Midnight Observatory")
 ```
 
 ## Live Sitemap
 
 | Page | Status | Route |
 |------|--------|-------|
-| Homepage | Complete | `/` |
-| About | Complete | `/about` |
-| Post 01: Series Launch | Complete | `/posts/post-01-series-launch` |
-| Post 02: Multi-Agent Consensus | Complete | `/posts/post-02-multi-agent-consensus` |
-| Post 03: Functional Validation | Complete | `/posts/post-03-functional-validation` |
-| Post 04: iOS Streaming Bridge | Complete | `/posts/post-04-ios-streaming-bridge` |
-| Post 05: SDK Bridge | Complete | `/posts/post-05-sdk-bridge` |
-| Post 06: Parallel Worktrees | Complete | `/posts/post-06-parallel-worktrees` |
-| Post 07: Prompt Engineering Stack | Complete | `/posts/post-07-prompt-engineering-stack` |
-| Post 08: Ralph Orchestrator | Complete | `/posts/post-08-ralph-orchestrator` |
-| Post 09: Code Tales | Complete | `/posts/post-09-code-tales` |
-| Post 10: Stitch Design-to-Code | Complete | `/posts/post-10-stitch-design-to-code` |
-| Post 11: AI Dev Operating System | Complete | `/posts/post-11-ai-dev-operating-system` |
+| Homepage | Deployed | `/` |
+| About | Deployed | `/about` |
+| Post 01–11 | Deployed | `/posts/post-01-*` through `/posts/post-11-*` |
+| Post 12–21 | Deployed | `/posts/post-12-*` through `/posts/post-21-*` |
+| Post 22–31 | Deployed | `/posts/post-22-*` through `/posts/post-31-*` |
+| Post 32–41 | Deployed | `/posts/post-32-*` through `/posts/post-41-*` |
+| Post 42–51 | Deployed | `/posts/post-42-*` through `/posts/post-51-*` |
+| Post 52–61 | Deployed | `/posts/post-52-*` through `/posts/post-61-*` |
+| RSS Feed | Deployed | `/feed.xml` |
+| Sitemap | Deployed | `/sitemap.xml` |
 
 ## Roadmap
 
-- [ ] Deploy to Vercel with custom domain
-- [ ] Add analytics (Vercel Analytics + Plausible)
-- [ ] Generate hero images for all posts via Stitch MCP
-- [ ] Add RSS feed and sitemap.xml
-- [ ] SEO optimization (OG images, JSON-LD)
-- [ ] Generate 10 new posts from 180-day session scan
-- [ ] Social media content (X threads, LinkedIn, newsletter)
+- [x] RSS feed (`/feed.xml`)
+- [x] Sitemap (`/sitemap.xml`)
+- [x] Vercel Analytics + Speed Insights
+- [x] JSON-LD structured data on posts
+- [x] OG meta tags
+- [x] Deploy to Vercel (SSO-protected; disable in dashboard for public access)
+- [x] Write posts 22-61 from session mining (40 new posts)
+- [x] Social media content for all posts (twitter, linkedin, newsletter)
+- [ ] Generate hero images for posts 12-61 via Stitch MCP
+- [ ] Generate visual assets (social cards) for posts 12-61
+- [ ] Custom domain assignment
 - [ ] Package pipeline as reusable skill
+
+## Stats
+- **61** published posts
+- **425,000+** words across all posts
+- **21** companion repositories
+- **8,481** AI coding sessions analyzed
+- **90** days of production development
 
 ## Creative Freedom
 - Hero images: gradient dark backgrounds with dot grid overlays, category pills

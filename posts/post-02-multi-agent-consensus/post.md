@@ -4,7 +4,7 @@ subtitle: "How multi-agent consensus with hard unanimity gates catches the bugs 
 author: "Nick Krzemienski"
 date: "2025-03-01"
 series_number: 2
-series_total: 11
+series_total: 61
 github_repo: "https://github.com/krzemienski/agentic-development-guide"
 tags:
   - CodeQuality

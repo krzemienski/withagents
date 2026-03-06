@@ -4,7 +4,7 @@ subtitle: "Agentic Development: 10 Lessons from 8,481 AI Coding Sessions (Post 7
 author: "Nick Krzemienski"
 date: "2025-03-01"
 series_number: 7
-series_total: 11
+series_total: 61
 github_repo: https://github.com/krzemienski/claude-prompt-stack
 tags:
   - AgenticDevelopment

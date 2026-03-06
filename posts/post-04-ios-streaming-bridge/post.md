@@ -4,7 +4,7 @@ subtitle: "Ten hops per token, each one a place where the stream can break"
 author: "Nick Krzemienski"
 date: "2025-03-01"
 series_number: 4
-series_total: 11
+series_total: 61
 github_repo: https://github.com/krzemienski/claude-ios-streaming-bridge
 tags:
   - AgenticDevelopment

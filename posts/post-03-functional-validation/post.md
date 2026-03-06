@@ -4,7 +4,7 @@ subtitle: "A functional validation framework that forces real systems to prove t
 author: "Nick Krzemienski"
 date: "2025-03-01"
 series_number: 3
-series_total: 11
+series_total: 61
 github_repo: https://github.com/krzemienski/functional-validation-framework
 tags:
   - AgenticDevelopment

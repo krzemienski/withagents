@@ -4,7 +4,7 @@ subtitle: "Agentic Development: 10 Lessons from 8,481 AI Coding Sessions (Part 6
 author: "Nick Krzemienski"
 date: "2025-03-01"
 series_number: 6
-series_total: 11
+series_total: 61
 github_repo: https://github.com/krzemienski/auto-claude-worktrees
 tags:
   - AgenticDevelopment

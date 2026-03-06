@@ -1,6 +1,6 @@
 # Agentic Development Blog Series
 
-Technical blog series: "Agentic Development: 10 Lessons from 8,481 AI Coding Sessions" by Nick Krzemienski.
+Technical blog series: "Agentic Development: 21 Lessons from 8,481 AI Coding Sessions" by Nick Krzemienski.
 
 ## Project Structure
 
@@ -19,7 +19,7 @@ blog-series/
 └── docs/                  # Project documentation
 ```
 
-## Companion Repos (10)
+## Companion Repos (20)
 
 Each post has a working companion repo in the project root:
 - `multi-agent-consensus/` — Python, 3-agent unanimous gate voting
@@ -33,6 +33,16 @@ Each post has a working companion repo in the project root:
 - `stitch-design-to-code/` — Node.js, design tokens + Stitch MCP
 - `ai-dev-operating-system/` — Python, meta-system combining all subsystems
 - `agentic-development-guide/` — Meta-repo organizing all 10 topics
+- `ui-validation-at-scale/` — Python, 321-screenshot idb_tap automation
+- `kaizen-algorithm-tuning/` — Python, PDCA precision improvement loops
+- `spec-driven-implementation/` — Rust/Python, YAML spec → multi-agent build
+- `claude-mem-architecture/` — Python + SQLite, cross-session observation store
+- `multi-agent-merge-orchestrator/` — Python, 35-worktree conflict-free merging
+- `sequential-thinking-debugging/` — Python, 84-step root cause analysis
+- `full-stack-orchestrator/` — Python + Swift + TypeScript, 3-platform coordination
+- `github-to-audio-pipeline/` — Python, 5-stage content transformation pipeline
+- `design-token-automation/` — Python + Stitch MCP, cross-platform token propagation
+- `session-observability/` — Python, telemetry framework + analytics dashboard
 
 ## Commands
 
@@ -52,7 +62,7 @@ subtitle: "Brief description"
 author: "Nick Krzemienski"
 date: "YYYY-MM-DD"
 series_number: N
-series_total: 11
+series_total: 21
 github_repo: "https://github.com/krzemienski/repo-name"
 tags:
   - AgenticDevelopment

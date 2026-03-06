@@ -4,7 +4,7 @@ subtitle: "How a brutalist-cyberpunk design system, structured prompts, and 107 
 author: "Nick Krzemienski"
 date: "2025-03-01"
 series_number: 10
-series_total: 11
+series_total: 61
 github_repo: https://github.com/krzemienski/stitch-design-to-code
 tags: [AgenticDevelopment, StitchMCP, DesignToCode, ReactComponents, PuppeteerValidation]
 ---
