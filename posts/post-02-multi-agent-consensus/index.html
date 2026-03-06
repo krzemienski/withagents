@@ -1,0 +1,1166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>When AI Agents Disagree: Building Consensus Systems</title>
+<meta property="og:title" content="When AI Agents Disagree: Building Consensus Systems">
+<meta property="og:description" content="How split-role agents catch bugs that single agents miss">
+<meta property="og:type" content="article">
+<meta property="og:image" content="assets/hero-card.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="When AI Agents Disagree: Building Consensus Systems">
+<meta name="twitter:description" content="How split-role agents catch bugs that single agents miss">
+<meta name="author" content="Nick Krzemienski">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0a0a0a; color: #e2e8f0; line-height: 1.8; }
+  .hero-container { max-width: 1200px; margin: 0 auto; }
+  .hero-container > div { width: 100% !important; max-width: 100%; }
+  article { max-width: 780px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: 2.5em; font-weight: 800; color: #f8fafc; line-height: 1.2; margin: 0 0 16px; }
+  h2 { font-size: 1.75em; font-weight: 700; color: #f1f5f9; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #1e293b; }
+  h3 { font-size: 1.3em; font-weight: 600; color: #e2e8f0; margin: 32px 0 12px; }
+  h4 { font-size: 1.1em; font-weight: 600; color: #cbd5e1; margin: 24px 0 8px; }
+  p { margin: 0 0 16px; color: #cbd5e1; }
+  a { color: #818cf8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; background: #1e293b; color: #a5b4fc; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+  pre { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 20px; margin: 16px 0 24px; overflow-x: auto; }
+  pre code { background: none; padding: 0; color: #e2e8f0; font-size: 0.85em; line-height: 1.6; }
+  blockquote { border-left: 3px solid #6366f1; padding: 12px 20px; margin: 16px 0; background: rgba(99,102,241,0.05); border-radius: 0 8px 8px 0; }
+  blockquote p { color: #94a3b8; margin: 0; }
+  ul, ol { margin: 8px 0 16px 24px; color: #cbd5e1; }
+  li { margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; }
+  th { background: #1e293b; color: #f1f5f9; padding: 10px 16px; text-align: left; font-weight: 600; font-size: 0.9em; }
+  td { padding: 10px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.9em; }
+  tr:hover td { background: rgba(99,102,241,0.03); }
+  hr { border: none; border-top: 1px solid #1e293b; margin: 32px 0; }
+  img, svg { max-width: 100%; height: auto; border-radius: 8px; margin: 16px 0; }
+  .diagram { margin: 32px 0; padding: 24px; background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; overflow-x: auto; }
+  .diagram h4 { color: #64748b; font-size: 0.85em; font-weight: 500; margin: 0 0 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .diagram svg { display: block; margin: 0 auto; max-height: 600px; }
+  .meta { color: #64748b; font-size: 0.9em; margin: 8px 0 32px; }
+  .social-cards { display: flex; gap: 24px; flex-wrap: wrap; margin: 48px 0; padding: 24px; background: #0f172a; border-radius: 12px; }
+  .social-cards h3 { width: 100%; color: #64748b; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px; }
+  .social-cards iframe { border: 1px solid #1e293b; border-radius: 8px; }
+  .series-nav { display: flex; justify-content: space-between; padding: 24px; background: #0f172a; border-radius: 12px; margin-top: 48px; }
+  .series-nav a { color: #818cf8; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="hero-container"><div style="width:1200px;height:630px;background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%);display:flex;flex-direction:column;justify-content:center;padding:0 80px;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif;position:relative;overflow:hidden;">
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:radial-gradient(circle at 1px 1px,rgba(34,211,238,0.15) 1px,transparent 0);background-size:40px 40px;"></div>
+  <div style="position:absolute;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(34,211,238,0.2) 0%,transparent 70%);border-radius:50%;"></div>
+  <div style="position:relative;z-index:1;display:inline-block;background:rgba(34,211,238,0.2);border:1px solid rgba(34,211,238,0.4);border-radius:20px;padding:6px 16px;margin-bottom:24px;width:fit-content;">
+    <span style="color:rgba(34,211,238,0.9);font-size:14px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">LESSON 02 OF 10 · MULTI-AGENT CONSENSUS</span>
+  </div>
+  <h1 style="position:relative;z-index:1;color:#f1f5f9;font-size:46px;font-weight:800;line-height:1.15;margin:0 0 20px 0;max-width:900px;">When AI Agents Disagree: Building Consensus Systems</h1>
+  <p style="position:relative;z-index:1;color:#94a3b8;font-size:20px;line-height:1.5;margin:0 0 32px 0;max-width:700px;">How split-role agents catch bugs that single agents miss every time</p>
+  <div style="position:relative;z-index:1;display:flex;align-items:center;gap:12px;">
+    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,rgb(34,211,238),#8b5cf6);display:flex;align-items:center;justify-content:center;">
+      <span style="color:white;font-weight:700;font-size:16px;">NK</span>
+    </div>
+    <div>
+      <div style="color:#f1f5f9;font-size:14px;font-weight:600;">Nick Krzemienski</div>
+      <div style="color:#64748b;font-size:13px;">March 2026 · Agentic Development Series</div>
+    </div>
+  </div>
+</div></div>
+<article>
+<p class="meta">Lesson 02 of 10 · Nick Krzemienski · March 2026 · Agentic Development Series</p>
+<figure>
+<embed src="../visuals/html/series-hero.html" />
+<figcaption aria-hidden="true">Hero</figcaption>
+</figure>
+<h2
+id="a-single-ai-agent-said-looks-correct.-three-agents-found-the-p2-bug.">A
+Single AI Agent Said “Looks Correct.” Three Agents Found the P2
+Bug.</h2>
+<p>A single AI agent reviewed my streaming code and said “looks
+correct.”</p>
+<p>Three agents found a P2 bug on line 926. Here is the full story of
+how a one-character fix exposed a structural flaw in how we review
+AI-generated code – and the framework I built to make sure it never
+happens again.</p>
+<hr />
+<h3 id="the-bug-that-lived-for-three-days">The Bug That Lived for Three
+Days</h3>
+<p>I was building ILS, a native iOS client for Claude Code. The
+streaming chat interface was the core feature: messages arrive from
+Claude’s API as Server-Sent Events, tokens flow in real time, the UI
+renders them progressively. It looked like it worked. Messages appeared.
+The UI felt responsive.</p>
+<p>I ran a single-agent code review. The agent scanned
+<code>ChatViewModel.swift</code>, noted some minor style
+inconsistencies, and reported: “Streaming implementation looks
+correct.”</p>
+<p>The bug had been in the codebase for three days.</p>
+<p>Here is what was actually happening. When a user sent a message and
+Claude’s response streamed back, every token appeared twice. The word
+“Four” rendered as “Four.Four.” on screen. The assistant message handler
+was using <code>+=</code> to append text blocks, but those text blocks
+already contained the full accumulated content from prior
+<code>textDelta</code> streaming events. Append plus authoritative full
+text equals duplication.</p>
+<p>The code looked like this:</p>
+<pre class="swift"><code>// ChatViewModel.swift, line 926 -- the bug
+message.text += textBlock.text</code></pre>
+<p>The fix:</p>
+<pre class="swift"><code>// The correct version -- assignment, not append
+message.text = textBlock.text</code></pre>
+<p>One character. The <code>+=</code> became <code>=</code>. The
+<code>+=</code> operator makes perfect sense if you are building text
+incrementally from deltas. The <code>textBlock.text</code> containing
+the full accumulated content makes perfect sense if the assistant event
+is authoritative. Both are valid patterns. The bug exists only at their
+intersection – two update mechanisms, each individually reasonable,
+interacting badly when combined.</p>
+<p>But there was a second root cause that compounded the first. The
+stream-end handler reset <code>lastProcessedMessageIndex</code> to zero.
+On the next observation cycle, the entire SSE message buffer replayed
+from the beginning, feeding already-processed messages back through the
+rendering pipeline. Double processing on top of double accumulation.</p>
+<pre class="swift"><code>// Root cause 2 -- the index reset
+// BEFORE (bug):
+self.lastProcessedMessageIndex = 0   // replays all messages next cycle
+
+// AFTER (fix):
+let finalCount = sseClient.messages.count
+self.lastProcessedMessageIndex = finalCount  // preserves position</code></pre>
+<p>The result in practice: every streaming response stuttered visibly.
+Tokens appeared, doubled, then resolved to the correct text once
+streaming completed. It would not crash. It would not fail silently. It
+would just look broken – the kind of bug that erodes trust in a product
+the first time a user sees it.</p>
+<hr />
+<h3 id="the-single-agent-review-that-missed-it">The Single-Agent Review
+That Missed It</h3>
+<p>Let me walk you through what actually happened when the single agent
+reviewed this code.</p>
+<p>I pointed Claude at <code>ChatViewModel.swift</code> and asked for a
+thorough code review. The agent methodically worked through the file. It
+flagged that some <code>@Published</code> properties could be marked
+private. It suggested extracting a helper for the message-parsing switch
+statement. It noted that a force-unwrap on line 412 should use optional
+binding instead.</p>
+<p>Then it reached the streaming handler. It read line 926:
+<code>message.text += textBlock.text</code>. It saw the <code>+=</code>
+operator. It recognized this as a standard text accumulation pattern –
+you have a buffer, you append to it, the buffer grows as data arrives.
+Correct pattern. Move on.</p>
+<p>Forty lines later, it read the <code>textDelta</code> handler:
+<code>message.text += text</code>. Same pattern. Append new text. Makes
+sense. Move on.</p>
+<p>The agent never asked the question that would have surfaced the bug:
+“What does <code>textBlock.text</code> actually contain?” The answer is
+right there in the Claude Code streaming format documentation – each
+<code>assistant</code> event contains the full accumulated text up to
+that point, not a delta. But the agent was pattern-matching, not tracing
+data flow. It recognized the shape of correctness without verifying the
+substance.</p>
+<p>This is not a knock on the agent. This is the fundamental limitation
+of single-perspective review. When you bring one lens to a problem, you
+see what that lens is calibrated to see. The agent was calibrated for
+code patterns. The bug lived in data semantics.</p>
+<hr />
+<h3 id="why-single-agent-review-missed-it">Why Single-Agent Review
+Missed It</h3>
+<p>When you ask one AI agent to review code, it brings a single
+perspective. It pattern-matches against known error categories. It reads
+the streaming implementation and sees the shape of correctness – delta
+events, accumulation buffers, state updates. Each line makes sense in
+isolation.</p>
+<p>The mistake is that the agent is checking “does this line look
+correct?” when the bug is about how two correct-looking lines interact.
+The <code>+=</code> operator is a standard accumulation pattern. The
+<code>textBlock</code> containing full text is a standard
+authoritative-update pattern. The individual reviewer sees both
+patterns, recognizes both as valid, and moves on. The bug lives in the
+space between the patterns.</p>
+<p>This is not unique to AI. Human code review has the same failure
+mode. Individual reviewers develop blind spots. The pattern recognition
+that makes you productive is exactly what causes you to miss novel bugs.
+You see what you expect to see.</p>
+<hr />
+<h3 id="why-not-just-run-one-agent-three-times">Why Not Just Run One
+Agent Three Times?</h3>
+<p>The obvious objection: “Instead of three different agents, why not
+just run the same agent three times and take a majority vote?”</p>
+<p>I tried this. Same prompt, same model, three runs. The results were
+depressingly correlated.</p>
+<p>All three runs flagged the same style inconsistencies. All three
+missed the <code>+=</code> bug. All three produced nearly identical
+review summaries. On the fourth run, for good measure – same result. The
+fifth run caught a different cosmetic issue but still missed the data
+flow interaction.</p>
+<p>This makes sense when you think about how language models work. Given
+the same prompt, the same context window, and the same temperature
+setting, the model’s attention patterns are nearly deterministic. It
+will read the file in roughly the same order, activate the same
+pattern-matching circuits, and produce the same blind spots. Running it
+again does not create independence. It creates redundancy.</p>
+<p>The analogy from statistics is correlation between measurements.
+Three measurements with correlation coefficient 0.95 give you almost no
+more information than one measurement. Three measurements with
+correlation 0.1 give you genuine triangulation. The key variable is not
+how many times you run the review. It is how independent each review
+is.</p>
+<p>Independence requires different prompts, different focus areas,
+different evaluation criteria. It requires each reviewer to approach the
+code from a genuinely different angle. That is what the role definitions
+provide.</p>
+<p>Think of it this way: if you ask three people who all learned
+programming from the same textbook to review the same code, they will
+find the same bugs and miss the same bugs. If you ask a security
+engineer, a performance engineer, and a domain expert, their coverage is
+dramatically wider. Same principle applies to AI agents.</p>
+<hr />
+<h3 id="the-three-agent-architecture">The Three-Agent Architecture</h3>
+<p>Multi-agent consensus addresses this structurally. Not by making each
+agent smarter, but by ensuring that genuinely independent perspectives
+must all agree before work advances.</p>
+<p>The pattern: three agents review independently. All three must vote
+PASS. Any single FAIL keeps the gate closed.</p>
+<p>I built this as a Python CLI framework. The three roles are defined
+as frozen dataclasses in <code>roles.py</code>, each with a specialized
+system prompt, focus areas, and a list of what it is calibrated to
+catch.</p>
+<hr />
+<h3 id="the-roledefinition-class-anatomy-of-a-perspective">The
+RoleDefinition Class: Anatomy of a Perspective</h3>
+<p>The foundation of the system is the <code>RoleDefinition</code>
+dataclass. Every agent in the consensus triad is fully defined by one of
+these:</p>
+<pre class="python"><code># src/consensus/roles.py
+
+@dataclass(frozen=True)
+class RoleDefinition:
+    &quot;&quot;&quot;Complete definition of an agent role in the consensus triad.
+
+    Includes the role identity, system prompt, specialization focus,
+    and what categories of issues this role is calibrated to find.
+    &quot;&quot;&quot;
+
+    role: Role
+    title: str
+    description: str
+    system_prompt: str
+    focus_areas: list[str]
+    catches: list[str]
+
+    def format_system_prompt(self, phase: str, target: str) -&gt; str:
+        &quot;&quot;&quot;Format the system prompt with phase and target context.&quot;&quot;&quot;
+        return self.system_prompt.format(
+            role=self.title,
+            phase=phase,
+            target=target,
+        )</code></pre>
+<p>The class is frozen – immutable after creation. This is intentional.
+Role definitions are institutional knowledge. They encode what you have
+learned about what classes of bugs exist and which perspective catches
+each class. Mutating them at runtime would defeat the purpose.</p>
+<p>The <code>format_system_prompt</code> method is where the role’s
+perspective gets injected into the actual agent invocation. The
+<code>{phase}</code> and <code>{target}</code> variables are filled in
+at gate time, but the core perspective – what the agent cares about,
+what it looks for, what principles it applies – is baked into the
+definition.</p>
+<p>Let me walk through each role and why it exists.</p>
+<hr />
+<h3 id="lead-the-architects-eye">Lead: The Architect’s Eye</h3>
+<pre class="python"><code>LEAD = RoleDefinition(
+    role=Role.LEAD,
+    title=&quot;Lead (Architecture &amp; Consistency Specialist)&quot;,
+    description=(
+        &quot;Validates the whole. Looks for cross-component consistency, pattern compliance, &quot;
+        &quot;and whether fixes introduced new inconsistencies elsewhere.&quot;
+    ),
+    system_prompt=&quot;&quot;&quot;\
+You are the LEAD validator — architecture and consistency specialist.
+
+Your job is to independently validate work at {target} for the &#39;{phase}&#39; phase.
+
+YOUR PERSPECTIVE:
+- Cross-component consistency: do all parts agree on contracts, naming, data shapes?
+- Pattern compliance: does the code follow established project patterns?
+- Architectural coherence: do changes fit the overall system design?
+- Regression detection: did any fix introduce inconsistencies elsewhere?
+
+INDEPENDENCE REQUIREMENT:
+You are working INDEPENDENTLY. You have NO visibility into what Alpha or Bravo found.
+Form your OWN conclusions before voting. Do not hedge — commit to PASS or FAIL.
+
+EVIDENCE REQUIREMENT:
+Every claim must be backed by evidence: file paths, line numbers, command output,
+or screenshots. &quot;Looks correct&quot; is not evidence. &quot;Line 42 of foo.py returns the
+correct type because...&quot; is evidence.\&quot;&quot;&quot;,
+    focus_areas=[
+        &quot;Cross-component consistency&quot;,
+        &quot;API contract compliance&quot;,
+        &quot;Pattern adherence&quot;,
+        &quot;Architectural coherence&quot;,
+        &quot;Regression detection&quot;,
+    ],
+    catches=[
+        &quot;Contract mismatches between layers&quot;,
+        &quot;Pattern violations&quot;,
+        &quot;Inconsistent naming or data shapes&quot;,
+        &quot;Fixes that break other components&quot;,
+        &quot;Missing cross-cutting concerns&quot;,
+    ],
+)</code></pre>
+<p>Lead validates the whole. It looks for cross-component consistency,
+whether all parts agree on contracts and naming, whether fixes
+introduced new inconsistencies elsewhere. In the ILS case, Lead
+cross-checked that both the SDK and CLI execution paths used the same
+corrected handler after the fix was applied.</p>
+<p>Notice the system prompt explicitly says “You have NO visibility into
+what Alpha or Bravo found.” This is the independence guarantee. Without
+it, agents would anchor on each other’s conclusions. The prompt forces
+each agent to form its own opinion from scratch.</p>
+<p>The evidence requirement is equally critical. “Looks correct” is
+explicitly called out as not-evidence. This was added after I observed
+agents producing vague passing assessments. Forcing them to cite
+specific file paths and line numbers dramatically increases the quality
+of both PASS and FAIL votes.</p>
+<hr />
+<h3 id="alpha-the-detail-oriented-auditor">Alpha: The Detail-Oriented
+Auditor</h3>
+<pre class="python"><code>ALPHA = RoleDefinition(
+    role=Role.ALPHA,
+    title=&quot;Alpha (Code &amp; Logic Specialist)&quot;,
+    description=(
+        &quot;Reads implementation line by line. Looks for incorrect accumulation patterns, &quot;
+        &quot;off-by-one errors in state machines, race conditions, API contract violations.&quot;
+    ),
+    system_prompt=&quot;&quot;&quot;\
+You are ALPHA — the code and logic specialist.
+
+YOUR PERSPECTIVE:
+- Line-by-line code correctness: does each line do what it claims?
+- State management: are accumulation patterns, counters, indices correct?
+- Logic errors: off-by-one, wrong operators (+= vs =), missed edge cases
+- API contracts: do callers and callees agree on types, nullability, ordering?
+
+THE += vs = PRINCIPLE:
+The most dangerous bugs look correct in isolation. `message.text += delta` makes sense
+for incremental accumulation. `delta` containing full accumulated text makes sense for
+authoritative updates. The bug exists at their INTERSECTION. Look for these interactions.\&quot;&quot;&quot;,
+    focus_areas=[
+        &quot;Line-by-line code correctness&quot;,
+        &quot;State management and accumulation patterns&quot;,
+        &quot;Operator correctness (+= vs = vs ==)&quot;,
+        &quot;Off-by-one and boundary errors&quot;,
+        &quot;API contract compliance&quot;,
+        &quot;Error handling completeness&quot;,
+    ],
+    catches=[
+        &quot;Logic errors invisible in isolation&quot;,
+        &quot;Incorrect accumulation (the += bug)&quot;,
+        &quot;State machine index resets&quot;,
+        &quot;Type mismatches at boundaries&quot;,
+        &quot;Missing error handlers&quot;,
+        &quot;Race conditions in async code&quot;,
+    ],
+)</code></pre>
+<p>Alpha is the detail-oriented auditor. It reads implementation line by
+line. Its system prompt includes what I call “THE += vs = PRINCIPLE” – a
+direct reference to the exact bug class that started this whole
+framework, embedded as institutional knowledge.</p>
+<p>This is the key insight: the system prompt is not just instructions.
+It is a compressed lesson from a real production bug. When Alpha
+encounters a new codebase with a streaming handler, it does not just
+check whether each line looks correct. It specifically looks for
+interactions between update mechanisms – because the prompt tells it
+that is where the most dangerous bugs live.</p>
+<p>Alpha caught both root causes in the ILS streaming bug on the first
+pass because it was specifically prompted to look at how data flow
+mechanisms interact – not just whether individual lines were
+correct.</p>
+<hr />
+<h3 id="bravo-the-systems-thinker">Bravo: The Systems Thinker</h3>
+<pre class="python"><code>BRAVO = RoleDefinition(
+    role=Role.BRAVO,
+    title=&quot;Bravo (Systems &amp; Functional Specialist)&quot;,
+    description=(
+        &quot;Exercises the running system. Looks for UI behavior under real conditions, &quot;
+        &quot;edge cases that only appear with actual data, regressions in previously &quot;
+        &quot;working flows.&quot;
+    ),
+    system_prompt=&quot;&quot;&quot;\
+You are BRAVO — the systems and functional specialist.
+
+YOUR PERSPECTIVE:
+- Does it actually work? Not &quot;does the code look right&quot; — does the system BEHAVE correctly?
+- Edge cases: what happens with empty input, huge input, special characters, concurrent access?
+- Real-world conditions: slow networks, partial failures, race conditions under load
+- User experience: does the output look right? Timing? Formatting? Error messages?
+
+THE VERIFICATION PRINCIPLE:
+Alpha reads code. You RUN things. Build, execute, curl, inspect output. If you can&#39;t
+run it, analyze what WOULD happen under real conditions. &quot;Four.&quot; should not render
+as &quot;Four.Four.&quot; — that&#39;s a system-level bug that code review alone might miss.\&quot;&quot;&quot;,
+    focus_areas=[
+        &quot;Functional correctness under real conditions&quot;,
+        &quot;Edge case behavior&quot;,
+        &quot;UI/output verification&quot;,
+        &quot;Performance under load&quot;,
+        &quot;Regression detection&quot;,
+        &quot;Error message quality&quot;,
+    ],
+    catches=[
+        &quot;Bugs that only appear at runtime&quot;,
+        &quot;Visual/output duplication or corruption&quot;,
+        &quot;Edge cases with real data&quot;,
+        &quot;Performance degradation&quot;,
+        &quot;Regressions in existing flows&quot;,
+        &quot;UX issues (timing, formatting, responsiveness)&quot;,
+    ],
+)</code></pre>
+<p>Bravo exercises the running system. Its prompt explicitly states:
+“Alpha reads code. You RUN things.” This one sentence creates genuine
+independence. Alpha and Bravo cannot converge on the same blind spot
+because they are not even using the same evaluation methodology.</p>
+<p>Bravo confirmed the fix by verifying that responses rendered as
+“Four.” and “Six.” – not “Four.Four.” and “Six.Six.” That verification
+is something a code reviewer cannot do by reading source files. You have
+to run the system and look at what appears on screen.</p>
+<p>The three roles are not arbitrary. They are calibrated so that what
+Alpha misses in the running UI, Bravo catches, and what both miss at the
+architectural level, Lead finds.</p>
+<pre class="mermaid"><code>flowchart LR
+    subgraph lead_scope [&quot;LEAD: Architecture &amp; Consistency&quot;]
+        direction TB
+        L1[&quot;Cross-component contracts&quot;]
+        L2[&quot;Pattern compliance&quot;]
+        L3[&quot;Naming consistency&quot;]
+        L4[&quot;Regression from fixes&quot;]
+        L5[&quot;Architectural coherence&quot;]
+    end
+
+    subgraph alpha_scope [&quot;ALPHA: Code &amp; Logic&quot;]
+        direction TB
+        A1[&quot;Line-by-line correctness&quot;]
+        A2[&quot;Operator semantics\n+= vs = vs ==&quot;]
+        A3[&quot;State machine indices&quot;]
+        A4[&quot;Off-by-one errors&quot;]
+        A5[&quot;Race conditions&quot;]
+        A6[&quot;Error handling paths&quot;]
+    end
+
+    subgraph bravo_scope [&quot;BRAVO: Systems &amp; Functional&quot;]
+        direction TB
+        B1[&quot;Runtime behavior&quot;]
+        B2[&quot;Edge cases\nempty, huge, special chars&quot;]
+        B3[&quot;Visual output verification&quot;]
+        B4[&quot;Performance under load&quot;]
+        B5[&quot;Regression in existing flows&quot;]
+        B6[&quot;UX: timing, formatting&quot;]
+    end
+
+    codebase[(&quot;Codebase\nUnder Review&quot;)]
+
+    codebase --&gt; lead_scope
+    codebase --&gt; alpha_scope
+    codebase --&gt; bravo_scope
+
+    lead_scope --&gt; gate{&quot;Unanimity\nGate&quot;}
+    alpha_scope --&gt; gate
+    bravo_scope --&gt; gate
+
+    gate --&gt;|&quot;All PASS&quot;| ship[&quot;Ship&quot;]
+    gate --&gt;|&quot;Any FAIL&quot;| fix[&quot;Fix Cycle\nAll 3 Re-validate&quot;]
+
+    classDef leadStyle fill:#1b4332,stroke:#2d6a4f,color:#fff
+    classDef alphaStyle fill:#14213d,stroke:#1d3557,color:#fff
+    classDef bravoStyle fill:#3c1642,stroke:#6b2fa0,color:#fff
+    classDef gateStyle fill:#e63946,stroke:#d00000,color:#fff
+
+    class L1,L2,L3,L4,L5 leadStyle
+    class A1,A2,A3,A4,A5,A6 alphaStyle
+    class B1,B2,B3,B4,B5,B6 bravoStyle
+    class gate gateStyle</code></pre>
+<hr />
+<h3 id="how-the-gate-actually-works">How the Gate Actually Works</h3>
+<p>The gate mechanism is implemented in <code>gate.py</code>. Each agent
+is invoked via subprocess – the Claude CLI with <code>--print</code>, a
+model flag, and the role-specific system prompt:</p>
+<pre class="python"><code># src/consensus/gate.py
+
+cmd = [
+    &quot;claude&quot;, &quot;--print&quot;,
+    &quot;--model&quot;, agent_config.model,
+    &quot;--system-prompt&quot;, system_prompt,
+    user_prompt,
+]
+
+result = subprocess.run(
+    cmd,
+    capture_output=True,
+    text=True,
+    timeout=agent_config.timeout_seconds,
+)</code></pre>
+<p>By default, agents run in parallel using
+<code>ThreadPoolExecutor</code> with <code>max_workers=3</code> – true
+independence, no shared state, no ability to anchor on each other’s
+conclusions:</p>
+<pre class="python"><code># src/consensus/gate.py
+
+if config.parallel_agents:
+    with ThreadPoolExecutor(max_workers=3) as executor:
+        future_to_role = {
+            executor.submit(
+                run_agent_validation, role_def, phase_name, target_path, config,
+            ): role_def
+            for role_def in roles
+        }
+
+        for future in as_completed(future_to_role):
+            role_def = future_to_role[future]
+            try:
+                vote = future.result()
+                votes.append(vote)
+            except Exception as e:
+                votes.append(Vote(
+                    role=role_def.role,
+                    outcome=VoteOutcome.FAIL,
+                    reasoning=f&quot;Agent execution failed: {e}&quot;,
+                    findings=[str(e)],
+                ))</code></pre>
+<p>There is a subtle but important detail here: the
+<code>except Exception</code> clause. If an agent crashes – out of
+memory, API timeout, malformed response – the framework defaults to
+FAIL. Not “skip this agent and check the other two.” Not “treat the
+crash as a PASS because the agent did not explicitly find anything
+wrong.” FAIL. The principle is that the absence of evidence is not
+evidence of absence.</p>
+<p>Each agent returns a structured JSON vote. The framework parses it
+into a Pydantic model:</p>
+<pre class="python"><code># src/consensus/models.py
+
+class Vote(BaseModel):
+    role: Role
+    outcome: VoteOutcome       # PASS or FAIL
+    reasoning: str             # 2-3 sentence summary
+    findings: list[str]        # specific issues found
+    evidence_paths: list[str]  # file paths, line numbers, command output
+    duration_seconds: float
+    voted_at: datetime = Field(default_factory=datetime.now)
+
+    def is_pass(self) -&gt; bool:
+        return self.outcome == VoteOutcome.PASS
+
+    def is_fail(self) -&gt; bool:
+        return self.outcome == VoteOutcome.FAIL</code></pre>
+<p>The <code>evidence_paths</code> field is not optional decoration.
+Without evidence, a PASS vote means nothing. “The code looks correct” is
+the exact phrase that missed the bug in the first place. “Line 926 uses
+<code>=</code> (assignment) which is correct because
+<code>textBlock.text</code> contains accumulated content per the Claude
+streaming format spec” – that is evidence.</p>
+<p>Unanimity is computed with a single line:</p>
+<pre class="python"><code>unanimous = all(v.is_pass() for v in votes)</code></pre>
+<p>If any agent’s JSON response fails to parse, the framework defaults
+to FAIL for safety – not PASS. Ambiguity blocks the gate:</p>
+<pre class="python"><code># src/consensus/gate.py
+
+except json.JSONDecodeError as e:
+    logger.error(&quot;Failed to parse %s vote JSON: %s&quot;, role.value, e)
+    return Vote(
+        role=role,
+        outcome=VoteOutcome.FAIL,
+        reasoning=f&quot;Vote response parsing failed: {e}&quot;,
+        findings=[&quot;Agent response was not valid JSON — treating as FAIL for safety&quot;],
+        duration_seconds=duration,
+    )</code></pre>
+<p>The <code>GateResult</code> model aggregates everything:</p>
+<pre class="python"><code># src/consensus/models.py
+
+class GateResult(BaseModel):
+    phase_name: str
+    gate_number: int
+    votes: list[Vote]
+    unanimous_pass: bool
+    evidence: list[Evidence]
+    fix_cycle_count: int
+
+    @classmethod
+    def from_votes(cls, phase_name, gate_number, votes, evidence=None, fix_cycle_count=0):
+        unanimous = all(v.is_pass() for v in votes)
+        return cls(
+            phase_name=phase_name,
+            gate_number=gate_number,
+            votes=votes,
+            unanimous_pass=unanimous,
+            evidence=evidence or [],
+            fix_cycle_count=fix_cycle_count,
+        )
+
+    def failing_agents(self) -&gt; list[Role]:
+        return [v.role for v in self.votes if v.is_fail()]
+
+    def all_findings(self) -&gt; list[str]:
+        findings: list[str] = []
+        for vote in self.votes:
+            if vote.is_fail():
+                findings.extend(vote.findings)
+        return findings</code></pre>
+<p>The <code>all_findings()</code> method aggregates every specific
+issue from every failing agent. This becomes the input to the fix cycle
+– a concrete, actionable list of what needs to change.</p>
+<pre class="mermaid"><code>flowchart TD
+    CP[Checkpoint Prompt] --&gt; Lead_In[Lead Agent]
+    CP --&gt; Alpha_In[Alpha Agent]
+    CP --&gt; Bravo_In[Bravo Agent]
+
+    subgraph lane_lead [Lead Lane]
+        Lead_In --&gt; Lead_Eval[Independent Evaluation]
+        Lead_Eval --&gt; Lead_Vote[&quot;Vote: outcome, reasoning, findings, evidence&quot;]
+    end
+
+    subgraph lane_alpha [Alpha Lane]
+        Alpha_In --&gt; Alpha_Eval[Independent Evaluation]
+        Alpha_Eval --&gt; Alpha_Vote[&quot;Vote: outcome, reasoning, findings, evidence&quot;]
+    end
+
+    subgraph lane_bravo [Bravo Lane]
+        Bravo_In --&gt; Bravo_Eval[Independent Evaluation]
+        Bravo_Eval --&gt; Bravo_Vote[&quot;Vote: outcome, reasoning, findings, evidence&quot;]
+    end
+
+    Lead_Vote --&gt; Unanimity{Unanimity Check}
+    Alpha_Vote --&gt; Unanimity
+    Bravo_Vote --&gt; Unanimity
+
+    Unanimity --&gt;|All PASS| Gate_Open[Gate Opens]
+    Gate_Open --&gt; Pipeline_Advance[Pipeline Advances]
+
+    Unanimity --&gt;|Any FAIL| Gate_Closed[Gate Stays Closed]
+    Gate_Closed --&gt; Fix_Cycle[Fix Cycle Triggered]
+    Fix_Cycle --&gt; Fix_Counter{fix_cycle count\nle max_fix_cycles 3}
+
+    Fix_Counter --&gt;|Within limit| Revalidate[All Three Re-validate]
+    Revalidate --&gt; Lead_In
+    Revalidate --&gt; Alpha_In
+    Revalidate --&gt; Bravo_In
+
+    Fix_Counter --&gt;|Exceeded limit| Hard_Failure[Hard Failure]</code></pre>
+<hr />
+<h3 id="the-fix-cycle-why-all-three-re-validate">The Fix Cycle: Why All
+Three Re-Validate</h3>
+<p>When a gate fails, the fix-and-retry loop is where the pattern earns
+its overhead cost. The critical design decision: after a fix is applied,
+ALL THREE agents re-validate, not just the one that failed.</p>
+<pre class="python"><code># src/consensus/gate.py
+
+def run_gate_with_fix_cycles(
+    phase_name, gate_number, target_path, config,
+    evidence_collector=None, max_fix_cycles=3, fix_callback=None,
+):
+    for cycle in range(max_fix_cycles + 1):
+        result = run_gate_check(
+            phase_name=phase_name,
+            gate_number=gate_number,
+            target_path=target_path,
+            config=config,
+            evidence_collector=evidence_collector,
+            fix_cycle_count=cycle,
+        )
+
+        if result.unanimous_pass:
+            return result
+
+        if cycle &gt;= max_fix_cycles:
+            logger.error(
+                &quot;Gate #%d exhausted all %d fix cycles — HARD FAILURE&quot;,
+                gate_number, max_fix_cycles,
+            )
+            return result
+
+        findings = result.all_findings()
+        if fix_callback and callable(fix_callback):
+            fixes_applied = fix_callback(findings)
+            if not fixes_applied:
+                return result
+        else:
+            return result
+
+        logger.info(&quot;Re-validating with ALL THREE agents after fix cycle %d...&quot;, cycle + 1)
+
+    return result</code></pre>
+<p>This catches the failure mode where a fix resolves the original issue
+but introduces a regression. The agent that previously passed might now
+fail on something the fix broke. You do not get to carry forward stale
+passing votes.</p>
+<p>In the ILS streaming fix, after Alpha flagged the <code>+=</code> bug
+and the index reset, the fix was implemented. Then all three re-ran.
+Alpha confirmed the code logic was correct (assignment, not append;
+index preserved). Bravo ran the app and verified clean single-token
+rendering. Lead cross-checked that both SDK and CLI execution paths used
+the same corrected handler. All three PASS. Gate opened.</p>
+<p>The <code>max_fix_cycles=3</code> default is deliberate. If three
+rounds of fix-and-revalidate do not resolve the issue, the problem is
+likely architectural – not something that incremental patches will fix.
+Hard failure forces the developer to step back and rethink the approach
+rather than entering an infinite fix loop.</p>
+<hr />
+<h3 id="four-more-bugs-the-consensus-caught">Four More Bugs the
+Consensus Caught</h3>
+<p>The <code>+=</code> bug is the most dramatic example, but the
+consensus pattern has caught several other issues across ILS and two
+other projects. Here are four that illustrate different failure
+modes.</p>
+<p><strong>Bug 2: The snake_case/camelCase Contract Mismatch.</strong>
+The Vapor backend was normalizing Claude Code’s <code>tool_use</code>
+field to <code>toolUse</code> before sending it to the iOS client. But
+the <code>ContentBlock</code> decoder only handled
+<code>"tool_use"</code>. Lead caught this – it was specifically looking
+for contract mismatches between layers. Alpha and Bravo both passed
+because the code was internally consistent on each side of the boundary.
+The bug only existed at the interface between two correct
+implementations.</p>
+<p><strong>Bug 3: The Silent Timeout Inheritance.</strong> The
+<code>ClaudeExecutorService</code> was passing its 300-second total
+timeout to the <code>Process</code> but not to the Python SDK wrapper.
+The SDK had its own internal timeout of 60 seconds. When Claude’s
+extended thinking exceeded 60 seconds, the SDK wrapper terminated the
+query, but the Swift process thought it had 300 seconds remaining. The
+result: a partial response followed by silence. Bravo caught this by
+mentally tracing the timeout chain across all five layers. Alpha missed
+it because each individual timeout value was reasonable in
+isolation.</p>
+<p><strong>Bug 4: The Memory Leak in SSE Reconnection.</strong> Each
+reconnection attempt created a new <code>Task</code> for the heartbeat
+watchdog but the old watchdog was not cancelled until <code>defer</code>
+unwound. If the connection failed fast enough (under 15 seconds), the
+old watchdog was still sleeping and the new one started – accumulating
+Tasks that all held strong references to
+<code>LastActivityTracker</code>. Alpha found this by tracing the
+lifecycle of <code>Task.detached</code> calls through reconnection
+paths. It was a classic “correct in the happy path, wrong in the error
+path” bug.</p>
+<p><strong>Bug 5: The Evidence Directory Race Condition.</strong> In the
+consensus framework itself, two agents running in parallel could attempt
+to create the same evidence subdirectory simultaneously. The
+<code>EvidenceCollector</code> calls
+<code>mkdir(parents=True, exist_ok=True)</code>, which is safe for the
+directory itself – but the subsequent file write could fail if two
+agents chose the same timestamp-based filename. Lead found this by
+examining the <code>record_inline</code> method and noting that the
+filename includes only <code>%H%M%S</code> granularity (seconds), and
+two parallel agents could easily write within the same second. The fix:
+append the role name to the filename.</p>
+<p>Each of these bugs shares a common trait: they are correct from at
+least one perspective. The contract mismatch is correct on both sides of
+the boundary. The timeout inheritance is correct in each layer. The
+memory leak is correct in the happy path. The race condition is correct
+for sequential execution. No single reviewer, human or AI, looking from
+one angle would necessarily flag them. Three independent angles, forced
+to agree, cover the gaps.</p>
+<hr />
+<h3 id="human-code-review-comparison">Human Code Review Comparison</h3>
+<p>The multi-agent consensus pattern maps directly to established
+practices in human software engineering. Understanding the parallel
+helps explain why it works.</p>
+<p><strong>Single reviewer</strong> is the equivalent of single-agent
+review. One person reads the code, applies their expertise, and either
+approves or requests changes. Industry data suggests a single reviewer
+catches 30-50% of defects, depending on expertise and code complexity.
+The single agent that said “looks correct” on the <code>+=</code> bug is
+not an outlier. It is the expected outcome for a novel interaction
+bug.</p>
+<p><strong>Pair programming</strong> adds a second perspective in real
+time. Two developers at one keyboard catch more than one developer alone
+– roughly 15% more defects according to the research. But the
+perspectives are not independent. The navigator anchors on the driver’s
+approach. They share context, share assumptions, and develop correlated
+blind spots during the session.</p>
+<p><strong>Formal inspection</strong> (Fagan inspection) is the closest
+human analog to multi-agent consensus. Three to five reviewers
+independently read the code before a meeting. Each reviewer uses a
+checklist calibrated to specific defect categories. Findings are
+collected and reconciled. The research consistently shows formal
+inspection catching 60-90% of defects – dramatically more than single
+reviewer or pair programming.</p>
+<p>The key insight from the formal inspection literature is the same one
+that drives multi-agent consensus: <strong>independence plus structure
+beats more of the same perspective.</strong> Two reviewers with
+independent checklists outperform four reviewers who all focus on the
+same concerns.</p>
+<p>The three-agent triad is a streamlined formal inspection. Lead brings
+the architectural checklist. Alpha brings the logic checklist. Bravo
+brings the behavioral checklist. They do not see each other’s findings
+before voting. The unanimity gate is the reconciliation meeting,
+compressed to a boolean.</p>
+<hr />
+<h3 id="the-cost-and-when-it-is-worth-it">The Cost and When It Is Worth
+It</h3>
+<p>The default configuration in <code>config.py</code> assigns models by
+role: Lead runs on Opus (deepest reasoning for architectural analysis),
+while Alpha and Bravo run on Sonnet (best coding model for detail
+work):</p>
+<pre class="python"><code># src/consensus/config.py
+
+@dataclass
+class ConsensusConfig:
+    lead: AgentConfig = field(default_factory=lambda: AgentConfig(model=&quot;opus&quot;))
+    alpha: AgentConfig = field(default_factory=lambda: AgentConfig(model=&quot;sonnet&quot;))
+    bravo: AgentConfig = field(default_factory=lambda: AgentConfig(model=&quot;sonnet&quot;))
+
+    phases: list[str] = field(default_factory=lambda: [
+        &quot;explore&quot;, &quot;audit&quot;, &quot;fix&quot;, &quot;verify&quot;,
+    ])
+    max_fix_cycles: int = 3
+    parallel_agents: bool = True</code></pre>
+<p>The pipeline defaults to four phases – explore, audit, fix, verify –
+with a maximum of 3 fix cycles per gate before hard failure. Running
+three agents in parallel (<code>parallel_agents: true</code> by default)
+means you pay 3x in compute but roughly 1x in wall clock time.</p>
+<p>Here is the cost breakdown per gate:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Model</th>
+<th>Input tokens (avg)</th>
+<th>Output tokens (avg)</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lead</td>
+<td>Opus</td>
+<td>~4,000</td>
+<td>~800</td>
+<td>~$0.07</td>
+</tr>
+<tr>
+<td>Alpha</td>
+<td>Sonnet</td>
+<td>~4,000</td>
+<td>~600</td>
+<td>~$0.03</td>
+</tr>
+<tr>
+<td>Bravo</td>
+<td>Sonnet</td>
+<td>~4,000</td>
+<td>~600</td>
+<td>~$0.03</td>
+</tr>
+<tr>
+<td><strong>Per gate</strong></td>
+<td></td>
+<td></td>
+<td></td>
+<td><strong>~$0.13-0.17</strong></td>
+</tr>
+</tbody>
+</table>
+<p>I have run this pattern across 3 projects with 10 blocking gates
+each. The cost per gate averages roughly $0.15. That means a full
+project audit with 10 gates costs about $1.50. A fix cycle adds another
+$0.15 per retry.</p>
+<p>For the ILS streaming bug specifically, the consensus pass that
+caught it cost minutes and cents. The alternative – a P2 visual
+duplication bug in a live product’s core chat interface – would have
+required a hotfix release, a TestFlight build, App Store review, and
+weeks of trust repair with early users who saw their chat messages
+stutter and duplicate.</p>
+<p>The calculus is simple: $1.50 in compute versus the cost of shipping
+a visible bug.</p>
+<p><strong>When to use three-agent consensus:</strong> - Complex state
+management with multiple interacting update mechanisms - Multiple system
+layers that must agree on data contracts - Bugs that would be
+immediately visible to users - Comprehensive audits across 50+ files -
+Any change to streaming, real-time, or event-driven code</p>
+<p><strong>When single-agent review is sufficient:</strong> - Isolated,
+low-risk changes (rename a variable, update a string) - Changes with no
+cross-component interaction - Documentation updates - Dependency version
+bumps</p>
+<hr />
+<h3 id="how-to-add-consensus-gates-to-your-project">How to Add Consensus
+Gates to Your Project</h3>
+<p>The companion repo ships as a pip-installable CLI. Here is how to
+integrate it into an existing project:</p>
+<p><strong>Step 1: Install and configure.</strong></p>
+<pre class="bash"><code>pip install -e .</code></pre>
+<p>Create a <code>consensus.yml</code> in your project root:</p>
+<pre class="yaml"><code>agents:
+  lead:
+    model: opus
+    timeout_seconds: 300
+  alpha:
+    model: sonnet
+    timeout_seconds: 300
+  bravo:
+    model: sonnet
+    timeout_seconds: 300
+
+pipeline:
+  phases:
+    - explore
+    - audit
+    - fix
+    - verify
+  max_fix_cycles: 3
+  parallel_agents: true
+
+gate:
+  require_unanimous: true
+  require_evidence: true</code></pre>
+<p><strong>Step 2: Run a single gate check to test.</strong></p>
+<pre class="bash"><code>consensus validate --target ./my-project --phase audit</code></pre>
+<p>This runs all three agents against your project for the audit phase
+and reports the result. Use this to iterate on your configuration before
+running the full pipeline.</p>
+<p><strong>Step 3: Run the full pipeline.</strong></p>
+<pre class="bash"><code>consensus run --target ./my-project</code></pre>
+<p>The pipeline progresses through explore, audit, fix, verify. Each
+phase has a gate. If a gate fails, the findings are reported and a fix
+cycle begins. State is saved after each gate so you can resume with
+<code>--resume</code> if interrupted.</p>
+<p><strong>Step 4: Customize the phase prompts.</strong></p>
+<p>The default prompts are generic. For maximum effectiveness, customize
+them for your project’s domain. Add project-specific patterns, known bug
+classes, and architectural constraints to the phase prompt templates in
+<code>consensus.yml</code>.</p>
+<p><strong>Step 5: Review the evidence.</strong></p>
+<pre class="bash"><code>consensus report --target ./my-project --format json</code></pre>
+<p>Evidence is stored in <code>.consensus/evidence/</code> organized by
+phase and role. The manifest includes every finding, every vote, and the
+evidence that supported each decision. This is your audit trail.</p>
+<hr />
+<h3 id="the-evidence-system-votes-without-proof-are-worthless">The
+Evidence System: Votes Without Proof Are Worthless</h3>
+<p>The <code>EvidenceCollector</code> is the infrastructure that makes
+votes meaningful. Without it, a PASS vote is just the agent saying
+“looks correct” – the exact phrase that missed the bug in the first
+place.</p>
+<pre class="python"><code># src/consensus/evidence.py
+
+class EvidenceCollector:
+    &quot;&quot;&quot;Collects and manages evidence artifacts for a consensus pipeline run.
+
+    Evidence is organized by phase and role:
+        evidence_dir/
+        ├── explore/
+        │   ├── lead/
+        │   ├── alpha/
+        │   └── bravo/
+        ├── audit/
+        │   ├── lead/
+        │   ├── alpha/
+        │   └── bravo/
+        └── ...
+    &quot;&quot;&quot;
+
+    def __init__(self, evidence_dir: Path) -&gt; None:
+        self.evidence_dir = evidence_dir
+        self.evidence_dir.mkdir(parents=True, exist_ok=True)
+        self._artifacts: list[Evidence] = []</code></pre>
+<p>The directory structure mirrors the pipeline: evidence is organized
+by phase, then by role within each phase. After a pipeline run, you can
+look at <code>evidence/audit/alpha/</code> and see exactly what Alpha
+found during the audit phase – specific file paths, line numbers, code
+analysis, and reasoning.</p>
+<p>Two kinds of evidence are collected. Inline evidence captures command
+output, code snippets, and analysis text:</p>
+<pre class="python"><code>def record_inline(self, evidence_type, role, phase_name, title, content):
+    safe_title = title.replace(&quot; &quot;, &quot;-&quot;).replace(&quot;/&quot;, &quot;-&quot;)[:50]
+    timestamp = datetime.now().strftime(&quot;%H%M%S&quot;)
+    filename = f&quot;{timestamp}-{safe_title}.txt&quot;
+    file_path = self._phase_role_dir(phase_name, role) / filename
+    file_path.write_text(content, encoding=&quot;utf-8&quot;)
+    # ...</code></pre>
+<p>File-based evidence captures screenshots, build logs, and other
+artifacts:</p>
+<pre class="python"><code>def record_file(self, evidence_type, role, phase_name, title, source_path):
+    if not source_path.exists():
+        raise FileNotFoundError(f&quot;Evidence source not found: {source_path}&quot;)
+    dest_dir = self._phase_role_dir(phase_name, role)
+    shutil.copy2(source_path, dest_path)
+    # ...</code></pre>
+<p>After a pipeline run, the evidence manifest provides a
+machine-readable index of every artifact:</p>
+<pre class="python"><code>def write_manifest(self) -&gt; Path:
+    manifest_data = []
+    for evidence in self._artifacts:
+        entry = {
+            &quot;type&quot;: evidence.evidence_type.value,
+            &quot;role&quot;: evidence.role.value,
+            &quot;phase&quot;: evidence.phase_name,
+            &quot;title&quot;: evidence.title,
+            &quot;has_content&quot;: evidence.content is not None,
+            &quot;file_path&quot;: str(evidence.file_path) if evidence.file_path else None,
+            &quot;collected_at&quot;: evidence.collected_at.isoformat(),
+        }
+        manifest_data.append(entry)
+    # Write to evidence_dir/manifest.json</code></pre>
+<p>The manifest is your audit trail. When someone asks “how do you know
+this code is correct?” the answer is not “an AI said so.” The answer is
+“here are three independent analyses with specific file paths, line
+numbers, and reasoning, all agreeing, backed by 15 evidence artifacts
+you can inspect.”</p>
+<hr />
+<h3 id="the-pipeline-orchestrator-tying-it-all-together">The Pipeline
+Orchestrator: Tying It All Together</h3>
+<p>The <code>PipelineOrchestrator</code> runs the full multi-phase
+pipeline with state persistence and resumability:</p>
+<pre class="python"><code># src/consensus/orchestrator.py
+
+class PipelineOrchestrator:
+    def __init__(self, target_path: Path, config: ConsensusConfig):
+        self.target_path = target_path.resolve()
+        self.config = config
+        self.paths = config.resolve_paths(self.target_path)
+        self.evidence = EvidenceCollector(self.paths[&quot;evidence&quot;])
+
+        self.state = PipelineState(
+            target_path=str(self.target_path),
+            phases=[
+                Phase(
+                    name=name,
+                    description=config.phase_descriptions.get(name, &quot;&quot;),
+                    max_fix_cycles=config.max_fix_cycles,
+                )
+                for name in config.phases
+            ],
+        )
+
+    def run(self) -&gt; PipelineState:
+        for i, phase in enumerate(self.state.phases):
+            self.state.current_phase_index = i
+            if phase.status == PhaseStatus.PASSED:
+                continue  # Skip already-passed phases (for resume)
+
+            gate_result = self.run_phase(phase)
+
+            if not gate_result.unanimous_pass:
+                break  # Pipeline halted at failed gate
+
+        self.state.completed_at = datetime.now()
+        self.save_state()
+        self.evidence.write_manifest()
+        return self.state</code></pre>
+<p>State is saved to disk after every gate check. If the process is
+interrupted – laptop closing, network drop, out of memory – you can
+resume from the last completed phase with <code>--resume</code>:</p>
+<pre class="bash"><code>consensus run --target ./my-project --resume</code></pre>
+<p>The orchestrator reads the state file, skips passed phases, and
+continues from where it left off. This is essential for long-running
+audits across large codebases where a full pipeline run can take 20-30
+minutes.</p>
+<p>The final report prints a Rich-formatted table showing each phase’s
+status, gate count, fix cycles, and duration:</p>
+<pre class="bash"><code>$ consensus run --target ./my-project
+
+Consensus Pipeline: my-project
+Phases: explore → audit → fix → verify
+Agents: Lead (opus), Alpha (sonnet), Bravo (sonnet)
+
+Phase: explore
+  Running gate check #1 (fix cycle 0)...
+  Gate PASSED — all agents unanimous
+
+Phase: audit
+  Running gate check #2 (fix cycle 0)...
+  Gate FAILED — 1 agent(s) voted FAIL
+    - Alpha: FAIL — Line 926 uses += on accumulated text (should be =)
+  Entering fix cycle 1...
+  Re-validating with ALL THREE agents...
+  Gate PASSED — all agents unanimous
+
+Phase: fix
+  Running gate check #4 (fix cycle 0)...
+  Gate PASSED — all agents unanimous
+
+Phase: verify
+  Running gate check #5 (fix cycle 0)...
+  Gate PASSED — all agents unanimous
+
+All gates passed — pipeline complete!</code></pre>
+<hr />
+<h3 id="the-cli-running-it-in-practice">The CLI: Running It in
+Practice</h3>
+<p>The framework ships as a Click CLI with four commands:</p>
+<pre class="bash"><code># Run the full pipeline
+consensus run --target ./my-project --config consensus.yml
+
+# Run a single gate check for one phase
+consensus validate --target ./my-project --phase audit
+
+# Generate a report from the last run
+consensus report --target ./my-project --format json
+
+# Display the role definitions
+consensus roles
+
+# Show current configuration
+consensus show-config --config consensus.yml</code></pre>
+<p>The <code>validate</code> command is particularly useful during
+development. When you change a role’s system prompt or adjust its focus
+areas, you can re-run a single phase gate to see how the change affects
+the results without running the entire pipeline.</p>
+<hr />
+<h3 id="the-broader-principle">The Broader Principle</h3>
+<p>What makes this work is not the number three. It is two structural
+properties: independent verification and hard gates.</p>
+<p>Independent verification means each agent starts from scratch with no
+anchor on another agent’s conclusions. This is the AI equivalent of not
+showing one code reviewer another reviewer’s comments before they have
+formed their own opinion. It eliminates groupthink.</p>
+<p>Hard gates mean that “mostly passing” is not passing.
+Two-out-of-three does not open the gate. The unanimity requirement,
+implemented as <code>all(v.is_pass() for v in votes)</code>, eliminates
+the reviewer who waves something through because someone else already
+approved it.</p>
+<p>The <code>+=</code> operator was right there on line 926 for three
+days. It looked correct because the pattern – accumulate text in a
+streaming handler – should use append. The bug was that this particular
+text was already accumulated. A single perspective saw what it expected.
+Three independent perspectives, forced to agree, found what one would
+have shipped.</p>
+<p>The framework is small – six Python files, 700 lines of
+implementation, zero external dependencies beyond Pydantic and Click.
+The hard part is not the code. The hard part is accepting that your
+first reviewer, no matter how good, has blind spots that are
+structurally impossible to eliminate with more of the same
+perspective.</p>
+<figure>
+<img src="../visuals/svg/review-comparison.svg"
+alt="Bug Detection: Single Agent vs Consensus" />
+<figcaption aria-hidden="true">Bug Detection: Single Agent vs
+Consensus</figcaption>
+</figure>
+<p>Full framework with CLI, Pydantic models, and pipeline orchestrator:
+<a
+href="https://github.com/krzemienski/multi-agent-consensus">github.com/krzemienski/multi-agent-consensus</a></p>
+<p>Technical writeup with system diagrams: <a
+href="https://github.com/krzemienski/agentic-development-guide/tree/main/04-multi-agent-consensus">github.com/krzemienski/agentic-development-guide/tree/main/04-multi-agent-consensus</a></p>
+<p>#CodeQuality #AI #SoftwareEngineering #CodeReview
+#AgenticDevelopment</p>
+<hr />
+<p><em>Part 2 of 11 in the <a
+href="https://github.com/krzemienski/agentic-development-guide">Agentic
+Development</a> series.</em></p>
+
+<hr>
+<h2>Diagrams &amp; Visual Assets</h2>
+
+
+<div class="social-cards">
+<h3>Social Media Cards</h3>
+<p style="color:#94a3b8;font-size:0.9em;">Open <code>assets/twitter-card.html</code> and <code>assets/linkedin-card.html</code> in a browser to preview social cards.</p>
+</div>
+
+<div class="series-nav">
+<span>Agentic Development: 10 Lessons from 8,481 AI Coding Sessions</span>
+<span style="color:#64748b;">Post 02 of 11</span>
+</div>
+</article>
+</body>
+</html>

@@ -1,0 +1,1805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4 Failed Attempts to Call One API</title>
+<meta property="og:title" content="4 Failed Attempts to Call One API">
+<meta property="og:description" content="RunLoop vs NIO and the 3-line fix after 10 hours">
+<meta property="og:type" content="article">
+<meta property="og:image" content="assets/hero-card.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="4 Failed Attempts to Call One API">
+<meta name="twitter:description" content="RunLoop vs NIO and the 3-line fix after 10 hours">
+<meta name="author" content="Nick Krzemienski">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0a0a0a; color: #e2e8f0; line-height: 1.8; }
+  .hero-container { max-width: 1200px; margin: 0 auto; }
+  .hero-container > div { width: 100% !important; max-width: 100%; }
+  article { max-width: 780px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: 2.5em; font-weight: 800; color: #f8fafc; line-height: 1.2; margin: 0 0 16px; }
+  h2 { font-size: 1.75em; font-weight: 700; color: #f1f5f9; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #1e293b; }
+  h3 { font-size: 1.3em; font-weight: 600; color: #e2e8f0; margin: 32px 0 12px; }
+  h4 { font-size: 1.1em; font-weight: 600; color: #cbd5e1; margin: 24px 0 8px; }
+  p { margin: 0 0 16px; color: #cbd5e1; }
+  a { color: #818cf8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; background: #1e293b; color: #a5b4fc; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+  pre { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 20px; margin: 16px 0 24px; overflow-x: auto; }
+  pre code { background: none; padding: 0; color: #e2e8f0; font-size: 0.85em; line-height: 1.6; }
+  blockquote { border-left: 3px solid #6366f1; padding: 12px 20px; margin: 16px 0; background: rgba(99,102,241,0.05); border-radius: 0 8px 8px 0; }
+  blockquote p { color: #94a3b8; margin: 0; }
+  ul, ol { margin: 8px 0 16px 24px; color: #cbd5e1; }
+  li { margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; }
+  th { background: #1e293b; color: #f1f5f9; padding: 10px 16px; text-align: left; font-weight: 600; font-size: 0.9em; }
+  td { padding: 10px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.9em; }
+  tr:hover td { background: rgba(99,102,241,0.03); }
+  hr { border: none; border-top: 1px solid #1e293b; margin: 32px 0; }
+  img, svg { max-width: 100%; height: auto; border-radius: 8px; margin: 16px 0; }
+  .diagram { margin: 32px 0; padding: 24px; background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; overflow-x: auto; }
+  .diagram h4 { color: #64748b; font-size: 0.85em; font-weight: 500; margin: 0 0 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .diagram svg { display: block; margin: 0 auto; max-height: 600px; }
+  .meta { color: #64748b; font-size: 0.9em; margin: 8px 0 32px; }
+  .social-cards { display: flex; gap: 24px; flex-wrap: wrap; margin: 48px 0; padding: 24px; background: #0f172a; border-radius: 12px; }
+  .social-cards h3 { width: 100%; color: #64748b; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px; }
+  .social-cards iframe { border: 1px solid #1e293b; border-radius: 8px; }
+  .series-nav { display: flex; justify-content: space-between; padding: 24px; background: #0f172a; border-radius: 12px; margin-top: 48px; }
+  .series-nav a { color: #818cf8; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="hero-container"><div style="width:1200px;height:630px;background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%);display:flex;flex-direction:column;justify-content:center;padding:0 80px;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif;position:relative;overflow:hidden;">
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:radial-gradient(circle at 1px 1px,rgba(245,158,11,0.15) 1px,transparent 0);background-size:40px 40px;"></div>
+  <div style="position:absolute;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(245,158,11,0.2) 0%,transparent 70%);border-radius:50%;"></div>
+  <div style="position:relative;z-index:1;display:inline-block;background:rgba(245,158,11,0.2);border:1px solid rgba(245,158,11,0.4);border-radius:20px;padding:6px 16px;margin-bottom:24px;width:fit-content;">
+    <span style="color:rgba(245,158,11,0.9);font-size:14px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">LESSON 05 OF 10 · SDK BRIDGE</span>
+  </div>
+  <h1 style="position:relative;z-index:1;color:#f1f5f9;font-size:46px;font-weight:800;line-height:1.15;margin:0 0 20px 0;max-width:900px;">4 Failed Attempts to Call One API</h1>
+  <p style="position:relative;z-index:1;color:#94a3b8;font-size:20px;line-height:1.5;margin:0 0 32px 0;max-width:700px;">RunLoop vs NIO, OAuth vs API keys, and the 3-line fix after 10 hours</p>
+  <div style="position:relative;z-index:1;display:flex;align-items:center;gap:12px;">
+    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,rgb(245,158,11),#8b5cf6);display:flex;align-items:center;justify-content:center;">
+      <span style="color:white;font-weight:700;font-size:16px;">NK</span>
+    </div>
+    <div>
+      <div style="color:#f1f5f9;font-size:14px;font-weight:600;">Nick Krzemienski</div>
+      <div style="color:#64748b;font-size:13px;">March 2026 · Agentic Development Series</div>
+    </div>
+  </div>
+</div></div>
+<article>
+<p class="meta">Lesson 05 of 10 · Nick Krzemienski · March 2026 · Agentic Development Series</p>
+<h2 id="layers-to-call-an-api">5 Layers to Call an API</h2>
+<p>I needed to call one API. It took five layers, four failed attempts,
+and thirty hours of debugging to get there.</p>
+<p>This is the story of connecting an iOS app to Claude Code – a problem
+that sounds like it should take an afternoon and instead became a
+two-week debugging odyssey. The working solution has five layers of
+indirection between the user tapping “Send” and Claude receiving the
+prompt. Every layer exists because I tried to remove it and failed.</p>
+<p>The companion repo has all four failed attempts with real code and
+the working bridge: <a
+href="https://github.com/krzemienski/claude-sdk-bridge">github.com/krzemienski/claude-sdk-bridge</a></p>
+<hr />
+<h3 id="the-four-failures-at-a-glance">The Four Failures at a
+Glance</h3>
+<p>Before diving into the details, here is the timeline of what went
+wrong, when, and why. Four approaches, each with a different class of
+failure. The failures are instructive because they illustrate four
+distinct categories of integration problems: authentication boundaries,
+runtime paradigm mismatches, language ecosystem friction, and ambient
+environment contamination.</p>
+<pre class="mermaid"><code>timeline
+    title Four Failed Attempts to Call One API
+    section Attempt 1 : Direct API
+        Day 0.5 : anthropic.AuthenticationError
+             : No API key provided
+             : Claude Code uses OAuth, not ANTHROPIC_API_KEY
+             : Clear error, quick abandonment
+    section Attempt 2 : ClaudeCodeSDK in Vapor
+        Day 1-2.5 : Zero error messages
+             : AsyncStream never yields
+             : RunLoop/NIO impedance mismatch
+             : PassthroughSubject.send() called but subscriber never fires
+             : Three workarounds attempted, all deadlock
+    section Attempt 3 : JavaScript SDK
+        Day 2.5-3 : Same AuthenticationError
+             : OAuth wall identical to Attempt 1
+             : Added Node.js runtime for nothing
+             : Env var inheritance issues in Agent SDK
+    section Attempt 4 : CLI Subprocess
+        Day 3-4.5 : Works in terminal, silent failure in Claude Code
+             : CLAUDECODE=1 nesting detection
+             : Zero-byte stdout response
+             : Three-line fix after 10 hours
+             : Bonus: NSInvalidArgumentException race condition</code></pre>
+<p>Each attempt taught something different. Attempt 1 was a clear
+boundary violation – the authentication model did not match. Attempt 2
+was an architectural incompatibility so deep it produced zero diagnostic
+output. Attempt 3 was a pattern-recognition failure – I should have
+recognized the OAuth wall from Attempt 1 before writing any code.
+Attempt 4 was a context-contamination bug that only manifests in a
+specific runtime environment. Together, they map the full landscape of
+integration failure modes.</p>
+<p>The total debugging time across all four attempts was approximately
+thirty hours. Attempt 2 consumed fourteen of those hours by itself,
+largely because the failure mode was silence rather than an error. Here
+is a more detailed breakdown of where time went:</p>
+<table>
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 15%" />
+<col style="width: 28%" />
+<col style="width: 35%" />
+</colgroup>
+<thead>
+<tr>
+<th>Attempt</th>
+<th>Hours</th>
+<th>Failure Mode</th>
+<th>Diagnosability</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1: Direct API</td>
+<td>4</td>
+<td>Clear error message</td>
+<td>High – error tells you exactly what’s wrong</td>
+</tr>
+<tr>
+<td>2: ClaudeCodeSDK</td>
+<td>14</td>
+<td>Zero output, no errors</td>
+<td>Near-zero – binary search through framework internals</td>
+</tr>
+<tr>
+<td>3: JS SDK</td>
+<td>2</td>
+<td>Same error as Attempt 1</td>
+<td>High, but should have been caught by pattern recognition</td>
+</tr>
+<tr>
+<td>4: CLI Subprocess</td>
+<td>10</td>
+<td>Works in one context, fails silently in another</td>
+<td>Low – environment-dependent, invisible variables</td>
+</tr>
+</tbody>
+</table>
+<p>The diagnosability column is the most important insight. Hours spent
+correlate inversely with diagnosability. Attempt 1 had a clear error and
+took half a day. Attempt 2 had zero diagnostic output and took two full
+days. The lesson: when evaluating an integration approach, estimate the
+debugging cost of its failure mode, not just its success path.</p>
+<hr />
+<h3
+id="attempt-1-the-obvious-approach-and-why-it-dies-immediately">Attempt
+1: The Obvious Approach (And Why It Dies Immediately)</h3>
+<p>When you want to call an API from an app, the obvious architecture
+is: app calls API. Three lines of meaningful code. Here is what that
+looks like:</p>
+<pre class="python"><code># From: failed-attempts/01-direct-api/attempt.py
+
+client = anthropic.Anthropic()
+
+with client.messages.stream(
+    model=&quot;claude-sonnet-4-20250514&quot;,
+    max_tokens=4096,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+) as stream:
+    for text in stream.text_stream:
+        collected_text += text
+        print(text, end=&quot;&quot;, flush=True)</code></pre>
+<p>Clean. Elegant. Dead on arrival.</p>
+<p>The error is immediate and clear:</p>
+<pre><code>anthropic.AuthenticationError: No API key provided.
+Set ANTHROPIC_API_KEY environment variable or pass api_key parameter.</code></pre>
+<p>Claude Code does not use API keys. It uses browser-based OAuth
+authentication. When you first run <code>claude</code> in a terminal, it
+opens a browser window, you log in through Anthropic’s website, and the
+CLI stores OAuth tokens in <code>~/.claude/</code>. These tokens are
+session tokens – they have expiration, they get refreshed automatically,
+and they are managed entirely inside the CLI’s runtime. There is no
+<code>ANTHROPIC_API_KEY</code> environment variable. There is no way to
+extract the OAuth tokens through a public API. The CLI is the
+gatekeeper.</p>
+<p>You could ask users to create a separate API key through the
+Anthropic Console at <code>console.anthropic.com</code>. But that
+defeats the purpose of building a client for Claude Code. Users would
+need separate billing (Claude Code uses Claude Max or Pro subscriptions;
+the API uses pay-per-token billing). They would lose access to Claude
+Code features – tools, MCP servers, project context, system prompts from
+<code>CLAUDE.md</code> files. They would pay twice for the same
+capability. The whole point of the iOS client is to extend Claude Code
+to mobile, not to build a separate product that happens to call the same
+model.</p>
+<p>The full error handler in the companion repo captures this
+clearly:</p>
+<pre class="python"><code># From: failed-attempts/01-direct-api/attempt.py
+
+try:
+    result = asyncio.run(stream_response(prompt))
+    print(f&quot;\n\nFull response: {result}&quot;)
+except anthropic.AuthenticationError as e:
+    print(f&quot;\nAuthentication failed: {e}&quot;, file=sys.stderr)
+    print(
+        &quot;Claude Code uses OAuth, not API keys. &quot;
+        &quot;ANTHROPIC_API_KEY is not available.&quot;,
+        file=sys.stderr,
+    )
+    sys.exit(1)</code></pre>
+<p>Half a day lost. The least painful failure on the list, because at
+least the error message was clear and the root cause was immediately
+understandable. The authentication boundary between Claude Code’s OAuth
+flow and the Anthropic API’s key-based flow is fundamental. No amount of
+clever engineering bridges it from the consumer side.</p>
+<p>The lesson from Attempt 1 is simple but important: when building a
+client for a tool that manages its own authentication, you must flow
+through that tool’s auth chain. There is no shortcut. The tool owns the
+tokens, the tool manages refresh, and the tool decides what capabilities
+those tokens unlock. Working around the auth chain means working without
+the capabilities the auth chain provides.</p>
+<hr />
+<h3
+id="attempt-2-the-silent-failure-two-days-zero-error-messages">Attempt
+2: The Silent Failure (Two Days, Zero Error Messages)</h3>
+<p>Attempt 2 was the one that nearly broke me. Anthropic ships a Swift
+SDK – ClaudeCodeSDK – designed for exactly this scenario. Same language
+as our backend (Swift). Same ecosystem (Apple platforms). It wraps the
+Claude CLI process and provides a publisher-based streaming interface
+using Combine’s <code>PassthroughSubject</code>. It should have
+worked.</p>
+<pre class="swift"><code>// From: failed-attempts/02-claude-code-sdk/attempt.swift
+
+func attemptClaudeCodeSDK(req: Request) async throws -&gt; Response {
+    let claude = ClaudeCodeProcess()
+    claude.arguments = [&quot;-p&quot;, &quot;--output-format&quot;, &quot;stream-json&quot;]
+
+    let stream = claude.stream(prompt: &quot;Say hello&quot;)
+
+    var response = &quot;&quot;
+    for try await chunk in stream {
+        response += chunk  // Never reached
+    }
+
+    return Response(status: .ok, body: .init(string: response))
+}</code></pre>
+<p>Nothing happened. No errors. No crashes. No output. The
+<code>AsyncStream</code> returned by the SDK simply never yielded a
+single value. The <code>for try await</code> loop ran forever, waiting
+for data that would never arrive. No timeout fired. No error was thrown.
+The process sat there, silently consuming resources and returning
+nothing.</p>
+<p>This is the worst kind of bug – the kind that gives you nothing to
+work with. A crash gives you a stack trace. An error gives you a
+message. Even a wrong result gives you something to diff against
+expectations. Silence gives you nothing except the slow realization that
+you are going to have to instrument every layer yourself.</p>
+<p>The debugging process for this attempt is worth documenting in detail
+because it illustrates how you diagnose a zero-output failure.</p>
+<p><strong>Hour 1-2: Verify the SDK is installed and callable.</strong>
+I wrote a standalone macOS command-line tool (not Vapor) that imports
+<code>ClaudeCodeSDK</code> and calls <code>stream()</code>. It worked.
+The stream yielded data. This confirmed the SDK was functional in
+isolation.</p>
+<p><strong>Hour 3-4: Verify the Vapor route handler reaches the SDK
+call.</strong> Added <code>print()</code> before and after the
+<code>ClaudeCodeProcess()</code> initialization. Both printed. The SDK
+was being initialized inside Vapor. But the <code>for try await</code>
+never yielded.</p>
+<p><strong>Hour 5-8: Instrument the SDK internals.</strong> Downloaded
+the ClaudeCodeSDK source. Added <code>print()</code> inside
+<code>readabilityHandler</code>. It fired. Data was being read from
+stdout. Added <code>print()</code> inside
+<code>PassthroughSubject.send()</code>. It was called with actual data
+bytes. The publisher was sending. But the subscriber was not
+receiving.</p>
+<p><strong>Hour 9-11: Narrow the gap.</strong> The data entered the
+Combine pipeline via <code>send()</code> but never exited to the
+<code>AsyncStream</code> continuation. The subscriber was registered.
+The publisher was sending. The delivery was queued. But no thread was
+processing the delivery queue. This is when I started reading about
+<code>RunLoop</code> scheduling in Combine.</p>
+<p><strong>Hour 12-14: Understand the root cause and attempt
+workarounds.</strong> Three workarounds attempted (detailed below), all
+failed. The root cause was clear but unfixable without abandoning the
+SDK entirely.</p>
+<hr />
+<h3
+id="runloop-vs-nio-eventloop-a-deep-dive-into-paradigm-incompatibility">RunLoop
+vs NIO EventLoop: A Deep Dive into Paradigm Incompatibility</h3>
+<p>To understand why the SDK fails silently, you need to understand two
+competing concurrency paradigms in the Apple ecosystem that happen to
+share a process but never share a thread.</p>
+<p><strong>RunLoop</strong> is Apple’s original event processing
+mechanism, dating back to NeXTSTEP. Every <code>Thread</code> can have
+an associated <code>RunLoop</code>. The main thread always has one.
+<code>RunLoop</code> processes input sources, timers, and observer
+callbacks in a loop. Critically for this bug,
+<code>FileHandle.readabilityHandler</code> dispatches through
+<code>RunLoop</code>, and Combine’s <code>PassthroughSubject</code>
+delivers events through <code>RunLoop</code> scheduling.</p>
+<p><strong>SwiftNIO EventLoop</strong> is a completely separate event
+processing system. NIO was built from scratch for high-performance
+server workloads. It uses its own <code>EventLoop</code> protocol that
+runs on dedicated NIO-managed threads. These threads never pump
+<code>RunLoop</code>. They have their own scheduling, their own I/O
+multiplexing (using <code>epoll</code> on Linux, <code>kqueue</code> on
+macOS), and their own callback dispatch.</p>
+<p>The distinction is not just academic. It means that code written for
+one paradigm is fundamentally incompatible with the other, even though
+they run in the same process, on the same machine, sharing the same
+memory space. They are two independent event processing systems
+coexisting without interaction.</p>
+<p>Here is a concrete comparison of how each paradigm handles the same
+operation – reading data from a file descriptor:</p>
+<table>
+<colgroup>
+<col style="width: 36%" />
+<col style="width: 30%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Operation</th>
+<th>RunLoop</th>
+<th>SwiftNIO</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Register for data</td>
+<td><code>FileHandle.readabilityHandler</code></td>
+<td><code>channel.pipeline.addHandler()</code></td>
+</tr>
+<tr>
+<td>Scheduling mechanism</td>
+<td><code>RunLoop.current.run()</code> on thread</td>
+<td><code>EventLoop.execute()</code> on NIO thread</td>
+</tr>
+<tr>
+<td>Callback delivery</td>
+<td><code>RunLoop</code> iteration picks up pending callbacks</td>
+<td><code>EventLoop</code> dequeues and executes tasks</td>
+</tr>
+<tr>
+<td>Thread requirement</td>
+<td>Must run on a thread that pumps <code>RunLoop</code></td>
+<td>Must run on a NIO-managed <code>EventLoop</code> thread</td>
+</tr>
+<tr>
+<td>Cross-paradigm bridge</td>
+<td>None built-in</td>
+<td>None built-in</td>
+</tr>
+</tbody>
+</table>
+<p>When our Vapor backend receives an HTTP request, the route handler
+runs on a NIO <code>EventLoop</code> thread. When that handler calls the
+ClaudeCodeSDK, the SDK does the following internally:</p>
+<ol type="1">
+<li>Creates a <code>Process</code> (the Claude CLI subprocess)</li>
+<li>Attaches a <code>Pipe</code> to stdout</li>
+<li>Sets <code>pipe.fileHandleForReading.readabilityHandler</code> – a
+closure that fires when data is available</li>
+<li>Inside that closure, calls <code>passthrough.send(data)</code> on a
+Combine <code>PassthroughSubject</code></li>
+<li>The <code>PassthroughSubject</code> has a subscriber that maps data
+into the <code>AsyncStream</code>’s continuation</li>
+</ol>
+<p>Steps 1-4 work correctly. The process spawns. Claude receives the
+prompt and generates a response. Bytes arrive on stdout. The
+<code>readabilityHandler</code> fires and reads the data. The
+<code>PassthroughSubject.send()</code> call executes. I verified this by
+adding logging at every layer – <code>send()</code> is called with the
+correct data.</p>
+<p>Step 5 never happens. The Combine subscriber is scheduled for
+delivery on <code>RunLoop</code>. The current thread is a NIO
+<code>EventLoop</code> thread. NIO threads do not pump
+<code>RunLoop</code>. The delivery is queued but never executed. The
+data exists in memory, read and dispatched, but it vanishes into a
+scheduling void between two paradigms that share a process but not an
+execution model.</p>
+<pre class="mermaid"><code>flowchart LR
+    subgraph RunLoop[&quot;RunLoop Thread&quot;]
+        FH[&quot;FileHandle.readabilityHandler&quot;]
+        PS[&quot;PassthroughSubject.send()&quot;]
+        SUB[&quot;Combine Subscriber&quot;]
+        FH --&gt; PS --&gt; SUB
+    end
+
+    subgraph NIOLoop[&quot;NIO EventLoop Thread&quot;]
+        REQ[&quot;Incoming HTTP Request&quot;]
+        HAND[&quot;Route Handler&quot;]
+        RESP[&quot;HTTP Response&quot;]
+        REQ --&gt; HAND --&gt; RESP
+    end
+
+    PS -.-&gt;|&quot;Never crosses&quot;| HAND
+
+    note1[&quot;The Impedance Mismatch\nRunLoop publishes but NIO never pumps it&quot;]</code></pre>
+<p>I tried three workarounds, each failing in a different way.</p>
+<p><strong>Workaround 1: Manually pump RunLoop on a background
+thread.</strong> Create a <code>Thread</code>, give it a
+<code>RunLoop</code>, add a <code>Port</code> to keep it alive, call
+<code>runLoop.run()</code>. Result: deadlock. The NIO
+<code>EventLoop</code> thread and the <code>RunLoop</code> thread
+contend for shared resources. The async/await bridge between NIO and the
+<code>RunLoop</code>-backed stream creates a circular wait.</p>
+<pre class="swift"><code>// From: failed-attempts/02-claude-code-sdk/attempt.swift
+
+func workaround1_manualRunLoop() {
+    let thread = Thread {
+        let runLoop = RunLoop.current
+        runLoop.add(Port(), forMode: .default)
+        runLoop.run()  // Blocks forever, doesn&#39;t help NIO
+    }
+    thread.start()
+}</code></pre>
+<p>The deadlock manifested as a hang: the HTTP request never returned,
+the NIO event loop stalled, and after 60 seconds the client connection
+timed out. No error. No crash. Just a frozen connection. The cause: the
+<code>async/await</code> bridge between NIO’s concurrency model and the
+<code>RunLoop</code>-backed <code>AsyncStream</code> required both
+threads to yield to each other, creating a cycle where each waited for
+the other to produce data.</p>
+<p><strong>Workaround 2: Wrap subscription in
+<code>DispatchQueue.main.async</code>.</strong> The idea was to move the
+subscription to the main queue where <code>RunLoop</code> is always
+running. Result: the events dispatched, but the Combine pipeline still
+internally depends on <code>RunLoop</code> scheduling for the subscriber
+callback. Moving the subscription setup does not change where delivery
+happens. The silent failure moved to a different layer.</p>
+<pre class="swift"><code>// From: failed-attempts/02-claude-code-sdk/attempt.swift
+
+func workaround2_dispatchMain() {
+    DispatchQueue.main.async {
+        // subscriber.receive still requires RunLoop scheduling
+        // This just moves the problem, doesn&#39;t solve it
+    }
+}</code></pre>
+<p>On a server, there is no “main thread” in the UIKit sense. Vapor’s
+main thread is itself a NIO event loop.
+<code>DispatchQueue.main.async</code> does dispatch to the main queue,
+but the main queue’s <code>RunLoop</code> is not being pumped by NIO
+either. This approach works in a UIKit app because
+<code>UIApplication.main</code> pumps the main <code>RunLoop</code>
+continuously. In a Vapor server, nobody pumps any <code>RunLoop</code>.
+Ever.</p>
+<p><strong>Workaround 3: Dedicated <code>Thread</code> with its own
+<code>RunLoop</code>.</strong> Create a thread, pump its
+<code>RunLoop</code>, set up the entire SDK subscription on that thread.
+Result: event ordering issues. Combine’s internal scheduling does not
+guarantee delivery to the correct thread when the publisher and
+subscriber are on different <code>RunLoop</code> instances. Some events
+arrived. Some did not. The ordering was non-deterministic. Under load,
+deadlocks appeared.</p>
+<pre class="swift"><code>// From: failed-attempts/02-claude-code-sdk/attempt.swift
+
+func workaround3_dedicatedThread() {
+    let runLoopThread = Thread {
+        let loop = RunLoop.current
+        // Even with a dedicated RunLoop, Combine&#39;s internal scheduling
+        // doesn&#39;t guarantee delivery to the correct thread
+        loop.run()
+    }
+    runLoopThread.start()
+}</code></pre>
+<p>The non-determinism was the final nail. Under testing, roughly 60% of
+events arrived correctly. The other 40% were either dropped or arrived
+out of order. For a streaming chat interface where token order matters,
+even 1% dropped events is unacceptable. The approach was fundamentally
+unreliable.</p>
+<p>None of them worked because this is not a bug – it is an
+architectural incompatibility. The SDK was designed for client-side
+Apple applications where <code>RunLoop</code> is always available (UIKit
+runs on <code>RunLoop</code>). It was not designed for server-side
+frameworks like Vapor where <code>RunLoop</code> is never pumped. The
+fix is not to make <code>RunLoop</code> work inside NIO. The fix is to
+bypass <code>RunLoop</code> entirely.</p>
+<p>Two full days. Most of that time was spent verifying the SDK was
+receiving data – adding <code>print()</code> statements at every layer,
+confirming <code>PassthroughSubject.send()</code> was being called,
+slowly narrowing the gap to the subscriber side. The silence was the
+hardest part. If the SDK had thrown an error or logged a warning –
+“Combine subscriber not receiving events; possible RunLoop scheduling
+issue” – this would have been a thirty-minute fix. Instead, it was two
+days of binary search through a framework’s internals.</p>
+<p>The lesson here extends beyond this specific bug. When integrating
+two frameworks that each own their concurrency model, the failure mode
+is not “throws an error” – it is “silently drops events.” The data
+enters one paradigm and never exits to the other. This is a class of
+bugs that cannot be caught by error handling because no error occurs.
+The only defense is understanding both paradigms deeply enough to know
+where the boundary fails.</p>
+<p>Any library that assumes <code>RunLoop</code> availability is quietly
+incompatible with server-side Swift. Apple’s documentation treats
+<code>RunLoop</code> as the default scheduling mechanism for Foundation
+callbacks. But modern Swift server frameworks – Vapor, Hummingbird,
+anything on SwiftNIO – use cooperative task executors and NIO event
+loops. This is documented nowhere as a compatibility concern. It
+manifests only at runtime, as silence.</p>
+<hr />
+<h3 id="attempt-3-the-wrong-language">Attempt 3: The Wrong Language</h3>
+<p>Attempt 3 was the JavaScript SDK. The reasoning was: if the Swift SDK
+fails because of RunLoop/NIO, maybe a different language SDK avoids that
+problem entirely. The <code>@anthropic-ai/sdk</code> npm package for
+Node.js.</p>
+<pre class="javascript"><code>// From: failed-attempts/03-js-sdk/attempt.js
+
+const client = new Anthropic();
+
+const stream = await client.messages.stream({
+    model: &quot;claude-sonnet-4-20250514&quot;,
+    max_tokens: 4096,
+    messages: [{ role: &quot;user&quot;, content: prompt }],
+});</code></pre>
+<p>Same error. Different language. The JavaScript SDK hits the same
+OAuth wall as Attempt 1. It expects <code>ANTHROPIC_API_KEY</code> as an
+environment variable or constructor parameter. Claude Code’s OAuth
+tokens are not accessible to third-party SDK consumers regardless of
+language.</p>
+<p>The exact error from the JS SDK was slightly different in formatting
+but identical in substance:</p>
+<pre><code>Error: 401 {&quot;type&quot;:&quot;error&quot;,&quot;error&quot;:{&quot;type&quot;:&quot;authentication_error&quot;,&quot;message&quot;:&quot;invalid x-api-key&quot;}}</code></pre>
+<p>There was a secondary path worth exploring: the
+<code>@anthropic-ai/claude-agent-sdk</code> npm package, which wraps the
+Claude CLI similarly to the Python Agent SDK. But it inherits the parent
+process environment, including <code>CLAUDECODE=1</code>, which triggers
+the same nesting detection that killed Attempt 4. And it adds Node.js as
+a runtime dependency to a Swift backend that has no other JavaScript
+dependencies – an operational overhead for the sole purpose of calling
+one API.</p>
+<pre class="javascript"><code>// From: failed-attempts/03-js-sdk/attempt.js
+
+async function streamWithAgentSDK(prompt) {
+  const { query } = await import(&quot;@anthropic-ai/claude-agent-sdk&quot;);
+
+  const stream = query({
+    prompt,
+    options: {
+      include_partial_messages: true,
+    },
+  });
+
+  for await (const message of stream) {
+    if (message.type === &quot;assistant&quot;) {
+      for (const block of message.content) {
+        if (block.type === &quot;text&quot;) {
+          process.stdout.write(block.text);
+        }
+      }
+    }
+  }
+}</code></pre>
+<p>A few hours wasted before recognizing the pattern and moving on. This
+attempt was a failure of pattern recognition – I should have seen the
+OAuth boundary from Attempt 1 and immediately asked “does this SDK
+authenticate differently?” before writing a single line of code. It does
+not. The authentication mechanism is the same across all language SDKs.
+The only path through the OAuth wall is the CLI itself.</p>
+<p>The operational overhead argument is worth expanding. Adding Node.js
+to a Swift backend means:</p>
+<ol type="1">
+<li><strong>Runtime management</strong>: Installing and maintaining
+<code>node</code>, <code>npm</code>, <code>package.json</code>, and
+<code>node_modules</code> on every deployment target.</li>
+<li><strong>Dependency surface</strong>: The <code>node_modules</code>
+directory for <code>@anthropic-ai/sdk</code> alone pulls in dozens of
+transitive dependencies, each a potential security and compatibility
+concern.</li>
+<li><strong>Subprocess complexity</strong>: Spawning a Node.js process
+from Swift involves the same <code>Process</code>/<code>Pipe</code>
+machinery as spawning Python, but with a heavier runtime and more
+configuration (module resolution, ES modules vs CommonJS, etc.).</li>
+<li><strong>Debugging surface</strong>: When something goes wrong, you
+are debugging across Swift, NIO, GCD, Node.js’s event loop, and npm’s
+module system simultaneously.</li>
+</ol>
+<p>Python avoids all of these because it is pre-installed on macOS, the
+<code>claude-agent-sdk</code> pip package has minimal dependencies, and
+the subprocess interface (<code>sys.stdout.write</code> +
+<code>sys.stdout.flush</code>) is as simple as I/O gets. The choice
+between languages for the bridge layer is not about capability – both
+can do the job – it is about operational complexity and the debugging
+cost of failures.</p>
+<hr />
+<h3 id="attempt-4-three-lines-ten-hours">Attempt 4: Three Lines, Ten
+Hours</h3>
+<p>Attempt 4 got tantalizingly close. Bypass all SDKs. Spawn the Claude
+CLI directly as a <code>Process</code> (formerly <code>NSTask</code>)
+with GCD-based stdout reading. No <code>RunLoop</code> dependency, no
+Combine, just <code>DispatchQueue</code> handlers on a
+<code>Pipe</code>. This approach should have no paradigm mismatch
+because it uses GCD dispatch queues, which NIO can interoperate
+with.</p>
+<p>It worked perfectly from a standalone terminal. It failed silently
+when running inside an active Claude Code session.</p>
+<pre class="swift"><code>// From: failed-attempts/04-cli-subprocess/attempt.swift
+
+func executeClaudeDirectly(prompt: String) async throws -&gt; String {
+    let process = Process()
+    process.executableURL = URL(fileURLWithPath: &quot;/usr/local/bin/claude&quot;)
+    process.arguments = [&quot;-p&quot;, prompt, &quot;--output-format&quot;, &quot;stream-json&quot;]
+
+    let stdoutPipe = Pipe()
+    process.standardOutput = stdoutPipe
+
+    // BUG: This inherits ALL environment variables from the parent process,
+    // including CLAUDECODE=1 and CLAUDE_CODE_* if running inside Claude Code.
+    // The child Claude CLI detects these and silently refuses to execute.
+
+    try process.run()
+    process.waitUntilExit()
+    // ...
+}</code></pre>
+<p>The symptom: Claude CLI exits immediately with no output. No error on
+stderr. No exit code error. Just a zero-byte response from stdout. The
+NDJSON parser interprets this as an empty stream. The caller gets
+nothing back. From the outside, it looks identical to “Claude had
+nothing to say” – a plausible but incorrect explanation that cost me
+hours of wrong-direction debugging.</p>
+<p>Here is a detailed log of the debugging path, because it illustrates
+how environment-dependent bugs resist systematic diagnosis:</p>
+<p><strong>Hour 1-2: Verify the command works.</strong> Open a terminal.
+Run <code>claude -p "Say hello" --output-format stream-json</code>.
+Works perfectly. JSON lines stream to stdout. This confirms the CLI, the
+model, and the authentication chain all function.</p>
+<p><strong>Hour 3-4: Verify the Swift Process works.</strong> Write a
+standalone Swift script that spawns <code>claude</code> via
+<code>Process</code>. Works perfectly. Same JSON output. This confirms
+<code>Process</code>, <code>Pipe</code>, and GCD reading all
+function.</p>
+<p><strong>Hour 5-6: Verify it works inside Vapor.</strong> Add the same
+code to a Vapor route handler. Test from a terminal:
+<code>curl localhost:9999/api/v1/chat/stream -d '{"prompt":"Say hello"}'</code>.
+Works. JSON streams. Everything looks correct.</p>
+<p><strong>Hour 7-8: Deploy and test in production context.</strong>
+Start the Vapor backend from within a Claude Code session (because I am
+developing the backend with Claude Code). Run the same curl command.
+Zero-byte response. No error. No stderr. The CLI exits immediately.</p>
+<p><strong>Hour 8-9: Wrong direction.</strong> Suspected PATH issues.
+Suspected working directory issues. Suspected file descriptor limits.
+Added extensive logging for <code>process.arguments</code>,
+<code>process.currentDirectoryURL</code>,
+<code>process.environment</code>. Everything looked identical between
+the working and non-working cases. Except I was printing
+<code>process.environment</code> only when I explicitly set it. When I
+didn’t set it, it was <code>nil</code>, meaning “inherit parent
+environment.” I did not think to inspect the inherited environment.</p>
+<p><strong>Hour 9-10: The breakthrough.</strong> Added
+<code>ProcessInfo.processInfo.environment.forEach { print("\($0.key)=\($0.value)") }</code>
+to the route handler. The output included <code>CLAUDECODE=1</code> and
+a dozen <code>CLAUDE_CODE_*</code> variables. These were inherited from
+the Claude Code session I was developing in. The child CLI process saw
+these and concluded it was a nested invocation, refusing to execute as a
+safety measure against recursive agent loops.</p>
+<p>The cause: environment variable inheritance. When a process spawns a
+child using <code>Process()</code> in Swift (or
+<code>fork</code>/<code>exec</code> in C), the child inherits the
+parent’s entire environment dictionary. This includes every variable the
+parent has, whether the child wants them or not. Claude Code sets
+<code>CLAUDECODE=1</code> and a family of <code>CLAUDE_CODE_*</code>
+variables in its process environment. These carry session metadata: the
+session ID, the working directory, the model in use. The Claude CLI uses
+these variables for nesting detection – if it sees
+<code>CLAUDECODE=1</code>, it knows it is running inside another Claude
+Code session and silently refuses to execute. This prevents infinite
+recursion where Claude Code spawns Claude Code spawns Claude Code.</p>
+<p>The problem is that “silently refuses to execute” means “exits with
+zero output and no error.” The nesting detection is a safety mechanism,
+not an error condition, so it does not log or throw. It just stops. This
+is a reasonable design decision from the CLI’s perspective – logging a
+warning every time nesting is detected would be noisy in legitimate
+nesting-detection scenarios. But from the debugging perspective, it
+transforms a three-line fix into a ten-hour investigation.</p>
+<p>The fix was three lines:</p>
+<pre class="swift"><code>// From: failed-attempts/04-cli-subprocess/attempt.swift
+
+var env = ProcessInfo.processInfo.environment
+env.removeValue(forKey: &quot;CLAUDECODE&quot;)
+env = env.filter { !$0.key.hasPrefix(&quot;CLAUDE_CODE_&quot;) }
+process.environment = env</code></pre>
+<p>Three lines. Ten hours to discover them. The environment-dependent
+failure – works in terminal (no <code>CLAUDECODE</code> variable
+present), fails in Claude Code (variable inherited from parent) – made
+it extremely hard to diagnose. I spent hours checking the subprocess
+arguments, the working directory, the PATH, the Python installation, the
+pip packages. The environment was the last thing I checked because
+environment variables are invisible. You do not see them. They are
+ambient authority – the subprocess did not ask to be inside a Claude
+Code session. It inherited that context silently and failed
+silently.</p>
+<p>And there was a bonus bug: accessing
+<code>process.terminationStatus</code> after reading EOF from stdout
+caused an <code>NSInvalidArgumentException</code> crash. The crash
+message:</p>
+<pre><code>*** Terminating app due to uncaught exception &#39;NSInvalidArgumentException&#39;,
+reason: &#39;task not yet launched or already terminated&#39;</code></pre>
+<p>Reading EOF from a pipe does NOT mean the process has exited. There
+is a race condition between pipe closure and process termination. The
+pipe’s reading end sees EOF when the writing end closes – which happens
+when stdout flushes its final buffer. But the process may still be
+running cleanup (signal handlers, atexit callbacks, file descriptor
+cleanup). If you access <code>terminationStatus</code> during this
+window, Foundation throws because the process object’s state machine has
+not yet transitioned to “terminated.”</p>
+<p>The fix is mechanical but critical:</p>
+<pre class="swift"><code>// WRONG -- causes NSInvalidArgumentException:
+let status = process.terminationStatus  // Process might still be running!
+
+// CORRECT -- wait first, then read:
+process.waitUntilExit()                 // Blocks until process exits
+let status = process.terminationStatus  // Safe now</code></pre>
+<p>This race condition is documented in Apple’s <code>Process</code>
+(formerly <code>NSTask</code>) documentation, but only if you know to
+look. The error message does not point to the race condition. It says
+“task not yet launched or already terminated” – which sounds like you
+forgot to call <code>run()</code>, not like you have a race between pipe
+EOF and process exit. The misdirection in the error message added
+another hour to the debugging.</p>
+<hr />
+<h3 id="the-working-bridge-why-five-layers-is-simpler">The Working
+Bridge: Why Five Layers Is Simpler</h3>
+<p>The working solution has five layers. Every “simpler” architecture
+was tried and failed. Five layers is what remains when you remove
+everything that does not work.</p>
+<p>Here is the full path a user’s message travels:</p>
+<pre class="mermaid"><code>flowchart TD
+    L1[&quot;Layer 1: SwiftUI\nHTTP / SSE&quot;]
+    B1[/&quot;Boundary 1: SSE text/event-stream&quot;/]
+    L2[&quot;Layer 2: Vapor Backend\nProcess + GCD&quot;]
+    B2[/&quot;Boundary 2: stdout pipe&quot;/]
+    L3[&quot;Layer 3: Python Bridge\nNDJSON on stdout&quot;]
+    B3[/&quot;Boundary 3: NDJSON newline-delimited&quot;/]
+    L4[&quot;Layer 4: Claude CLI\nSDK async iterator&quot;]
+    B4[/&quot;Boundary 4: SDK async stream&quot;/]
+    L5[&quot;Layer 5: Anthropic API\nOAuth HTTP&quot;]
+    B5[/&quot;Boundary 5: JSON over HTTPS&quot;/]
+    L5AUTH[/&quot;Boundary 6: OAuth token refresh&quot;/]
+
+    L1 --&gt; B1 --&gt; L2 --&gt; B2 --&gt; L3 --&gt; B3 --&gt; L4 --&gt; B4 --&gt; L5 --&gt; B5 --&gt; L5AUTH</code></pre>
+<p>Each layer exists because the layer above cannot talk to the layer
+below without an intermediary:</p>
+<ul>
+<li><p><strong>Layer 1 to 2</strong> is standard HTTP. The iOS app sends
+a POST request. The Vapor backend returns a
+<code>text/event-stream</code> response. This is how all web clients
+talk to servers. No controversy here.</p></li>
+<li><p><strong>Layer 2 to 3</strong> exists because Swift cannot use the
+Swift SDK (RunLoop/NIO mismatch, Attempt 2) and cannot call the
+Anthropic API directly (OAuth, not API keys, Attempt 1). The Vapor
+backend must delegate to something that can authenticate through Claude
+Code’s OAuth chain. That something is a Python script.</p></li>
+<li><p><strong>Layer 3 is Python</strong> because the
+<code>claude-agent-sdk</code> pip package wraps the Claude CLI natively
+and inherits OAuth authentication from <code>~/.claude/</code>. Python
+is pre-installed on macOS. The bridge is ~50 lines. The async iterator
+interface (<code>async for message in query(...)</code>) is
+clean.</p></li>
+<li><p><strong>Layer 4 is the Claude CLI</strong> because it is the only
+consumer-accessible interface that handles the OAuth token chain. The
+CLI manages token refresh, session persistence, and the credential
+store. No other tool exposes these capabilities.</p></li>
+<li><p><strong>Layer 5 was never a problem.</strong> The Anthropic API
+is a standard HTTPS endpoint.</p></li>
+</ul>
+<hr />
+<h3 id="the-python-bridge-solution-isinstance-dispatch-explained">The
+Python Bridge Solution: isinstance() Dispatch Explained</h3>
+<p>The Python bridge is the keystone of the architecture. It sits
+between the Swift backend (which cannot use the SDK) and the Claude CLI
+(which requires OAuth). Its job is to translate SDK message objects into
+NDJSON lines on stdout.</p>
+<p>The bridge uses <code>isinstance()</code> dispatch – Python’s
+type-checking mechanism – to handle each message type from the Claude
+Agent SDK. This is not optional. The SDK’s compliance requirements
+specify that message types must be checked with
+<code>isinstance()</code>, not with <code>getattr()</code> or
+<code>.type</code> attribute access. The reason: SDK message types may
+use inheritance, and <code>isinstance()</code> respects the type
+hierarchy while attribute checks do not.</p>
+<pre class="python"><code># From: working-bridge/claude_bridge.py
+
+# SDK message and block type imports -- required for isinstance() checks.
+from claude_agent_sdk import (
+    query, ClaudeAgentOptions,
+    AssistantMessage, UserMessage, SystemMessage, ResultMessage,
+    TextBlock, ThinkingBlock, ToolUseBlock, ToolResultBlock,
+)</code></pre>
+<p>The main loop iterates over the SDK’s async iterator. Each message is
+dispatched by type:</p>
+<pre class="python"><code># From: working-bridge/claude_bridge.py
+
+async for message in query(prompt=prompt, options=options):
+    if isinstance(message, SystemMessage):
+        pass
+
+    elif isinstance(message, AssistantMessage):
+        blocks = [convert_block(b) for b in message.content]
+        if blocks:
+            got_content = True
+        emit({&quot;type&quot;: &quot;assistant&quot;, &quot;message&quot;: {&quot;role&quot;: &quot;assistant&quot;,
+             &quot;content&quot;: blocks, &quot;model&quot;: getattr(message, &quot;model&quot;, None)}})
+
+    elif isinstance(message, ResultMessage):
+        got_result = True
+        result = {
+            &quot;type&quot;: &quot;result&quot;,
+            &quot;subtype&quot;: &quot;error&quot; if message.is_error else &quot;success&quot;,
+            &quot;is_error&quot;: message.is_error,
+            &quot;session_id&quot;: message.session_id or session_id,
+            &quot;total_cost_usd&quot;: message.total_cost_usd or 0.0,
+        }
+        emit(result)</code></pre>
+<p><code>SystemMessage</code> is silently ignored – it contains
+protocol-level metadata that the iOS client does not need.
+<code>AssistantMessage</code> is the main content: Claude’s text, tool
+use requests, and thinking blocks. <code>ResultMessage</code> marks the
+end of a response with cost and session metadata.</p>
+<p>The block converter handles the four content types:</p>
+<pre class="python"><code># From: working-bridge/claude_bridge.py
+
+def convert_block(block) -&gt; dict:
+    if isinstance(block, TextBlock):
+        return {&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: block.text}
+    elif isinstance(block, ToolUseBlock):
+        return {
+            &quot;type&quot;: &quot;tool_use&quot;,
+            &quot;id&quot;: block.id,
+            &quot;name&quot;: block.name,
+            &quot;input&quot;: block.input,
+        }
+    elif isinstance(block, ToolResultBlock):
+        return {
+            &quot;type&quot;: &quot;tool_result&quot;,
+            &quot;tool_use_id&quot;: block.tool_use_id,
+            &quot;content&quot;: block.content,
+            &quot;is_error&quot;: block.is_error,
+        }
+    elif isinstance(block, ThinkingBlock):
+        return {&quot;type&quot;: &quot;thinking&quot;, &quot;thinking&quot;: block.thinking}
+    else:
+        text = getattr(block, &quot;text&quot;, None) or str(block)
+        return {&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: text}</code></pre>
+<p>The <code>else</code> clause is a safety net for future SDK versions
+that might add new block types. Rather than crashing, it degrades
+gracefully by extracting whatever text representation the block offers.
+This forward-compatibility pattern is especially important in a bridge
+layer – if the SDK adds a <code>CodeBlock</code> type in v2, the bridge
+continues working (with degraded representation) while you update the
+dispatch table.</p>
+<p>The <code>ResultMessage</code> handler also captures token usage when
+available:</p>
+<pre class="python"><code># From: working-bridge/claude_bridge.py
+
+elif isinstance(message, ResultMessage):
+    got_result = True
+    result = {
+        &quot;type&quot;: &quot;result&quot;,
+        &quot;subtype&quot;: &quot;error&quot; if message.is_error else &quot;success&quot;,
+        &quot;is_error&quot;: message.is_error,
+        &quot;session_id&quot;: message.session_id or session_id,
+        &quot;total_cost_usd&quot;: message.total_cost_usd or 0.0,
+    }
+    if message.usage:
+        u = message.usage
+        result[&quot;usage&quot;] = {
+            &quot;input_tokens&quot;: getattr(u, &quot;input_tokens&quot;, 0),
+            &quot;output_tokens&quot;: getattr(u, &quot;output_tokens&quot;, 0),
+            &quot;cache_read_input_tokens&quot;: getattr(u, &quot;cache_read_input_tokens&quot;, 0),
+            &quot;cache_creation_input_tokens&quot;: getattr(u, &quot;cache_creation_input_tokens&quot;, 0),
+        }
+    emit(result)</code></pre>
+<p>The usage data lets the iOS client display cost information per query
+– a feature that turned out to be surprisingly valuable. Users want to
+know what each interaction costs, and the bridge captures this without
+any additional API calls.</p>
+<hr />
+<h3 id="the-flushtrue-discovery-why-buffered-stdout-kills-streaming">The
+flush=True Discovery: Why Buffered stdout Kills Streaming</h3>
+<p>Every write in the bridge flushes immediately:</p>
+<pre class="python"><code># From: working-bridge/claude_bridge.py
+
+def emit(obj: dict) -&gt; None:
+    line = json.dumps(obj, separators=(&quot;,&quot;, &quot;:&quot;))
+    sys.stdout.write(line + &quot;\n&quot;)
+    sys.stdout.flush()  # Critical: force immediate delivery</code></pre>
+<p>This looks like a minor detail. It is the difference between a
+working streaming experience and a broken one.</p>
+<p>Python’s stdout buffering behavior changes depending on what it is
+connected to. When stdout is a terminal (a TTY), Python uses
+<strong>line buffering</strong> – each <code>\n</code> triggers a flush.
+When stdout is a pipe (which is what happens when a Swift
+<code>Process</code> reads from it), Python switches to <strong>block
+buffering</strong> – data accumulates in a buffer (typically 8KB) and
+flushes only when the buffer is full or the process exits.</p>
+<p>The symptoms of block buffering in a streaming context are
+distinctive and confusing:</p>
+<ol type="1">
+<li>User sends a message</li>
+<li>Nothing happens for several seconds</li>
+<li>A burst of text appears all at once</li>
+<li>Nothing happens for several more seconds</li>
+<li>Another burst appears</li>
+</ol>
+<p>The text arrives in 8KB chunks instead of token-by-token. The
+streaming illusion is completely destroyed. Worse, if the response is
+shorter than the buffer size, the entire response is held until the
+Python process exits – which means the user sees nothing until the
+<code>ResultMessage</code> arrives and the bridge’s <code>main()</code>
+function returns.</p>
+<p>The diagnosis path for this was surprisingly long. Here is the
+sequence of hypotheses I tested, each wrong:</p>
+<p><strong>Hypothesis 1: The Claude CLI is buffering output.</strong>
+Tested by running the CLI directly and piping to <code>cat</code> with
+timestamps. Tokens arrived immediately. The CLI was not buffering.</p>
+<p><strong>Hypothesis 2: The NIO event loop is batching reads.</strong>
+Tested by adding microsecond-resolution timestamps to the GCD reader
+callback. Callbacks fired in 8KB bursts, not individual tokens. This
+pointed to a buffering layer between the Python process and the GCD
+reader – but I initially attributed it to GCD’s dispatch queue
+coalescing.</p>
+<p><strong>Hypothesis 3: GCD is coalescing <code>availableData</code>
+notifications.</strong> Tested by replacing <code>availableData</code>
+with a raw <code>read()</code> call on the file descriptor. Same burst
+behavior. GCD was not the cause.</p>
+<p><strong>Hypothesis 4 (correct): Python’s stdout is block-buffered
+when connected to a pipe.</strong> Confirmed by adding
+<code>PYTHONUNBUFFERED=1</code> to the subprocess environment. Tokens
+immediately appeared one by one. The fix was either the environment
+variable or explicit <code>flush()</code> calls.</p>
+<p>I chose explicit <code>flush()</code> over
+<code>PYTHONUNBUFFERED=1</code> for three reasons. First,
+<code>flush()</code> is visible in the code – a reader of
+<code>bridge.py</code> can see that flushing happens and understand why.
+Environment variable settings are invisible unless you know to look for
+them. Second, <code>PYTHONUNBUFFERED=1</code> affects all stdio,
+including stderr, which may have its own legitimate buffering
+requirements. Third, <code>flush()</code> does not depend on environment
+variable propagation – if the environment stripping logic (for
+<code>CLAUDECODE</code> removal) accidentally also removes
+<code>PYTHONUNBUFFERED</code>, the explicit flush still works.</p>
+<p>The <code>separators=(",", ":")</code> in <code>json.dumps()</code>
+is also deliberate. It removes whitespace from the JSON output. Over
+thousands of events, this reduces bandwidth and avoids ambiguity about
+whether whitespace is part of the data or formatting.</p>
+<p>An alternative approach would be to use <code>python3 -u</code>
+(unbuffered binary mode) in the subprocess command. This disables all
+stdout buffering at the interpreter level. But it has side effects on
+stdin and stderr that are not always desirable, and it is less explicit
+about intent than <code>flush()</code> calls at each emission point.</p>
+<hr />
+<h3 id="the-swift-side-environment-sanitization-and-ndjson-parsing">The
+Swift Side: Environment Sanitization and NDJSON Parsing</h3>
+<p>The Swift executor spawns the Python bridge, strips the dangerous
+environment variables, and reads NDJSON from stdout on a dedicated GCD
+queue:</p>
+<pre class="swift"><code>// From: working-bridge/executor.swift
+
+// CRITICAL: Strip Claude Code nesting detection env vars.
+let escaped = configJson.replacingOccurrences(of: &quot;&#39;&quot;, with: &quot;&#39;\\&#39;&#39;&quot;)
+let command = &quot;python3 &#39;\(bridgePath)&#39; &#39;\(escaped)&#39;&quot;
+let cleanCmd = &quot;for v in $(env | grep ^CLAUDE | cut -d= -f1); do unset $v; done; \(command)&quot;
+process.arguments = [&quot;-l&quot;, &quot;-c&quot;, cleanCmd]
+
+// Belt-and-suspenders: also strip from Process.environment
+var env = ProcessInfo.processInfo.environment
+for key in env.keys where key.hasPrefix(&quot;CLAUDE&quot;) {
+    env.removeValue(forKey: key)
+}
+process.environment = env</code></pre>
+<p>Belt-and-suspenders: the environment is stripped both in the shell
+command (the <code>for v in $(env | grep ^CLAUDE ...)</code> loop) AND
+in the <code>Process.environment</code> dictionary. Two redundant
+protections for a bug that took ten hours to find the first time. The
+shell-level stripping catches variables that might be set by shell
+initialization files (<code>~/.zshrc</code>,
+<code>/etc/zprofile</code>). The <code>Process.environment</code>
+stripping catches variables inherited from the parent process. Together,
+they cover both sources.</p>
+<p>Why both? Because I got burned once and decided that ten hours of
+debugging justified thirty seconds of redundant protection. The
+shell-level <code>unset</code> loop handles a case I have not personally
+encountered but can imagine: a shell profile that sets
+<code>CLAUDE_*</code> variables for convenience. The
+<code>Process.environment</code> filtering handles the case I have
+encountered: inheritance from the parent process. Neither alone covers
+both sources. Together, they are bulletproof.</p>
+<p>The executor uses a two-tier timeout mechanism:</p>
+<pre class="swift"><code>// From: working-bridge/executor.swift
+
+// Two-tier timeout mechanism
+let didTimeout = AtomicBool(false)
+
+let initialTimeoutWork = DispatchWorkItem {
+    didTimeout.value = true
+    process.terminate()
+}
+DispatchQueue.global().asyncAfter(
+    deadline: .now() + self.initialTimeout,
+    execute: initialTimeoutWork
+)
+
+let totalTimeoutWork = DispatchWorkItem {
+    guard process.isRunning else { return }
+    didTimeout.value = true
+    process.terminate()
+}
+DispatchQueue.global().asyncAfter(
+    deadline: .now() + self.totalTimeout,
+    execute: totalTimeoutWork
+)</code></pre>
+<p>The initial timeout (30 seconds) catches the case where the bridge
+never starts producing output – a Python import failure, a missing
+<code>claude-agent-sdk</code> package, or a CLI authentication error.
+The total timeout (5 minutes) catches runaway queries that produce
+output but never terminate. The initial timeout is cancelled as soon as
+the first byte arrives on stdout.</p>
+<p>The two-tier design prevents two different failure modes. Without the
+initial timeout, a broken bridge (wrong Python version, missing package,
+authentication failure) would hang for the full 5 minutes before the
+user sees any feedback. Without the total timeout, a query that keeps
+generating output forever (a reasoning loop, a very long tool chain)
+would never be terminated. The two tiers are independently
+necessary.</p>
+<p>The NDJSON reader runs on a dedicated GCD queue with no
+<code>RunLoop</code> dependency. This is the critical lesson from
+Attempt 2 – never use <code>RunLoop</code>-based I/O in a NIO context.
+It handles partial lines, buffer accumulation, and the critical
+<code>waitUntilExit()</code> pattern:</p>
+<pre class="swift"><code>// From: working-bridge/executor.swift
+
+DispatchQueue(label: &quot;bridge-reader&quot;, qos: .userInitiated).async {
+    let handle = stdoutPipe.fileHandleForReading
+    var buffer = Data()
+
+    while true {
+        let chunk = handle.availableData
+        if chunk.isEmpty { break }
+
+        initialTimeoutWork.cancel()  // Got data, cancel initial timeout
+        buffer.append(chunk)
+
+        guard let str = String(data: buffer, encoding: .utf8) else { continue }
+        let lines = str.components(separatedBy: &quot;\n&quot;)
+
+        if lines.count &gt; 1 {
+            for i in 0..&lt;(lines.count - 1) {
+                let line = lines[i].trimmingCharacters(in: .whitespacesAndNewlines)
+                if !line.isEmpty,
+                   let data = line.data(using: .utf8),
+                   let json = try? JSONSerialization.jsonObject(with: data)
+                       as? [String: Any] {
+                    continuation.yield(json)
+                }
+            }
+            buffer = lines.last?.data(using: .utf8) ?? Data()
+        }
+    }
+
+    // CRITICAL: Always waitUntilExit() before terminationStatus.
+    process.waitUntilExit()
+    continuation.finish()
+}</code></pre>
+<p>The buffer accumulation logic handles a subtle edge case: NDJSON
+lines can arrive split across multiple <code>availableData</code> reads.
+If a 200-byte JSON line is split into a 150-byte chunk and a 50-byte
+chunk, the first read gives you incomplete JSON. The buffer accumulates
+bytes and only emits complete lines (delimited by <code>\n</code>). The
+last element of the <code>lines</code> array after splitting is always
+the incomplete remainder, which stays in the buffer for the next
+read.</p>
+<p>The
+<code>guard let str = String(data: buffer, encoding: .utf8) else { continue }</code>
+line handles another edge case: multi-byte UTF-8 characters split across
+chunk boundaries. A 3-byte UTF-8 character (like a CJK glyph or an
+emoji) can arrive with 2 bytes in one chunk and 1 byte in the next. The
+<code>String(data:encoding:)</code> initializer returns <code>nil</code>
+for incomplete UTF-8 sequences, and the <code>continue</code> keeps the
+partial bytes in the buffer until the rest arrives.</p>
+<hr />
+<h3 id="the-full-data-flow-six-serialization-boundaries">The Full Data
+Flow: Six Serialization Boundaries</h3>
+<p>Every piece of data crosses six serialization boundaries on its way
+from the Anthropic API to the user’s screen. Each boundary is a
+potential source of bugs, latency, and data loss.</p>
+<pre class="mermaid"><code>flowchart TD
+    subgraph iOS[&quot;Layer 1: iOS App (SwiftUI)&quot;]
+        TAP[&quot;User taps Send&quot;]
+        REQ[&quot;URLSession POST /api/v1/chat/stream&quot;]
+        SSE[&quot;SSEClient parses text/event-stream&quot;]
+        TAP --&gt; REQ --&gt; SSE
+    end
+
+    subgraph Vapor[&quot;Layer 2: Vapor Backend (Swift/NIO)&quot;]
+        ROUTE[&quot;Route handler receives Request&quot;]
+        ENV[&quot;Strip CLAUDECODE + CLAUDE_CODE_* env vars&quot;]
+        SPAWN[&quot;Process() spawns /bin/zsh -l -c&quot;]
+        GCD[&quot;GCD DispatchQueue reads stdout pipe&quot;]
+        NDJSON_PARSE[&quot;NDJSON line parser: JSON bytes to [String: Any]&quot;]
+        ROUTE --&gt; ENV --&gt; SPAWN --&gt; GCD --&gt; NDJSON_PARSE
+    end
+
+    subgraph Python[&quot;Layer 3: Python Bridge (claude_bridge.py)&quot;]
+        ARGV[&quot;json.loads(sys.argv[1]) config&quot;]
+        SDK_CALL[&quot;query(prompt=prompt, options=options)&quot;]
+        ISINSTANCE[&quot;isinstance() dispatch: AssistantMessage, ResultMessage, ...&quot;]
+        CONVERT[&quot;convert_block(): TextBlock, ToolUseBlock, ThinkingBlock&quot;]
+        EMIT[&quot;json.dumps() + sys.stdout.write() + sys.stdout.flush()&quot;]
+        ARGV --&gt; SDK_CALL --&gt; ISINSTANCE --&gt; CONVERT --&gt; EMIT
+    end
+
+    subgraph CLI[&quot;Layer 4: Claude CLI&quot;]
+        OAUTH[&quot;Load OAuth tokens from ~/.claude/&quot;]
+        STREAM[&quot;--output-format stream-json&quot;]
+        OAUTH --&gt; STREAM
+    end
+
+    subgraph API[&quot;Layer 5: Anthropic API&quot;]
+        HTTPS[&quot;HTTPS POST /v1/messages&quot;]
+        TOKENS[&quot;Token generation + streaming response&quot;]
+        HTTPS --&gt; TOKENS
+    end
+
+    SSE --&gt;|&quot;Boundary 1: HTTP SSE\nContent-Type: text/event-stream&quot;| ROUTE
+    NDJSON_PARSE --&gt;|&quot;Boundary 2: stdout pipe\nNDJSON newline-delimited bytes&quot;| EMIT
+    EMIT --&gt;|&quot;Boundary 3: NDJSON on stdout\nOne JSON object per line&quot;| SDK_CALL
+    SDK_CALL --&gt;|&quot;Boundary 4: SDK async iterator\nPython objects via yield&quot;| STREAM
+    STREAM --&gt;|&quot;Boundary 5: HTTPS JSON\nOAuth bearer token&quot;| HTTPS
+    TOKENS --&gt;|&quot;Boundary 6: SSE chunks\nOAuth token refresh&quot;| STREAM</code></pre>
+<p>The text duplication P2 bug – where every response appeared twice in
+the iOS client – was caused by a two-character error at boundary 5. The
+accumulator was using <code>+=</code> instead of <code>=</code>:</p>
+<pre class="swift"><code>// BUG: accumulated text += newChunk  (appends to existing)
+// FIX: accumulated text = newChunk   (replaces with latest)</code></pre>
+<p>The <code>AssistantMessage</code> from the SDK already contains the
+full accumulated text up to that point. Using <code>+=</code> appended
+the latest full text to the previous full text, doubling it. Two
+characters. Three hours of debugging. But the serialization boundary
+made it easy to isolate once I knew where to look – I could log the data
+on each side of boundary 5 and compare.</p>
+<p>This is the paradox of layered architectures: they add complexity but
+they also add observability. Each boundary is a logging point. When
+something goes wrong, you can inspect the data at each boundary and
+pinpoint exactly where the corruption occurs. In a monolithic
+architecture where the same process handles everything from HTTP parsing
+to API calls, the debugging surface is the entire codebase. In a layered
+architecture, the debugging surface is the boundary between two
+layers.</p>
+<hr />
+<h3 id="performance-the-cost-of-abstraction-layers">Performance: The
+Cost of Abstraction Layers</h3>
+<p>Every layer adds latency. Here is the breakdown:</p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 35%" />
+<col style="width: 38%" />
+</colgroup>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Direct API</th>
+<th>SDK Bridge</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cold start</td>
+<td>1-3s</td>
+<td>~12s</td>
+</tr>
+<tr>
+<td>Warm response</td>
+<td>1-3s</td>
+<td>~2-3s</td>
+</tr>
+<tr>
+<td>Cost per query</td>
+<td>~$0.04</td>
+<td>~$0.04</td>
+</tr>
+<tr>
+<td>Auth requirement</td>
+<td>API key</td>
+<td>OAuth (automatic)</td>
+</tr>
+<tr>
+<td>Features available</td>
+<td>Messages API only</td>
+<td>Full Claude Code (tools, MCP, context)</td>
+</tr>
+<tr>
+<td>Runtime dependencies</td>
+<td>Python + anthropic</td>
+<td>Python + claude-agent-sdk</td>
+</tr>
+<tr>
+<td>Failure modes</td>
+<td>Auth error (clear)</td>
+<td>4 failure classes (silent)</td>
+</tr>
+</tbody>
+</table>
+<p>The cold start penalty comes from three sources: Python interpreter
+startup (~2s), <code>claude-agent-sdk</code> module import (~1s), and
+Claude CLI initialization + OAuth token load (~9s). After the first
+query, the CLI process has already initialized, so warm queries drop to
+2-3 seconds – comparable to direct API calls.</p>
+<p>Breaking down the cold start in more detail:</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 27%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th>Component</th>
+<th>Time</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Python interpreter</td>
+<td>~2s</td>
+<td><code>python3</code> process spawn + <code>site.py</code>
+imports</td>
+</tr>
+<tr>
+<td><code>claude-agent-sdk</code> import</td>
+<td>~1s</td>
+<td>Package loading + dependency resolution</td>
+</tr>
+<tr>
+<td>Claude CLI spawn</td>
+<td>~3s</td>
+<td>Binary loading + argument parsing</td>
+</tr>
+<tr>
+<td>OAuth token load</td>
+<td>~3s</td>
+<td>Read <code>~/.claude/</code>, validate token, refresh if
+expired</td>
+</tr>
+<tr>
+<td>First API round-trip</td>
+<td>~3s</td>
+<td>HTTPS connection establishment + model warm-up</td>
+</tr>
+<tr>
+<td><strong>Total cold start</strong></td>
+<td><strong>~12s</strong></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>The warm start eliminates the first four rows because the CLI process
+persists. The Python interpreter stays alive for the duration of the
+query. On subsequent queries (if using session persistence), only the
+API round-trip time applies.</p>
+<p>The cost per query is identical because the bridge calls the same API
+through the same model. The abstraction layers add latency but not token
+cost. The only additional cost is compute – the Python process and the
+GCD reader thread consume minimal CPU.</p>
+<p>The feature gap is the real value proposition. Direct API gives you
+the Messages API: send text, get text back. The SDK bridge gives you
+everything Claude Code offers: tool use, MCP server integration, project
+context from <code>CLAUDE.md</code> files, system prompts, conversation
+persistence with session IDs. These features justify the 12-second cold
+start.</p>
+<hr />
+<h3
+id="lessons-in-integration-architecture-when-to-bridge-vs-when-to-rewrite">Lessons
+in Integration Architecture: When to Bridge vs When to Rewrite</h3>
+<p>This experience crystallized a decision framework for integration
+architecture. When two systems need to communicate and the direct path
+fails, you face a choice: bridge the gap or rewrite one side to
+eliminate it.</p>
+<p><strong>Bridge when:</strong> - The gap is at the authentication or
+protocol layer, not the data model - The bridge code is small relative
+to the systems it connects (our bridge is ~260 lines total) - Both
+systems are mature and actively maintained (rewriting means forking
+their evolution) - The bridge can be stateless (no persistent state
+means no consistency bugs)</p>
+<p><strong>Rewrite when:</strong> - The gap is at the data model layer
+(different schemas, different semantics) - The bridge would need to
+maintain state between the two systems - One system is under your
+control and can be modified - The performance penalty of the bridge is
+unacceptable for the use case</p>
+<p>In our case, bridging was correct. The gap was at the authentication
+and runtime paradigm layers. The bridge is stateless – each request is
+independent. Both systems (Vapor and Claude CLI) are actively maintained
+by separate teams. The bridge code is 50 lines of Python and 210 lines
+of Swift. A rewrite would mean forking either Vapor’s concurrency model
+or the Claude CLI’s authentication flow, both of which are moving
+targets.</p>
+<p>There is a third option that is sometimes appropriate: <strong>wait
+for the gap to close.</strong> If the upstream SDK adds NIO-compatible
+streaming in a future version, the bridge becomes unnecessary. But
+waiting has a cost too – the product does not ship until the gap closes,
+and you have no control over the timeline. The bridge lets you ship
+today while remaining easy to remove later. The 260 lines of bridge code
+are the cost of not waiting.</p>
+<p>The cost-of-abstraction analysis for this specific bridge:</p>
+<table>
+<colgroup>
+<col style="width: 35%" />
+<col style="width: 28%" />
+<col style="width: 35%" />
+</colgroup>
+<thead>
+<tr>
+<th>Cost Category</th>
+<th>Magnitude</th>
+<th>Justification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Cold start latency</td>
+<td>~12s (one-time)</td>
+<td>Acceptable for chat interactions; amortized across conversation</td>
+</tr>
+<tr>
+<td>Code complexity</td>
+<td>~260 lines</td>
+<td>Small; contained in two files; no shared state</td>
+</tr>
+<tr>
+<td>Runtime dependencies</td>
+<td>Python 3, pip package</td>
+<td>Pre-installed on macOS; single pip install</td>
+</tr>
+<tr>
+<td>Debugging surface</td>
+<td>6 serialization boundaries</td>
+<td>Each boundary is a logging point; easier to isolate bugs than
+monolithic alternative</td>
+</tr>
+<tr>
+<td>Maintenance burden</td>
+<td>SDK version updates</td>
+<td><code>isinstance()</code> dispatch is forward-compatible;
+<code>else</code> clause handles unknown types</td>
+</tr>
+<tr>
+<td>Operational overhead</td>
+<td>Process management, timeouts</td>
+<td>Two-tier timeout handles all failure modes; GCD reader is
+robust</td>
+</tr>
+</tbody>
+</table>
+<p>The total cost is modest. The alternative – not shipping the iOS
+client until a NIO-compatible SDK exists – has an unbounded cost in lost
+product iterations, user feedback, and competitive positioning.</p>
+<hr />
+<h3 id="a-taxonomy-of-integration-failures">A Taxonomy of Integration
+Failures</h3>
+<p>The four failed attempts map onto a taxonomy of integration failure
+modes that generalizes beyond this specific project. Every polyglot
+integration will encounter some subset of these categories.</p>
+<p><strong>Category 1: Authentication Boundary Mismatch (Attempts 1 and
+3).</strong> System A authenticates with mechanism X. System B
+authenticates with mechanism Y. No adapter exists. This is the most
+common integration failure and the most quickly diagnosed because auth
+errors are usually clear. The fix is always the same: route through
+whatever system owns the credentials. You cannot work around an auth
+boundary from the consumer side.</p>
+<p><strong>Category 2: Runtime Paradigm Incompatibility (Attempt
+2).</strong> System A uses concurrency model X. System B uses
+concurrency model Y. Data enters one model and never exits to the other.
+This is the most expensive failure because it produces zero diagnostic
+output. The data is correct, the code is correct, the scheduling is
+correct within each paradigm. The failure is in the gap between
+paradigms. The fix is to avoid crossing paradigm boundaries in-process.
+Use an out-of-process boundary (pipe, socket, HTTP) that both paradigms
+can interact with.</p>
+<p><strong>Category 3: Ambient Context Contamination (Attempt
+4).</strong> System A sets environment variable V for its own purposes.
+System B inherits V and misinterprets it. Neither system is wrong. The
+contamination is invisible because environment variables have no
+declaration, no type system, and no visibility in source code. The fix
+is to always use explicit environment dictionaries for subprocesses and
+to audit inherited variables in new deployment contexts.</p>
+<p><strong>Category 4: Language Ecosystem Friction (Attempt 3).</strong>
+System A is in language X. The bridge to system B is available in
+language Y. Adding language Y introduces a disproportionate operational
+burden (runtime management, dependency trees, module resolution). This
+is not a technical failure – the code works. It is an operational
+failure – the maintenance cost exceeds the value. The fix is to choose
+the bridge language that minimizes operational overhead, not the one
+that is most familiar.</p>
+<p>These four categories are exhaustive for the integration failures I
+have encountered across multiple projects. When starting a new
+integration, I now explicitly evaluate each category before writing
+code: “Does the auth model match? Do the concurrency paradigms
+interoperate? What environment variables does each system set? What
+operational overhead does each bridge language add?” Answering these
+four questions takes thirty minutes and can save thirty hours.</p>
+<hr />
+<h3 id="what-i-would-do-differently">What I Would Do Differently</h3>
+<p>Hindsight reveals several decisions I would change if I were starting
+this integration today.</p>
+<p><strong>Start with environment inspection, not architecture
+exploration.</strong> The single highest-impact debugging technique in
+this entire odyssey was printing the environment variables. If I had
+done that on day one – before writing a single line of integration code
+– I would have discovered the <code>CLAUDECODE=1</code> nesting
+detection immediately and saved ten hours. The lesson: when integrating
+with any tool that uses subprocess spawning, your first action should be
+<code>env | sort</code> in the target context. Environment variables are
+ambient authority. They affect behavior without appearing in any source
+code. Inspect them first.</p>
+<p><strong>Build a diagnostic mode before building the feature.</strong>
+The most expensive failures were silent. If I had built a minimal
+diagnostic script first – one that just spawns the Claude CLI, captures
+stdout and stderr, prints the exit code, and dumps the environment – I
+would have isolated each failure in minutes instead of hours. A
+diagnostic mode that exercises each layer independently is worth
+building before the production bridge. The companion repo now includes
+<code>diagnostics/check_bridge.py</code> for exactly this purpose.</p>
+<p><strong>Test in the production context from the start.</strong>
+Attempt 4 worked in a terminal and failed in Claude Code. I tested in
+the terminal first because it was convenient. If I had tested inside
+Claude Code from the beginning, the nesting detection bug would have
+surfaced immediately. The general principle: test in the context where
+the code will actually run. “It works on my machine” is not just a meme
+– it is a description of environment-dependent bugs that only manifest
+in the deployment context.</p>
+<p><strong>Use explicit environment dictionaries, never
+inherit.</strong> The default behavior of <code>Process()</code> in
+Swift is to inherit the parent’s environment when you do not set
+<code>process.environment</code>. This is almost never what you want for
+a subprocess that needs to be independent of its parent. Setting
+<code>process.environment</code> to a explicit dictionary – even if it
+is a copy of the current environment with specific keys removed – makes
+the subprocess’s context visible and auditable. Implicit inheritance is
+a debugging trap.</p>
+<p><strong>Document the failure modes, not just the working
+solution.</strong> The companion repo’s <code>failed-attempts/</code>
+directory with <code>FAILURE.md</code> files in each attempt directory
+has been more useful for other developers than the working bridge code.
+When someone hits a similar integration problem, they search for the
+error message. Finding a documented failure with a root cause analysis
+saves them the same ten-hour investigation. The failure documentation is
+the most valuable artifact of this project.</p>
+<hr />
+<h3 id="the-sseclient-parsing-textevent-stream-on-ios">The SSEClient:
+Parsing text/event-stream on iOS</h3>
+<p>The iOS side of the bridge deserves attention because it solves a
+problem that SwiftUI does not handle natively: parsing Server-Sent
+Events from a streaming HTTP response.</p>
+<p>The SSEClient uses <code>URLSession</code> with a delegate that
+receives data incrementally. Each chunk is appended to a UTF-8 buffer,
+and the buffer is scanned for complete SSE events (delimited by double
+newlines):</p>
+<pre class="swift"><code>// Simplified from the companion repo&#39;s SSEClient.swift
+
+class SSEClient: NSObject, URLSessionDataDelegate {
+    private var buffer = Data()
+
+    func urlSession(_ session: URLSession, dataTask: URLSessionDataTask,
+                    didReceive data: Data) {
+        buffer.append(data)
+        processBuffer()
+    }
+
+    private func processBuffer() {
+        guard let string = String(data: buffer, encoding: .utf8) else { return }
+
+        let events = string.components(separatedBy: &quot;\n\n&quot;)
+        // All complete events (all but the last, which may be partial)
+        for i in 0..&lt;(events.count - 1) {
+            let event = events[i].trimmingCharacters(in: .whitespacesAndNewlines)
+            if !event.isEmpty {
+                parseEvent(event)
+            }
+        }
+        // Keep the last (potentially incomplete) event in the buffer
+        buffer = events.last?.data(using: .utf8) ?? Data()
+    }
+}</code></pre>
+<p>The buffer management pattern is identical to the NDJSON reader on
+the Vapor side. This is not a coincidence – both are solving the same
+problem (parsing delimited records from a streaming byte source) with
+the same solution (accumulate bytes, split on delimiter, keep the
+trailing partial record in the buffer).</p>
+<p>The SSEClient also handles reconnection with exponential backoff, a
+heartbeat watchdog that detects stale connections, and a complete type
+system for the stream protocol:</p>
+<pre class="swift"><code>// Stream message types from the companion repo
+enum StreamEventType: String {
+    case assistant
+    case result
+    case error
+    case ping
+}
+
+struct StreamMessage {
+    let type: StreamEventType
+    let content: [ContentBlock]
+    let model: String?
+    let usage: UsageInfo?
+}</code></pre>
+<p>These types flow directly into the SwiftUI views. When a
+<code>StreamMessage</code> with type <code>.assistant</code> arrives,
+the chat view appends the text content. When a <code>.result</code>
+arrives, the chat view displays the cost. When an <code>.error</code>
+arrives, the chat view shows an error banner. The type system ensures
+that every possible stream event is handled – no untyped JSON
+dictionaries leak into the UI layer.</p>
+<p>The SSEClient also implements reconnection with exponential backoff.
+Network interruptions are expected on mobile – the user walks through a
+dead zone, switches from WiFi to cellular, or the server restarts during
+deployment. The reconnection logic must handle all of these without
+losing the user’s context:</p>
+<pre class="swift"><code>// Simplified from the companion repo&#39;s SSEClient.swift
+
+private func reconnect() {
+    guard reconnectAttempts &lt; maxReconnectAttempts else {
+        delegate?.sseClientDidFail(self, error: .maxRetriesExceeded)
+        return
+    }
+
+    reconnectAttempts += 1
+    let delay = min(
+        baseReconnectDelay * pow(2.0, Double(reconnectAttempts - 1)),
+        maxReconnectDelay
+    )
+
+    DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+        self?.connect()
+    }
+}</code></pre>
+<p>The exponential backoff prevents thundering herd problems when a
+server restart causes all connected clients to reconnect simultaneously.
+The first retry is immediate (or near-immediate), the second waits 2
+seconds, the third waits 4 seconds, up to a configurable maximum
+(typically 30 seconds). After <code>maxReconnectAttempts</code>
+failures, the client gives up and reports the error to the UI layer.</p>
+<p>The heartbeat watchdog complements the reconnection logic. It detects
+“zombie connections” where the TCP connection is alive but the server
+has stopped sending data:</p>
+<pre class="swift"><code>// Simplified from the companion repo&#39;s SSEClient.swift
+
+actor LastActivityTracker {
+    private var lastActivity: Date = Date()
+
+    func recordActivity() {
+        lastActivity = Date()
+    }
+
+    func timeSinceLastActivity() -&gt; TimeInterval {
+        Date().timeIntervalSince(lastActivity)
+    }
+}
+
+// In the streaming loop:
+if await activityTracker.timeSinceLastActivity() &gt; heartbeatTimeout {
+    // Server stopped sending -- treat as disconnect
+    disconnect()
+    reconnect()
+}</code></pre>
+<p>The <code>LastActivityTracker</code> is an actor to ensure thread
+safety. The streaming loop checks the tracker periodically. If no data
+has arrived within the heartbeat timeout (typically 60 seconds for chat,
+which includes model thinking time), the client treats the connection as
+dead and initiates reconnection. This catches a class of failure that
+neither TCP keepalive nor HTTP timeouts detect: the server is alive, the
+connection is open, but the application-level stream has stalled.</p>
+<p>The “done” event handling is another critical detail. When the server
+sends a completion event (the <code>ResultMessage</code> translated into
+an SSE <code>data: {"type":"result",...}</code> line), the SSEClient
+must reset its streaming state. A bug in early versions of the ILS
+client failed to reset <code>isStreaming</code> to <code>false</code> on
+the “done” event. The consequence: the UI continued showing a streaming
+indicator after the response was complete, and subsequent messages were
+not properly initiated because the client believed a stream was still
+active. The fix was a single line – <code>isStreaming = false</code> in
+the “done” event handler – but diagnosing it required tracing the full
+state machine across the SSE parsing, the ViewModel, and the SwiftUI
+view layer.</p>
+<hr />
+<h3 id="debugging-integration-problems-a-systematic-approach">Debugging
+Integration Problems: A Systematic Approach</h3>
+<p>After thirty hours of debugging across four failed attempts, I
+developed a systematic approach for diagnosing integration failures.
+This approach would have saved me at least twenty of those hours if I
+had followed it from the beginning.</p>
+<p><strong>Step 1: Map the data path.</strong> Before writing any
+integration code, draw the complete path from data source to data
+consumer. List every process boundary, every serialization format, and
+every authentication mechanism. For the SDK bridge, this map has six
+boundaries. Each boundary is a potential failure point and a potential
+logging point.</p>
+<p><strong>Step 2: Build boundary probes.</strong> For each boundary on
+the map, write a minimal script that tests that boundary in isolation.
+Can Layer 2 talk to Layer 3? Write a script that sends one message
+through the boundary and prints the result. The companion repo’s
+<code>diagnostics/</code> directory contains probes for each
+boundary:</p>
+<pre class="bash"><code># Probe 1: Can we reach the Vapor backend?
+curl -s http://localhost:9999/health
+
+# Probe 2: Can the backend spawn a Python process?
+curl -s http://localhost:9999/api/v1/debug/python-check
+
+# Probe 3: Can Python import the SDK?
+python3 -c &quot;from claude_agent_sdk import query; print(&#39;OK&#39;)&quot;
+
+# Probe 4: Can the CLI authenticate?
+claude --version
+
+# Probe 5: Can the CLI reach the API?
+claude -p &quot;Say OK&quot; --output-format stream-json 2&gt;/dev/null | head -1</code></pre>
+<p>If probe 3 fails, you know the problem is between Layer 2 and Layer
+3. You do not need to debug Layers 4 and 5. The probes narrow the search
+space from “something is broken” to “this specific boundary is
+broken.”</p>
+<p><strong>Step 3: Inspect the environment.</strong> Before any other
+debugging, dump the environment variables in the context where the
+integration code will run. Not in your terminal. Not in a standalone
+script. In the actual production context. For the SDK bridge, this meant
+adding a temporary route to the Vapor backend that returned
+<code>ProcessInfo.processInfo.environment</code> as JSON. This single
+step would have immediately revealed the <code>CLAUDECODE=1</code>
+variable that caused ten hours of debugging.</p>
+<p><strong>Step 4: Log at every boundary.</strong> When a probe fails,
+add logging on both sides of the failing boundary. Log the exact bytes
+being sent and the exact bytes being received. For pipes, log the data
+written by the sender and the data read by the receiver. For HTTP, log
+the request headers and response headers. The discrepancy between what
+is sent and what is received is the bug.</p>
+<p><strong>Step 5: Test in the production context from the
+start.</strong> The most expensive failures in this project were
+environment-dependent. They worked in one context (terminal, standalone
+script) and failed in another (inside Claude Code, inside Vapor). Always
+test in the most constrained context first. If it works there, it will
+work everywhere. If it fails there, you have found a real bug.</p>
+<p>This five-step approach applies to any polyglot integration, not just
+this specific bridge. The key insight is that integration debugging is
+fundamentally about boundaries. Each boundary is a potential information
+loss point. Systematic boundary probing eliminates entire categories of
+failure before you write a single line of production code.</p>
+<hr />
+<h3 id="the-counterintuitive-lesson">The Counterintuitive Lesson</h3>
+<p>Five layers sounds overengineered. It sounds like the kind of
+architecture an astronaut builds when a direct call would suffice. But
+here is the thing: every “simpler” approach failed. The direct API call
+(1 layer) hits an authentication wall. The Swift SDK (2 layers) hits a
+<code>RunLoop</code>/NIO mismatch. The CLI subprocess (2 layers) hits
+nesting detection. The JS SDK (2 layers) hits authentication plus adds
+an unnecessary runtime.</p>
+<p>Five layers works because each layer does exactly one
+translation:</p>
+<ol type="1">
+<li>SwiftUI gesture to HTTP request</li>
+<li>HTTP request to subprocess spawn (with env sanitization)</li>
+<li>Python SDK call to NDJSON on stdout</li>
+<li>OAuth-authenticated CLI call</li>
+<li>HTTP to Anthropic’s servers</li>
+</ol>
+<p>No layer tries to be clever. No layer combines responsibilities. The
+<code>bridge.py</code> file is ~50 lines. The
+<code>executor.swift</code> is ~210 lines. The total bridge code is
+smaller than any of the failed attempts because each layer has a single,
+clear job.</p>
+<p>Six serialization boundaries exist in the full round trip. Each one
+is a potential source of bugs. The text duplication P2 bug – where every
+response appeared twice – was caused by using <code>+=</code> on
+accumulated text instead of <code>=</code> at boundary 5. Two
+characters. Three hours of debugging. But the serialization boundary
+made it easy to isolate once I knew where to look.</p>
+<p>The counterintuitive insight: <strong>the number of layers is not a
+measure of complexity.</strong> Five layers with clear boundaries and
+single responsibilities is simpler to debug, test, and maintain than two
+layers with mixed concerns. When the P2 duplication bug appeared, I
+could log the data at each boundary and pinpoint exactly where the
+duplication occurred within minutes. If the same logic were collapsed
+into two layers, the debugging surface would have been much larger.</p>
+<p>This principle generalizes beyond this specific bridge. Any time you
+have an integration problem where the “simple” approach fails silently,
+consider whether adding a layer of indirection with an explicit
+serialization boundary would make the failure mode observable. A Unix
+pipe between two processes is a serialization boundary you can log,
+inspect, and debug. A function call within a single process is not.
+Sometimes the extra layer is the simplification.</p>
+<p>Total debugging time across all failure modes: approximately thirty
+hours. Cold start latency: ~12 seconds. Warm latency: ~2-3 seconds. Cost
+per query: ~$0.04. The bridge has been running in production for months
+without a single failure mode it was not designed to handle.</p>
+<p>Sometimes the “wrong” architecture is the only one that works.</p>
+<hr />
+<h3 id="applying-these-lessons-to-your-own-integrations">Applying These
+Lessons to Your Own Integrations</h3>
+<p>The specific technologies in this post – Swift, Vapor, Python, Claude
+CLI – are particular to this project. But the patterns generalize to any
+polyglot integration. Here is a checklist distilled from thirty hours of
+debugging that you can apply before writing your first line of
+integration code.</p>
+<p><strong>Before you start:</strong></p>
+<ol type="1">
+<li><p>Map the authentication chain. Does the target system use API
+keys, OAuth tokens, session cookies, or certificate-based auth? Can you
+obtain credentials from outside the system, or must you flow through its
+auth mechanism? If the answer is “must flow through,” your architecture
+is constrained to use the system as a passthrough layer. Accept this
+early.</p></li>
+<li><p>Identify the concurrency models. What event processing paradigm
+does each system use? RunLoop, event loop, thread pool, async/await,
+goroutines? Do they interoperate in-process, or must they communicate
+through an out-of-process boundary? If they do not interoperate (and
+most do not), plan for a process boundary with a pipe, socket, or HTTP
+connection.</p></li>
+<li><p>Audit the environment. What environment variables does each
+system set, expect, or react to? Print the full environment in the
+context where your integration will run. Not in your terminal. In the
+actual deployment context. Environment variables are invisible
+authority. They cause bugs that are invisible in source code.</p></li>
+<li><p>Estimate the debugging cost of each failure mode. The “simplest”
+architecture is not the one with the fewest layers. It is the one whose
+failure modes produce the most diagnostic information. A three-layer
+architecture where failures are silent is harder to debug than a
+five-layer architecture where every failure produces a log line. Choose
+the architecture that fails observably.</p></li>
+<li><p>Build probes before bridges. Write a one-line test for each
+boundary in your architecture. Can Layer A talk to Layer B? If all
+probes pass, your architecture works. If probe 3 fails, you know exactly
+where the problem is. This narrows thirty hours of debugging to thirty
+minutes of probe writing.</p></li>
+</ol>
+<p><strong>During implementation:</strong></p>
+<ol start="6" type="1">
+<li><p>Log at every serialization boundary. Every time data crosses a
+process boundary, format change, or protocol translation, log what goes
+in and what comes out. The discrepancy is the bug.</p></li>
+<li><p>Use explicit environment dictionaries for all subprocesses. Never
+rely on environment inheritance. The subprocess should receive exactly
+the variables it needs, no more.</p></li>
+<li><p>Implement two-tier timeouts: one for “nothing happened” (fast,
+catches setup failures) and one for “it’s taking too long” (slow,
+catches runaway processes).</p></li>
+<li><p>Handle partial data at every buffer boundary. Streaming data
+arrives in chunks of arbitrary size. Every parser must accumulate
+partial records and only emit complete ones.</p></li>
+<li><p>Flush explicitly. Never assume buffering behavior. Different
+runtimes, different pipe configurations, and different operating systems
+buffer differently. Explicit <code>flush()</code> calls are
+self-documenting and environment-independent.</p></li>
+</ol>
+<p>These ten points are not theoretical. Each one corresponds to a
+specific bug that cost hours to diagnose in this project. Following all
+ten from the start would have reduced the total debugging time from
+thirty hours to approximately five.</p>
+<p>Companion repo: <a
+href="https://github.com/krzemienski/claude-sdk-bridge">github.com/krzemienski/claude-sdk-bridge</a></p>
+<hr />
+<p><em>Part 5 of 11 in the <a
+href="https://github.com/krzemienski/agentic-development-guide">Agentic
+Development</a> series.</em></p>
+<p><code>#AgenticDevelopment</code> <code>#ClaudeCode</code>
+<code>#iOSDevelopment</code> <code>#SoftwareArchitecture</code>
+<code>#AIEngineering</code></p>
+
+<hr>
+<h2>Diagrams &amp; Visual Assets</h2>
+
+
+<div class="social-cards">
+<h3>Social Media Cards</h3>
+<p style="color:#94a3b8;font-size:0.9em;">Open <code>assets/twitter-card.html</code> and <code>assets/linkedin-card.html</code> in a browser to preview social cards.</p>
+</div>
+
+<div class="series-nav">
+<span>Agentic Development: 10 Lessons from 8,481 AI Coding Sessions</span>
+<span style="color:#64748b;">Post 05 of 11</span>
+</div>
+</article>
+</body>
+</html>

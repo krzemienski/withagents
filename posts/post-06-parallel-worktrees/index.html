@@ -1,0 +1,2787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>194 Worktrees, Zero Conflicts</title>
+<meta property="og:title" content="194 Worktrees, Zero Conflicts">
+<meta property="og:description" content="Scaling AI development from serial to massively parallel">
+<meta property="og:type" content="article">
+<meta property="og:image" content="assets/hero-card.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="194 Worktrees, Zero Conflicts">
+<meta name="twitter:description" content="Scaling AI development from serial to massively parallel">
+<meta name="author" content="Nick Krzemienski">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0a0a0a; color: #e2e8f0; line-height: 1.8; }
+  .hero-container { max-width: 1200px; margin: 0 auto; }
+  .hero-container > div { width: 100% !important; max-width: 100%; }
+  article { max-width: 780px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: 2.5em; font-weight: 800; color: #f8fafc; line-height: 1.2; margin: 0 0 16px; }
+  h2 { font-size: 1.75em; font-weight: 700; color: #f1f5f9; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #1e293b; }
+  h3 { font-size: 1.3em; font-weight: 600; color: #e2e8f0; margin: 32px 0 12px; }
+  h4 { font-size: 1.1em; font-weight: 600; color: #cbd5e1; margin: 24px 0 8px; }
+  p { margin: 0 0 16px; color: #cbd5e1; }
+  a { color: #818cf8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; background: #1e293b; color: #a5b4fc; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+  pre { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 20px; margin: 16px 0 24px; overflow-x: auto; }
+  pre code { background: none; padding: 0; color: #e2e8f0; font-size: 0.85em; line-height: 1.6; }
+  blockquote { border-left: 3px solid #6366f1; padding: 12px 20px; margin: 16px 0; background: rgba(99,102,241,0.05); border-radius: 0 8px 8px 0; }
+  blockquote p { color: #94a3b8; margin: 0; }
+  ul, ol { margin: 8px 0 16px 24px; color: #cbd5e1; }
+  li { margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; }
+  th { background: #1e293b; color: #f1f5f9; padding: 10px 16px; text-align: left; font-weight: 600; font-size: 0.9em; }
+  td { padding: 10px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.9em; }
+  tr:hover td { background: rgba(99,102,241,0.03); }
+  hr { border: none; border-top: 1px solid #1e293b; margin: 32px 0; }
+  img, svg { max-width: 100%; height: auto; border-radius: 8px; margin: 16px 0; }
+  .diagram { margin: 32px 0; padding: 24px; background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; overflow-x: auto; }
+  .diagram h4 { color: #64748b; font-size: 0.85em; font-weight: 500; margin: 0 0 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .diagram svg { display: block; margin: 0 auto; max-height: 600px; }
+  .meta { color: #64748b; font-size: 0.9em; margin: 8px 0 32px; }
+  .social-cards { display: flex; gap: 24px; flex-wrap: wrap; margin: 48px 0; padding: 24px; background: #0f172a; border-radius: 12px; }
+  .social-cards h3 { width: 100%; color: #64748b; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px; }
+  .social-cards iframe { border: 1px solid #1e293b; border-radius: 8px; }
+  .series-nav { display: flex; justify-content: space-between; padding: 24px; background: #0f172a; border-radius: 12px; margin-top: 48px; }
+  .series-nav a { color: #818cf8; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="hero-container"><div style="width:1200px;height:630px;background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%);display:flex;flex-direction:column;justify-content:center;padding:0 80px;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif;position:relative;overflow:hidden;">
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:radial-gradient(circle at 1px 1px,rgba(30,64,175,0.15) 1px,transparent 0);background-size:40px 40px;"></div>
+  <div style="position:absolute;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(30,64,175,0.2) 0%,transparent 70%);border-radius:50%;"></div>
+  <div style="position:relative;z-index:1;display:inline-block;background:rgba(30,64,175,0.2);border:1px solid rgba(30,64,175,0.4);border-radius:20px;padding:6px 16px;margin-bottom:24px;width:fit-content;">
+    <span style="color:rgba(30,64,175,0.9);font-size:14px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">LESSON 06 OF 10 · PARALLEL EXECUTION</span>
+  </div>
+  <h1 style="position:relative;z-index:1;color:#f1f5f9;font-size:46px;font-weight:800;line-height:1.15;margin:0 0 20px 0;max-width:900px;">194 Worktrees, Zero Conflicts</h1>
+  <p style="position:relative;z-index:1;color:#94a3b8;font-size:20px;line-height:1.5;margin:0 0 32px 0;max-width:700px;">Scaling AI development from serial to massively parallel without losing your mind</p>
+  <div style="position:relative;z-index:1;display:flex;align-items:center;gap:12px;">
+    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,rgb(30,64,175),#8b5cf6);display:flex;align-items:center;justify-content:center;">
+      <span style="color:white;font-weight:700;font-size:16px;">NK</span>
+    </div>
+    <div>
+      <div style="color:#f1f5f9;font-size:14px;font-weight:600;">Nick Krzemienski</div>
+      <div style="color:#64748b;font-size:13px;">March 2026 · Agentic Development Series</div>
+    </div>
+  </div>
+</div></div>
+<article>
+<p class="meta">Lesson 06 of 10 · Nick Krzemienski · March 2026 · Agentic Development Series</p>
+<figure>
+<embed src="../visuals/html/post6-hero.html" />
+<figcaption aria-hidden="true">Hero</figcaption>
+</figure>
+<h2 id="parallel-ai-worktrees">194 Parallel AI Worktrees</h2>
+<p>I gave an AI 194 tasks, 194 isolated copies of a codebase, and told
+it to build. The execution agents were not the hard part. The QA
+pipeline was.</p>
+<p>This is the story of auto-claude-worktrees – a system that uses git
+worktrees to spin up dozens of parallel AI agents, each working in
+complete filesystem isolation, then runs independent QA agents to decide
+what ships and what gets sent back for fixes. The numbers from one real
+project: 194 tasks ideated, 91 specs generated, 71 QA reports produced,
+3,066 sessions consumed, 470 MB of conversation data.</p>
+<p>The companion repo has the full pipeline: <a
+href="https://github.com/krzemienski/auto-claude-worktrees">github.com/krzemienski/auto-claude-worktrees</a></p>
+<hr />
+<h3 id="the-problem-with-parallel-ai-development">The Problem with
+Parallel AI Development</h3>
+<p>When you ask one AI agent to build a large feature, it works
+sequentially through a long chain of changes. If it makes a mistake in
+step 3, steps 4 through 20 compound the error. If you ask it to fix step
+3, it often breaks step 7 in the process.</p>
+<p>The obvious answer is parallelism. Break the work into independent
+tasks, run them simultaneously. But naive parallelism hits an immediate
+wall: merge conflicts. If agent A modifies <code>utils.py</code> at line
+40 and agent B modifies <code>utils.py</code> at line 50, you have a
+conflict that neither agent anticipated.</p>
+<p>Git worktrees solve this cleanly. Each worktree is a full copy of the
+repository on a separate branch. No shared filesystem state. No
+cross-contamination. The conflicts only surface at merge time, when you
+can handle them systematically instead of reactively.</p>
+<p>But worktrees alone are not enough. You also need a system that
+decides what to build (ideation), how to build it (specs), who reviews
+it (QA), and in what order to integrate it (merge queue). That is the
+real engineering challenge – not the parallelism itself, but the
+pipeline that wraps it.</p>
+<pre><code>auto-claude full --repo ./my-project --workers 8</code></pre>
+<p>That single command runs five pipeline stages that took me months to
+get right.</p>
+<pre class="mermaid"><code>flowchart LR
+    subgraph S1[&quot;Stage 1&quot;]
+        A[&quot;Ideate\n194 tasks&quot;]
+        A_op[&quot;Claude analyzes codebase&quot;]
+    end
+
+    subgraph S2[&quot;Stage 2&quot;]
+        B[&quot;Spec Gen\n91 specs&quot;]
+        B_op[&quot;Task to acceptance criteria&quot;]
+    end
+
+    subgraph S3[&quot;Stage 3&quot;]
+        C[&quot;Worktree Factory\n71 worktrees&quot;]
+        C_op[&quot;git worktree add + agent spawn&quot;]
+    end
+
+    subgraph S4[&quot;Stage 4&quot;]
+        D[&quot;QA Review\n71 reports&quot;]
+        D_op[&quot;Independent reviewer vs spec&quot;]
+    end
+
+    subgraph S5[&quot;Stage 5&quot;]
+        E[&quot;Merge Queue\n~60 merged&quot;]
+        E_op[&quot;Priority-weighted toposort&quot;]
+    end
+
+    A --&gt; B --&gt; C --&gt; D --&gt; E</code></pre>
+<figure>
+<img src="../visuals/svg-rendered/post6-worktree-pipeline.svg"
+alt="Pipeline overview" />
+<figcaption aria-hidden="true">Pipeline overview</figcaption>
+</figure>
+<hr />
+<h3 id="the-194-worktree-session-a-case-study">The 194-Worktree Session:
+A Case Study</h3>
+<p>The project was an Awesome List application – a curated directory
+with categories, ratings, search, and contribution workflows. The kind
+of project that sounds simple until you realize it needs data models,
+API endpoints, a frontend, authentication, email notifications, markdown
+parsing, CI/CD, and a dozen other subsystems.</p>
+<p>I decided to throw the entire codebase at the ideation phase and see
+what came back. 194 tasks. Everything from “add type annotations to all
+public functions” to “implement full-text search with stemming” to
+“create Docker Compose production deployment.”</p>
+<p>Here is what actually happened.</p>
+<p><strong>What it accomplished.</strong> In a single overnight run, the
+system produced working implementations for 60 tasks. Sixty. Each one
+built on its own branch, reviewed by an independent QA agent, and merged
+through a dependency-aware queue. The equivalent of two weeks of focused
+engineering work – generated, reviewed, and integrated while I
+slept.</p>
+<p><strong>What went wrong.</strong> Plenty. Eleven tasks permanently
+failed because the specs were too vague. “Improve the UI” is not
+actionable for an autonomous agent. Eight tasks hit timeout limits
+because the agent entered infinite refactoring loops – editing file A to
+fix an issue, which broke file B, which it “fixed” by reverting the
+change to file A, round and round. Three tasks produced code that passed
+QA but introduced subtle performance regressions that the QA agent’s
+diff-based review could not catch.</p>
+<p><strong>What I learned.</strong> Three things crystallized during
+that run. First, spec quality determines everything. The 22% first-pass
+QA rejection rate correlated directly with spec precision – tasks with
+five or more concrete acceptance criteria had a 12% rejection rate.
+Tasks with two vague criteria had a 38% rejection rate. Second, QA agent
+independence is not optional. In early experiments where I let the
+execution agent self-review, 100% of work “passed.” Separate reviewers
+caught real problems. Third, the merge queue’s topological sort
+prevented what would have been catastrophic cascading conflicts. Without
+dependency ordering, the first broad refactor to merge would have
+conflicted with almost everything after it.</p>
+<h4 id="the-timeline-of-a-real-run">The Timeline of a Real Run</h4>
+<p>The full 194-task run took approximately 14 hours wall-clock time.
+Here is how that time broke down:</p>
+<ul>
+<li><strong>Ideation (Stage 1):</strong> 8 minutes. A single Claude Opus
+call analyzes the codebase and generates the task manifest. This is the
+cheapest stage by far – one API call for 194 tasks.</li>
+<li><strong>Spec generation (Stage 2):</strong> 45 minutes. 91 specs
+generated in parallel with 4 workers. Each spec requires a separate API
+call with codebase context. The 103 tasks that did not receive specs
+were either blocked by dependencies, filtered for scope overlap, or
+failed spec generation due to ambiguity.</li>
+<li><strong>Worktree execution (Stage 3):</strong> 9 hours. This is the
+dominant cost. 71 worktrees running with 8 parallel workers. Each agent
+works for 10-30 minutes on its task. The long tail comes from complex
+tasks that involve multiple file changes and iterative debugging.</li>
+<li><strong>QA review (Stage 4):</strong> 3 hours. 71 QA reviews with 4
+parallel workers. Each review involves reading the spec, reading the
+diff, reasoning about correctness, and producing a structured verdict.
+The QA model (Opus) is slower but more thorough than the execution model
+(Sonnet).</li>
+<li><strong>Merge queue (Stage 5):</strong> 25 minutes. Sequential by
+necessity – each merge depends on the previous one. 60 successful
+merges, 8 conflicts, 3 skipped due to permanent QA rejection.</li>
+</ul>
+<p>The total API cost for the run was approximately $380. The equivalent
+human engineering time (conservatively 2 weeks of focused work for 60
+implemented tasks) would cost roughly $15,000-$25,000 in developer
+salary. Even accounting for the tasks that failed, the cost ratio is
+striking.</p>
+<h4 id="post-run-analysis-what-the-numbers-reveal">Post-Run Analysis:
+What the Numbers Reveal</h4>
+<p>After the run completed, the <code>manifest.json</code> file
+contained the full lifecycle of every task. Aggregating across all 194
+tasks reveals patterns invisible during execution:</p>
+<p><strong>Task category success rates:</strong></p>
+<table>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 10%" />
+<col style="width: 15%" />
+<col style="width: 21%" />
+<col style="width: 18%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr>
+<th>Category</th>
+<th>Tasks</th>
+<th>Completed</th>
+<th>First-Pass QA</th>
+<th>Final Merged</th>
+<th>Success Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Type annotations</td>
+<td>23</td>
+<td>22</td>
+<td>20</td>
+<td>20</td>
+<td>87%</td>
+</tr>
+<tr>
+<td>Documentation</td>
+<td>18</td>
+<td>17</td>
+<td>16</td>
+<td>16</td>
+<td>89%</td>
+</tr>
+<tr>
+<td>Error handling</td>
+<td>31</td>
+<td>26</td>
+<td>18</td>
+<td>22</td>
+<td>71%</td>
+</tr>
+<tr>
+<td>New features</td>
+<td>42</td>
+<td>30</td>
+<td>14</td>
+<td>20</td>
+<td>48%</td>
+</tr>
+<tr>
+<td>Refactoring</td>
+<td>28</td>
+<td>19</td>
+<td>10</td>
+<td>14</td>
+<td>50%</td>
+</tr>
+<tr>
+<td>Testing infrastructure</td>
+<td>15</td>
+<td>11</td>
+<td>7</td>
+<td>8</td>
+<td>53%</td>
+</tr>
+<tr>
+<td>CI/CD</td>
+<td>12</td>
+<td>8</td>
+<td>5</td>
+<td>5</td>
+<td>42%</td>
+</tr>
+<tr>
+<td>UI/Frontend</td>
+<td>25</td>
+<td>16</td>
+<td>8</td>
+<td>11</td>
+<td>44%</td>
+</tr>
+</tbody>
+</table>
+<p>The pattern is unmistakable. Narrow, well-defined tasks (type
+annotations, documentation) succeed at nearly 90%. Tasks requiring
+creative decisions (new features, UI) succeed at under 50%. This is not
+a flaw – it is a design input. The next pipeline run should generate
+more narrow tasks and fewer creative ones, or route creative tasks to
+human review instead of autonomous execution.</p>
+<p><strong>The fix cycle data is equally revealing.</strong> Of the 22
+tasks that were initially rejected by QA but eventually merged, 16
+required exactly one fix cycle, 4 required two, and 2 required three
+(the maximum before permanent rejection). The average fix cycle added 8
+minutes of execution time and $3.50 in API cost. At $3.50 per fix, it is
+vastly cheaper to attempt a fix than to discard and re-specify – which
+is why the <code>max_retries = 2</code> default exists.</p>
+<p><strong>The 11 permanently rejected tasks</strong> shared a common
+trait: their specs contained ambiguous acceptance criteria that the QA
+agent interpreted differently from the execution agent. “Improve error
+messages” was permanently rejected because the QA agent could not
+objectively evaluate “improved.” “Add validation to all forms” was
+rejected because “all” was undefined. These rejections are not failures
+of the pipeline – they are the pipeline correctly identifying specs that
+need human clarification.</p>
+<hr />
+<h3 id="stage-1-ideation-over-generate-deliberately">Stage 1: Ideation –
+Over-Generate Deliberately</h3>
+<p>The ideation phase uses Claude to analyze the entire codebase and
+generate a task manifest. The key data model:</p>
+<pre class="python"><code># From: src/auto_claude/models.py
+
+class Task(BaseModel):
+    id: str = Field(description=&quot;Unique task identifier, e.g. &#39;modularization&#39;, &#39;reduce-any-types&#39;&quot;)
+    title: str = Field(description=&quot;Human-readable task title&quot;)
+    description: str = Field(description=&quot;Detailed description of what needs to be done&quot;)
+    scope: list[str] = Field(
+        default_factory=list,
+        description=&quot;Files and modules affected by this task&quot;,
+    )
+    dependencies: list[str] = Field(
+        default_factory=list,
+        description=&quot;Task IDs that must complete before this task&quot;,
+    )
+    priority: TaskPriority = Field(default=TaskPriority.MEDIUM)
+    status: TaskStatus = Field(default=TaskStatus.IDEATED)
+    tags: list[str] = Field(default_factory=list, description=&quot;Categorization tags&quot;)</code></pre>
+<p>Two methods on the <code>Task</code> model enable the pipeline’s
+dependency and conflict logic:</p>
+<pre class="python"><code># From: src/auto_claude/models.py
+
+def is_blocked(self, completed_task_ids: set[str]) -&gt; bool:
+    &quot;&quot;&quot;Check if this task is blocked by incomplete dependencies.&quot;&quot;&quot;
+    return bool(set(self.dependencies) - completed_task_ids)
+
+def has_scope_overlap(self, other: Task) -&gt; bool:
+    &quot;&quot;&quot;Check if two tasks modify overlapping files.&quot;&quot;&quot;
+    return bool(set(self.scope) &amp; set(other.scope))</code></pre>
+<p>The <code>has_scope_overlap</code> method is how the pipeline
+predicts conflicts before they happen. If two tasks declare overlapping
+file scopes, the system knows they cannot safely run in parallel against
+the same base – one must merge first, and the other re-executes against
+the updated main.</p>
+<p>The priority enum determines merge order later:</p>
+<pre class="python"><code># From: src/auto_claude/models.py
+
+class TaskPriority(str, enum.Enum):
+    CRITICAL = &quot;critical&quot;
+    HIGH = &quot;high&quot;
+    MEDIUM = &quot;medium&quot;
+    LOW = &quot;low&quot;</code></pre>
+<p>A critical design decision: the ideation phase over-generates
+deliberately. Generating 194 task descriptions costs a fraction of
+executing one. The QA pipeline downstream filters what should not ship.
+This is the opposite of how most people think about AI task planning –
+they try to generate exactly the right set of tasks upfront. That
+precision is expensive and fragile. Casting a wide net and filtering is
+cheaper and more robust.</p>
+<p>The ideation agent receives the full codebase context – directory
+tree, key config files, and sampled source files – along with a system
+prompt that instructs it to think across all dimensions:</p>
+<pre class="python"><code># From: src/auto_claude/ideate.py
+
+IDEATION_SYSTEM_PROMPT = &quot;&quot;&quot;\
+You are a senior software architect analyzing a codebase for improvement opportunities.
+
+Your job is to produce a comprehensive task manifest — a JSON array of tasks that would
+improve this codebase across all dimensions: architecture, code quality, type safety,
+testing, documentation, deployment, accessibility, performance, and security.
+
+Guidelines:
+- Over-generate deliberately — downstream QA will filter
+- Foundation work (types, error handling, shared infra) should be &quot;critical&quot; or &quot;high&quot; priority
+- Feature work should depend on relevant foundation tasks
+- Group related changes into single tasks when they touch the same files
+- Keep tasks focused enough for one agent to complete in isolation
+
+Respond with ONLY a JSON array of task objects. No markdown, no commentary.&quot;&quot;&quot;</code></pre>
+<p>That last guideline – “focused enough for one agent to complete in
+isolation” – is the sentence that makes the whole system possible. Tasks
+that require coordination between agents cannot be parallelized. The
+ideation phase must decompose work into independently completable
+units.</p>
+<p>The repository scanning function builds context that the ideation
+agent can reason about:</p>
+<pre class="python"><code># From: src/auto_claude/ideate.py
+
+def scan_repository(repo_path: Path, config: PipelineConfig) -&gt; str:
+    context_parts: list[str] = []
+
+    # Directory tree (depth-limited)
+    context_parts.append(&quot;## Directory Structure\n&quot;)
+    result = subprocess.run(
+        [&quot;find&quot;, &quot;.&quot;, &quot;-type&quot;, &quot;f&quot;, &quot;-not&quot;, &quot;-path&quot;, &quot;./.git/*&quot;,
+         &quot;-not&quot;, &quot;-path&quot;, &quot;./node_modules/*&quot;, &quot;-not&quot;, &quot;-path&quot;, &quot;./__pycache__/*&quot;],
+        capture_output=True, text=True, cwd=repo_path, timeout=30,
+    )
+    files = sorted(result.stdout.strip().split(&quot;\n&quot;)) if result.stdout.strip() else []
+    context_parts.append(f&quot;Total files: {len(files)}\n&quot;)
+
+    # README and key config files
+    for key_file in [&quot;README.md&quot;, &quot;pyproject.toml&quot;, &quot;package.json&quot;, &quot;Cargo.toml&quot;]:
+        path = repo_path / key_file
+        if path.exists():
+            content = path.read_text(errors=&quot;replace&quot;)[:3000]
+            context_parts.append(f&quot;\n## {key_file}\n```\n{content}\n```&quot;)
+
+    # Sample source files (first 100 lines each)
+    source_files = []
+    for pattern in config.include_patterns:
+        source_files.extend(repo_path.glob(pattern))
+
+    for src_file in source_files[:50]:  # Sample top 50 by size
+        rel_path = src_file.relative_to(repo_path)
+        lines = src_file.read_text(errors=&quot;replace&quot;).split(&quot;\n&quot;)[:100]
+        preview = &quot;\n&quot;.join(lines)
+        context_parts.append(f&quot;\n### {rel_path}\n```\n{preview}\n```&quot;)
+
+    return &quot;\n&quot;.join(context_parts)</code></pre>
+<p>The 50-file cap and 100-line limit per file are pragmatic. Sending
+the entire codebase would blow the context window. Sending only the
+README would not give the agent enough to reason about scope and
+dependencies. The sweet spot is a representative sample: structure plus
+key files plus the largest source files.</p>
+<h4 id="what-makes-a-good-ideated-task">What Makes a Good Ideated
+Task</h4>
+<p>After running the ideation phase across multiple projects, patterns
+emerge in which tasks succeed and which fail. The best ideated tasks
+share three properties:</p>
+<ol type="1">
+<li><p><strong>Bounded scope.</strong> “Add type annotations to the
+<code>auth/</code> module” succeeds. “Improve type safety across the
+codebase” does not – it is too broad for one agent to complete in a
+single session.</p></li>
+<li><p><strong>Clear definition of done.</strong> “Add
+<code>--verbose</code> flag to the CLI that enables debug logging to
+stderr” has a concrete end state. “Make the CLI more user-friendly” is
+subjective and leads to unbounded work.</p></li>
+<li><p><strong>Explicit file scope.</strong> Tasks that name the
+specific files they will modify allow the merge queue to predict
+conflicts. Tasks with vague scope (“various files”) force the system to
+assume the worst case – potential conflicts with everything.</p></li>
+</ol>
+<p>The ideation prompt’s instruction to “group related changes into
+single tasks when they touch the same files” addresses a specific
+failure mode. In early runs, the ideation agent would generate separate
+tasks like “add error handling to <code>api.py</code>” and “add logging
+to <code>api.py</code>” – two tasks that both modify the same file,
+guaranteeing a merge conflict. Grouping them into one task (“add error
+handling and logging to <code>api.py</code>”) eliminates the conflict
+entirely.</p>
+<hr />
+<h3 id="stage-2-specs-the-real-bottleneck">Stage 2: Specs – The Real
+Bottleneck</h3>
+<p>Raw task descriptions are not enough for autonomous agents. “Improve
+error handling” is too vague. The spec generator produces detailed
+implementation blueprints:</p>
+<pre class="python"><code># From: src/auto_claude/models.py
+
+class Spec(BaseModel):
+    task_id: str = Field(description=&quot;ID of the source task&quot;)
+    objective: str = Field(description=&quot;Single-sentence end-state description&quot;)
+    files_in_scope: list[str] = Field(
+        description=&quot;Explicit list of files to create, modify, or delete&quot;
+    )
+    implementation_steps: list[str] = Field(
+        description=&quot;Ordered sequence of changes to make&quot;
+    )
+    acceptance_criteria: list[str] = Field(
+        description=&quot;Concrete, verifiable conditions for completion&quot;
+    )
+    risk_notes: list[str] = Field(
+        default_factory=list,
+        description=&quot;Known pitfalls, edge cases, or compatibility concerns&quot;,
+    )
+    estimated_complexity: str = Field(
+        default=&quot;medium&quot;,
+        description=&quot;Complexity estimate: low, medium, high&quot;,
+    )
+    branch_name: str = Field(default=&quot;&quot;, description=&quot;Git branch name (auto-generated if empty)&quot;)</code></pre>
+<p>The <code>acceptance_criteria</code> field is the most important. It
+is the contract between the execution agent and the QA agent. Every
+criterion must be concrete and verifiable – not “code is clean” but “all
+public functions have docstrings” or “error paths return structured
+error responses.”</p>
+<p>The spec generation system prompt enforces this precision:</p>
+<pre class="python"><code># From: src/auto_claude/specgen.py
+
+SPEC_SYSTEM_PROMPT = &quot;&quot;&quot;\
+You are an expert technical writer generating implementation specifications
+for autonomous AI agents.
+
+Respond with a single JSON object containing:
+- &quot;task_id&quot;: The task identifier (from input)
+- &quot;objective&quot;: A single sentence describing the end state
+- &quot;files_in_scope&quot;: Explicit list of files to create, modify, or delete
+- &quot;implementation_steps&quot;: Ordered sequence of specific changes
+- &quot;acceptance_criteria&quot;: Concrete, verifiable conditions for completion
+- &quot;risk_notes&quot;: Known pitfalls, edge cases, or compatibility concerns
+
+Guidelines:
+- Be explicit about file paths — no vague references like &quot;the config file&quot;
+- Each implementation step should be one atomic action
+- Acceptance criteria must be objectively verifiable (not &quot;code is clean&quot;)
+- Risk notes should warn about specific gotchas the agent might hit&quot;&quot;&quot;</code></pre>
+<p>Each spec gets formatted into a prompt context that the execution
+agent can reference:</p>
+<pre class="python"><code># From: src/auto_claude/models.py
+
+def to_prompt_context(self) -&gt; str:
+    lines = [
+        f&quot;# Task: {self.task_id}&quot;,
+        f&quot;\n## Objective\n{self.objective}&quot;,
+        &quot;\n## Files in Scope&quot;,
+    ]
+    for f in self.files_in_scope:
+        lines.append(f&quot;- {f}&quot;)
+    lines.append(&quot;\n## Implementation Steps&quot;)
+    for i, step in enumerate(self.implementation_steps, 1):
+        lines.append(f&quot;{i}. {step}&quot;)
+    lines.append(&quot;\n## Acceptance Criteria&quot;)
+    for criterion in self.acceptance_criteria:
+        lines.append(f&quot;- [ ] {criterion}&quot;)
+    if self.risk_notes:
+        lines.append(&quot;\n## Risk Notes&quot;)
+        for note in self.risk_notes:
+            lines.append(f&quot;- {note}&quot;)
+    return &quot;\n&quot;.join(lines)</code></pre>
+<p>Spec generation runs in parallel, using the same
+<code>ThreadPoolExecutor</code> pattern as the rest of the pipeline:</p>
+<pre class="python"><code># From: src/auto_claude/specgen.py
+
+def generate_specs(tasks, repo_path, config, output_dir=None):
+    eligible = filter_specifiable_tasks(tasks)
+
+    specs: list[Spec] = []
+
+    with ThreadPoolExecutor(max_workers=config.max_parallel_workers) as executor:
+        future_to_task = {
+            executor.submit(generate_single_spec, task, repo_path, config): task
+            for task in eligible
+        }
+
+        for future in as_completed(future_to_task):
+            task = future_to_task[future]
+            spec = future.result()
+            if spec:
+                specs.append(spec)
+                task.status = TaskStatus.SPECIFIED
+            else:
+                task.status = TaskStatus.DEFERRED
+
+    return specs</code></pre>
+<p>The <code>filter_specifiable_tasks</code> function enforces
+dependency ordering – tasks blocked by incomplete dependencies get
+deferred until their prerequisites are done. This is why 194 ideated
+tasks became only 91 specs: some were blocked, some failed spec
+generation, some overlapped and were deferred.</p>
+<h4 id="the-spec-quality-spectrum">The Spec Quality Spectrum</h4>
+<p>Specs are the bottleneck, not execution. A precise spec passes QA on
+the first attempt. A vague spec produces work that gets rejected, fixed,
+re-reviewed, and sometimes rejected again. The ~22% first-pass rejection
+rate in our data correlates directly with spec precision – tasks with
+five or more concrete acceptance criteria had a significantly lower
+rejection rate than tasks with two or three vague ones.</p>
+<p>Here is a concrete example of the difference. A bad spec for an “add
+error handling” task:</p>
+<pre><code>Acceptance Criteria:
+- Error handling is present
+- The code is robust</code></pre>
+<p>The QA agent has no objective way to verify “robust.” A good spec for
+the same task:</p>
+<pre><code>Acceptance Criteria:
+- All API endpoint handlers wrap database calls in try/except blocks
+- Database errors return HTTP 500 with {&quot;error&quot;: &quot;internal_error&quot;, &quot;message&quot;: &quot;&lt;description&gt;&quot;}
+- Validation errors return HTTP 422 with {&quot;error&quot;: &quot;validation_error&quot;, &quot;fields&quot;: {...}}
+- All error responses include a request_id header for debugging
+- No bare except clauses — all exceptions are typed</code></pre>
+<p>The second spec took 30 seconds longer to generate. It saved 15
+minutes of QA rejection-fix-resubmit cycles. That is a 30x return on
+investment in spec precision.</p>
+<hr />
+<h3 id="stage-3-the-worktree-factory">Stage 3: The Worktree Factory</h3>
+<p>This is the core of the system. For each spec, the factory creates a
+git worktree, injects the spec, and spawns a Claude agent.</p>
+<h4 id="worktree-creation">Worktree Creation</h4>
+<pre class="python"><code># From: src/auto_claude/factory.py
+
+def create_worktree(
+    repo_path: Path,
+    branch_name: str,
+    base_dir: Path,
+) -&gt; Path:
+    base_dir.mkdir(parents=True, exist_ok=True)
+    worktree_path = base_dir / branch_name.replace(&quot;/&quot;, &quot;-&quot;)
+
+    # Remove existing worktree if it exists (from a previous run)
+    if worktree_path.exists():
+        subprocess.run(
+            [&quot;git&quot;, &quot;worktree&quot;, &quot;remove&quot;, &quot;--force&quot;, str(worktree_path)],
+            cwd=repo_path, capture_output=True,
+        )
+
+    # Delete branch if it exists (from a previous run)
+    subprocess.run(
+        [&quot;git&quot;, &quot;branch&quot;, &quot;-D&quot;, branch_name],
+        cwd=repo_path, capture_output=True,
+    )
+
+    # Create fresh worktree with new branch
+    result = subprocess.run(
+        [&quot;git&quot;, &quot;worktree&quot;, &quot;add&quot;, &quot;-b&quot;, branch_name, str(worktree_path)],
+        cwd=repo_path, capture_output=True, text=True,
+    )
+
+    if result.returncode != 0:
+        raise RuntimeError(
+            f&quot;Failed to create worktree &#39;{branch_name}&#39;: {result.stderr.strip()}&quot;
+        )
+
+    return worktree_path</code></pre>
+<p>There is a subtlety in the cleanup logic at the top. The
+<code>--force</code> remove and <code>branch -D</code> are not defensive
+programming for its own sake. They handle the common case where a
+pipeline run failed halfway through and left stale worktrees from a
+previous attempt. Without this cleanup, the second run would fail on
+every task that had been attempted before. I learned this after the
+third time a partial failure turned into a complete failure because the
+worktree directory already existed.</p>
+<h4 id="branch-naming-convention">Branch Naming Convention</h4>
+<p>The spec model auto-generates branch names from task IDs:</p>
+<pre class="python"><code># From: src/auto_claude/models.py
+
+def get_branch_name(self) -&gt; str:
+    &quot;&quot;&quot;Return the branch name, generating one from task_id if not set.&quot;&quot;&quot;
+    if self.branch_name:
+        return self.branch_name
+    return f&quot;auto/{self.task_id}&quot;</code></pre>
+<p>The <code>auto/</code> prefix is important. It namespaces all
+pipeline-generated branches so they are visually distinct from
+human-created branches in <code>git branch</code> output and can be
+batch-cleaned with a single glob pattern:
+<code>git branch -D $(git branch --list 'auto/*')</code>.</p>
+<p>This naming convention also makes post-run analysis easier. You can
+count how many pipeline branches exist, how many were merged, and how
+many are still pending with simple git commands:</p>
+<pre class="bash"><code># Count all pipeline branches
+git branch --list &#39;auto/*&#39; | wc -l
+
+# Count merged pipeline branches
+git branch --merged main --list &#39;auto/*&#39; | wc -l
+
+# Count unmerged (pending or failed) pipeline branches
+git branch --no-merged main --list &#39;auto/*&#39; | wc -l</code></pre>
+<h4 id="spec-injection">Spec Injection</h4>
+<p>After creating the worktree, the spec gets injected as a context file
+– both human-readable markdown and machine-readable JSON:</p>
+<pre class="python"><code># From: src/auto_claude/factory.py
+
+def inject_spec(worktree_path: Path, spec: Spec) -&gt; Path:
+    spec_dir = worktree_path / &quot;.auto-claude&quot;
+    spec_dir.mkdir(exist_ok=True)
+
+    spec_md = spec_dir / &quot;spec.md&quot;
+    spec_md.write_text(spec.to_prompt_context())
+
+    spec_json = spec_dir / &quot;spec.json&quot;
+    with open(spec_json, &quot;w&quot;) as f:
+        json.dump(spec.model_dump(mode=&quot;json&quot;), f, indent=2, default=str)
+
+    return spec_md</code></pre>
+<p>The dual format is deliberate. The markdown is for the agent’s prompt
+context – it reads well in a conversation. The JSON is for the QA
+pipeline – it can programmatically extract acceptance criteria and
+compare them against the agent’s output.</p>
+<h4 id="agent-spawning">Agent Spawning</h4>
+<p>Then a Claude agent is spawned, scoped entirely to that worktree’s
+filesystem:</p>
+<pre class="python"><code># From: src/auto_claude/factory.py
+
+EXECUTION_SYSTEM_PROMPT = &quot;&quot;&quot;\
+You are an autonomous software engineer executing a specific implementation task.
+
+You are working in an isolated git worktree. You have full access to read and write
+files within this worktree. Your changes will not affect any other branch or worktree.
+
+Follow the implementation spec exactly. Complete all steps. Meet all acceptance criteria.
+When finished, commit your changes with a clear commit message describing what was done.
+
+Important:
+- Do NOT modify files outside the spec&#39;s scope unless absolutely necessary
+- Do NOT introduce new dependencies without documenting why
+- Commit early and often — each logical change should be its own commit
+- If you encounter a blocker, document it clearly in a BLOCKERS.md file&quot;&quot;&quot;
+
+
+def spawn_agent(
+    worktree_path: Path,
+    spec: Spec,
+    config: PipelineConfig,
+) -&gt; subprocess.Popen[str]:
+    prompt = f&quot;&quot;&quot;\
+Execute this implementation spec in your current working directory.
+
+{spec.to_prompt_context()}
+
+After completing all steps:
+1. Verify each acceptance criterion is met
+2. Commit all changes with descriptive messages
+3. Create a COMPLETION.md file summarizing what was done
+&quot;&quot;&quot;
+
+    cmd = [
+        &quot;claude&quot;, &quot;--print&quot;,
+        &quot;--model&quot;, config.model,
+        &quot;--system-prompt&quot;, EXECUTION_SYSTEM_PROMPT,
+        prompt,
+    ]
+
+    process = subprocess.Popen(
+        cmd,
+        cwd=worktree_path,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+    )
+
+    return process</code></pre>
+<p>The <code>BLOCKERS.md</code> escape valve is a lesson learned from
+the first run. Some tasks are genuinely impossible given the current
+state of the codebase. Without an explicit way to signal “I cannot do
+this and here is why,” the agent would either produce garbage output or
+loop until timeout. The QA agent knows to check for
+<code>BLOCKERS.md</code> and can issue a permanent rejection with the
+blocker information attached.</p>
+<p>The <code>COMPLETION.md</code> file serves a similar purpose in the
+other direction. It gives the execution agent a place to document what
+it did, why it made certain choices, and any caveats. The QA agent reads
+this alongside the diff, gaining context that pure code review would
+miss – like “I chose approach B over approach A because the dependency
+graph ruled out A.”</p>
+<h4 id="the-full-lifecycle">The Full Lifecycle</h4>
+<p>Each worktree execution follows a four-stage lifecycle within a
+single function:</p>
+<pre class="python"><code># From: src/auto_claude/factory.py
+
+def execute_in_worktree(spec, repo_path, config, base_dir) -&gt; WorktreeState:
+    branch_name = spec.get_branch_name()
+    state = WorktreeState(
+        task_id=spec.task_id, spec=spec,
+        worktree_path=Path(&quot;.&quot;), branch_name=branch_name,
+    )
+
+    try:
+        # Stage 1: Create worktree
+        worktree_path = create_worktree(repo_path, branch_name, base_dir)
+        state.worktree_path = worktree_path
+
+        # Stage 2: Inject spec
+        inject_spec(worktree_path, spec)
+
+        # Stage 3: Spawn agent
+        process = spawn_agent(worktree_path, spec, config)
+        state.pid = process.pid
+
+        # Stage 4: Wait for completion with timeout
+        try:
+            stdout, stderr = process.communicate(timeout=config.timeout_seconds)
+            state.session_count = 1
+
+            if process.returncode == 0:
+                state.mark_completed()
+                # Write agent output for QA review
+                output_path = worktree_path / &quot;.auto-claude&quot; / &quot;agent-output.txt&quot;
+                output_path.write_text(stdout)
+            else:
+                state.mark_failed(
+                    f&quot;Agent exited with code {process.returncode}: {stderr.strip()}&quot;
+                )
+        except subprocess.TimeoutExpired:
+            process.kill()
+            process.wait()
+            state.mark_failed(f&quot;Agent timed out after {config.timeout_seconds}s&quot;)
+
+    except RuntimeError as e:
+        state.mark_failed(str(e))
+
+    return state</code></pre>
+<p>The parallel execution uses <code>ThreadPoolExecutor</code>. The
+config controls concurrency:</p>
+<pre class="python"><code># From: src/auto_claude/factory.py
+
+def run_factory(specs, repo_path, config):
+    base_dir = config.resolve_paths(repo_path)[&quot;worktree_base&quot;]
+
+    states: list[WorktreeState] = []
+
+    with ThreadPoolExecutor(max_workers=config.max_parallel_workers) as executor:
+        future_to_spec = {
+            executor.submit(
+                execute_in_worktree, spec, repo_path, config, base_dir,
+            ): spec
+            for spec in specs
+        }
+
+        for future in as_completed(future_to_spec):
+            spec = future_to_spec[future]
+            try:
+                state = future.result()
+                states.append(state)
+            except Exception as e:
+                logger.error(&quot;Unexpected error executing &#39;%s&#39;: %s&quot;, spec.task_id, e)
+
+    return states</code></pre>
+<p>Each worktree execution is tracked through a lifecycle model with
+fourteen states:</p>
+<pre class="python"><code># From: src/auto_claude/models.py
+
+class TaskStatus(str, enum.Enum):
+    IDEATED = &quot;ideated&quot;
+    SPECIFIED = &quot;specified&quot;
+    DEFERRED = &quot;deferred&quot;
+    MERGED = &quot;merged&quot;
+    IN_PROGRESS = &quot;in_progress&quot;
+    COMPLETED = &quot;completed&quot;
+    QA_PENDING = &quot;qa_pending&quot;
+    QA_APPROVED = &quot;qa_approved&quot;
+    QA_REJECTED = &quot;qa_rejected&quot;
+    QA_REJECTED_PERMANENT = &quot;qa_rejected_permanent&quot;
+    MERGE_READY = &quot;merge_ready&quot;
+    MERGE_COMPLETE = &quot;merge_complete&quot;
+    MERGE_CONFLICT = &quot;merge_conflict&quot;
+    FAILED = &quot;failed&quot;</code></pre>
+<p>Fourteen states. That might seem excessive until you realize each
+state represents a decision point where the pipeline needs to know what
+to do next. <code>QA_REJECTED</code> means “send back for fixes.”
+<code>QA_REJECTED_PERMANENT</code> means “discard and re-specify.”
+<code>MERGE_CONFLICT</code> means “re-execute against the updated main.”
+Without these distinctions, the pipeline has no way to route work
+correctly through the fix-and-retry cycles.</p>
+<p>The <code>WorktreeState</code> model tracks everything about a single
+execution:</p>
+<pre class="python"><code># From: src/auto_claude/models.py
+
+class WorktreeState(BaseModel):
+    task_id: str
+    spec: Spec
+    worktree_path: Path
+    branch_name: str
+    status: TaskStatus = TaskStatus.IN_PROGRESS
+    pid: int | None = None
+    session_count: int = 0
+    retry_count: int = 0
+    error_message: str = &quot;&quot;
+    started_at: datetime = Field(default_factory=datetime.now)
+    completed_at: datetime | None = None</code></pre>
+<p>The <code>session_count</code> and <code>retry_count</code> fields
+serve different purposes. <code>session_count</code> tracks total Claude
+sessions consumed (including fix cycles). <code>retry_count</code>
+tracks QA rejection-fix iterations. A task with
+<code>session_count=4, retry_count=2</code> means: one initial
+execution, two fix-and-retry cycles (each consuming one additional
+session), plus one extra session for the final QA re-review. These
+metrics are essential for cost analysis and pipeline tuning.</p>
+<hr />
+<h3 id="stage-4-qa-where-quality-actually-comes-from">Stage 4: QA –
+Where Quality Actually Comes From</h3>
+<p>This is the insight that took months to internalize: the QA pipeline
+matters more than the execution agents.</p>
+<p>The QA system has three possible verdicts:</p>
+<pre class="python"><code># From: src/auto_claude/models.py
+
+class QAVerdict(str, enum.Enum):
+    APPROVED = &quot;approved&quot;
+    REJECTED_WITH_FIXES = &quot;rejected_with_fixes&quot;
+    REJECTED_PERMANENT = &quot;rejected_permanent&quot;</code></pre>
+<p>The first principle, stated explicitly in the QA agent’s system
+prompt:</p>
+<pre class="python"><code># From: src/auto_claude/qa.py
+
+QA_SYSTEM_PROMPT = &quot;&quot;&quot;\
+You are an independent QA reviewer for an autonomous development pipeline.
+
+IMPORTANT: You are NOT the agent that wrote this code. You are a separate reviewer
+with fresh eyes. Do not assume anything works -- verify everything against the spec.
+
+Your job is to review the code changes in this worktree against the original
+implementation specification and produce a verdict:
+
+1. &quot;approved&quot; -- All acceptance criteria met, code quality acceptable, no regressions
+2. &quot;rejected_with_fixes&quot; -- Specific issues found, but the approach is sound. Provide
+   detailed remediation instructions for the execution agent.
+3. &quot;rejected_permanent&quot; -- Fundamental approach is flawed. Task needs re-specification.
+
+Be thorough. Check:
+- Does the code actually do what the spec says?
+- Are all acceptance criteria objectively met?
+- Are there edge cases the implementation misses?
+- Does the code introduce any regressions?
+- Is error handling present and correct?
+- Are there hardcoded values that should be configurable?
+
+Respond with ONLY the JSON object. No markdown, no commentary.&quot;&quot;&quot;</code></pre>
+<p>QA agents must be separate from execution agents. Self-review does
+not work. The same biases that led an agent to write buggy code lead it
+to overlook those bugs in review. This is not a theoretical concern – it
+is a pattern I observed repeatedly. An execution agent that
+misunderstands a requirement will confidently report that requirement as
+met. A separate reviewer catches the gap.</p>
+<p>The QA context is built from three sources – the original spec, the
+git diff, and any completion notes:</p>
+<pre class="python"><code># From: src/auto_claude/qa.py
+
+def build_qa_context(state: WorktreeState) -&gt; str:
+    parts: list[str] = []
+
+    parts.append(&quot;# Original Specification\n&quot;)
+    parts.append(state.spec.to_prompt_context())
+
+    parts.append(&quot;\n\n# Code Changes (git diff)\n&quot;)
+    diff_result = subprocess.run(
+        [&quot;git&quot;, &quot;diff&quot;, &quot;HEAD~..HEAD&quot;, &quot;--stat&quot;],
+        cwd=state.worktree_path, capture_output=True, text=True,
+    )
+    if diff_result.returncode == 0 and diff_result.stdout.strip():
+        parts.append(f&quot;```\n{diff_result.stdout.strip()}\n```\n&quot;)
+
+    # Full diff (capped at 10000 chars to avoid token explosion)
+    full_diff = subprocess.run(
+        [&quot;git&quot;, &quot;diff&quot;, &quot;HEAD~..HEAD&quot;],
+        cwd=state.worktree_path, capture_output=True, text=True,
+    )
+    if full_diff.returncode == 0 and full_diff.stdout.strip():
+        diff_text = full_diff.stdout.strip()[:10000]
+        parts.append(f&quot;```diff\n{diff_text}\n```&quot;)
+
+    # Completion notes
+    completion_path = state.worktree_path / &quot;.auto-claude&quot; / &quot;COMPLETION.md&quot;
+    if completion_path.exists():
+        parts.append(&quot;\n\n# Execution Agent&#39;s Completion Notes\n&quot;)
+        parts.append(completion_path.read_text(errors=&quot;replace&quot;)[:3000])
+
+    # Blockers
+    blockers_path = state.worktree_path / &quot;BLOCKERS.md&quot;
+    if blockers_path.exists():
+        parts.append(&quot;\n\n# Reported Blockers\n&quot;)
+        parts.append(blockers_path.read_text(errors=&quot;replace&quot;)[:2000])
+
+    return &quot;\n&quot;.join(parts)</code></pre>
+<p>The 10,000-character diff cap is a pragmatic constraint. Some tasks
+touch dozens of files and produce diffs exceeding 50,000 characters.
+Sending the full diff would consume most of the QA agent’s context
+window, leaving little room for reasoning. The <code>--stat</code>
+summary provides the big picture; the capped full diff provides enough
+detail for line-by-line review of the most important changes.</p>
+<pre class="mermaid"><code>flowchart TD
+    EXEC[&quot;Execution Agent&quot;]
+    WORK[&quot;Completed Work&quot;]
+    QA[&quot;QA Agent\n(separate)&quot;]
+    VERDICT{&quot;Verdict?&quot;}
+    MERGE[&quot;Merge Queue&quot;]
+    DISCARD[&quot;Discard&quot;]
+
+    EXEC --&gt; WORK --&gt; QA --&gt; VERDICT
+    VERDICT --&gt;|&quot;Approved&quot;| MERGE
+    VERDICT --&gt;|&quot;Rejected with Fixes&quot;| EXEC
+    VERDICT --&gt;|&quot;Rejected Permanent&quot;| DISCARD
+
+    EXEC -.-&gt;|&quot;max_retries: 2&quot;| QA</code></pre>
+<figure>
+<img src="../visuals/svg-rendered/post6-qa-cycle.svg" alt="QA cycle" />
+<figcaption aria-hidden="true">QA cycle</figcaption>
+</figure>
+<h4 id="what-qa-catches-that-self-review-misses">What QA Catches That
+Self-Review Misses</h4>
+<p>The 22% first-pass rejection rate broke down into specific failure
+categories. Here is what the independent QA agents found that
+self-reviewing execution agents would have missed:</p>
+<p><strong>Missing edge cases (38% of rejections).</strong> The spec
+said “handle all error paths.” The execution agent handled the happy
+path and the most obvious error. The QA agent checked every acceptance
+criterion and found that two error paths returned unstructured strings
+instead of the specified JSON format.</p>
+<p><strong>Incomplete implementations (29% of rejections).</strong> The
+spec had seven acceptance criteria. The execution agent met five and
+missed two. When asked to self-review, the execution agent confirmed all
+seven as met – it believed its own work was complete. The independent
+reviewer, starting from the spec with fresh eyes, caught the gaps.</p>
+<p><strong>Subtle regressions (18% of rejections).</strong> The
+execution agent modified a shared utility function to add new
+functionality but changed the return type in a way that broke existing
+callers. The agent did not notice because it was focused on its own
+task. The QA agent, reading the full diff, caught the signature change
+and flagged the regression.</p>
+<p><strong>Code quality issues (15% of rejections).</strong> Hardcoded
+values, missing error handling, bare <code>except</code> clauses, and
+duplicated logic. These are the issues that pass self-review because the
+agent that wrote the code does not see them as problems – it wrote them
+that way intentionally.</p>
+<h4 id="calibrating-qa-strictness">Calibrating QA Strictness</h4>
+<p>The QA agent’s system prompt controls how strict the reviews are. Too
+strict and everything gets rejected – even competent implementations
+with minor style issues. Too lenient and real problems slip through.</p>
+<p>I tuned the QA prompt through three iterations:</p>
+<p><strong>Version 1 (too strict):</strong> “Reject any implementation
+that does not perfectly match the spec.” Result: 68% rejection rate.
+Tasks were rejected for missing docstrings, variable naming preferences,
+and whitespace formatting. The fix cycles wasted time on cosmetic
+changes.</p>
+<p><strong>Version 2 (too lenient):</strong> “Approve if the core
+functionality works, even if some acceptance criteria are partially
+met.” Result: 4% rejection rate. Tasks were approved with missing error
+handling, incomplete edge case coverage, and silent failure modes. The
+low rejection rate was not a sign of quality – it was a sign of
+insufficient review.</p>
+<p><strong>Version 3 (calibrated):</strong> “Approve if ALL acceptance
+criteria are objectively met. Reject for functional gaps, missing error
+handling, or regressions. Do NOT reject for style, naming, or formatting
+preferences unless the spec explicitly requires them.” Result: 22%
+rejection rate. This version separates functional correctness (must be
+perfect) from style preferences (tolerated). The rejection rate is high
+enough to catch real issues but low enough to avoid wasting fix cycles
+on cosmetic problems.</p>
+<p>The 22% rate is the sweet spot for this project. A different codebase
+with different standards might calibrate to 15% or 30%. The important
+thing is measuring and tuning – not guessing.</p>
+<p><strong>QA model selection.</strong> The QA agent uses Opus, not
+Sonnet. This is deliberate. The QA task requires reasoning about code
+correctness across multiple files, comparing implementation details
+against abstract acceptance criteria, and identifying subtle
+regressions. Sonnet can do this for simple tasks, but for multi-file
+changes with interdependencies, Opus catches problems that Sonnet
+misses. The cost difference ($0.60 per QA review with Opus vs. $0.15
+with Sonnet) is small relative to the cost of a false positive that
+merges broken code into main.</p>
+<hr />
+<h3 id="the-rejection-and-fix-cycle">The Rejection-and-Fix Cycle</h3>
+<p>When QA rejects a task, the system sends it back to the execution
+agent with specific remediation instructions:</p>
+<pre class="python"><code># From: src/auto_claude/qa.py
+
+def send_back_for_fixes(state, qa_result, config):
+    fix_prompt = f&quot;&quot;&quot;\
+Your previous implementation was reviewed and REJECTED. Fix the following issues:
+
+## QA Summary
+{qa_result.summary}
+
+## Failed Criteria
+{chr(10).join(f&#39;- {c}&#39; for c in qa_result.failed_criteria)}
+
+## Specific Issues
+{chr(10).join(f&#39;- {i}&#39; for i in qa_result.issues)}
+
+## Remediation Instructions
+{chr(10).join(f&#39;{n+1}. {inst}&#39; for n, inst in enumerate(qa_result.remediation_instructions))}
+
+Fix ALL issues listed above. Then commit your changes and update COMPLETION.md.
+&quot;&quot;&quot;
+
+    cmd = [
+        &quot;claude&quot;, &quot;--print&quot;,
+        &quot;--model&quot;, config.model,
+        &quot;--system-prompt&quot;, factory.EXECUTION_SYSTEM_PROMPT,
+        fix_prompt,
+    ]
+
+    result = subprocess.run(
+        cmd, capture_output=True, text=True,
+        cwd=state.worktree_path, timeout=config.timeout_seconds,
+    )
+    state.retry_count += 1
+    state.session_count += 1</code></pre>
+<p>The fix prompt structure matters. It is not “try again” – it is
+structured remediation with four components: a summary of what was
+wrong, which acceptance criteria failed, specific issues found, and
+step-by-step instructions for fixing each one. This specificity is why
+the second-pass approval rate is ~95%. The agent does not have to figure
+out what is wrong; it just has to follow the fix instructions.</p>
+<p>The full QA pipeline runs review, rejection, fix, and re-review
+cycles:</p>
+<pre class="python"><code># From: src/auto_claude/qa.py
+
+def run_qa_pipeline(states, config):
+    completed = [s for s in states if s.status == TaskStatus.COMPLETED]
+    all_results: list[QAResult] = []
+
+    with ThreadPoolExecutor(max_workers=config.max_parallel_workers) as executor:
+        # First pass review
+        future_to_state = {
+            executor.submit(review_single_task, state, config, 1): state
+            for state in completed
+        }
+
+        for future in as_completed(future_to_state):
+            state = future_to_state[future]
+            qa_result = future.result()
+            all_results.append(qa_result)
+
+            if qa_result.is_approved():
+                state.status = TaskStatus.QA_APPROVED
+            elif qa_result.is_permanently_rejected():
+                state.status = TaskStatus.QA_REJECTED_PERMANENT
+            else:
+                state.status = TaskStatus.QA_REJECTED
+
+    # Fix-and-retry cycles for rejected tasks
+    for retry in range(config.max_retries):
+        rejected = [s for s in completed if s.status == TaskStatus.QA_REJECTED]
+        if not rejected:
+            break
+
+        for state in rejected:
+            task_results = [r for r in all_results if r.task_id == state.task_id]
+            last_rejection = task_results[-1]
+
+            state = send_back_for_fixes(state, last_rejection, config)
+
+            if state.status == TaskStatus.QA_PENDING:
+                qa_result = review_single_task(state, config, retry + 2)
+                all_results.append(qa_result)</code></pre>
+<p>The <code>max_retries</code> config defaults to 2. Three total
+attempts: the original execution plus two fix cycles. Beyond that, you
+are fighting a flawed spec – additional fix attempts produce diminishing
+returns. The system marks tasks that exceed max retries as permanently
+rejected and flags them for re-specification in the next pipeline
+run.</p>
+<p>The QA result model captures everything needed for both the fix cycle
+and post-run analysis:</p>
+<pre class="python"><code># From: src/auto_claude/models.py
+
+class QAResult(BaseModel):
+    task_id: str
+    verdict: QAVerdict
+    summary: str = Field(description=&quot;Brief summary of the review findings&quot;)
+    passed_criteria: list[str] = Field(default_factory=list)
+    failed_criteria: list[str] = Field(default_factory=list)
+    issues: list[str] = Field(default_factory=list)
+    remediation_instructions: list[str] = Field(default_factory=list)
+    reviewed_at: datetime = Field(default_factory=datetime.now)
+    review_pass_number: int = Field(default=1)</code></pre>
+<p>The <code>review_pass_number</code> field is critical for analytics.
+It tells you which pass approved the task, which lets you measure the
+effectiveness of the rejection-and-fix cycle. In the Awesome List
+project: 78% approved on first pass, 17% approved on second pass, 3%
+approved on third pass, 2% permanently rejected.</p>
+<hr />
+<h3
+id="stage-5-the-merge-queue-topological-sort-with-priority-weights">Stage
+5: The Merge Queue – Topological Sort with Priority Weights</h3>
+<p>The merge queue is the final piece. Not all approved branches can
+merge cleanly – parallel development means potential conflicts. The
+merge order matters enormously.</p>
+<pre class="mermaid"><code>flowchart TD
+    subgraph INPUT[&quot;QA-Approved Branches&quot;]
+        T1[&quot;auth-refactor\nCRITICAL\ndeps: none\nscope: 3 files&quot;]
+        T2[&quot;error-handling\nHIGH\ndeps: auth-refactor\nscope: 8 files&quot;]
+        T3[&quot;add-logging\nMEDIUM\ndeps: none\nscope: 2 files&quot;]
+        T4[&quot;api-docs\nMEDIUM\ndeps: error-handling\nscope: 5 files&quot;]
+        T5[&quot;perf-cache\nMEDIUM\ndeps: none\nscope: 12 files&quot;]
+        T6[&quot;ui-polish\nLOW\ndeps: none\nscope: 4 files&quot;]
+    end
+
+    subgraph TOPOSORT[&quot;Topological Sort + Priority Weight&quot;]
+        SORT[&quot;1. Group by priority tier\n2. Within tier: narrower scope first\n3. Visit dependencies before dependents\n4. Circular deps: warn + skip&quot;]
+    end
+
+    subgraph QUEUE[&quot;Merge Order (computed)&quot;]
+        M1[&quot;1. auth-refactor (CRITICAL, 3 files)&quot;]
+        M2[&quot;2. add-logging (MEDIUM, 2 files)&quot;]
+        M3[&quot;3. error-handling (HIGH, 8 files, dep: auth-refactor)&quot;]
+        M4[&quot;4. api-docs (MEDIUM, 5 files, dep: error-handling)&quot;]
+        M5[&quot;5. perf-cache (MEDIUM, 12 files)&quot;]
+        M6[&quot;6. ui-polish (LOW, 4 files)&quot;]
+    end
+
+    subgraph MERGE[&quot;Merge Execution&quot;]
+        DRY[&quot;Dry-run: git merge --no-commit --no-ff&quot;]
+        CHECK{&quot;Conflicts?&quot;}
+        APPLY[&quot;git merge --no-ff -m &#39;auto-claude: ...&#39;&quot;]
+        ABORT[&quot;git merge --abort&quot;]
+        FLAG[&quot;Mark MERGE_CONFLICT\nRe-enter pipeline&quot;]
+        NEXT[&quot;Next branch&quot;]
+
+        DRY --&gt; CHECK
+        CHECK --&gt;|&quot;No&quot;| APPLY --&gt; NEXT
+        CHECK --&gt;|&quot;Yes&quot;| ABORT --&gt; FLAG
+    end
+
+    INPUT --&gt; TOPOSORT --&gt; QUEUE --&gt; MERGE</code></pre>
+<figure>
+<img src="../visuals/svg-rendered/post6-merge-queue.svg"
+alt="Merge queue" />
+<figcaption aria-hidden="true">Merge queue</figcaption>
+</figure>
+<h4 id="why-dependency-aware-merging-prevents-cascading-conflicts">Why
+Dependency-Aware Merging Prevents Cascading Conflicts</h4>
+<p>Consider what happens without topological sorting. Suppose
+<code>perf-cache</code> (12 files, MEDIUM priority) merges first because
+it finished execution earliest. It touches <code>config.py</code>,
+<code>database.py</code>, and <code>cache.py</code> among others. Now
+<code>auth-refactor</code> (CRITICAL priority, touches
+<code>config.py</code>) tries to merge. Conflict.
+<code>error-handling</code> (which depends on <code>auth-refactor</code>
+and also touches <code>config.py</code>) also conflicts.
+<code>api-docs</code> (which depends on <code>error-handling</code>)
+cannot merge either. One wrong merge order turned a clean pipeline into
+four conflicts.</p>
+<p>With topological sorting, <code>auth-refactor</code> merges first
+(CRITICAL, no dependencies, narrow scope). Then <code>add-logging</code>
+(MEDIUM, no deps, narrowest scope). Then <code>error-handling</code>
+(its dependency <code>auth-refactor</code> is already merged). Then
+<code>api-docs</code>. By the time <code>perf-cache</code> merges, the
+foundation tasks are integrated and its broad changes merge against a
+stable base.</p>
+<p>The sorting algorithm:</p>
+<pre class="python"><code># From: src/auto_claude/merge.py
+
+def compute_merge_order(tasks, approved_ids):
+    approved_tasks = [t for t in tasks if t.id in approved_ids]
+
+    sorted_ids: list[str] = []
+    visited: set[str] = set()
+    in_progress: set[str] = set()
+
+    task_map = {t.id: t for t in approved_tasks}
+
+    def visit(task_id: str) -&gt; None:
+        if task_id in visited:
+            return
+        if task_id in in_progress:
+            logger.warning(&quot;Circular dependency detected involving &#39;%s&#39;&quot;, task_id)
+            return
+        if task_id not in task_map:
+            return
+
+        in_progress.add(task_id)
+        task = task_map[task_id]
+
+        for dep in task.dependencies:
+            if dep in approved_ids:
+                visit(dep)
+
+        in_progress.discard(task_id)
+        visited.add(task_id)
+        sorted_ids.append(task_id)
+
+    priority_order = {
+        TaskPriority.CRITICAL: 0,
+        TaskPriority.HIGH: 1,
+        TaskPriority.MEDIUM: 2,
+        TaskPriority.LOW: 3,
+    }
+
+    for task in sorted(
+        approved_tasks,
+        key=lambda t: (priority_order[t.priority], len(t.scope), t.id),
+    ):
+        visit(task.id)
+
+    return sorted_ids</code></pre>
+<p>The three-part sort key –
+<code>(priority_order, len(scope), task.id)</code> – encodes three
+heuristics:</p>
+<ol type="1">
+<li><strong>Priority first.</strong> Critical foundation tasks before
+feature work.</li>
+<li><strong>Narrow scope before broad scope.</strong> Within the same
+priority, tasks touching fewer files merge first. The intuition: narrow
+changes are less likely to conflict with later merges.</li>
+<li><strong>Alphabetical for determinism.</strong> Within identical
+priority and scope size, alphabetical ordering ensures the merge order
+is reproducible across runs.</li>
+</ol>
+<p>The circular dependency check (<code>in_progress</code> set) handles
+the edge case where the ideation agent generates tasks with circular
+dependencies. Rather than deadlocking, the algorithm warns and skips the
+cycle, allowing the rest of the graph to merge.</p>
+<h4 id="dry-run-conflict-detection">Dry-Run Conflict Detection</h4>
+<p>Before each merge, a dry-run conflict check prevents partial
+merges:</p>
+<pre class="python"><code># From: src/auto_claude/merge.py
+
+def check_conflicts(repo_path, branch_name):
+    result = subprocess.run(
+        [&quot;git&quot;, &quot;merge&quot;, &quot;--no-commit&quot;, &quot;--no-ff&quot;, branch_name],
+        cwd=repo_path, capture_output=True, text=True,
+    )
+
+    conflicts: list[str] = []
+
+    if result.returncode != 0:
+        status = subprocess.run(
+            [&quot;git&quot;, &quot;diff&quot;, &quot;--name-only&quot;, &quot;--diff-filter=U&quot;],
+            cwd=repo_path, capture_output=True, text=True,
+        )
+        if status.stdout.strip():
+            conflicts = status.stdout.strip().split(&quot;\n&quot;)
+
+    subprocess.run(
+        [&quot;git&quot;, &quot;merge&quot;, &quot;--abort&quot;],
+        cwd=repo_path, capture_output=True,
+    )
+
+    return conflicts</code></pre>
+<p>The <code>--abort</code> at the end is unconditional. Even if the dry
+run succeeded, we abort because we want to do the real merge with a
+proper commit message. This ensures the working tree is always clean
+between merge attempts.</p>
+<p>Tasks with conflicts get flagged for re-execution against the updated
+main. They do not just fail – they re-enter the pipeline with fresh
+context. The merged state of main becomes their new base, and the
+execution agent starts from scratch with the updated codebase.</p>
+<h4 id="merge-execution">Merge Execution</h4>
+<p>The actual merge uses <code>--no-ff</code> to preserve the branch
+history in a merge commit:</p>
+<pre class="python"><code># From: src/auto_claude/merge.py
+
+def merge_branch(repo_path, branch_name, task_id):
+    conflicts = check_conflicts(repo_path, branch_name)
+    if conflicts:
+        return MergeResult(
+            task_id=task_id, branch_name=branch_name,
+            success=False, conflict_files=conflicts,
+        )
+
+    result = subprocess.run(
+        [&quot;git&quot;, &quot;merge&quot;, &quot;--no-ff&quot;, &quot;-m&quot;,
+         f&quot;auto-claude: Merge {branch_name} ({task_id})&quot;,
+         branch_name],
+        cwd=repo_path, capture_output=True, text=True,
+    )
+
+    if result.returncode != 0:
+        subprocess.run([&quot;git&quot;, &quot;merge&quot;, &quot;--abort&quot;], cwd=repo_path, capture_output=True)
+        return MergeResult(
+            task_id=task_id, branch_name=branch_name,
+            success=False, error_message=f&quot;Merge failed: {result.stderr.strip()[:200]}&quot;,
+        )
+
+    # Get the merge commit hash
+    commit_result = subprocess.run(
+        [&quot;git&quot;, &quot;rev-parse&quot;, &quot;HEAD&quot;],
+        cwd=repo_path, capture_output=True, text=True,
+    )
+    commit_hash = commit_result.stdout.strip()
+
+    return MergeResult(
+        task_id=task_id, branch_name=branch_name,
+        success=True, merge_commit=commit_hash,
+    )</code></pre>
+<p>The <code>auto-claude:</code> prefix in the commit message makes
+pipeline merges instantly recognizable in <code>git log</code>. When
+reviewing history weeks later, you can immediately distinguish
+AI-generated work from human commits. This is not just cosmetic – it
+enables audit queries like “how many lines of code were AI-generated in
+this release?” with a simple <code>git log --author</code> filter.</p>
+<hr />
+<h3 id="agent-prompt-engineering-for-pipeline-tasks">Agent Prompt
+Engineering for Pipeline Tasks</h3>
+<p>The execution agent’s system prompt is not generic. It is tuned
+specifically for pipeline work – tasks that must be completed
+autonomously, without human intervention, within a fixed timeout.</p>
+<p>Here is the full system prompt the factory injects into each
+execution agent:</p>
+<pre class="python"><code># From: src/auto_claude/factory.py
+
+EXECUTION_SYSTEM_PROMPT = &quot;&quot;&quot;\
+You are an autonomous execution agent in a development pipeline.
+You have been given a specification and a git worktree.
+
+RULES:
+1. Read the spec at .auto-claude/spec.md FIRST. Do not start coding
+   until you understand every acceptance criterion.
+2. Make ONE change at a time. Commit after each logical unit of work.
+   This creates a reviewable git history for the QA agent.
+3. Do NOT refactor code unrelated to your task. Your scope is defined
+   by the spec&#39;s files_in_scope. Do not touch other files unless
+   the spec explicitly requires it.
+4. If you encounter a blocker that prevents completion, write it to
+   BLOCKERS.md and stop. Do not attempt workarounds that violate
+   the spec.
+5. When finished, write a summary to .auto-claude/COMPLETION.md
+   listing what you did and how each acceptance criterion was met.
+6. Do NOT write tests unless the spec explicitly lists testing as
+   an acceptance criterion. Your job is implementation, not testing.
+&quot;&quot;&quot;</code></pre>
+<p>Every rule in that prompt exists because of a real failure. Rule 3
+(scope constraint) was added after an agent “helpfully” reformatted 40
+files while implementing a 3-file feature, creating a 2,000-line diff
+that the QA agent could not meaningfully review. Rule 4 (blocker
+reporting) was added after agents spent their entire timeout budget
+attempting creative workarounds for missing dependencies instead of
+documenting the blocker and stopping. Rule 6 (no tests) was added after
+agents spent 70% of their execution time writing elaborate test suites
+for trivial implementations, leaving too little time for the actual
+work.</p>
+<p><strong>The commit granularity instruction (Rule 2) is critical for
+QA quality.</strong> When an agent makes 15 changes in a single commit,
+the QA agent sees a monolithic diff. When the agent commits after each
+logical change, the QA agent can review each step independently and
+pinpoint exactly where a problem was introduced. The difference in QA
+accuracy is measurable: tasks with 3+ commits had a 15% QA rejection
+rate; tasks with a single commit had a 28% rejection rate. More commits
+means better diffs means better reviews.</p>
+<p><strong>Model selection for execution agents matters less than you
+think.</strong> I tested Opus, Sonnet, and Haiku as execution models
+across 50 identical tasks. Opus produced slightly cleaner code but took
+3x longer per task. Haiku was fast but failed on tasks requiring
+multi-file reasoning. Sonnet hit the sweet spot – fast enough to stay
+within timeout, capable enough to handle 85% of tasks. The remaining 15%
+(complex architectural tasks) are better handled by reducing scope in
+the spec than by upgrading the model.</p>
+<hr />
+<h3 id="conflict-resolution-strategies-for-parallel-branches">Conflict
+Resolution Strategies for Parallel Branches</h3>
+<p>When parallel branches touch the same files, you have three options.
+The choice between them depends on the nature of the overlap.</p>
+<p><strong>Strategy 1: Priority-based serialization.</strong> The
+higher-priority branch merges first. The lower-priority branch
+re-executes against the updated main. This is the default and handles
+most cases. Cost: one re-execution per conflict.</p>
+<p><strong>Strategy 2: Scope partitioning at ideation time.</strong> If
+you know two tasks will touch the same file, the ideation phase can be
+instructed to make one depend on the other, serializing them
+automatically. This prevents the conflict entirely but reduces
+parallelism. Best for tasks that modify the same core files.</p>
+<p><strong>Strategy 3: Semantic merge resolution.</strong> For
+non-overlapping changes to the same file (e.g., one task adds a function
+at line 100, another adds a different function at line 200), git’s
+built-in merge usually resolves automatically. The narrow-scope-first
+heuristic maximizes the chance of this happening by merging small,
+focused changes before broad refactors.</p>
+<p>The current system does not support automatic conflict resolution
+(<code>auto_resolve_conflicts = false</code> in the config). I
+experimented with having an AI agent resolve conflicts, but the results
+were unreliable – the agent would resolve the syntactic conflict but
+introduce semantic errors. A merge conflict between two AI-generated
+branches is particularly tricky because neither branch has a human
+author who can explain the intent. Human review of conflicts remains the
+safest option for production codebases.</p>
+<p><strong>When conflicts are informative.</strong> Not all conflicts
+are problems. A high conflict rate between two task categories (e.g.,
+“type safety” tasks conflicting with “error handling” tasks) indicates
+that the ideation phase should merge those categories into combined
+tasks. Tracking conflict rates by task tag reveals these patterns and
+feeds back into ideation prompt tuning.</p>
+<hr />
+<h3 id="scaling-laws-for-parallel-development">Scaling Laws for Parallel
+Development</h3>
+<p>Running this system at various scales revealed non-obvious throughput
+patterns.</p>
+<p><strong>Linear scaling up to ~8 workers.</strong> Below 8 parallel
+agents, throughput scales almost linearly. Each agent operates on its
+own worktree with no contention.</p>
+<p><strong>Diminishing returns from 8 to 16 workers.</strong> Beyond 8
+agents, two bottlenecks emerge. First, disk I/O. Each worktree is a full
+copy of the repository. For a large codebase, 16 worktrees means 16
+copies of every file on disk. Second, the Claude API rate limit. Each
+agent makes multiple API calls per task, and at 16 workers, you start
+hitting the requests-per-minute ceiling.</p>
+<p><strong>Negative returns beyond 16 workers.</strong> At 20+ workers,
+the coordination overhead (worktree creation, QA parallelism, merge
+queue serialization) begins to dominate. The merge queue is inherently
+sequential – each merge must complete before the next one starts,
+because the next merge depends on the outcome of the current one.</p>
+<p>Here is the full scaling data from real pipeline runs on the same
+194-task project:</p>
+<table>
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 20%" />
+<col style="width: 12%" />
+<col style="width: 15%" />
+<col style="width: 22%" />
+<col style="width: 16%" />
+</colgroup>
+<thead>
+<tr>
+<th>Workers</th>
+<th>Wall-Clock Time</th>
+<th>API Cost</th>
+<th>Tasks/Hour</th>
+<th>Merge Conflicts</th>
+<th>Failure Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>~48 hours</td>
+<td>$310</td>
+<td>4.0</td>
+<td>0</td>
+<td>8%</td>
+</tr>
+<tr>
+<td>2</td>
+<td>~25 hours</td>
+<td>$325</td>
+<td>7.8</td>
+<td>1</td>
+<td>9%</td>
+</tr>
+<tr>
+<td>4</td>
+<td>~14 hours</td>
+<td>$380</td>
+<td>13.9</td>
+<td>3</td>
+<td>11%</td>
+</tr>
+<tr>
+<td>8</td>
+<td>~8 hours</td>
+<td>$420</td>
+<td>24.4</td>
+<td>8</td>
+<td>14%</td>
+</tr>
+<tr>
+<td>12</td>
+<td>~6.5 hours</td>
+<td>$465</td>
+<td>30.0</td>
+<td>14</td>
+<td>18%</td>
+</tr>
+<tr>
+<td>16</td>
+<td>~5 hours</td>
+<td>$510</td>
+<td>39.0</td>
+<td>22</td>
+<td>23%</td>
+</tr>
+<tr>
+<td>24</td>
+<td>~5.5 hours</td>
+<td>$590</td>
+<td>35.5</td>
+<td>38</td>
+<td>31%</td>
+</tr>
+</tbody>
+</table>
+<p>The pattern is clear. Beyond 16 workers, wall-clock time actually
+increases because the merge conflict rate scales quadratically with
+worker count. At 24 workers, almost a third of tasks fail due to
+conflicts, rate limiting, or timeout cascades. The time spent on fix
+cycles and re-execution erases the parallelism gains.</p>
+<p>Notice the merge conflict column. At 4 workers, conflicts are rare
+because the small number of concurrent branches minimizes the chance of
+two agents touching the same file. At 16 workers, the probability of
+file overlap becomes significant. At 24, it becomes dominant. This is
+the fundamental limit of parallel development – not compute, not cost,
+but the shared state surface area of the codebase.</p>
+<p><strong>The optimal configuration for most projects: 4-8
+workers.</strong> This balances throughput against resource usage and
+keeps the merge queue manageable. The config defaults to 4:</p>
+<pre class="toml"><code># From: config/default.toml
+
+[pipeline]
+max_parallel_workers = 4
+model = &quot;sonnet&quot;
+qa_model = &quot;opus&quot;
+timeout_seconds = 600
+max_retries = 2</code></pre>
+<h4 id="the-cost-curve">The Cost Curve</h4>
+<p>At 4 workers, the 194-task run cost approximately $380 over 14 hours.
+Doubling workers to 8 reduced wall-clock time to approximately 8 hours
+but increased cost to approximately $420 due to more aggressive API
+usage and some wasted work from additional timeouts. The marginal cost
+per hour saved is about $7 – well within the “just pay for it” range for
+most engineering budgets.</p>
+<p>At 16 workers, wall-clock time dropped to 5 hours but cost rose to
+$510. The extra $90 bought only 3 additional hours of savings. Beyond 16
+workers, costs increased without meaningful time savings.</p>
+<p>The sweet spot depends on your time constraints. If the pipeline runs
+overnight (no urgency), 4 workers minimizes cost. If you need results
+within a few hours, 8 workers provides the best cost-to-speed ratio. If
+you need results urgently, 16 workers is the pragmatic maximum.</p>
+<hr />
+<h3
+id="resource-management-disk-space-git-gc-and-stale-worktrees">Resource
+Management: Disk Space, Git GC, and Stale Worktrees</h3>
+<p>Running dozens of worktrees creates real resource pressure.</p>
+<p><strong>Disk space monitoring.</strong> Each worktree copies the full
+working tree (not the <code>.git</code> objects – those are shared). For
+a 100MB project, 20 worktrees consume ~2GB of disk. The system does not
+currently monitor disk space, which caused a production failure when a
+500MB project with 40 worktrees filled a disk partition. The cleanup
+function addresses this after the pipeline completes:</p>
+<pre class="python"><code># From: src/auto_claude/factory.py
+
+def cleanup_worktrees(repo_path: Path, base_dir: Path) -&gt; int:
+    if not base_dir.exists():
+        return 0
+
+    count = 0
+    for worktree_dir in base_dir.iterdir():
+        if not worktree_dir.is_dir():
+            continue
+
+        result = subprocess.run(
+            [&quot;git&quot;, &quot;worktree&quot;, &quot;remove&quot;, &quot;--force&quot;, str(worktree_dir)],
+            cwd=repo_path, capture_output=True, text=True,
+        )
+
+        if result.returncode == 0:
+            count += 1
+
+    # Prune stale worktree references
+    subprocess.run(
+        [&quot;git&quot;, &quot;worktree&quot;, &quot;prune&quot;],
+        cwd=repo_path, capture_output=True,
+    )
+
+    return count</code></pre>
+<p><strong>Git GC automation.</strong> After merging 60 branches, the
+git object database bloats with dangling objects from deleted branches.
+Running <code>git gc --aggressive</code> after a pipeline run reclaims
+significant space. The cleanup function calls
+<code>git worktree prune</code> which handles the worktree-specific
+garbage, but a full GC is recommended after large runs.</p>
+<p><strong>Stale worktree detection.</strong> Worktrees from crashed
+pipeline runs linger on disk and in git’s worktree registry. The
+<code>git worktree prune</code> command in the cleanup function handles
+the registry side. The filesystem cleanup iterates over the base
+directory and force-removes each worktree. The <code>--force</code> flag
+is necessary because worktrees with uncommitted changes (from crashed
+agents) would otherwise refuse removal.</p>
+<p><strong>Branch cleanup after merge.</strong> Successfully merged
+branches should be deleted to keep the branch list manageable:</p>
+<pre class="python"><code># From: src/auto_claude/merge.py
+
+def cleanup_merged_branches(repo_path, merge_results):
+    deleted = 0
+    for result in merge_results:
+        if not result.success:
+            continue
+
+        del_result = subprocess.run(
+            [&quot;git&quot;, &quot;branch&quot;, &quot;-d&quot;, result.branch_name],
+            cwd=repo_path, capture_output=True, text=True,
+        )
+
+        if del_result.returncode == 0:
+            deleted += 1
+
+    return deleted</code></pre>
+<p>Note the use of <code>-d</code> (lowercase) instead of
+<code>-D</code>. The lowercase flag only deletes branches that have been
+fully merged, providing a safety check against accidentally deleting
+unmerged work. In the Awesome List run, this step cleaned up 60 merged
+branches while preserving the 11 that had conflicts or permanent
+rejections for human review.</p>
+<h4 id="monitoring-during-a-long-run">Monitoring During a Long Run</h4>
+<p>For overnight runs, monitoring becomes essential. The pipeline does
+not currently have a built-in dashboard, but you can construct a
+lightweight monitor from the output directory:</p>
+<pre class="bash"><code># Watch pipeline progress in real-time
+watch -n 30 &#39;echo &quot;=== Pipeline Status ===&quot; &amp;&amp; \
+  echo &quot;Worktrees active: $(ls .worktrees/ 2&gt;/dev/null | wc -l)&quot; &amp;&amp; \
+  echo &quot;Specs completed: $(ls .auto-claude/specs/ 2&gt;/dev/null | wc -l)&quot; &amp;&amp; \
+  echo &quot;QA reports: $(ls .auto-claude/qa/ 2&gt;/dev/null | wc -l)&quot; &amp;&amp; \
+  echo &quot;Merges: $(git log --oneline | grep &quot;auto-claude:&quot; | wc -l)&quot; &amp;&amp; \
+  echo &quot;&quot; &amp;&amp; \
+  echo &quot;=== Recent Activity ===&quot; &amp;&amp; \
+  ls -lt .auto-claude/qa/ 2&gt;/dev/null | head -5&#39;</code></pre>
+<p>This gives you a live view of how many worktrees are active, how many
+specs have been generated, how many QA reports exist, and how many
+merges have completed. The “Recent Activity” section shows which QA
+reports were most recently written, giving you a sense of pipeline
+throughput.</p>
+<p>For more detailed monitoring, you can inspect individual worktree
+states:</p>
+<pre class="bash"><code># Check which worktrees have completed
+for dir in .worktrees/*/; do
+    if [ -f &quot;$dir/.auto-claude/COMPLETION.md&quot; ]; then
+        echo &quot;DONE: $(basename $dir)&quot;
+    elif [ -f &quot;$dir/BLOCKERS.md&quot; ]; then
+        echo &quot;BLOCKED: $(basename $dir)&quot;
+    else
+        echo &quot;RUNNING: $(basename $dir)&quot;
+    fi
+done</code></pre>
+<p>The presence of <code>COMPLETION.md</code> indicates the agent
+finished its work. <code>BLOCKERS.md</code> indicates the agent hit an
+insurmountable obstacle. Neither file means the agent is still running
+(or crashed without producing either file).</p>
+<h4 id="disk-space-budget-calculator">Disk Space Budget Calculator</h4>
+<p>Before starting a large run, estimate the disk space requirement:</p>
+<pre><code>Disk needed = (project_size - .git_size) × num_worktrees × 1.2
+
+Example:
+  Project: 200 MB total, 150 MB in .git
+  Working tree: 50 MB
+  40 worktrees × 50 MB × 1.2 safety margin = 2.4 GB</code></pre>
+<p>The 1.2 safety margin accounts for agent-generated files
+(COMPLETION.md, agent-output.txt, temporary build artifacts). For
+projects with build artifacts that are not gitignored, the margin should
+be higher – build outputs can easily double or triple the working tree
+size.</p>
+<hr />
+<h3 id="lessons-from-failed-pipeline-runs">Lessons from Failed Pipeline
+Runs</h3>
+<p>Not every pipeline run succeeds. Here are the failure modes I
+encountered and how the system handles them.</p>
+<p><strong>The infinite refactoring loop.</strong> In the first version
+of the system, there was no timeout. Agent A was tasked with “improve
+code quality in <code>utils.py</code>.” It reformatted a function. The
+reformat broke an import. It fixed the import by rewriting the module
+structure. The rewrite broke three callers. It fixed the callers by
+adding compatibility shims. The shims triggered linting warnings. It
+“fixed” the warnings by reverting to the original format. Loop detected
+– by a human, eight hours later. The <code>timeout_seconds</code> config
+(default: 600 seconds) now kills agents that run too long. Most
+legitimate tasks complete within 10 minutes.</p>
+<p><strong>The spec ambiguity cascade.</strong> A task spec said “add
+authentication to all endpoints.” The execution agent added JWT
+authentication to 14 endpoints. The QA agent rejected it because the
+spec did not specify JWT – it could have been API key auth, OAuth, or
+session-based. The fix cycle sent back “use JWT.” The agent
+re-implemented with JWT. QA rejected again because the spec did not
+specify where to store the secret key. Third attempt failed because no
+<code>.env</code> file existed for the secret. Permanent rejection. The
+fix was not in the pipeline – it was in the spec. “All endpoints” is not
+a valid scope for an autonomous agent. The improved spec: “Add JWT
+authentication to the 3 endpoints in <code>api/routes.py</code> using
+<code>pyjwt</code>. Store the secret key in the <code>JWT_SECRET</code>
+environment variable with a default of <code>dev-secret</code> for local
+development.”</p>
+<p><strong>The disk space failure.</strong> A project with 500MB of
+assets (images, fonts, documentation) was run with 40 workers. Each
+worktree copied the full working tree, consuming 20GB of disk. The
+system had no disk space monitoring. At worktree 38, the file system
+returned ENOSPC. The two worktrees that failed could not be cleaned up
+because <code>git worktree remove</code> also requires disk space for
+temporary files. Manual intervention was required. The lesson: either
+add a <code>.gitattributes</code> filter to exclude large assets from
+worktree copies, or monitor available disk before each worktree
+creation.</p>
+<p><strong>The API rate limit thundering herd.</strong> With 16 workers,
+all starting within seconds of each other, the first API call from each
+worker hit the rate limiter simultaneously. Fourteen of sixteen workers
+received 429 responses on their first call, retried after the default
+backoff, hit the rate limit again (because all 14 retried at the same
+time), and finally succeeded on the third attempt with jitter. Total
+wasted time: about 4 minutes. The fix: stagger worker starts with a
+2-second delay between each spawn. Not elegant, but effective.</p>
+<p><strong>The permission error cascade.</strong> On a Linux CI server,
+worktrees were created by the CI user but the Claude agent ran as a
+different user. Every file operation in the worktree failed with
+permission denied errors. Sixty-two worktrees all failed with the same
+error. The agent output for each one was identical: “Error: EACCES:
+permission denied.” The fix: ensure the CI user and the agent user are
+the same, or configure the worktree base directory with appropriate
+group permissions. The pipeline now logs a warning if the worktree
+directory is not writable.</p>
+<p><strong>The half-merged main branch.</strong> During a merge queue
+run, the process was interrupted after 30 of 60 merges. Main was in a
+state where 30 tasks were integrated and 30 were not. The pipeline’s
+<code>manifest.json</code> recorded all 60 as “QA_APPROVED” but only 30
+as “MERGE_COMPLETE.” Restarting the pipeline would have re-run all 60
+tasks because it saw 30 as un-merged. The fix: the merge function now
+reads <code>manifest.json</code> at startup and skips tasks that are
+already marked <code>MERGE_COMPLETE</code>. Idempotent merge execution
+is not optional for production pipelines.</p>
+<p><strong>The spec that produced a 50,000-line diff.</strong> A task
+spec for “add comprehensive type annotations” did not specify a file
+scope limit. The execution agent annotated every function in a 200-file
+project – a legitimate interpretation of “comprehensive.” The QA agent
+received a 50,000-character diff (capped at 10,000), could not
+meaningfully review it, and approved it with a generic “changes look
+correct” assessment. The fix was twofold: enforce a file scope limit in
+specs (no more than 15 files per task), and add a QA criterion that
+rejects diffs exceeding 5,000 lines as “too broad for reliable
+review.”</p>
+<hr />
+<h3 id="debugging-failed-worktrees">Debugging Failed Worktrees</h3>
+<p>When a worktree execution fails, you need to understand why without
+re-running the entire pipeline. The <code>.auto-claude/</code> directory
+in each worktree contains everything you need for post-mortem
+analysis.</p>
+<p><strong>Reading the execution trace.</strong> Every worktree has
+three diagnostic files after execution:</p>
+<pre><code>worktree-dir/
+  .auto-claude/
+    spec.md          # What the agent was told to do
+    spec.json         # Machine-readable version
+    COMPLETION.md     # What the agent claims it did (if it completed)
+    BLOCKERS.md       # What prevented completion (if it failed)</code></pre>
+<p>When an agent fails, the first step is always comparing
+<code>spec.md</code> against <code>BLOCKERS.md</code>. The gap between
+what was asked and what blocked the agent reveals whether the problem is
+in the spec, the codebase, or the agent’s reasoning.</p>
+<p><strong>Common failure patterns and their signatures:</strong></p>
+<table>
+<colgroup>
+<col style="width: 32%" />
+<col style="width: 44%" />
+<col style="width: 22%" />
+</colgroup>
+<thead>
+<tr>
+<th>Failure Pattern</th>
+<th>BLOCKERS.md Signature</th>
+<th>Root Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Missing dependency</td>
+<td>“ImportError”, “ModuleNotFoundError”</td>
+<td>Spec did not include setup step</td>
+</tr>
+<tr>
+<td>File not found</td>
+<td>“FileNotFoundError”, “No such file”</td>
+<td>Spec referenced wrong path or file was renamed</td>
+</tr>
+<tr>
+<td>Type error cascade</td>
+<td>Multiple “TypeError” across files</td>
+<td>Spec touched shared interface without updating callers</td>
+</tr>
+<tr>
+<td>Infinite loop detected</td>
+<td>No BLOCKERS.md, timeout reached</td>
+<td>Agent entered edit-break-fix cycle</td>
+</tr>
+<tr>
+<td>Permission denied</td>
+<td>“EACCES”, “Permission denied”</td>
+<td>Worktree directory ownership mismatch</td>
+</tr>
+<tr>
+<td>Context overflow</td>
+<td>Agent output truncated mid-sentence</td>
+<td>Task scope too large for model context window</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Batch diagnostics across all worktrees.</strong> After a
+pipeline run, a quick scan of all worktree outcomes gives you the
+aggregate picture:</p>
+<pre class="bash"><code># Count outcomes across all worktrees
+for dir in .auto-claude-worktrees/auto-*; do
+  task=$(basename &quot;$dir&quot;)
+  if [ -f &quot;$dir/.auto-claude/COMPLETION.md&quot; ]; then
+    echo &quot;COMPLETE: $task&quot;
+  elif [ -f &quot;$dir/BLOCKERS.md&quot; ]; then
+    echo &quot;BLOCKED:  $task — $(head -1 &quot;$dir/BLOCKERS.md&quot;)&quot;
+  else
+    echo &quot;TIMEOUT:  $task&quot;
+  fi
+done | sort | uniq -c | sort -rn</code></pre>
+<p>This one-liner reveals patterns. If 8 out of 10 failures mention
+“ImportError: no module named ‘redis’,” the fix is not in the specs – it
+is in the worktree setup script. If 5 failures are timeouts on tasks
+tagged “refactor,” your timeout might be too short for refactoring
+tasks, or those specs need tighter scope.</p>
+<p><strong>Rerunning a single failed worktree.</strong> You do not need
+to re-run the entire pipeline to retry one task. The factory module
+supports single-worktree execution:</p>
+<pre class="bash"><code># Re-execute a single task from its existing spec
+auto-claude run-one \
+  --repo ./my-project \
+  --spec .auto-claude-worktrees/auto-042/.auto-claude/spec.json \
+  --worktree .auto-claude-worktrees/auto-042</code></pre>
+<p>This reuses the existing worktree (cleaning uncommitted changes
+first) and the existing spec. It is useful for iterating on a fix to the
+agent’s environment without regenerating everything from scratch.</p>
+<p><strong>The 80/20 rule for failed runs.</strong> In practice, 80% of
+failures in a pipeline run share the same root cause. The first time you
+run a pipeline on a new codebase, expect a 30-50% failure rate as you
+discover missing setup steps, ambiguous specs, and environment gaps. By
+the third run, the failure rate typically drops to 10-15% as specs and
+setup scripts mature. By the fifth run, you are down to the irreducible
+5-8% of tasks that are genuinely too complex for autonomous
+execution.</p>
+<hr />
+<h3 id="when-worktrees-do-not-help">When Worktrees Do Not Help</h3>
+<p>Worktrees are not a universal solution. Some categories of work are
+inherently resistant to parallelization.</p>
+<p><strong>Shared state modifications.</strong> Tasks that all modify
+the same configuration file, database schema, or shared type definitions
+cannot be safely parallelized. Even with topological sorting, the
+conflicts are inevitable because every task needs to read and write the
+same lines. The ideation phase should chain these as dependencies.</p>
+<p><strong>Whole-codebase refactors.</strong> “Rename all instances of
+<code>FooBar</code> to <code>BazQux</code>” touches every file. There is
+no meaningful way to parallelize it, and it conflicts with everything.
+These tasks should run alone on a clean branch.</p>
+<p><strong>Integration tasks.</strong> Tasks that require testing the
+interaction between two components – “verify that the auth module
+correctly passes tokens to the API client” – cannot be decomposed into
+independently testable units. They depend on the output of other tasks
+existing in the same codebase.</p>
+<p><strong>Performance-sensitive changes.</strong> The QA pipeline
+reviews code diffs, not runtime behavior. It can verify that the code is
+correct but not that it is fast. Performance-sensitive changes need
+runtime profiling, which the current pipeline does not support. A
+perf-cache task that passes QA might introduce O(n^2) behavior that only
+manifests at scale.</p>
+<p><strong>UI/UX changes.</strong> Visual changes require
+screenshot-based validation, not diff-based review. The QA agent can
+verify that a CSS class was added but not that the resulting layout
+looks correct. These tasks need a different validation pipeline – one
+with browser automation and screenshot comparison. (This is exactly what
+the functional validation framework from Post 3 addresses.)</p>
+<p>The lesson: use worktrees for tasks that are independently
+completable and diff-verifiable. Route everything else through a
+sequential pipeline with appropriate validation.</p>
+<hr />
+<h3 id="the-configuration">The Configuration</h3>
+<p>The whole pipeline is configurable through a TOML file:</p>
+<pre class="toml"><code># From: config/default.toml
+
+[pipeline]
+max_parallel_workers = 4
+model = &quot;sonnet&quot;
+qa_model = &quot;opus&quot;
+timeout_seconds = 600
+max_retries = 2
+worktree_base_dir = &quot;.worktrees&quot;
+specs_dir = &quot;specs&quot;
+output_dir = &quot;.auto-claude&quot;
+
+[qa]
+criteria = [
+    &quot;All acceptance criteria from the spec are met&quot;,
+    &quot;No regressions introduced in existing functionality&quot;,
+    &quot;Code quality meets project standards (formatting, naming, structure)&quot;,
+    &quot;No hardcoded values that should be configurable&quot;,
+    &quot;Error handling is present for failure paths&quot;,
+]
+
+[ideation]
+model = &quot;opus&quot;
+max_tasks = 200
+include_patterns = [&quot;**/*.py&quot;, &quot;**/*.ts&quot;, &quot;**/*.js&quot;, &quot;**/*.swift&quot;, &quot;**/*.go&quot;, &quot;**/*.rs&quot;]
+exclude_patterns = [&quot;node_modules/**&quot;, &quot;.git/**&quot;, &quot;__pycache__/**&quot;, &quot;.venv/**&quot;]
+
+[merge]
+strategy = &quot;priority-weighted&quot;
+auto_resolve_conflicts = false</code></pre>
+<p>Notice the model split: opus for ideation and QA (where reasoning
+quality matters most), sonnet for execution (where speed and volume
+matter more). This is not arbitrary – ideation and QA are judgment
+tasks. Execution is mostly mechanical once the spec is precise.</p>
+<p>The <code>[qa]</code> section’s <code>criteria</code> list provides
+universal QA criteria that apply to every task in addition to the
+task-specific acceptance criteria from the spec. This ensures a baseline
+quality standard even for tasks where the spec’s criteria are
+narrow.</p>
+<h4 id="language-specific-configuration">Language-Specific
+Configuration</h4>
+<p>The default config works for Python projects. Other languages need
+tuned <code>include_patterns</code> and occasionally adjusted timeout
+values:</p>
+<p><strong>TypeScript/JavaScript projects:</strong></p>
+<pre class="toml"><code>[ideation]
+include_patterns = [&quot;src/**/*.ts&quot;, &quot;src/**/*.tsx&quot;, &quot;lib/**/*.ts&quot;]
+exclude_patterns = [&quot;node_modules/**&quot;, &quot;dist/**&quot;, &quot;build/**&quot;, &quot;.next/**&quot;]
+
+[pipeline]
+timeout_seconds = 480  # TypeScript builds are typically faster</code></pre>
+<p><strong>Swift/iOS projects:</strong></p>
+<pre class="toml"><code>[ideation]
+include_patterns = [&quot;Sources/**/*.swift&quot;, &quot;App/**/*.swift&quot;]
+exclude_patterns = [&quot;DerivedData/**&quot;, &quot;.build/**&quot;, &quot;Pods/**&quot;]
+
+[pipeline]
+timeout_seconds = 900  # Xcode builds are slow; give agents more time</code></pre>
+<p><strong>Rust projects:</strong></p>
+<pre class="toml"><code>[ideation]
+include_patterns = [&quot;src/**/*.rs&quot;]
+exclude_patterns = [&quot;target/**&quot;]
+
+[pipeline]
+timeout_seconds = 720  # Cargo builds with many crates take time</code></pre>
+<p><strong>Go projects:</strong></p>
+<pre class="toml"><code>[ideation]
+include_patterns = [&quot;**/*.go&quot;]
+exclude_patterns = [&quot;vendor/**&quot;]
+
+[pipeline]
+timeout_seconds = 300  # Go builds are fast; shorter timeout catches loops sooner</code></pre>
+<p>The timeout values reflect real build times. A Swift project where
+<code>xcodebuild</code> takes 90 seconds needs a higher timeout than a
+Go project where <code>go build</code> takes 5 seconds. Setting the
+timeout too low causes false failures (agent times out during a
+legitimate build). Setting it too high wastes time on agents stuck in
+infinite loops. The default of 600 seconds (10 minutes) works for most
+projects, but tuning it per language improves both reliability and
+efficiency.</p>
+<p>The <code>include_patterns</code> and <code>exclude_patterns</code>
+in <code>[ideation]</code> control which files the ideation agent sees.
+Getting these right matters – if the agent does not see test files, it
+will not generate test improvement tasks. If it sees
+<code>node_modules/</code>, it will waste tokens analyzing third-party
+code.</p>
+<p>For most projects, the default patterns work well:</p>
+<pre class="toml"><code># Python projects:
+include_patterns = [&quot;**/*.py&quot;]
+exclude_patterns = [&quot;.venv/**&quot;, &quot;__pycache__/**&quot;, &quot;*.egg-info/**&quot;]
+
+# TypeScript projects:
+include_patterns = [&quot;**/*.ts&quot;, &quot;**/*.tsx&quot;]
+exclude_patterns = [&quot;node_modules/**&quot;, &quot;dist/**&quot;, &quot;.next/**&quot;]
+
+# Swift projects:
+include_patterns = [&quot;**/*.swift&quot;]
+exclude_patterns = [&quot;DerivedData/**&quot;, &quot;.build/**&quot;, &quot;Pods/**&quot;]
+
+# Rust projects:
+include_patterns = [&quot;**/*.rs&quot;]
+exclude_patterns = [&quot;target/**&quot;]</code></pre>
+<p>The config resolution supports three layers of override:</p>
+<pre class="python"><code># From: src/auto_claude/config.py
+
+@classmethod
+def load(cls, config_path=None, repo_path=None):
+    &quot;&quot;&quot;Load configuration from TOML file with defaults.
+
+    Resolution order:
+    1. Built-in defaults (this dataclass)
+    2. Package default.toml
+    3. Project .auto-claude.toml (if repo_path provided)
+    4. Explicit config_path (if provided)
+    &quot;&quot;&quot;
+    config = cls()
+
+    if DEFAULT_CONFIG_PATH.exists():
+        config._merge_from_toml(DEFAULT_CONFIG_PATH)
+
+    if repo_path:
+        project_config = repo_path / &quot;.auto-claude.toml&quot;
+        if project_config.exists():
+            config._merge_from_toml(project_config)
+
+    if config_path and config_path.exists():
+        config._merge_from_toml(config_path)
+
+    return config</code></pre>
+<p>This means you can set global defaults in the package, per-project
+overrides in <code>.auto-claude.toml</code>, and per-run overrides via
+the <code>--config</code> flag. The three-layer resolution mirrors the
+prompt stack from Post 7 – global defaults, project specifics, and
+per-invocation overrides.</p>
+<hr />
+<h3 id="the-cli-running-each-stage-independently">The CLI: Running Each
+Stage Independently</h3>
+<p>The pipeline exposes each stage as a separate CLI command:</p>
+<pre class="bash"><code># Run the full pipeline end-to-end
+auto-claude full --repo ./my-project --workers 8
+
+# Or run each stage independently:
+auto-claude ideate --repo ./my-project --max-tasks 100
+auto-claude spec --repo ./my-project --tasks .auto-claude/tasks.json
+auto-claude run --repo ./my-project --specs .auto-claude/specs/ --workers 8
+auto-claude qa --repo ./my-project
+auto-claude merge --repo ./my-project</code></pre>
+<p>Running stages independently is useful for debugging and iteration.
+You can ideate once, inspect the task manifest, then re-run spec
+generation with different settings. You can run execution, inspect the
+results, then run QA without re-executing. Each stage reads its input
+from and writes its output to the <code>.auto-claude/</code>
+directory.</p>
+<p>The stage-by-stage approach also supports partial re-runs. If QA
+rejects several tasks after the initial pipeline run, you can fix the
+specs for those tasks and re-run just the execution and QA stages for
+the affected tasks, without re-running the entire pipeline.</p>
+<hr />
+<h3 id="the-numbers-and-what-they-mean">The Numbers and What They
+Mean</h3>
+<p>From the Awesome List project:</p>
+<pre><code>Tasks ideated:                 194
+Specs generated:                91
+QA reports produced:            71
+Git branches created:           90
+Total sessions:              3,066
+Conversation data:           470 MB
+QA first-pass rejection rate:  ~22%
+QA second-pass approval rate:  ~95%</code></pre>
+<p>194 tasks ideated, 91 specs generated. The gap is intentional – some
+tasks are blocked by dependencies, some are deferred because spec
+generation fails, some overlap and get merged. Over-generation at the
+ideation phase feeds the funnel without waste because ideation is
+cheap.</p>
+<p>The 22% first-pass rejection rate is the most important number. It
+means more than one in five execution attempts produce work that a
+separate reviewer deems insufficient. Without the QA pipeline, that 22%
+would have shipped as-is. Some of those rejections were missing edge
+cases. Some were incomplete implementations. Some were hardcoded values.
+All of them were things the execution agent thought were correct.</p>
+<p>The 95% second-pass approval rate validates the fix cycle. When an
+agent gets specific, actionable feedback about what failed and why, it
+almost always fixes the issues. The rejection is not “try again” – it is
+structured remediation with failed criteria, specific issues, and
+step-by-step fix instructions.</p>
+<p>3,066 sessions across 71 tasks means an average of ~43 sessions per
+task. Session count correlates with task breadth, not difficulty. Wide
+tasks that touch many files consume more sessions than complex but
+narrow ones. This is useful for capacity planning – if you know a task
+touches 15 files, budget more sessions than a task that deeply refactors
+3 files.</p>
+<p>The pipeline tracking model aggregates all these metrics:</p>
+<pre class="python"><code># From: src/auto_claude/models.py
+
+class PipelineManifest(BaseModel):
+    repo_path: str
+    tasks: list[Task] = Field(default_factory=list)
+    specs: list[Spec] = Field(default_factory=list)
+    worktrees: list[WorktreeState] = Field(default_factory=list)
+    qa_results: list[QAResult] = Field(default_factory=list)
+    merge_results: list[MergeResult] = Field(default_factory=list)
+
+    @property
+    def qa_first_pass_rejection_rate(self) -&gt; float:
+        first_pass = [r for r in self.qa_results if r.review_pass_number == 1]
+        if not first_pass:
+            return 0.0
+        rejected = sum(1 for r in first_pass if not r.is_approved())
+        return rejected / len(first_pass)
+
+    def summary_table(self) -&gt; dict[str, int | float]:
+        return {
+            &quot;tasks_ideated&quot;: self.tasks_ideated,
+            &quot;specs_generated&quot;: self.specs_generated,
+            &quot;qa_reports_produced&quot;: self.qa_reports_produced,
+            &quot;branches_created&quot;: len({s.get_branch_name() for s in self.specs}),
+            &quot;qa_first_pass_rejection_rate&quot;: round(
+                self.qa_first_pass_rejection_rate * 100, 1
+            ),
+            &quot;merges_completed&quot;: sum(1 for m in self.merge_results if m.success),
+            &quot;merge_conflicts&quot;: sum(1 for m in self.merge_results if not m.success),
+        }</code></pre>
+<hr />
+<h3 id="comparison-sequential-vs-parallel-development">Comparison:
+Sequential vs Parallel Development</h3>
+<p>To understand why the worktree pipeline matters, consider the
+alternative. Sequential development – one agent, one branch, one task at
+a time – is simpler to implement but hits fundamental limitations.</p>
+<p><strong>Sequential approach: 60 tasks, one at a time.</strong></p>
+<pre><code>Time:    Task 1 (20min) → Task 2 (15min) → Task 3 (25min) → ... → Task 60
+Total:   ~20 hours wall-clock
+Cost:    ~$180 (fewer sessions, less QA overhead)
+Quality: No independent QA — self-review only
+Merge:   No conflicts — everything is on one branch
+Risk:    One bad task corrupts all subsequent work</code></pre>
+<p><strong>Parallel approach: 60 tasks, 8 workers.</strong></p>
+<pre><code>Time:    8 tasks running simultaneously → QA → merge
+Total:   ~9 hours wall-clock (14 hours with QA and merge)
+Cost:    ~$380 (more sessions, QA agent costs, retry cycles)
+Quality: Independent QA on every task — 22% rejection rate
+Merge:   8 conflicts out of 60 — resolved by re-execution
+Risk:    One bad task affects only its own branch</code></pre>
+<p>The parallel approach costs more and takes longer when you include QA
+and merge time. So why use it?</p>
+<p><strong>Fault isolation.</strong> In the sequential approach, task 15
+introducing a subtle bug means tasks 16-60 inherit that bug. In the
+parallel approach, task 15’s bug exists only on its branch. The QA agent
+catches it. The fix cycle resolves it. No other task is affected.</p>
+<p><strong>Quality assurance.</strong> The sequential approach has no
+natural point for independent review. The agent writes code, reviews its
+own code, and moves on. The parallel approach forces independent review
+through the QA pipeline. The 22% first-pass rejection rate is 22% of
+bugs caught that sequential development would have shipped.</p>
+<p><strong>Retry without regression.</strong> When the sequential agent
+needs to fix task 15, it modifies the same branch that contains tasks
+1-14. Every fix has the potential to break previous work. When the
+parallel agent needs to fix task 15, it modifies only task 15’s branch.
+Tasks 1-14 are untouched.</p>
+<p><strong>Throughput ceiling.</strong> A sequential agent hits a
+throughput ceiling at one task’s-worth of progress per unit time. The
+parallel approach scales to N tasks per unit time (up to the optimal
+worker count). For projects with 50+ independent tasks, the throughput
+difference is decisive.</p>
+<p>The parallel approach is not universally better. For small projects
+with fewer than 10 tasks, the overhead of the pipeline (QA, merge queue,
+conflict resolution) exceeds the benefits. For projects with highly
+interdependent tasks, the merge conflict rate makes parallelism
+impractical. The sweet spot is projects with 20-200 independent tasks –
+exactly the kind of work that codebase-wide improvements generate.</p>
+<h4 id="hybrid-strategies">Hybrid Strategies</h4>
+<p>The choice between sequential and parallel is not binary. The most
+effective approach is hybrid:</p>
+<ol type="1">
+<li><p><strong>Run sequential for foundation tasks.</strong> Database
+schema changes, shared type definitions, core infrastructure – these
+affect everything and should be done first, on one branch, verified, and
+merged.</p></li>
+<li><p><strong>Run parallel for independent features.</strong> Once the
+foundation is stable, feature work can be parallelized. “Add search
+endpoint,” “add export feature,” “add analytics dashboard” – these touch
+different parts of the codebase with minimal overlap.</p></li>
+<li><p><strong>Run sequential for integration.</strong> After parallel
+features are merged, integration tasks (wiring features together, adding
+cross-feature navigation, end-to-end testing) run sequentially because
+they depend on the combined state of all previous work.</p></li>
+</ol>
+<p>This hybrid approach uses the worktree pipeline for Stage 2 (where it
+has the highest leverage) and sequential development for Stages 1 and 3
+(where interdependencies make parallelism counterproductive).</p>
+<p>In practice, the 194-task run was structured this way. The first 15
+tasks (CRITICAL priority: type system improvements, error handling
+foundation, shared utilities) were serial dependencies that merged
+first. The next 160 tasks (MEDIUM/HIGH priority: feature
+implementations, documentation, testing) ran in parallel. The final 19
+tasks (LOW priority: integration, polish, deployment) were blocked by
+the parallel batch and ran last.</p>
+<hr />
+<h3 id="pipeline-analytics-what-the-data-tells-you">Pipeline Analytics:
+What the Data Tells You</h3>
+<p>After running the pipeline across multiple projects, the
+<code>PipelineManifest</code> analytics reveal patterns that are not
+obvious from any single run.</p>
+<p><strong>Spec precision predicts everything.</strong> Across five
+pipeline runs on different codebases, the correlation between acceptance
+criteria count and first-pass approval rate was consistent:</p>
+<table>
+<thead>
+<tr>
+<th>Acceptance Criteria</th>
+<th>First-Pass Approval Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1-2 (vague)</td>
+<td>55-65%</td>
+</tr>
+<tr>
+<td>3-4 (moderate)</td>
+<td>72-80%</td>
+</tr>
+<tr>
+<td>5-7 (precise)</td>
+<td>85-92%</td>
+</tr>
+<tr>
+<td>8+ (very detailed)</td>
+<td>88-95%</td>
+</tr>
+</tbody>
+</table>
+<p>The diminishing returns above 7 criteria suggest a natural ceiling
+for spec precision. Beyond 7-8 criteria, additional specificity does not
+meaningfully improve approval rates. The effort is better spent on other
+tasks.</p>
+<p><strong>Task complexity predicts session consumption.</strong></p>
+<table>
+<thead>
+<tr>
+<th>Estimated Complexity</th>
+<th>Avg Sessions</th>
+<th>Avg Time (min)</th>
+<th>Timeout Rate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Low</td>
+<td>1.2</td>
+<td>8</td>
+<td>2%</td>
+</tr>
+<tr>
+<td>Medium</td>
+<td>2.8</td>
+<td>18</td>
+<td>8%</td>
+</tr>
+<tr>
+<td>High</td>
+<td>5.4</td>
+<td>35</td>
+<td>22%</td>
+</tr>
+</tbody>
+</table>
+<p>High-complexity tasks have a 22% timeout rate – nearly one in four.
+This suggests the 600-second (10-minute) default timeout is too
+aggressive for complex tasks. A more nuanced approach: 300 seconds for
+low complexity, 600 for medium, 1200 for high. The config does not
+currently support per-task timeouts, but the spec model’s
+<code>estimated_complexity</code> field enables this in a future
+version.</p>
+<p><strong>QA model matters.</strong> Running the same tasks with Sonnet
+as the QA model (instead of Opus) reduced QA costs by 60% but increased
+the false-negative rate – tasks that QA approved on first pass but had
+real issues. The estimated false-negative rate with Sonnet QA was 8-12%,
+versus 2-4% with Opus QA. For production codebases, the extra cost of
+Opus QA is justified. For prototypes or internal tools, Sonnet QA may be
+acceptable.</p>
+<p><strong>Merge conflict rate correlates with task scope
+breadth.</strong> Tasks with scope of 1-3 files had a 3% merge conflict
+rate. Tasks with scope of 4-8 files had a 12% rate. Tasks with scope of
+9+ files had a 28% rate. This validates the narrow-scope-first merge
+heuristic – merging narrow tasks first reduces the conflict surface for
+subsequent broader merges.</p>
+<hr />
+<h3 id="extending-the-pipeline">Extending the Pipeline</h3>
+<p>The five-stage pipeline is a starting point. Here are extensions I
+have explored or plan to implement.</p>
+<p><strong>Runtime validation stage.</strong> Between QA and merge, add
+a stage that actually runs the modified code and verifies it works – not
+just that the diff looks correct. This requires project-specific test
+harnesses (or the functional validation framework from Post 3), but it
+catches the class of bugs that pure diff review cannot: runtime errors,
+performance regressions, and behavioral changes.</p>
+<p><strong>Incremental re-execution.</strong> When a task’s branch
+conflicts with merged main, the current system re-executes the entire
+task from scratch. A smarter approach would rebase the existing work
+onto updated main and ask the agent to fix only the conflicts. This
+reduces re-execution cost from “full task” to “conflict resolution,”
+which is typically much faster.</p>
+<p><strong>Cross-task dependency learning.</strong> After multiple
+pipeline runs on the same codebase, the system could learn which file
+scopes tend to conflict and automatically add dependencies between
+overlapping tasks. This would reduce the merge conflict rate over time
+without manual intervention in the ideation prompt.</p>
+<p><strong>Parallel QA with consensus.</strong> Instead of one QA agent
+per task, run two QA agents independently and require consensus for
+approval. If one approves and one rejects, a third agent reviews both
+opinions and makes the final call. This reduces the false-negative rate
+at the cost of 2-3x QA processing time. The multi-agent consensus
+approach from Post 2 applies directly here.</p>
+<hr />
+<h3 id="five-lessons-from-the-factory-floor">Five Lessons from the
+Factory Floor</h3>
+<p><strong>First: isolation is non-negotiable.</strong> Git worktrees
+provide free, total filesystem separation. No shared state. No “oops,
+agent A overwrote agent B’s changes.” The isolation is not a
+nice-to-have – it is the foundation that makes everything else possible.
+Without it, parallel AI development devolves into merge conflict
+whack-a-mole.</p>
+<p><strong>Second: specs are the bottleneck, not execution.</strong> A
+precise spec with five concrete acceptance criteria passes QA on the
+first attempt. A vague spec with two criteria gets rejected, fixed,
+re-reviewed, and sometimes re-rejected. The spec generation phase
+determines the quality of everything downstream. Investing in better
+specs has a higher return than investing in smarter execution
+agents.</p>
+<p><strong>Third: QA agents must be separate from execution
+agents.</strong> Self-review does not work at scale. The same reasoning
+patterns that produce buggy code produce confident-but-incorrect
+self-assessments. The independent reviewer catches what the author
+cannot see.</p>
+<p><strong>Fourth: the rejection-and-fix cycle is where quality comes
+from.</strong> The goal is not first-pass perfection. The goal is a
+tight feedback loop: execute, review, reject with specifics, fix,
+re-review. The 22% first-pass rejection rate is not a failure – it is
+the system working as designed. The 95% second-pass approval rate proves
+the cycle works.</p>
+<p><strong>Fifth: merge order is an algorithm, not a queue.</strong>
+Naive first-in-first-out merge ordering causes cascading conflicts.
+Priority-weighted topological sort – merging foundation tasks first,
+narrow changes before broad refactors, dependencies before dependents –
+transforms a conflict-prone merge into a smooth integration. The
+topological sort is the reason 60 branches merged cleanly overnight
+instead of producing 30 conflicts.</p>
+<p>Each of these lessons was learned the hard way. The first version of
+the pipeline had no QA stage, no topological merge, and specs that were
+just task titles. The approval rate was 100% (because everything
+self-approved) and the code quality was abysmal. The merge queue was
+FIFO and produced conflicts on every other task. The specs were “improve
+error handling” instead of “add try/except to the 3 database functions
+in <code>db.py</code> with specific error types for ConnectionError,
+IntegrityError, and OperationalError.” Every improvement to the pipeline
+came from a specific failure that cost real time and money.</p>
+<h4 id="the-meta-lesson-pipeline-development-is-iterative">The
+Meta-Lesson: Pipeline Development Is Iterative</h4>
+<p>The pipeline itself went through its own development cycle. Version 1
+had 3 stages (ideate, execute, merge). Version 2 added QA. Version 3
+added fix cycles. Version 4 added topological merge ordering. Version 5
+added the monitoring and analytics layer.</p>
+<p>Each version was motivated by a specific category of failure that the
+previous version could not prevent:</p>
+<table>
+<colgroup>
+<col style="width: 24%" />
+<col style="width: 18%" />
+<col style="width: 56%" />
+</colgroup>
+<thead>
+<tr>
+<th>Version</th>
+<th>Added</th>
+<th>Failure It Addressed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v1</td>
+<td>Basic pipeline</td>
+<td>No pipeline at all – manual agent management</td>
+</tr>
+<tr>
+<td>v2</td>
+<td>QA stage</td>
+<td>100% self-approval rate, broken code merged</td>
+</tr>
+<tr>
+<td>v3</td>
+<td>Fix cycles</td>
+<td>Good code rejected for minor issues, no second chance</td>
+</tr>
+<tr>
+<td>v4</td>
+<td>Topological merge</td>
+<td>Cascading conflicts from random merge order</td>
+</tr>
+<tr>
+<td>v5</td>
+<td>Analytics + monitoring</td>
+<td>No visibility into why runs failed</td>
+</tr>
+</tbody>
+</table>
+<p>The current version is v5. It is not the final version. The next
+improvement – runtime validation between QA and merge – will address the
+category of bugs that pass diff-based review but fail at runtime. Each
+version is better than the last, and each was built because the previous
+version failed in a specific, observable way.</p>
+<hr />
+<h3 id="getting-started">Getting Started</h3>
+<p>Clone the companion repo and try it on a small project first:</p>
+<pre class="bash"><code>git clone https://github.com/krzemienski/auto-claude-worktrees
+cd auto-claude-worktrees
+pip install -e .
+
+# Try the ideation phase on your project
+auto-claude ideate --repo /path/to/your/project --max-tasks 20
+
+# Inspect the task manifest
+cat /path/to/your/project/.auto-claude/tasks.json | python -m json.tool
+
+# Run the full pipeline with 4 workers
+auto-claude full --repo /path/to/your/project --workers 4</code></pre>
+<p>Start with <code>max_tasks = 20</code> and <code>workers = 4</code>.
+Inspect the output at each stage. Tune the QA criteria and acceptance
+criteria precision based on your rejection rates. Scale up once you
+trust the pipeline.</p>
+<p>The best first project to try this on is one with clear, separable
+tasks – a codebase that needs type annotations added, error handling
+improved, documentation written, and configuration centralized. These
+are the kinds of tasks that parallelize well because they touch
+different aspects of the code with minimal overlap.</p>
+<p>Avoid starting with a project that needs a single, coordinated
+refactor. That is the worst case for parallel worktrees – one task where
+everything depends on everything else.</p>
+<h4 id="prerequisites-and-environment-setup">Prerequisites and
+Environment Setup</h4>
+<p>Before running your first pipeline, verify these prerequisites:</p>
+<p><strong>Disk space.</strong> Calculate your project’s worktree
+footprint: <code>du -sh --exclude=.git /path/to/project</code>
+multiplied by your worker count plus a 20% buffer. A 200MB project with
+8 workers needs approximately 2GB of free space. The pipeline does not
+check available disk before creating worktrees – it will fail
+ungracefully if you run out.</p>
+<p><strong>API access.</strong> You need a Claude API key with
+sufficient rate limits. At 4 workers, each making 2-3 API calls per
+minute, you need at least 12 requests per minute capacity. At 8 workers,
+24 requests per minute. If your rate limit is lower, reduce worker count
+or add the staggered start delay in the config.</p>
+<p><strong>Git configuration.</strong> Worktrees require a clean working
+tree on the base branch. Stash or commit uncommitted changes before
+running the pipeline. The pipeline creates branches from HEAD – if HEAD
+is not what you expect, the worktrees will be based on the wrong
+code.</p>
+<pre class="bash"><code># Verify prerequisites before first run
+echo &quot;=== Disk Space ===&quot;
+df -h . | tail -1
+
+echo &quot;=== Project Size ===&quot;
+du -sh --exclude=.git . 2&gt;/dev/null || du -sh . | head -1
+
+echo &quot;=== Git Status ===&quot;
+git status --short
+
+echo &quot;=== API Access ===&quot;
+claude --print &quot;hello&quot; 2&gt;&amp;1 | head -1</code></pre>
+<p><strong>Python environment.</strong> The pipeline requires Python
+3.10+ and the Claude CLI. Install with <code>pip install -e .</code>
+from the cloned repo. The <code>auto-claude</code> command should be
+available on your PATH after installation.</p>
+<h4 id="choosing-your-first-task-count">Choosing Your First Task
+Count</h4>
+<p>Start with fewer tasks than you think you need. Twenty is the right
+number for a first run. Here is why:</p>
+<ul>
+<li><strong>Ideation inspection:</strong> With 20 tasks, you can read
+every ideated task in 5 minutes. With 100 tasks, you cannot. The first
+run is about calibrating the ideation prompt, which means reading the
+output.</li>
+<li><strong>Spec review:</strong> You should manually review at least 5
+specs before trusting the pipeline. With 20 tasks and 15 specs
+generated, reviewing 5 is 33% coverage. With 100 tasks, 5 is 7%.</li>
+<li><strong>Cost containment:</strong> A 20-task run costs $30-60. A
+100-task run costs $200-400. If the first run reveals a systemic issue
+(wrong ideation prompt, missing setup step, overly strict QA), you want
+to discover it at $40, not $300.</li>
+<li><strong>Fast feedback:</strong> A 20-task run completes in 2-3
+hours. A 100-task run takes 8-14 hours. The faster you iterate on your
+pipeline configuration, the sooner you reach a reliable setup.</li>
+</ul>
+<h4 id="your-first-pipeline-run-what-to-expect">Your First Pipeline Run:
+What to Expect</h4>
+<p>Here is a realistic walkthrough of what happens when you run the
+pipeline for the first time on a medium-sized project (50-100 source
+files).</p>
+<p><strong>Ideation produces more tasks than you expect.</strong> For a
+70-file Python project, I typically see 80-120 tasks ideated. This feels
+like too many. It is not – the spec generation phase will filter down to
+40-60, and QA will approve 30-50. Over-generation is the point.</p>
+<p><strong>Spec generation takes longer than ideation.</strong> While
+ideation is a single API call (8-10 minutes), spec generation is one
+call per task (40-60 minutes at 4 workers). This is the first place
+where the pipeline “feels slow.” It is generating the precise acceptance
+criteria that make QA reliable.</p>
+<p><strong>The first QA rejection feels frustrating.</strong> When you
+see “QA_REJECTED” for the first time, the instinct is to override it. Do
+not. Read the rejection reason. It is almost always legitimate – a
+missing edge case, an incomplete implementation, or a hardcoded value.
+The QA agent is doing its job.</p>
+<p><strong>The merge queue is anticlimactic.</strong> After the drama of
+ideation, execution, and QA, the merge queue just… works. Branches merge
+one at a time, in the right order, and the conflicts that do arise get
+flagged cleanly. This is the payoff of the topological sort.</p>
+<p><strong>The post-run cleanup is satisfying.</strong> After 40
+worktrees merge successfully, running the cleanup function and seeing 40
+worktrees removed, 40 branches deleted, and a clean <code>git log</code>
+showing 40 merge commits with the <code>auto-claude:</code> prefix –
+that is the moment the system proves its value.</p>
+<h4 id="tuning-the-pipeline">Tuning the Pipeline</h4>
+<p>After your first run, you will want to tune these settings:</p>
+<p><strong>If the rejection rate exceeds 30%:</strong> Your specs are
+too vague. Increase the number of acceptance criteria in the spec
+generation prompt. Add examples of good vs bad criteria.</p>
+<p><strong>If the rejection rate is below 10%:</strong> Your QA model
+may be too lenient. Try switching from Sonnet to Opus for QA, or add
+stricter criteria to the <code>[qa]</code> config section.</p>
+<p><strong>If timeout rate exceeds 15%:</strong> Your tasks are too
+broad. Adjust the ideation prompt to generate more focused tasks.
+Alternatively, increase the <code>timeout_seconds</code> for complex
+tasks.</p>
+<p><strong>If merge conflict rate exceeds 20%:</strong> Your tasks have
+too much scope overlap. Adjust the ideation prompt to enforce stricter
+file scope boundaries, or add more dependencies between overlapping
+tasks.</p>
+<p><strong>If you are spending too much:</strong> Switch the execution
+model from Sonnet to Haiku for simple tasks (type annotations,
+documentation). Keep Sonnet for complex tasks. Use the
+<code>estimated_complexity</code> field to route.</p>
+<hr />
+<h3 id="real-world-pipeline-output">Real-World Pipeline Output</h3>
+<p>Here is an abbreviated sample of what the pipeline’s output directory
+looks like after a successful run:</p>
+<pre><code>.auto-claude/
+├── tasks.json                    # 194 ideated tasks
+├── specs/
+│   ├── add-type-annotations.json
+│   ├── error-handling-api.json
+│   ├── implement-search.json
+│   └── ... (91 spec files)
+├── worktrees/
+│   ├── auto-add-type-annotations/
+│   │   ├── .auto-claude/
+│   │   │   ├── spec.md
+│   │   │   ├── spec.json
+│   │   │   ├── agent-output.txt
+│   │   │   └── COMPLETION.md
+│   │   └── (modified source files)
+│   └── ... (71 worktree directories)
+├── qa/
+│   ├── add-type-annotations-pass1.json
+│   ├── error-handling-api-pass1.json
+│   ├── error-handling-api-pass2.json    # (rejected, then approved)
+│   └── ... (71+ QA result files)
+├── merge/
+│   ├── merge-results.json
+│   └── merge-order.json
+└── manifest.json                  # Full pipeline state</code></pre>
+<p>The <code>manifest.json</code> file is the single source of truth for
+the entire pipeline run. It contains every task, spec, worktree state,
+QA result, and merge result. You can reconstruct the entire history of
+the run from this one file.</p>
+<p>The QA directory shows the rejection-fix-approval cycle in action:
+<code>error-handling-api-pass1.json</code> contains the rejection with
+remediation instructions, and <code>error-handling-api-pass2.json</code>
+contains the approval after the fix cycle.</p>
+<hr />
+<h3 id="the-worktree-pipeline-as-a-development-paradigm">The Worktree
+Pipeline as a Development Paradigm</h3>
+<p>The worktree pipeline is more than a tool – it is a development
+paradigm shift. Instead of thinking “how do I implement this feature?”
+you think “how do I decompose this feature into independently
+implementable units?”</p>
+<p>This decomposition thinking has benefits beyond parallelism:</p>
+<p><strong>Better architecture.</strong> Tasks that cannot be decomposed
+into independent units often indicate poor module boundaries. The
+ideation phase’s constraint – “focused enough for one agent to complete
+in isolation” – forces you to identify coupling and either break it or
+acknowledge it as a dependency.</p>
+<p><strong>Clearer requirements.</strong> Writing specs with concrete
+acceptance criteria forces you to define “done” before you start. This
+is useful even if you never run the pipeline – the spec-writing process
+reveals ambiguities that would otherwise surface during
+implementation.</p>
+<p><strong>Built-in code review.</strong> The QA pipeline provides
+independent review of every change. Most teams struggle with code review
+throughput. The pipeline automates it, producing structured review
+reports with specific findings and remediation instructions.</p>
+<p><strong>Regression protection.</strong> Each task runs against a
+clean copy of main. If it introduces a regression, the QA agent catches
+it in isolation. The regression never reaches other tasks or the main
+branch.</p>
+<p>The paradigm works best when you embrace it fully: decompose
+aggressively, spec precisely, review independently, merge carefully.
+Skip any of these steps and you lose the guarantees that make the system
+reliable.</p>
+<hr />
+<h3 id="frequently-asked-questions">Frequently Asked Questions</h3>
+<p><strong>Q: Does this work with languages other than
+Python?</strong></p>
+<p>Yes. The pipeline itself is written in Python, but the execution
+agents can work in any language. The spec format is language-agnostic –
+it specifies files to modify, steps to follow, and criteria to meet. I
+have run it on Python, TypeScript, Swift, and Rust codebases. The only
+language-specific part is the <code>include_patterns</code> config that
+tells the ideation phase which source files to analyze.</p>
+<p><strong>Q: Can I use this with GitHub Copilot or other AI coding
+tools instead of Claude?</strong></p>
+<p>The system is designed around Claude’s CLI
+(<code>claude --print</code>) which accepts a system prompt and returns
+output in a single call. Adapting to other AI tools would require
+rewriting the <code>spawn_agent</code> function in
+<code>factory.py</code> and the QA agent invocation in
+<code>qa.py</code>. The pipeline architecture (ideation, spec,
+execution, QA, merge) is tool-agnostic; only the agent spawning is
+Claude-specific.</p>
+<p><strong>Q: How do I handle tasks that need environment variables or
+database setup?</strong></p>
+<p>Add a setup script to the spec’s <code>implementation_steps</code>.
+The execution agent runs in a fresh worktree, so any environment setup
+that the main branch requires also needs to happen in the worktree. For
+database-dependent tasks, include a step like “run
+<code>docker compose up -d postgres</code> before starting.” For
+environment variables, create a <code>.env.example</code> file in the
+repository that the agent can copy.</p>
+<p><strong>Q: What if the ideation phase generates duplicate
+tasks?</strong></p>
+<p>The spec generation phase handles this implicitly. When two tasks
+have overlapping <code>files_in_scope</code>, the
+<code>filter_specifiable_tasks</code> function defers one of them. You
+can also post-process the task manifest before spec generation –
+deduplicate by title similarity or scope overlap, keeping the
+higher-priority version.</p>
+<p><strong>Q: Is there a way to resume a failed pipeline
+run?</strong></p>
+<p>Yes. Each stage reads its input from and writes its output to the
+<code>.auto-claude/</code> directory. If the pipeline fails during
+execution (Stage 3), you can restart just the execution stage – the
+ideation and spec outputs from Stages 1 and 2 are preserved. The
+<code>manifest.json</code> file tracks the state of each task, so the
+pipeline knows which tasks have already been completed and which need
+re-execution.</p>
+<p><strong>Q: How much does a typical pipeline run cost?</strong></p>
+<p>Cost depends on task count, model choices, and retry rates. Rough
+estimates for a 50-task run:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Model</th>
+<th>Approx. Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Ideation (1 call)</td>
+<td>Opus</td>
+<td>$2-5</td>
+</tr>
+<tr>
+<td>Spec generation (50 calls)</td>
+<td>Opus</td>
+<td>$15-30</td>
+</tr>
+<tr>
+<td>Execution (50 tasks)</td>
+<td>Sonnet</td>
+<td>$50-120</td>
+</tr>
+<tr>
+<td>QA review (50+ reviews)</td>
+<td>Opus</td>
+<td>$30-60</td>
+</tr>
+<tr>
+<td>Fix cycles (~10 retries)</td>
+<td>Sonnet + Opus</td>
+<td>$15-30</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td></td>
+<td><strong>$112-245</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The execution stage dominates cost because each task involves
+multiple turns of file reading, editing, and building. QA is the
+second-largest cost because Opus reasoning on diffs is expensive but
+necessary for reliable review.</p>
+<hr />
+<h3 id="where-this-goes-next">Where This Goes Next</h3>
+<p>The worktree pipeline is version 1. The fundamental architecture –
+decompose, parallelize, review, merge – is sound. The specific
+implementation has room to grow.</p>
+<p>The most impactful next step is integrating runtime validation
+between QA and merge. Currently, QA reviews code diffs. It cannot catch
+runtime errors, performance regressions, or behavioral bugs. Adding a
+stage that builds and runs the code in each worktree before QA review
+would catch a class of bugs that diff-based review fundamentally
+cannot.</p>
+<p>The second most impactful improvement is incremental re-execution for
+merge conflicts. Currently, a conflict means full re-execution from
+scratch. Rebasing the existing work and asking the agent to resolve only
+the conflicts would reduce re-execution time by 60-80%.</p>
+<p>The third improvement is cross-run learning. After 5-10 pipeline runs
+on the same codebase, the system has enough data to predict which task
+categories produce the most QA rejections, which file scopes generate
+the most merge conflicts, and which spec patterns lead to the highest
+first-pass approval rates. Using this data to tune the ideation and spec
+generation prompts would make each successive run more efficient than
+the last.</p>
+<p>Companion repo: <a
+href="https://github.com/krzemienski/auto-claude-worktrees">github.com/krzemienski/auto-claude-worktrees</a></p>
+<hr />
+<p><em>Part 6 of 11 in the <a
+href="https://github.com/krzemienski/agentic-development-guide">Agentic
+Development</a> series.</em></p>
+<p><code>#AgenticDevelopment</code> <code>#GitWorktrees</code>
+<code>#AIEngineering</code> <code>#ParallelDevelopment</code>
+<code>#QualityAssurance</code></p>
+
+<hr>
+<h2>Diagrams &amp; Visual Assets</h2>
+
+
+<div class="social-cards">
+<h3>Social Media Cards</h3>
+<p style="color:#94a3b8;font-size:0.9em;">Open <code>assets/twitter-card.html</code> and <code>assets/linkedin-card.html</code> in a browser to preview social cards.</p>
+</div>
+
+<div class="series-nav">
+<span>Agentic Development: 10 Lessons from 8,481 AI Coding Sessions</span>
+<span style="color:#64748b;">Post 06 of 11</span>
+</div>
+</article>
+</body>
+</html>

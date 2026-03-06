@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>4 Failed API Attempts - Agentic Development</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6467f2",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .dot-grid {
+            background-image: radial-gradient(circle, #334155 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .glow-orb {
+            filter: blur(80px);
+            opacity: 0.15;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen relative overflow-x-hidden">
+<!-- Background Decor -->
+<div class="fixed inset-0 dot-grid opacity-20 pointer-events-none"></div>
+<div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary glow-orb rounded-full pointer-events-none"></div>
+<div class="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-cyan-500 glow-orb rounded-full pointer-events-none"></div>
+<div class="relative flex min-h-screen w-full flex-col">
+<div class="layout-container flex h-full grow flex-col">
+<!-- TopNavBar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-slate-800/50 px-10 py-4 bg-background-dark/80 backdrop-blur-md sticky top-0 z-50">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-white">
+<div class="size-8 bg-primary rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-white">terminal</span>
+</div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-tight">Agentic Dev</h2>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-slate-400 hover:text-white text-sm font-medium transition-colors" href="#">Articles</a>
+<a class="text-slate-400 hover:text-white text-sm font-medium transition-colors" href="#">Series</a>
+<a class="text-slate-400 hover:text-white text-sm font-medium transition-colors" href="#">Resources</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-6 items-center">
+<label class="hidden lg:flex flex-col min-w-40 !h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full bg-slate-800/50 border border-slate-700">
+<div class="text-slate-400 flex items-center justify-center pl-3">
+<span class="material-symbols-outlined text-xl">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-transparent text-white focus:ring-0 placeholder:text-slate-500 text-sm" placeholder="Search logs..." value=""/>
+</div>
+</label>
+<button class="flex min-w-[100px] cursor-pointer items-center justify-center rounded-lg h-10 px-5 bg-primary hover:bg-primary/90 text-white text-sm font-bold transition-all shadow-lg shadow-primary/20">
+                        Subscribe
+                    </button>
+</div>
+</header>
+<main class="flex-1 flex flex-col items-center px-6 py-12 lg:py-20 max-w-7xl mx-auto w-full">
+<!-- Hero Content -->
+<div class="text-center mb-16 space-y-4 max-w-3xl">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest mb-4">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+                        New Case Study
+                    </div>
+<h1 class="text-4xl md:text-6xl font-black text-white leading-[1.1] tracking-tight">
+                        4 Failed Attempts to <span class="text-primary">Call One API</span>
+</h1>
+<p class="text-slate-400 text-lg md:text-xl font-normal leading-relaxed">
+                        A deep dive into Agentic Development hurdles: exploring the failures of Direct API, ClaudeCodeSDK, and JS SDK before finding success with CLI Subprocess.
+                    </p>
+</div>
+<!-- Emoji Row -->
+<div class="flex justify-center gap-24 md:gap-32 mb-8 text-3xl md:text-4xl opacity-80">
+<span class="filter grayscale hover:grayscale-0 transition-all cursor-default">😫</span>
+<span class="filter grayscale hover:grayscale-0 transition-all cursor-default">🤨</span>
+<span class="filter grayscale hover:grayscale-0 transition-all cursor-default">😠</span>
+<span class="filter grayscale hover:grayscale-0 transition-all cursor-default">😌</span>
+</div>
+<!-- Vertical Cards Row -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 w-full mb-20">
+<!-- Card 1 -->
+<div class="flex flex-col gap-4 p-6 rounded-xl border border-red-500/30 bg-red-500/5 backdrop-blur-sm group hover:border-red-500 transition-colors">
+<div class="size-12 rounded-lg bg-red-500/20 flex items-center justify-center text-red-500">
+<span class="material-symbols-outlined font-bold">close</span>
+</div>
+<div>
+<h3 class="text-white text-lg font-bold">Direct API</h3>
+<p class="text-red-400/80 text-sm font-medium mb-2">Failed Attempt 1</p>
+<div class="p-3 bg-black/40 rounded border border-red-900/50 font-mono text-xs text-red-300">
+                                Error: 401 Unauthorized<br/>
+                                Missing auth headers
+                            </div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="flex flex-col gap-4 p-6 rounded-xl border border-red-500/30 bg-red-500/5 backdrop-blur-sm group hover:border-red-500 transition-colors">
+<div class="size-12 rounded-lg bg-red-500/20 flex items-center justify-center text-red-500">
+<span class="material-symbols-outlined font-bold">close</span>
+</div>
+<div>
+<h3 class="text-white text-lg font-bold">ClaudeCodeSDK</h3>
+<p class="text-red-400/80 text-sm font-medium mb-2">Failed Attempt 2</p>
+<div class="p-3 bg-black/40 rounded border border-red-900/50 font-mono text-xs text-red-300">
+                                RunLoop deadlock<br/>
+                                Main thread hung
+                            </div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="flex flex-col gap-4 p-6 rounded-xl border border-red-500/30 bg-red-500/5 backdrop-blur-sm group hover:border-red-500 transition-colors">
+<div class="size-12 rounded-lg bg-red-500/20 flex items-center justify-center text-red-500">
+<span class="material-symbols-outlined font-bold">close</span>
+</div>
+<div>
+<h3 class="text-white text-lg font-bold">JS SDK</h3>
+<p class="text-red-400/80 text-sm font-medium mb-2">Failed Attempt 3</p>
+<div class="p-3 bg-black/40 rounded border border-red-900/50 font-mono text-xs text-red-300">
+                                Process crash<br/>
+                                Error: SIGABRT
+                            </div>
+</div>
+</div>
+<!-- Card 4 - Success -->
+<div class="flex flex-col gap-4 p-6 rounded-xl border border-emerald-500/40 bg-emerald-500/5 backdrop-blur-sm group hover:border-emerald-500 transition-colors shadow-lg shadow-emerald-500/10">
+<div class="size-12 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-500">
+<span class="material-symbols-outlined font-bold">check</span>
+</div>
+<div>
+<h3 class="text-white text-lg font-bold">CLI Subprocess</h3>
+<p class="text-emerald-400/80 text-sm font-medium mb-2">Successful Solution</p>
+<div class="p-3 bg-black/40 rounded border border-emerald-900/50 font-mono text-xs text-emerald-300">
+                                Status: 200 OK<br/>
+                                Streaming verified
+                            </div>
+</div>
+</div>
+</div>
+<!-- Bridge Architecture Diagram -->
+<div class="w-full max-w-4xl bg-slate-900/50 rounded-2xl border border-slate-800 p-8 relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-primary/5"></div>
+<h4 class="text-slate-400 text-sm font-bold uppercase tracking-widest text-center mb-10 relative z-10">System Architecture</h4>
+<div class="flex flex-col md:flex-row items-center justify-between gap-8 md:gap-0 relative z-10">
+<!-- Swift Node -->
+<div class="flex flex-col items-center gap-3">
+<div class="size-20 rounded-2xl bg-orange-500/10 border border-orange-500/30 flex items-center justify-center shadow-lg shadow-orange-500/10">
+<span class="material-symbols-outlined text-4xl text-orange-500">sprint</span>
+</div>
+<span class="text-white font-bold">Swift UI</span>
+</div>
+<!-- Pulse Line 1 -->
+<div class="hidden md:block flex-1 h-px bg-gradient-to-r from-orange-500/50 via-primary to-blue-500/50 relative mx-4">
+<div class="absolute top-1/2 left-0 -translate-y-1/2 w-2 h-2 rounded-full bg-primary shadow-[0_0_15px_rgba(100,103,242,0.8)]"></div>
+</div>
+<!-- Python Node -->
+<div class="flex flex-col items-center gap-3">
+<div class="size-20 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center shadow-lg shadow-blue-500/10">
+<span class="material-symbols-outlined text-4xl text-blue-500">terminal</span>
+</div>
+<span class="text-white font-bold">Python Bridge</span>
+</div>
+<!-- Pulse Line 2 -->
+<div class="hidden md:block flex-1 h-px bg-gradient-to-r from-blue-500/50 via-primary to-indigo-500/50 relative mx-4">
+<div class="absolute top-1/2 right-0 -translate-y-1/2 w-2 h-2 rounded-full bg-primary shadow-[0_0_15px_rgba(100,103,242,0.8)]"></div>
+</div>
+<!-- Anthropic Node -->
+<div class="flex flex-col items-center gap-3">
+<div class="size-20 rounded-2xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center shadow-lg shadow-indigo-500/10">
+<span class="material-symbols-outlined text-4xl text-indigo-400">psychology</span>
+</div>
+<span class="text-white font-bold">Anthropic API</span>
+</div>
+</div>
+<!-- Glowing Pulse Lines (Mobile Connector) -->
+<div class="md:hidden flex flex-col items-center py-4 gap-4">
+<div class="w-px h-12 bg-gradient-to-b from-orange-500 to-blue-500"></div>
+<div class="w-px h-12 bg-gradient-to-b from-blue-500 to-indigo-500"></div>
+</div>
+</div>
+<!-- Action Button -->
+<div class="mt-16">
+<button class="px-8 py-4 bg-primary text-white font-bold rounded-xl flex items-center gap-3 hover:scale-105 transition-transform shadow-xl shadow-primary/20">
+                        Read the Full Breakdown
+                        <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+</div>
+</main>
+<!-- Footer Small -->
+<footer class="border-t border-slate-800/50 px-10 py-6 text-center">
+<p class="text-slate-500 text-sm">© 2024 Agentic Development Blog • Built with Anthropic &amp; Swift</p>
+</footer>
+</div>
+</div>
+</body></html>

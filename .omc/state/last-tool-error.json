@@ -1,0 +1,7 @@
+{
+  "tool_name": "Read",
+  "tool_input_preview": "{\"file_path\":\"/Users/nick/Desktop/blog-series/posts/01-series-launch/post.md\",\"limit\":80}",
+  "error": "File does not exist. Note: your current working directory is /Users/nick/Desktop/blog-series.",
+  "timestamp": "2026-03-06T02:28:18.229Z",
+  "retry_count": 1
+}

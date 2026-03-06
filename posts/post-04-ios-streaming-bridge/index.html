@@ -1,0 +1,2057 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Two-Character Bug That Took 3 Days</title>
+<meta property="og:title" content="The Two-Character Bug That Took 3 Days">
+<meta property="og:description" content="Building a native SSE client for iOS">
+<meta property="og:type" content="article">
+<meta property="og:image" content="assets/hero-card.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Two-Character Bug That Took 3 Days">
+<meta name="twitter:description" content="Building a native SSE client for iOS">
+<meta name="author" content="Nick Krzemienski">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0a0a0a; color: #e2e8f0; line-height: 1.8; }
+  .hero-container { max-width: 1200px; margin: 0 auto; }
+  .hero-container > div { width: 100% !important; max-width: 100%; }
+  article { max-width: 780px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: 2.5em; font-weight: 800; color: #f8fafc; line-height: 1.2; margin: 0 0 16px; }
+  h2 { font-size: 1.75em; font-weight: 700; color: #f1f5f9; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #1e293b; }
+  h3 { font-size: 1.3em; font-weight: 600; color: #e2e8f0; margin: 32px 0 12px; }
+  h4 { font-size: 1.1em; font-weight: 600; color: #cbd5e1; margin: 24px 0 8px; }
+  p { margin: 0 0 16px; color: #cbd5e1; }
+  a { color: #818cf8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; background: #1e293b; color: #a5b4fc; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+  pre { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 20px; margin: 16px 0 24px; overflow-x: auto; }
+  pre code { background: none; padding: 0; color: #e2e8f0; font-size: 0.85em; line-height: 1.6; }
+  blockquote { border-left: 3px solid #6366f1; padding: 12px 20px; margin: 16px 0; background: rgba(99,102,241,0.05); border-radius: 0 8px 8px 0; }
+  blockquote p { color: #94a3b8; margin: 0; }
+  ul, ol { margin: 8px 0 16px 24px; color: #cbd5e1; }
+  li { margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; }
+  th { background: #1e293b; color: #f1f5f9; padding: 10px 16px; text-align: left; font-weight: 600; font-size: 0.9em; }
+  td { padding: 10px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.9em; }
+  tr:hover td { background: rgba(99,102,241,0.03); }
+  hr { border: none; border-top: 1px solid #1e293b; margin: 32px 0; }
+  img, svg { max-width: 100%; height: auto; border-radius: 8px; margin: 16px 0; }
+  .diagram { margin: 32px 0; padding: 24px; background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; overflow-x: auto; }
+  .diagram h4 { color: #64748b; font-size: 0.85em; font-weight: 500; margin: 0 0 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .diagram svg { display: block; margin: 0 auto; max-height: 600px; }
+  .meta { color: #64748b; font-size: 0.9em; margin: 8px 0 32px; }
+  .social-cards { display: flex; gap: 24px; flex-wrap: wrap; margin: 48px 0; padding: 24px; background: #0f172a; border-radius: 12px; }
+  .social-cards h3 { width: 100%; color: #64748b; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px; }
+  .social-cards iframe { border: 1px solid #1e293b; border-radius: 8px; }
+  .series-nav { display: flex; justify-content: space-between; padding: 24px; background: #0f172a; border-radius: 12px; margin-top: 48px; }
+  .series-nav a { color: #818cf8; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="hero-container"><div style="width:1200px;height:630px;background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%);display:flex;flex-direction:column;justify-content:center;padding:0 80px;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif;position:relative;overflow:hidden;">
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:radial-gradient(circle at 1px 1px,rgba(239,68,68,0.15) 1px,transparent 0);background-size:40px 40px;"></div>
+  <div style="position:absolute;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(239,68,68,0.2) 0%,transparent 70%);border-radius:50%;"></div>
+  <div style="position:relative;z-index:1;display:inline-block;background:rgba(239,68,68,0.2);border:1px solid rgba(239,68,68,0.4);border-radius:20px;padding:6px 16px;margin-bottom:24px;width:fit-content;">
+    <span style="color:rgba(239,68,68,0.9);font-size:14px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">LESSON 04 OF 10 · IOS STREAMING</span>
+  </div>
+  <h1 style="position:relative;z-index:1;color:#f1f5f9;font-size:46px;font-weight:800;line-height:1.15;margin:0 0 20px 0;max-width:900px;">The Two-Character Bug That Took 3 Days</h1>
+  <p style="position:relative;z-index:1;color:#94a3b8;font-size:20px;line-height:1.5;margin:0 0 32px 0;max-width:700px;">Building a native SSE client when the spec says one thing and reality says another</p>
+  <div style="position:relative;z-index:1;display:flex;align-items:center;gap:12px;">
+    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,rgb(239,68,68),#8b5cf6);display:flex;align-items:center;justify-content:center;">
+      <span style="color:white;font-weight:700;font-size:16px;">NK</span>
+    </div>
+    <div>
+      <div style="color:#f1f5f9;font-size:14px;font-weight:600;">Nick Krzemienski</div>
+      <div style="color:#64748b;font-size:13px;">March 2026 · Agentic Development Series</div>
+    </div>
+  </div>
+</div></div>
+<article>
+<p class="meta">Lesson 04 of 10 · Nick Krzemienski · March 2026 · Agentic Development Series</p>
+<figure>
+<embed src="../visuals/html/series-hero.html" />
+<figcaption aria-hidden="true">Hero</figcaption>
+</figure>
+<h2
+id="the-5-layer-sse-bridge-building-a-native-ios-client-for-claude-code">The
+5-Layer SSE Bridge: Building a Native iOS Client for Claude Code</h2>
+<p><em>Agentic Development: 10 Lessons from 8,481 AI Coding
+Sessions</em></p>
+<p>Every token Claude generates on your behalf traverses five layers
+before it appears on your iPhone screen. SwiftUI view. Vapor backend.
+Python SDK wrapper. Claude CLI. Anthropic API. Then the whole chain
+reverses: API response, CLI stdout, Python NDJSON, Vapor SSE, URLSession
+async bytes, SwiftUI <code>@Observable</code>.</p>
+<p>Ten hops per token. Each one a place where the stream can break,
+stall, duplicate, or silently disappear.</p>
+<p>This is the story of building ILS, a native iOS and macOS client for
+Claude Code. Not a web wrapper. Not a thin API client. A full SwiftUI
+application that streams Claude’s responses token-by-token over
+Server-Sent Events, with reconnection logic, heartbeat monitoring,
+environment variable stripping, and a two-character bug that took an
+entire session to find.</p>
+<p>The companion repo extracts the streaming bridge as a standalone
+Swift package you can drop into any project.</p>
+<hr />
+<h3 id="the-architecture-at-a-glance">The Architecture at a Glance</h3>
+<p>Before diving into each layer, here is the full picture. The request
+flows down through five layers, and the response flows back up through
+the same five:</p>
+<pre class="mermaid"><code>flowchart TD
+    subgraph ios_app [iOS App]
+        ChatView[SwiftUI ChatView]
+        SSEClient[&quot;SSEClient\n(URLSession async bytes)&quot;]
+    end
+
+    subgraph backend [Backend]
+        Vapor[&quot;Vapor Backend\n(SSE endpoint)&quot;]
+    end
+
+    subgraph python_bridge [Python Bridge]
+        PythonSDK[&quot;Python SDK Wrapper\n(sdk-wrapper.py, flush=True)&quot;]
+    end
+
+    subgraph cli_layer [CLI]
+        ClaudeCLI[&quot;Claude CLI\n(output-format stream-json)&quot;]
+    end
+
+    AnthropicAPI[Anthropic API]
+
+    ChatView --&gt;|StreamMessage JSON| SSEClient
+    SSEClient --&gt;|SSE event data| Vapor
+    Vapor --&gt;|NDJSON lines| PythonSDK
+    PythonSDK --&gt;|stream-json stdout| ClaudeCLI
+    ClaudeCLI --&gt;|API response chunks| AnthropicAPI
+
+    AnthropicAPI -.-&gt;|API response chunks| ClaudeCLI
+    ClaudeCLI -.-&gt;|stream-json stdout| PythonSDK
+    PythonSDK -.-&gt;|NDJSON lines| Vapor
+    Vapor -.-&gt;|SSE event data| SSEClient
+    SSEClient -.-&gt;|StreamMessage JSON| ChatView</code></pre>
+<ul>
+<li><strong>Layer 1 – SwiftUI:</strong> <code>ChatView</code> observes
+an <code>@Observable</code> <code>SSEClient</code>. The view re-renders
+on every new token.</li>
+<li><strong>Layer 2 – SSE Client:</strong> <code>SSEClient</code> opens
+a POST to the Vapor backend’s <code>/api/v1/chat/stream</code> endpoint.
+Manages connection state, heartbeat watchdog, and reconnection.</li>
+<li><strong>Layer 3 – Vapor Backend:</strong> Spawns
+<code>python3 sdk-wrapper.py</code>, reads NDJSON from the subprocess
+stdout, and re-emits each line as an SSE event to the HTTP
+response.</li>
+<li><strong>Layer 4 – Python SDK Wrapper:</strong> Calls the
+<code>claude-agent-sdk</code> Python package, which wraps Claude CLI.
+Converts SDK events to NDJSON on stdout with
+<code>flush=True</code>.</li>
+<li><strong>Layer 5 – Claude CLI:</strong> Calls the Anthropic API with
+<code>--output-format stream-json</code>. Handles OAuth
+authentication.</li>
+</ul>
+<p>Responses flow back up the same chain. Each layer adds its own
+failure modes.</p>
+<p>This architecture is not what I would have designed on a whiteboard.
+It is what emerged from constraints and four failed attempts. Direct
+Anthropic API from Swift – failed, no OAuth token available. JavaScript
+SDK via Node subprocess – failed, NIO event loops do not pump RunLoop.
+Swift ClaudeCodeSDK in Vapor – failed,
+<code>FileHandle.readabilityHandler</code> needs RunLoop which NIO does
+not provide. Direct CLI invocation – failed, nesting detection blocks
+Claude inside Claude. The fifth attempt worked: a Python subprocess
+bridge with environment variable stripping.</p>
+<p>The counterintuitive lesson: the five-layer architecture is simpler
+than any of the “simpler” approaches because each layer does exactly one
+translation with exactly one failure mode.</p>
+<hr />
+<h3 id="layer-1-the-bridge-configuration">Layer 1: The Bridge
+Configuration</h3>
+<p>Everything starts with a configuration struct that controls timeouts,
+reconnection, and network behavior:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/Configuration.swift
+
+public struct BridgeConfiguration: Sendable {
+    /// Base URL of the Vapor backend (e.g., &quot;http://localhost:9999&quot;).
+    public let backendURL: String
+
+    /// Timeout for initial connection to receive first byte. Default: 30s.
+    public let initialTimeout: TimeInterval
+
+    /// Total timeout for the entire streaming session. Default: 300s (5 min).
+    public let totalTimeout: TimeInterval
+
+    /// Heartbeat watchdog timeout. No data for this long = connection stale. Default: 45s.
+    public let heartbeatTimeout: TimeInterval
+
+    /// Max automatic reconnection attempts on network errors. Default: 10.
+    public let maxReconnectAttempts: Int
+
+    /// Base delay for exponential backoff. Actual = min(base * 2^(attempt-1), 30s). Default: 2s.
+    public let reconnectBaseDelay: TimeInterval
+
+    /// Whether to stream over expensive networks (hotspot). Default: true.
+    public let allowsExpensiveNetworkAccess: Bool
+
+    /// Whether to stream in Low Data Mode. Default: false.
+    public let allowsConstrainedNetworkAccess: Bool
+
+    /// API path for chat streaming endpoint. Default: &quot;/api/v1/chat/stream&quot;.
+    public let streamEndpoint: String
+
+    /// Path to Python SDK wrapper, relative to project root. Default: &quot;scripts/sdk-wrapper.py&quot;.
+    public let sdkWrapperPath: String
+
+    public static let `default` = BridgeConfiguration()
+
+    public init(
+        backendURL: String = &quot;http://localhost:9999&quot;,
+        initialTimeout: TimeInterval = 30,
+        totalTimeout: TimeInterval = 300,
+        heartbeatTimeout: TimeInterval = 45,
+        maxReconnectAttempts: Int = 10,
+        reconnectBaseDelay: TimeInterval = 2,
+        allowsExpensiveNetworkAccess: Bool = true,
+        allowsConstrainedNetworkAccess: Bool = false,
+        streamEndpoint: String = &quot;/api/v1/chat/stream&quot;,
+        sdkWrapperPath: String = &quot;scripts/sdk-wrapper.py&quot;
+    ) { ... }
+}</code></pre>
+<p>Three timeout values, not one. This is not over-engineering. This is
+the result of watching streams fail in three different ways.</p>
+<p>The <code>initialTimeout</code> (30 seconds) catches stuck
+connections where the backend accepts the HTTP connection but never
+sends a byte. This happens when Claude is overwhelmed or when the Python
+subprocess fails to launch. Without this timeout, the user stares at
+“Connecting…” forever. Thirty seconds is long enough for Claude’s
+extended thinking to begin producing output, but short enough that users
+know something is wrong if nothing happens.</p>
+<p>The <code>totalTimeout</code> (300 seconds) caps the entire streaming
+session. Some prompts trigger extended thinking that can run for
+minutes. Five minutes is generous but bounded. Without this, a hung
+Claude process silently consumes battery forever. I discovered this the
+hard way: a prompt that triggered Claude to read a 2,000-line file and
+produce a refactoring plan. The response took 4 minutes 12 seconds. Any
+shorter total timeout would have killed a valid response.</p>
+<p>The <code>heartbeatTimeout</code> (45 seconds) is the watchdog. Even
+after a healthy connection is established, the stream can go stale –
+network interruption, backend crash, Claude timeout on the API side. If
+no data arrives for 45 seconds, the connection is declared dead. The
+45-second value was chosen because Claude’s longest observed thinking
+pauses between output tokens are around 30 seconds. Adding 50% margin
+gives us 45.</p>
+<p>Notice <code>allowsConstrainedNetworkAccess</code> defaults to
+<code>false</code>. SSE streaming is continuous data. If the user has
+Low Data Mode enabled, we respect that and do not stream Claude
+responses over a metered connection. This is the kind of detail that is
+invisible in development and critical in production – a user on a
+limited data plan whose phone is silently streaming bytes at a sustained
+rate.</p>
+<hr />
+<h3 id="layer-2-the-sse-client">Layer 2: The SSE Client</h3>
+<p>The <code>SSEClient</code> is the heart of the streaming bridge. It
+manages the entire HTTP connection lifecycle – from initial connection
+through reconnection through teardown:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/SSEClient.swift
+
+@MainActor
+@Observable
+public class SSEClient {
+    /// Decoded stream messages received during the current session.
+    public var messages: [StreamMessage] = []
+
+    /// Whether the client is actively streaming.
+    public var isStreaming: Bool = false
+
+    /// Current error, if any.
+    public var error: Error?
+
+    /// Current connection state.
+    public var connectionState: ConnectionState = .disconnected
+
+    /// Connection state machine.
+    public enum ConnectionState: Equatable, Sendable {
+        case disconnected
+        case connecting
+        case connected
+        case reconnecting(attempt: Int)
+    }</code></pre>
+<p>The connection state is an explicit enum, not a boolean. This matters
+for the UI. “Connecting…” is different from “Reconnecting (attempt 3)…”
+which is different from “Connected.” The user needs to understand what
+is happening. A boolean <code>isConnected</code> would collapse these
+three meaningfully different states into two.</p>
+<p>The <code>@MainActor</code> annotation ensures all property mutations
+happen on the main thread. Combined with <code>@Observable</code>, this
+means SwiftUI views automatically re-render when any property changes.
+No Combine publishers. No <code>NotificationCenter</code>. No manual
+<code>objectWillChange.send()</code>. The observation system handles
+it.</p>
+<hr />
+<h3 id="the-sse-connection-state-machine">The SSE Connection State
+Machine</h3>
+<p>The connection goes through several states with well-defined
+transitions. Every edge case is accounted for – background app, network
+drops, timeout, cancellation:</p>
+<pre class="mermaid"><code>stateDiagram-v2
+    [*] --&gt; Disconnected
+
+    Disconnected --&gt; Connecting : startStream()
+
+    Connecting --&gt; Connected : HTTP 2xx + first byte
+    Connecting --&gt; Disconnected : Non-network error\n(bad JSON, auth failure)
+    Connecting --&gt; Disconnected : 60s connection timeout
+    Connecting --&gt; Disconnected : cancel()
+
+    Connected --&gt; Disconnected : Stream ends normally\n(EOF from server)
+    Connected --&gt; Reconnecting : Network error detected\n(isNetworkError = true)
+    Connected --&gt; Disconnected : 45s heartbeat timeout\n(no reconnect attempts left)
+    Connected --&gt; Disconnected : cancel()
+    Connected --&gt; Disconnected : App enters background\n(iOS only, saves radio)
+
+    Reconnecting --&gt; Connecting : Backoff delay elapsed\n(2s, 4s, 8s... cap 30s)
+    Reconnecting --&gt; Disconnected : Max attempts reached\n(default: 10)
+    Reconnecting --&gt; Connecting : resetAndReconnect()\n(cancels backoff sleep)
+    Reconnecting --&gt; Disconnected : cancel()
+
+    state Connected {
+        [*] --&gt; Streaming
+        Streaming --&gt; WatchdogCheck : Every 15s
+        WatchdogCheck --&gt; Streaming : lastActivity &lt; 45s
+        WatchdogCheck --&gt; HeartbeatTimeout : lastActivity &gt;= 45s
+    }
+
+    note right of Connecting
+        TaskGroup races connection
+        against 60s sleep.
+        First to complete wins.
+    end note
+
+    note right of Reconnecting
+        Backoff sleep stored in
+        separate Task so
+        resetAndReconnect() can
+        cancel it for immediate retry.
+    end note
+
+    note right of Connected
+        LastActivityTracker uses
+        OSAllocatedUnfairLock
+        (not actor) to avoid
+        hop overhead on hot path.
+    end note</code></pre>
+<p>Let me walk through the critical transitions.</p>
+<p><strong>Connecting to Connected</strong> requires both an HTTP 2xx
+response AND the first byte of data arriving. An HTTP 200 with an empty
+body is not “connected” – it is “stuck.” The connection timeout catches
+this.</p>
+<p><strong>Connected to Reconnecting</strong> only fires for network
+errors. Application-level errors (bad JSON, authentication failures,
+rate limits) fail immediately because retrying will not help. The
+<code>isNetworkError</code> check filters on the NSURLError domain:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/SSEClient.swift
+
+private func isNetworkError(_ error: Error) -&gt; Bool {
+    let nsError = error as NSError
+    let networkErrorCodes: [Int] = [
+        NSURLErrorNetworkConnectionLost,
+        NSURLErrorNotConnectedToInternet,
+        NSURLErrorTimedOut,
+        NSURLErrorCannotConnectToHost,
+        NSURLErrorCannotFindHost,
+        NSURLErrorDNSLookupFailed,
+    ]
+    return nsError.domain == NSURLErrorDomain &amp;&amp; networkErrorCodes.contains(nsError.code)
+}</code></pre>
+<p><strong>Connected to Disconnected on background</strong> is
+iOS-specific. When the app goes to background, the SSE stream is
+cancelled:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/SSEClient.swift
+
+#if os(iOS)
+backgroundObserver = NotificationCenter.default.addObserver(
+    forName: UIApplication.didEnterBackgroundNotification,
+    object: nil,
+    queue: .main
+) { [weak self] _ in
+    Task { @MainActor [weak self] in
+        guard let self, self.isStreaming else { return }
+        self.cancel()
+    }
+}
+#endif</code></pre>
+<p>SSE keeps the cellular radio active continuously. On cellular, that
+is significant power drain. The user can reconnect when they return to
+the app. Note the <code>[weak self]</code> capture list – without it,
+the notification observer would create a retain cycle keeping the
+SSEClient alive forever.</p>
+<hr />
+<h3 id="the-60-second-connection-race">The 60-Second Connection
+Race</h3>
+<p>The stream implementation races the connection against a 60-second
+timeout using a <code>TaskGroup</code>:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/SSEClient.swift
+
+let urlSession = self.session
+let (asyncBytes, response) = try await withThrowingTaskGroup(
+    of: (URLSession.AsyncBytes, URLResponse).self
+) { group in
+    group.addTask {
+        try await urlSession.bytes(for: urlRequest)
+    }
+    group.addTask {
+        try await Task.sleep(nanoseconds: 60_000_000_000)
+        throw URLError(.timedOut)
+    }
+    let result = try await group.next()!
+    group.cancelAll()
+    return result
+}</code></pre>
+<p>Whichever finishes first wins. If the connection succeeds, the
+timeout task is cancelled. If 60 seconds elapse, the connection is
+killed. This is a common Swift concurrency pattern for racing
+operations, but there is a subtlety: <code>group.cancelAll()</code> is
+called after the first result. Without it, the losing task would
+continue running in the background until it naturally completes or times
+out, wasting resources.</p>
+<p>This 60-second connection timeout is separate from the 30-second
+<code>initialTimeout</code> in the executor service. The connection
+timeout is for the HTTP handshake. The initial timeout is for the first
+byte of actual streaming data. They protect against different failure
+modes: “can’t reach the server” versus “reached the server but it’s not
+producing output.”</p>
+<hr />
+<h3 id="the-heartbeat-watchdog">The Heartbeat Watchdog</h3>
+<p>Once connected, the heartbeat watchdog starts. This is the mechanism
+that detects stale connections mid-stream:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/SSEClient.swift
+
+let lastActivity = LastActivityTracker()
+let watchdogTimeout = configuration.heartbeatTimeout
+
+let heartbeatWatchdog = Task.detached { [watchdogTimeout] in
+    while !Task.isCancelled {
+        try await Task.sleep(nanoseconds: 15_000_000_000)
+        if lastActivity.secondsSinceLastActivity() &gt; watchdogTimeout {
+            throw URLError(.timedOut)
+        }
+    }
+}
+defer { heartbeatWatchdog.cancel() }</code></pre>
+<p>Every 15 seconds, the watchdog checks: has any data arrived in the
+last 45 seconds? If not, the connection is declared stale. The
+<code>Task.detached</code> is significant – it runs outside the current
+actor context, which means it can fire even if the main actor is
+blocked. The <code>defer</code> ensures the watchdog is cancelled when
+the stream function exits, regardless of how it exits (normal
+completion, error, cancellation).</p>
+<p>The <code>LastActivityTracker</code> is a dedicated class using
+<code>OSAllocatedUnfairLock</code> instead of an actor:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/SSEClient.swift
+
+private final class LastActivityTracker: Sendable {
+    private let storage = OSAllocatedUnfairLock(initialState: Date())
+
+    func touch() {
+        storage.withLock { $0 = Date() }
+    }
+
+    func secondsSinceLastActivity() -&gt; TimeInterval {
+        let last = storage.withLock { $0 }
+        return Date().timeIntervalSince(last)
+    }
+}</code></pre>
+<p>Why not an actor? Performance. <code>touch()</code> is called on
+every single SSE line received. During active streaming, that is dozens
+of calls per second. Actor-hop overhead on every received line adds up.
+<code>OSAllocatedUnfairLock</code> gives us thread safety without the
+context switch. The lock acquisition is nanoseconds, not microseconds.
+On the hot path, that difference matters.</p>
+<p>Every line received calls <code>lastActivity.touch()</code>. The SSE
+parsing loop touches the tracker regardless of whether the line is a
+message, a heartbeat comment, or an event header:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/SSEClient.swift
+
+for try await line in asyncBytes.lines {
+    lastActivity.touch()
+
+    if line.hasPrefix(&quot;event:&quot;) {
+        currentEvent = String(line.dropFirst(6)).trimmingCharacters(in: .whitespaces)
+    } else if line.hasPrefix(&quot;id:&quot;) {
+        lastEventId = String(line.dropFirst(3)).trimmingCharacters(in: .whitespaces)
+    } else if line.hasPrefix(&quot;data:&quot;) {
+        currentData = String(line.dropFirst(5)).trimmingCharacters(in: .whitespaces)
+        if !currentData.isEmpty {
+            await parseAndAddMessage(event: currentEvent, data: currentData)
+        }
+        currentEvent = &quot;&quot;
+        currentData = &quot;&quot;
+    } else if line.hasPrefix(&quot;:&quot;) {
+        // Heartbeat/ping comment — activity already tracked
+        continue
+    }
+}</code></pre>
+<p>The SSE comment lines (starting with <code>:</code>) are the server’s
+heartbeat pings. They carry no data but they reset the watchdog timer.
+This is a standard SSE pattern: the server sends periodic empty comments
+to keep the connection alive through intermediary proxies and load
+balancers that would otherwise close idle connections.</p>
+<hr />
+<h3 id="reconnection-with-exponential-backoff">Reconnection With
+Exponential Backoff</h3>
+<p>When the stream drops, the client does not just retry immediately. It
+uses exponential backoff capped at 30 seconds:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/SSEClient.swift
+
+private func shouldReconnect(error: Error) async -&gt; Bool {
+    guard let request = currentRequest,
+          reconnectAttempts &lt; configuration.maxReconnectAttempts,
+          isNetworkError(error) else {
+        return false
+    }
+
+    reconnectAttempts += 1
+    connectionState = .reconnecting(attempt: reconnectAttempts)
+
+    // Exponential backoff: 2s, 4s, 8s, 16s, 30s, 30s, 30s...
+    let baseNanos = UInt64(configuration.reconnectBaseDelay * 1_000_000_000)
+    let delay = min(baseNanos * UInt64(1 &lt;&lt; (reconnectAttempts - 1)), 30_000_000_000)
+
+    let sleepTask = Task&lt;Void, Never&gt; {
+        try? await Task.sleep(nanoseconds: delay)
+    }
+    backoffSleepTask = sleepTask
+    await sleepTask.value
+    backoffSleepTask = nil
+
+    if Task.isCancelled { return false }
+
+    await performStream(request: request)
+    return true
+}</code></pre>
+<p>The backoff sequence for a 2-second base delay: 2s, 4s, 8s, 16s, 30s,
+30s, 30s… The cap at 30 seconds prevents absurd delays. After 10
+attempts (configurable), the client gives up and transitions to
+disconnected.</p>
+<p>The backoff sleep is stored in a separate task property so that
+<code>resetAndReconnect()</code> can cancel the sleep and force an
+immediate retry. This gives the user a “Retry Now” button that actually
+works, rather than making them wait through the exponential delay:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/SSEClient.swift
+
+public func resetAndReconnect() {
+    backoffSleepTask?.cancel()
+    backoffSleepTask = nil
+
+    guard let request = currentRequest else { return }
+
+    if !isStreaming {
+        reconnectAttempts = 0
+        isStreaming = true
+        error = nil
+        connectionState = .connecting
+        streamTask = Task { [weak self] in
+            await self?.performStream(request: request)
+        }
+    }
+}</code></pre>
+<p>The <code>reconnectAttempts = 0</code> reset is intentional. When the
+user explicitly taps “Retry Now,” it is a fresh attempt. They should get
+the full 10 retry budget again, not be penalized by previous automatic
+failures.</p>
+<hr />
+<h3 id="layer-3-the-message-type-system">Layer 3: The Message Type
+System</h3>
+<p>Every message on the SSE stream is decoded into a discriminated
+union. This is where Swift’s type system earns its keep:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/StreamingTypes.swift
+
+public enum StreamMessage: Codable, Sendable {
+    case system(SystemMessage)
+    case assistant(AssistantMessage)
+    case user(UserMessage)
+    case result(ResultMessage)
+    case streamEvent(StreamEventMessage)
+    case error(StreamError)
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(String.self, forKey: .type)
+
+        switch type {
+        case &quot;system&quot;:    self = .system(try SystemMessage(from: decoder))
+        case &quot;assistant&quot;: self = .assistant(try AssistantMessage(from: decoder))
+        case &quot;user&quot;:      self = .user(try UserMessage(from: decoder))
+        case &quot;result&quot;:    self = .result(try ResultMessage(from: decoder))
+        case &quot;streamEvent&quot;: self = .streamEvent(try StreamEventMessage(from: decoder))
+        case &quot;error&quot;:     self = .error(try StreamError(from: decoder))
+        default:
+            throw DecodingError.dataCorruptedError(
+                forKey: .type, in: container,
+                debugDescription: &quot;Unknown stream message type: \(type)&quot;
+            )
+        }
+    }
+}</code></pre>
+<p>The <code>type</code> field in the JSON drives the decode. This is
+Claude Code’s native streaming format, not something invented for ILS.
+The bridge has to handle every message type the CLI can produce.</p>
+<p>Six message types, each carrying different data. A
+<code>system</code> message arrives first with the session ID and
+available tools. <code>assistant</code> messages carry content blocks –
+text, tool use, thinking. <code>streamEvent</code> messages carry
+character-by-character deltas. <code>result</code> comes last with token
+usage and cost. <code>error</code> can arrive at any point.</p>
+<p>Content blocks within assistant messages are similarly
+discriminated:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/StreamingTypes.swift
+
+public enum ContentBlock: Codable, Sendable {
+    case text(TextBlock)
+    case toolUse(ToolUseBlock)
+    case toolResult(ToolResultBlock)
+    case thinking(ThinkingBlock)
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(String.self, forKey: .type)
+
+        switch type {
+        case &quot;text&quot;:
+            self = .text(try TextBlock(from: decoder))
+        case &quot;tool_use&quot;, &quot;toolUse&quot;:
+            self = .toolUse(try ToolUseBlock(from: decoder))
+        case &quot;tool_result&quot;, &quot;toolResult&quot;:
+            self = .toolResult(try ToolResultBlock(from: decoder))
+        case &quot;thinking&quot;:
+            self = .thinking(try ThinkingBlock(from: decoder))
+        default:
+            self = .text(TextBlock(text: &quot;[Unknown block type: \(type)]&quot;))
+        }
+    }
+}</code></pre>
+<p>Notice both <code>"tool_use"</code> and <code>"toolUse"</code> are
+accepted. Claude Code uses snake_case internally. The Vapor backend may
+normalize to camelCase. The bridge handles both, because in production
+you never control the entire pipeline perfectly. The same dual-case
+handling appears in the <code>StreamDelta</code> decoder:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/StreamingTypes.swift
+
+public enum StreamDelta: Codable, Sendable {
+    case textDelta(String)
+    case inputJsonDelta(String)
+    case thinkingDelta(String)
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let type = try container.decode(String.self, forKey: .type)
+        switch type {
+        case &quot;text_delta&quot;, &quot;textDelta&quot;:
+            let text = try container.decode(String.self, forKey: .text)
+            self = .textDelta(text)
+        case &quot;thinking_delta&quot;, &quot;thinkingDelta&quot;:
+            let thinking = try container.decode(String.self, forKey: .thinking)
+            self = .thinkingDelta(thinking)
+        case &quot;input_json_delta&quot;, &quot;inputJsonDelta&quot;:
+            let json = try container.decode(String.self, forKey: .partialJson)
+            self = .inputJsonDelta(json)
+        default:
+            self = .textDelta(&quot;&quot;)
+        }
+    }
+}</code></pre>
+<p>The <code>default</code> case returns an empty text delta instead of
+throwing. This is defensive – if Claude Code adds a new delta type in a
+future version, the bridge degrades gracefully instead of crashing.
+Unknown message types at the top level throw because an unknown type
+could indicate a protocol mismatch. Unknown delta types silently skip
+because they are incremental content that can be safely ignored.</p>
+<p>The result message carries token usage and cost:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/StreamingTypes.swift
+
+public struct ResultMessage: Codable, Sendable {
+    public let type: String
+    public let subtype: String
+    public let sessionId: String
+    public let durationMs: Int?
+    public let isError: Bool
+    public let numTurns: Int?
+    public let totalCostUSD: Double?
+    public let usage: UsageInfo?
+    public let result: String?
+}
+
+public struct UsageInfo: Codable, Sendable {
+    public let inputTokens: Int
+    public let outputTokens: Int
+    public let cacheReadInputTokens: Int?
+    public let cacheCreationInputTokens: Int?
+}</code></pre>
+<p>This is how you show “$0.04” next to each response in the UI. The
+cost data comes from Claude Code itself, through five layers, into a
+<code>Codable</code> struct on the client. The
+<code>cacheReadInputTokens</code> field tells you how much prompt
+caching saved. In a long conversation, this can reduce costs by 90%.</p>
+<hr />
+<h3
+id="layer-4-the-executor-service-and-the-nesting-detection-bug">Layer 4:
+The Executor Service and the Nesting Detection Bug</h3>
+<p>The <code>ClaudeExecutorService</code> spawns the Python SDK wrapper
+as a subprocess. This is where the most painful bug in the entire
+project lives.</p>
+<p>Claude CLI has nesting detection. If the environment variable
+<code>CLAUDECODE=1</code> is set, or any <code>CLAUDE_CODE_*</code>
+variables exist, the CLI assumes it is being called from inside an
+active Claude Code session and refuses to execute. No error message. No
+stderr output. Just silence.</p>
+<p>Let me tell you how long this took to figure out.</p>
+<p>I had the entire five-layer pipeline working. The SSEClient
+connected. The Vapor backend accepted requests. The Python SDK wrapper
+launched. And then… nothing. Zero bytes on stdout. Zero bytes on stderr.
+The process started, ran for a moment, and exited with code 0. Success,
+apparently. But with no output.</p>
+<p>I added logging to every layer. The Python wrapper was executing. The
+<code>claude_agent_sdk.query()</code> call was being made. No exception.
+No error. Just silence.</p>
+<p>I ran the same Python command manually in a terminal. It worked
+perfectly. Claude responded. Tokens streamed. Everything was fine.</p>
+<p>Then I ran it from inside the Vapor backend process. Silence.</p>
+<p>Then I ran it from inside any subprocess launched from Claude Code.
+Silence.</p>
+<p>I compared <code>env</code> between a working terminal and a
+subprocess launched from Vapor. There it was: <code>CLAUDECODE=1</code>
+and a dozen <code>CLAUDE_CODE_*</code> variables. The Vapor backend was
+running inside a Claude Code session (because I was developing it with
+Claude Code), so every subprocess it spawned inherited these environment
+variables. And Claude CLI, seeing those variables, quietly assumed it
+was being nested and refused to operate.</p>
+<p>The fix is three lines of code. Finding those three lines cost a full
+debugging session.</p>
+<pre class="swift"><code>// Sources/StreamingBridge/ClaudeExecutorService.swift
+
+// CRITICAL: Strip CLAUDE* env vars to prevent nesting detection.
+// Without this, Claude CLI silently refuses to execute inside
+// an active Claude Code session — no error, no stderr, just
+// a zero-byte response.
+let cleanCmd = &quot;&quot;&quot;
+    for v in $(env | grep ^CLAUDE | cut -d= -f1); do unset $v; done; \(command)
+    &quot;&quot;&quot;
+process.arguments = [&quot;-l&quot;, &quot;-c&quot;, cleanCmd]
+
+// Belt-and-suspenders: also strip from Process.environment
+var env = ProcessInfo.processInfo.environment
+for key in env.keys where key.hasPrefix(&quot;CLAUDE&quot;) {
+    env.removeValue(forKey: key)
+}
+process.environment = env</code></pre>
+<p>Belt and suspenders. The shell command unsets them. The
+<code>Process.environment</code> also strips them. Because I never want
+to debug this again.</p>
+<p>The shell command approach
+(<code>for v in $(env | grep ^CLAUDE | cut -d= -f1); do unset $v; done</code>)
+strips variables at the shell level before the Python process even
+starts. The <code>Process.environment</code> approach strips them at the
+Foundation level when configuring the subprocess. Either one alone would
+work. Both together guarantee it.</p>
+<p>Why does the CLI not produce an error message when it detects
+nesting? Good question. From the CLI’s perspective, nesting is not an
+error – it is a design constraint. Running Claude inside Claude can
+create infinite recursion, consume unbounded API credits, and produce
+confusing nested session states. The silent refusal is intentional. But
+from the perspective of someone building a tool that legitimately needs
+to invoke Claude from a subprocess, it is a maddening debugging
+experience.</p>
+<hr />
+<h3 id="the-two-tier-timeout-mechanism">The Two-Tier Timeout
+Mechanism</h3>
+<p>The executor service uses two timeouts implemented with GCD
+<code>DispatchWorkItem</code>s:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/ClaudeExecutorService.swift
+
+let didTimeout = AtomicBool(false)
+
+let timeoutWork = DispatchWorkItem {
+    didTimeout.value = true
+    process.terminate()
+    outputPipe.fileHandleForReading.closeFile()
+}
+DispatchQueue.global().asyncAfter(
+    deadline: .now() + config.initialTimeout,
+    execute: timeoutWork
+)
+
+let totalTimeoutWork = DispatchWorkItem {
+    if process.isRunning {
+        didTimeout.value = true
+        process.terminate()
+        outputPipe.fileHandleForReading.closeFile()
+    }
+}
+DispatchQueue.global().asyncAfter(
+    deadline: .now() + config.totalTimeout,
+    execute: totalTimeoutWork
+)</code></pre>
+<p>The initial timeout fires if no data arrives within 30 seconds. It is
+cancelled as soon as the first byte of stdout data arrives:</p>
+<pre class="swift"><code>// In the readStdout loop:
+let chunk = handle.availableData
+if chunk.isEmpty { break }
+
+// Cancel the initial timeout on first data received
+timeoutWork.cancel()
+buffer.append(chunk)</code></pre>
+<p>The total timeout runs for the entire session (300 seconds). It
+cannot be cancelled by data arriving – it is the absolute cap. Even if
+Claude is actively streaming, five minutes is the maximum.</p>
+<p>The <code>AtomicBool</code> shares the timeout state safely across
+GCD queues:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/ClaudeExecutorService.swift
+
+private final class AtomicBool: @unchecked Sendable {
+    private var _value: Bool
+    private let lock = NSLock()
+    init(_ value: Bool) { _value = value }
+    var value: Bool {
+        get { lock.lock(); defer { lock.unlock() }; return _value }
+        set { lock.lock(); defer { lock.unlock() }; _value = newValue }
+    }
+}</code></pre>
+<p>When the timeout fires, <code>didTimeout.value</code> is set to
+<code>true</code>. When the stdout reader finishes and checks the exit
+code, it reads <code>didTimeout.value</code> to distinguish between
+“process timed out” and “process failed for another reason.” This
+distinction matters for the error message shown to the user – “Claude
+timed out, try again” is actionable. “Process exited with code 1” is
+not.</p>
+<p>The timeout timeline visualized:</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant Client
+    participant SSEClient
+    participant VaporBackend
+    participant PythonSDK
+
+    Client-&gt;&gt;SSEClient: Open SSE connection
+    SSEClient-&gt;&gt;VaporBackend: HTTP GET /api/v1/chat/stream
+    VaporBackend-&gt;&gt;PythonSDK: Spawn sdk-wrapper.py
+
+    Note over SSEClient: Start 30s initial timeout
+
+    PythonSDK--&gt;&gt;VaporBackend: First NDJSON line
+    VaporBackend--&gt;&gt;SSEClient: SSE event data (first chunk)
+    SSEClient--&gt;&gt;Client: StreamMessage JSON
+
+    Note over SSEClient: First data received — cancel 30s initial timeout
+
+    loop Every 15s heartbeat check
+        VaporBackend--&gt;&gt;SSEClient: SSE heartbeat ping
+        SSEClient--&gt;&gt;Client: Heartbeat acknowledged
+    end
+
+    PythonSDK--&gt;&gt;VaporBackend: Continued NDJSON stream
+    VaporBackend--&gt;&gt;SSEClient: SSE event data (streaming)
+    SSEClient--&gt;&gt;Client: StreamMessage JSON chunks
+
+    Note over SSEClient: 300s absolute cap reached
+    SSEClient-&gt;&gt;VaporBackend: Connection closed (total timeout)
+    VaporBackend-&gt;&gt;PythonSDK: Terminate process
+    SSEClient--&gt;&gt;Client: Timeout error surfaced</code></pre>
+<p>The full message flow with timing annotations:</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant User as User (tap Send)
+    participant ChatVM as ChatViewModel
+    participant SSE as SSEClient
+    participant URLSess as URLSession
+    participant Vapor as Vapor Backend
+    participant Exec as ClaudeExecutorService
+    participant Python as sdk-wrapper.py
+    participant CLI as Claude CLI
+    participant API as Anthropic API
+
+    Note over User,API: Outbound: User prompt travels down 5 layers (~50ms setup)
+
+    User-&gt;&gt;ChatVM: sendMessage(&quot;Hello&quot;)
+    Note right of ChatVM: 0ms: Append user ChatMessage
+    ChatVM-&gt;&gt;SSE: startStream(ChatStreamRequest)
+    Note right of SSE: 1ms: POST /api/v1/chat/stream
+    SSE-&gt;&gt;URLSess: bytes(for: urlRequest)
+    Note right of URLSess: 2ms: HTTP connection opens
+    URLSess-&gt;&gt;Vapor: HTTP POST (JSON body)
+    Note right of Vapor: 5ms: Route handler invoked
+    Vapor-&gt;&gt;Exec: execute(prompt:)
+    Note right of Exec: 10ms: Strip CLAUDE* env vars
+    Exec-&gt;&gt;Python: Process.run() python3 sdk-wrapper.py
+    Note right of Python: 15ms: Import claude_agent_sdk
+    Python-&gt;&gt;CLI: claude_agent_sdk.query()
+    Note right of CLI: 20ms: --output-format stream-json
+    CLI-&gt;&gt;API: HTTP POST /v1/messages (streaming)
+    Note right of API: 50ms: Model inference begins
+
+    Note over User,API: Inbound: First token returns up 5 layers (~200-12000ms)
+
+    API--&gt;&gt;CLI: {&quot;type&quot;:&quot;content_block_delta&quot;,...}
+    Note right of CLI: +0ms: stdout JSON line
+    CLI--&gt;&gt;Python: NDJSON line on stdout
+    Note right of Python: +1ms: print(line, flush=True)
+    Python--&gt;&gt;Exec: Pipe read on readQueue
+    Note right of Exec: +2ms: Cancel 30s initial timeout
+    Exec--&gt;&gt;Vapor: AsyncThrowingStream yield
+    Note right of Vapor: +3ms: SSE event: data: {...}
+    Vapor--&gt;&gt;URLSess: HTTP chunk
+    Note right of URLSess: +5ms: asyncBytes.lines yields
+    URLSess--&gt;&gt;SSE: SSE line parsed
+    Note right of SSE: +6ms: lastActivity.touch()
+    SSE--&gt;&gt;ChatVM: withObservationTracking fires
+    Note right of ChatVM: +7ms: processStreamMessage
+    ChatVM--&gt;&gt;User: SwiftUI re-render
+    Note right of User: +8ms: Character appears on screen
+
+    Note over User,API: Subsequent tokens: ~8ms per hop (streaming)
+
+    loop Every token (streaming phase)
+        API--&gt;&gt;CLI: delta chunk
+        CLI--&gt;&gt;Python: stdout line
+        Python--&gt;&gt;Vapor: NDJSON
+        Vapor--&gt;&gt;SSE: SSE event
+        SSE--&gt;&gt;ChatVM: @Observable update
+        ChatVM--&gt;&gt;User: UI re-render
+    end
+
+    Note over User,API: Stream completion
+
+    API--&gt;&gt;CLI: {&quot;type&quot;:&quot;result&quot;,...}
+    CLI--&gt;&gt;Python: Final NDJSON + EOF
+    Python--&gt;&gt;Exec: EOF on pipe
+    Note right of Exec: waitUntilExit() before terminationStatus
+    Exec--&gt;&gt;Vapor: Stream finished
+    Vapor--&gt;&gt;SSE: SSE stream ends
+    SSE--&gt;&gt;ChatVM: isStreaming = false
+    ChatVM--&gt;&gt;User: Show cost: $0.04</code></pre>
+<hr />
+<h3 id="the-nstask-termination-status-crash">The NSTask Termination
+Status Crash</h3>
+<p>Here is a bug that only manifests under race conditions and crashes
+your app with an Objective-C exception that Swift cannot catch:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/ClaudeExecutorService.swift
+
+// CRITICAL: Always call waitUntilExit() before terminationStatus.
+// Reading EOF from stdout does NOT mean the process has exited.
+// Accessing terminationStatus on a running Process throws
+// NSInvalidArgumentException.
+process.waitUntilExit()
+timeoutWork.cancel()
+totalTimeoutWork.cancel()
+
+let exitCode = process.terminationStatus</code></pre>
+<p>Let me explain why this exists and why it is so dangerous.</p>
+<p>When the stdout pipe sends EOF, the intuition is “the process is
+done.” The pipe is closed, there is no more data, the process must have
+exited. Wrong. There is a race between the pipe closing and the process
+exiting. The process closes stdout, but it may still be running cleanup
+code – flushing stderr, releasing resources, running atexit handlers.
+This gap can be microseconds or milliseconds.</p>
+<p>If you read <code>terminationStatus</code> during that gap,
+Foundation throws <code>NSInvalidArgumentException</code>. This is not a
+Swift <code>Error</code> you can catch with <code>do/catch</code>. It is
+an Objective-C exception that unwinds the stack and crashes the process.
+There is no recovery.</p>
+<p>The fix is one line: <code>process.waitUntilExit()</code>. This
+blocks the current thread until the process has actually terminated.
+Only then is <code>terminationStatus</code> safe to read.</p>
+<p>But finding that one line required a crash report, a stack trace
+pointing into Foundation’s <code>NSConcreteTask</code> implementation,
+and the realization that pipe EOF and process exit are two different
+events that happen in no guaranteed order.</p>
+<p>I spent the better part of an afternoon on this. The crash was
+intermittent – it only happened when Claude returned very short
+responses (one line) that the process could finish before the pipe
+reader had time to process. Longer responses never triggered it because
+the pipe reader was still consuming data when the process exited.</p>
+<p>The <code>timeoutWork.cancel()</code> and
+<code>totalTimeoutWork.cancel()</code> after
+<code>waitUntilExit()</code> are cleanup. Once the process has exited,
+the timeout work items are no longer needed. Without cancellation, a
+timeout could fire after the process has already exited, attempting to
+<code>terminate()</code> a dead process (harmless but wasteful) or close
+an already-closed pipe (crashes on some OS versions).</p>
+<hr />
+<h3 id="the-stdout-reader-why-not-actors-why-not-runloop">The Stdout
+Reader: Why Not Actors, Why Not RunLoop</h3>
+<p>The stdout reader runs on a dedicated GCD queue:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/ClaudeExecutorService.swift
+
+self.readQueue.async {
+    Self.readStdout(
+        pipe: outputPipe,
+        errorPipe: errorPipe,
+        process: process,
+        sessionId: resolvedSessionId,
+        didTimeout: didTimeout,
+        timeoutWork: timeoutWork,
+        totalTimeoutWork: totalTimeoutWork,
+        continuation: continuation,
+        executor: self
+    )
+}</code></pre>
+<p>Not the main queue. Not an actor. A raw <code>DispatchQueue</code>.
+This deserves explanation.</p>
+<p>The original implementation used the <code>ClaudeCodeSDK</code> Swift
+package directly in the Vapor backend. The SDK uses
+<code>FileHandle.readabilityHandler</code> and Combine’s
+<code>PassthroughSubject</code> to emit data as it arrives on stdout.
+These mechanisms require <code>RunLoop</code> to work.</p>
+<p>Vapor uses SwiftNIO, which runs on <code>EventLoop</code>s, not
+<code>RunLoop</code>. The NIO event loops never pump
+<code>RunLoop</code>. The result:
+<code>FileHandle.readabilityHandler</code> is set, but the handler is
+never called. The Combine publisher is created, but it never emits. The
+data is there on the pipe. The OS has delivered it. The file handle has
+it. But the notification mechanism cannot fire because nobody is pumping
+the run loop.</p>
+<p>Months of debugging led to: bypass the SDK entirely. Use
+<code>Process</code> with a raw GCD queue for stdout reads. Call
+<code>handle.availableData</code> in a synchronous loop. Each chunk is
+decoded line-by-line and yielded to an
+<code>AsyncThrowingStream</code>:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/ClaudeExecutorService.swift
+
+let handle = pipe.fileHandleForReading
+let decoder = JSONDecoder()
+decoder.keyDecodingStrategy = .convertFromSnakeCase
+var buffer = Data()
+
+while true {
+    let chunk = handle.availableData
+    if chunk.isEmpty { break }
+
+    timeoutWork.cancel()  // Cancel initial timeout on first data
+    buffer.append(chunk)
+
+    guard let bufferString = String(data: buffer, encoding: .utf8) else { continue }
+
+    let lines = bufferString.components(separatedBy: &quot;\n&quot;)
+    if lines.count &gt; 1 {
+        for i in 0..&lt;(lines.count - 1) {
+            let line = lines[i].trimmingCharacters(in: .whitespacesAndNewlines)
+            if !line.isEmpty {
+                processJsonLine(line, decoder: decoder, continuation: continuation)
+            }
+        }
+        let lastLine = lines[lines.count - 1]
+        buffer = lastLine.data(using: .utf8) ?? Data()
+    }
+}</code></pre>
+<p>The buffer management handles UTF-8 boundary issues. A chunk of data
+from the pipe might split a multi-byte character across two reads. By
+keeping the last incomplete line in the buffer and only processing lines
+that have a terminating newline, we avoid decoding partial UTF-8
+sequences.</p>
+<p>The <code>processJsonLine</code> method decodes each line
+independently:</p>
+<pre class="swift"><code>private static func processJsonLine(
+    _ line: String,
+    decoder: JSONDecoder,
+    continuation: AsyncThrowingStream&lt;StreamMessage, Error&gt;.Continuation
+) {
+    guard let data = line.data(using: .utf8) else { return }
+    do {
+        let message = try decoder.decode(StreamMessage.self, from: data)
+        continuation.yield(message)
+    } catch {
+        #if DEBUG
+        print(&quot;[ClaudeExecutor] Failed to decode: \(error) — line: \(line.prefix(200))&quot;)
+        #endif
+    }
+}</code></pre>
+<p>A malformed line is logged but does not kill the stream. This is
+important because Claude Code occasionally emits lines that are not
+valid JSON – progress indicators, debug output, empty lines. The stream
+should survive those gracefully.</p>
+<hr />
+<h3 id="layer-5-the-python-sdk-wrapper">Layer 5: The Python SDK
+Wrapper</h3>
+<p>Between the Vapor backend and Claude CLI sits a Python script. This
+layer exists because the Claude Agent SDK is a Python package, and
+calling it from Swift requires a subprocess bridge.</p>
+<pre class="python"><code># scripts/sdk-wrapper.py
+
+def emit(obj):
+    &quot;&quot;&quot;Write a JSON object as an NDJSON line to stdout.&quot;&quot;&quot;
+    line = json.dumps(obj, separators=(&quot;,&quot;, &quot;:&quot;))
+    sys.stdout.write(line + &quot;\n&quot;)
+    sys.stdout.flush()</code></pre>
+<p>The <code>flush=True</code> (via explicit
+<code>sys.stdout.flush()</code>) on every write is the most important
+line in this file. Without it, Python’s output buffering delays events
+by unpredictable amounts.</p>
+<p>Here is what happens without the flush. Python buffers stdout by
+default when stdout is a pipe (not a terminal). When you call
+<code>print()</code>, the output accumulates in an internal buffer –
+typically 4KB or 8KB. The buffer flushes when it is full, when the
+process exits, or when you explicitly request it. For a streaming
+application, this means:</p>
+<ol type="1">
+<li>User sends “Hi” to Claude.</li>
+<li>Claude responds immediately.</li>
+<li>The Python wrapper buffers the response.</li>
+<li>The Vapor backend sees nothing.</li>
+<li>The iOS client shows “Connecting…” for 30 seconds.</li>
+<li>Eventually enough data accumulates to fill the buffer, or Claude
+finishes.</li>
+<li>Everything arrives in one burst.</li>
+</ol>
+<p>This bug does not exist if you test the Python script in isolation.
+When stdout is a terminal, Python uses line buffering – each
+<code>print()</code> with a newline flushes immediately. The buffering
+only engages when stdout is a pipe to another process. Another example
+of an integration boundary bug that no unit test catches.</p>
+<p>The wrapper converts Claude Agent SDK events to the
+<code>StreamMessage</code> format using <code>isinstance()</code>
+dispatch:</p>
+<pre class="python"><code># scripts/sdk-wrapper.py
+
+async for message in query(prompt=prompt, options=options):
+    if isinstance(message, AssistantMessage):
+        content_blocks = [convert_content_block(b) for b in message.content]
+        emit({
+            &quot;type&quot;: &quot;assistant&quot;,
+            &quot;message&quot;: {
+                &quot;role&quot;: &quot;assistant&quot;,
+                &quot;content&quot;: content_blocks,
+                &quot;model&quot;: getattr(message, &quot;model&quot;, None),
+            },
+        })
+
+    elif isinstance(message, ResultMessage):
+        result = {
+            &quot;type&quot;: &quot;result&quot;,
+            &quot;subtype&quot;: &quot;error&quot; if message.is_error else &quot;success&quot;,
+            &quot;is_error&quot;: message.is_error,
+            &quot;session_id&quot;: getattr(message, &quot;session_id&quot;, session_id),
+            &quot;total_cost_usd&quot;: message.total_cost_usd or 0.0,
+        }
+        emit(result)</code></pre>
+<p>The <code>isinstance()</code> checks follow the official Claude Agent
+SDK documentation. Early versions used <code>getattr()</code> to check
+for message types, which broke when the SDK renamed internal attributes.
+Using <code>isinstance()</code> with the public type classes is the
+correct, forward-compatible pattern.</p>
+<p>The <code>convert_content_block</code> function handles the same type
+discrimination for content blocks:</p>
+<pre class="python"><code># scripts/sdk-wrapper.py
+
+def convert_content_block(block):
+    from claude_agent_sdk import (
+        TextBlock, ThinkingBlock, ToolUseBlock, ToolResultBlock,
+    )
+
+    if isinstance(block, TextBlock):
+        return {&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: block.text}
+    elif isinstance(block, ToolUseBlock):
+        return {
+            &quot;type&quot;: &quot;tool_use&quot;,
+            &quot;id&quot;: block.id,
+            &quot;name&quot;: block.name,
+            &quot;input&quot;: block.input,
+        }
+    elif isinstance(block, ToolResultBlock):
+        return {
+            &quot;type&quot;: &quot;tool_result&quot;,
+            &quot;tool_use_id&quot;: block.tool_use_id,
+            &quot;content&quot;: block.content,
+            &quot;is_error&quot;: getattr(block, &quot;is_error&quot;, False),
+        }
+    elif isinstance(block, ThinkingBlock):
+        return {&quot;type&quot;: &quot;thinking&quot;, &quot;thinking&quot;: block.thinking}
+    else:
+        text = getattr(block, &quot;text&quot;, None) or str(block)
+        return {&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: text}</code></pre>
+<p>The fallback <code>else</code> clause converts unknown block types to
+text. This is the same defensive pattern used in the Swift decoder –
+degrade gracefully rather than crash on unrecognized types.</p>
+<hr />
+<h3 id="the-two-character-bug-vs">The Two-Character Bug: += vs =</h3>
+<p>This bug deserves its own deep dive because it is the purest example
+of how streaming introduces failure modes that do not exist in
+request-response architectures.</p>
+<p>The <code>SSEClient</code> receives two kinds of text events. An
+<code>assistant</code> event contains the accumulated text so far. A
+<code>streamEvent</code> with a <code>textDelta</code> contains only the
+new characters since the last delta.</p>
+<p>Here is the timeline of a normal streaming response for the prompt
+“What is 2+2?”:</p>
+<pre><code>Time 0ms:   assistant { content: [{ text: &quot;The&quot; }] }
+Time 50ms:  streamEvent { delta: { type: &quot;textDelta&quot;, text: &quot; answer&quot; } }
+Time 100ms: assistant { content: [{ text: &quot;The answer&quot; }] }
+Time 150ms: streamEvent { delta: { type: &quot;textDelta&quot;, text: &quot; is&quot; } }
+Time 200ms: assistant { content: [{ text: &quot;The answer is&quot; }] }
+Time 250ms: streamEvent { delta: { type: &quot;textDelta&quot;, text: &quot; 4.&quot; } }
+Time 300ms: assistant { content: [{ text: &quot;The answer is 4.&quot; }] }</code></pre>
+<p>Notice: each <code>assistant</code> event contains the FULL text up
+to that point. “The”, then “The answer”, then “The answer is”, then “The
+answer is 4.” These are authoritative snapshots, not deltas.</p>
+<p>The <code>textDelta</code> events contain ONLY the new characters: ”
+answer”, ” is”, ” 4.”</p>
+<p>Now here is what happens with the wrong operator:</p>
+<pre class="swift"><code>// BUG: Using += with assistant events
+case .assistant(let assistantMsg):
+    for block in assistantMsg.content {
+        case .text(let textBlock):
+            currentMessage.text += textBlock.text  // WRONG: +=</code></pre>
+<pre><code>Time 0ms:   text = &quot;&quot; + &quot;The&quot; = &quot;The&quot;                    (OK)
+Time 100ms: text = &quot;The&quot; + &quot;The answer&quot; = &quot;TheThe answer&quot;  (WRONG)
+Time 200ms: text = &quot;TheThe answer&quot; + &quot;The answer is&quot; = &quot;TheThe answerThe answer is&quot; (WORSE)</code></pre>
+<p>With assignment instead of append:</p>
+<pre class="swift"><code>// FIX: Using = with assistant events
+case .text(let textBlock):
+    currentMessage.text = textBlock.text  // CORRECT: =</code></pre>
+<pre><code>Time 0ms:   text = &quot;The&quot;                (OK)
+Time 100ms: text = &quot;The answer&quot;          (OK)
+Time 200ms: text = &quot;The answer is&quot;       (OK)
+Time 300ms: text = &quot;The answer is 4.&quot;    (OK)</code></pre>
+<p>The correct code from the companion repo:</p>
+<pre class="swift"><code>// Example/Sources/ExampleApp/ChatViewModel.swift
+
+case .assistant(let assistantMsg):
+    for block in assistantMsg.content {
+        switch block {
+        case .text(let textBlock):
+            // CRITICAL: Use assignment, not append.
+            // The assistant event contains accumulated text.
+            // Using += would duplicate: &quot;Hello&quot; -&gt; &quot;HelloHello&quot;
+            currentMessage.text = textBlock.text
+        // ...
+
+case .streamEvent(let event):
+    switch delta {
+    case .textDelta(let text):
+        // For deltas, += is correct — each delta is incremental
+        currentMessage.text += text</code></pre>
+<p>Two characters. The difference between <code>=</code> and
+<code>+=</code>. One produces a working chat interface. The other
+produces gibberish that doubles in size with every event.</p>
+<p>The comment in the source code is emphatic for a reason. This bug was
+identified as a P2 severity issue. The <code>SSEClient</code> header
+documents it as a permanent warning:</p>
+<pre class="swift"><code>// Sources/StreamingBridge/SSEClient.swift (class documentation)
+
+/// ## The Text Duplication Bug (P2)
+///
+/// A critical lesson from production: the `+=` vs `=` distinction matters
+/// for assistant messages. Each `assistant` event contains the **accumulated**
+/// text, not just the new token. Using `+=` on an already-accumulated string
+/// produces exact duplication. The fix: use `=` (assignment) for assistant
+/// events, `+=` only for `textDelta` stream events.</code></pre>
+<p>The second root cause compounded the duplication. The stream-end
+handler in the <code>ChatViewModel</code> reset the
+<code>lastProcessedMessageIndex</code> to zero:</p>
+<pre class="swift"><code>// BUG: Resetting the index replays all messages
+self.lastProcessedMessageIndex = 0
+
+// FIX: Preserve the high-water mark
+let finalCount = client.messages.count
+self.lastProcessedMessageIndex = finalCount</code></pre>
+<p>When <code>lastProcessedMessageIndex</code> resets to zero, the next
+observation cycle processes every message from the beginning. Messages
+that were already rendered get rendered again. On top of the
+<code>+=</code> duplication, this produced a second layer of
+duplication. The visual effect: tokens would appear, double, then the
+entire response would replay from the start.</p>
+<hr />
+<h3 id="building-real-time-streaming-uis-in-swiftui">Building Real-Time
+Streaming UIs in SwiftUI</h3>
+<p>The <code>ChatViewModel</code> ties the SSE client to the SwiftUI
+view layer. The key pattern is <code>withObservationTracking</code> –
+Swift’s native observation mechanism that replaced Combine’s
+<code>@Published</code>:</p>
+<pre class="swift"><code>// Example/Sources/ExampleApp/ChatViewModel.swift
+
+observationTask = Task { @MainActor [weak self] in
+    var lastStreaming = client.isStreaming
+    var lastMessageCount = 0
+
+    while let self, !Task.isCancelled {
+        await withCheckedContinuation { continuation in
+            withObservationTracking {
+                _ = client.isStreaming
+                _ = client.error
+                _ = client.connectionState
+                _ = client.messages
+            } onChange: {
+                continuation.resume()
+            }
+        }
+        guard !Task.isCancelled else { break }
+
+        // Sync streaming state
+        let streaming = client.isStreaming
+        if streaming != lastStreaming {
+            self.isStreaming = streaming
+            if streaming {
+                self.streamTokenCount = 0
+                self.lastProcessedMessageIndex = 0
+            } else {
+                // CRITICAL: Preserve the high-water mark to prevent replay
+                let finalCount = client.messages.count
+                self.lastProcessedMessageIndex = finalCount
+            }
+            lastStreaming = streaming
+        }
+
+        // Process new messages
+        let msgs = client.messages
+        if msgs.count &gt; lastMessageCount {
+            let newMessages = Array(msgs.suffix(from: self.lastProcessedMessageIndex))
+            for streamMessage in newMessages {
+                self.processStreamMessage(streamMessage)
+            }
+            self.lastProcessedMessageIndex = msgs.count
+            lastMessageCount = msgs.count
+        }
+    }
+}</code></pre>
+<p>No Combine. No <code>NotificationCenter</code> for state sync. Pure
+<code>@Observable</code> with explicit observation tracking. This is the
+modern SwiftUI pattern for bridging between a service object and a view
+model.</p>
+<p>The <code>withObservationTracking</code> block reads four properties.
+When any of them changes, the <code>onChange</code> closure fires and
+the continuation resumes. The while loop then processes the new state
+and suspends again waiting for the next change. This is essentially a
+reactive event loop built on structured concurrency.</p>
+<p>The UI itself is straightforward once the observation is set up:</p>
+<pre class="swift"><code>// Example/Sources/ExampleApp/ChatView.swift
+
+ScrollViewReader { proxy in
+    ScrollView {
+        LazyVStack(alignment: .leading, spacing: 12) {
+            ForEach(viewModel.messages) { message in
+                MessageBubble(message: message)
+                    .id(message.id)
+            }
+        }
+        .padding()
+    }
+    .onChange(of: viewModel.messages.count) {
+        if let lastMessage = viewModel.messages.last {
+            withAnimation(.easeOut(duration: 0.2)) {
+                proxy.scrollTo(lastMessage.id, anchor: .bottom)
+            }
+        }
+    }
+}</code></pre>
+<p>Auto-scrolling uses <code>ScrollViewReader</code> with
+<code>onChange(of: viewModel.messages.count)</code>. Every time a new
+message appears or an existing message updates, the scroll view animates
+to the bottom. The <code>LazyVStack</code> ensures only visible messages
+are rendered – important when conversations grow long.</p>
+<p>The streaming stats bar shows real-time token count and elapsed
+time:</p>
+<pre class="swift"><code>if viewModel.isStreaming {
+    HStack {
+        Text(&quot;~\(viewModel.streamTokenCount) tokens&quot;)
+        Spacer()
+        Text(String(format: &quot;%.1fs&quot;, viewModel.streamElapsedSeconds))
+    }
+    .font(.caption2)
+    .foregroundStyle(.tertiary)
+    .padding(.horizontal)
+    .padding(.top, 4)
+}</code></pre>
+<p>The token count is approximate –
+<code>currentMessage.text.count / 4</code> – because accurate token
+counting requires a tokenizer that the client does not have. The
+approximation is close enough for a progress indicator.</p>
+<hr />
+<h3 id="performance-cold-start-vs-warm">Performance: Cold Start vs
+Warm</h3>
+<p>The five-layer architecture has measurable latency
+characteristics.</p>
+<p><strong>Cold start (~12 seconds):</strong> The first request after
+the backend starts. Python needs to import <code>claude_agent_sdk</code>
+(2-3 seconds), the SDK authenticates via Claude CLI’s OAuth flow (3-5
+seconds), and the API processes the first request (2-4 seconds). The
+user sees “Connecting…” for this entire duration.</p>
+<p><strong>Warm start (~2-3 seconds):</strong> Subsequent requests reuse
+the authenticated session. The Python import is cached by the OS. The
+SDK does not re-authenticate. The latency is dominated by API processing
+time.</p>
+<p><strong>Per-token latency (~8ms):</strong> Once streaming is
+established, each token traverses the full five-layer chain in
+approximately 8 milliseconds. The breakdown:</p>
+<table>
+<thead>
+<tr>
+<th>Hop</th>
+<th>Latency</th>
+<th>What happens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>API to CLI</td>
+<td>~0ms</td>
+<td>Same process, stdout write</td>
+</tr>
+<tr>
+<td>CLI to Python</td>
+<td>~1ms</td>
+<td>Pipe read, NDJSON format</td>
+</tr>
+<tr>
+<td>Python to Vapor</td>
+<td>~1ms</td>
+<td>Pipe read, SSE format</td>
+</tr>
+<tr>
+<td>Vapor to URLSession</td>
+<td>~3ms</td>
+<td>HTTP chunk delivery</td>
+</tr>
+<tr>
+<td>URLSession to SwiftUI</td>
+<td>~3ms</td>
+<td>Decode, observation tracking, render</td>
+</tr>
+</tbody>
+</table>
+<p>The 3ms for HTTP delivery is the dominant factor. On localhost this
+is fast. Over a network (when using a Cloudflare tunnel for remote
+access), this jumps to 50-100ms per token, and the streaming feels
+noticeably choppier.</p>
+<p>The <code>connectingTooLong</code> timer in the ChatViewModel
+provides UX for the cold start case:</p>
+<pre class="swift"><code>// Example/Sources/ExampleApp/ChatViewModel.swift
+
+private func startConnectingTimer() {
+    connectingTimer?.cancel()
+    connectingTooLong = false
+    connectingTimer = Task { @MainActor [weak self] in
+        try? await Task.sleep(nanoseconds: 5_000_000_000)
+        guard !Task.isCancelled else { return }
+        self?.connectingTooLong = true
+    }
+}</code></pre>
+<p>After 5 seconds of “Connecting…”, the status changes to “Taking
+longer than expected…” This sets expectations without alarming the user.
+Five seconds is the threshold where users start wondering if something
+is broken.</p>
+<hr />
+<h3 id="putting-it-all-together">Putting It All Together</h3>
+<p>The public API of the streaming bridge is deliberately simple. All
+the complexity is encapsulated:</p>
+<pre class="swift"><code>// Example/Sources/ExampleApp/ChatViewModel.swift
+
+func sendMessage(_ text: String) {
+    guard let sseClient else { return }
+    messages.append(ChatMessage(isUser: true, text: text))
+    let request = ChatStreamRequest(prompt: text)
+    sseClient.startStream(request: request)
+}</code></pre>
+<p>One line to add the user message. One line to create the request. One
+line to start the stream. Behind those three lines: connection state
+machines, heartbeat watchdogs, environment variable stripping,
+exponential backoff, two-tier timeouts, UTF-8 buffer management,
+discriminated union decoders, and five layers of process
+orchestration.</p>
+<hr />
+<h3 id="the-four-failed-architectures">The Four Failed
+Architectures</h3>
+<p>Before the five-layer architecture, there were four failed attempts.
+Each one taught a lesson about why the current design exists.</p>
+<p><strong>Attempt 1: Direct Anthropic API from Swift.</strong> The
+simplest possible approach. Call the Anthropic Messages API directly
+from the iOS client using <code>URLSession</code>. Problem: Claude Code
+uses OAuth authentication. The OAuth token is managed by the Claude CLI.
+There is no public API to obtain it from Swift. You would need users to
+manually enter an API key, which defeats the purpose of building on
+Claude Code’s authentication infrastructure. Abandoned after two
+hours.</p>
+<p><strong>Attempt 2: JavaScript SDK via Node subprocess.</strong> The
+<code>@anthropic-ai/sdk</code> npm package supports streaming. The idea:
+spawn a Node.js process from the Vapor backend, pipe its stdout.
+Problem: the Node runtime is not bundled with macOS or iOS. Installing
+Node as a dependency of a native app is a non-starter for distribution.
+Even for local development, managing Node, npm, and package versions
+alongside Swift adds operational complexity that defeats the simplicity
+goal. Abandoned after one session.</p>
+<p><strong>Attempt 3: Swift ClaudeCodeSDK in Vapor.</strong> Anthropic
+provides a Swift SDK for Claude Code. Import it directly into the Vapor
+backend. The SDK would handle authentication, streaming, and response
+parsing. This was the most promising approach – same language, same
+ecosystem, direct integration.</p>
+<p>It failed spectacularly.</p>
+<p>The SDK uses <code>FileHandle.readabilityHandler</code> to receive
+data from the Claude CLI subprocess. This handler is dispatched via
+<code>RunLoop</code>. Vapor runs on SwiftNIO, which uses
+<code>EventLoop</code>s – not <code>RunLoop</code>. The NIO event loops
+never pump the run loop. So <code>readabilityHandler</code> is set, the
+data arrives on the pipe, the file handle has it, but the notification
+callback never fires. The data is there. The mechanism to deliver it is
+broken.</p>
+<p>I spent three sessions debugging this. The symptoms were maddening:
+the subprocess launched correctly, Claude was producing output (verified
+by redirecting stdout to a file), but the Swift code never received a
+single byte. Adding <code>RunLoop.current.run()</code> calls in
+strategic places fixed the immediate issue but deadlocked the NIO event
+loop, hanging the entire server.</p>
+<p>The root cause is a fundamental incompatibility between two
+concurrency models. RunLoop is Apple’s legacy event dispatch mechanism.
+EventLoop is NIO’s asynchronous I/O mechanism. They cannot cooperate
+because they both want to own the thread.</p>
+<p><strong>Attempt 4: Direct Claude CLI invocation.</strong> Spawn
+<code>claude -p "prompt" --output-format stream-json</code> directly
+from the Vapor backend. No Python. No SDK. Just a Process with stdout
+parsing.</p>
+<p>It worked. For about five minutes. Then I noticed it only worked when
+I ran the backend from a regular terminal. When I ran the backend from
+inside a Claude Code session (which was my entire development workflow),
+the CLI silently produced zero output.</p>
+<p>This is the nesting detection bug described in Layer 4. The
+<code>CLAUDECODE=1</code> environment variable blocks nested execution.
+The fix (environment variable stripping) eventually made it into the
+fifth attempt, but at the time of Attempt 4, I did not understand why
+the CLI was silent. I just knew it did not work.</p>
+<p><strong>Attempt 5: Python subprocess bridge with environment
+stripping.</strong> This is the architecture that shipped. The Python
+Agent SDK wraps the Claude CLI, handles authentication, and streams
+NDJSON. The Swift backend reads the NDJSON from the subprocess stdout
+and re-emits it as SSE events. Environment variables are stripped before
+spawning.</p>
+<p>Why did a five-layer architecture succeed where simpler approaches
+failed? Because each layer solves exactly one problem:</p>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Problem Solved</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SwiftUI + SSEClient</td>
+<td>Render streaming text with reconnection UI</td>
+</tr>
+<tr>
+<td>Vapor Backend</td>
+<td>HTTP endpoint with SSE framing</td>
+</tr>
+<tr>
+<td>Python SDK Wrapper</td>
+<td>Claude Agent SDK integration with NDJSON output</td>
+</tr>
+<tr>
+<td>Environment Stripping</td>
+<td>Nesting detection bypass</td>
+</tr>
+<tr>
+<td>Claude CLI</td>
+<td>OAuth authentication and API access</td>
+</tr>
+</tbody>
+</table>
+<p>Each layer has exactly one failure mode. When something breaks, you
+know which layer to look at. The “simpler” approaches combined multiple
+concerns into fewer layers, making failures harder to diagnose.</p>
+<hr />
+<h3 id="layer-3.5-the-vapor-sse-endpoint">Layer 3.5: The Vapor SSE
+Endpoint</h3>
+<p>I have not shown the Vapor backend code yet because it is the
+thinnest layer in the stack. But it has its own subtleties.</p>
+<p>The SSE endpoint receives the chat request, spawns the Python
+subprocess, and re-emits each NDJSON line as an SSE event:</p>
+<pre class="swift"><code>// Vapor route handler (simplified from ILS backend)
+app.post(&quot;api&quot;, &quot;v1&quot;, &quot;chat&quot;, &quot;stream&quot;) { req async throws -&gt; Response in
+    let chatRequest = try req.content.decode(ChatStreamRequest.self)
+
+    let response = Response(status: .ok)
+    response.headers.add(name: .contentType, value: &quot;text/event-stream&quot;)
+    response.headers.add(name: .cacheControl, value: &quot;no-cache&quot;)
+    response.headers.add(name: .connection, value: &quot;keep-alive&quot;)
+
+    // The response body is an AsyncStream of SSE-formatted bytes
+    response.body = .init(asyncStream: { writer in
+        let executor = ClaudeExecutorService(configuration: .default)
+        let stream = executor.execute(prompt: chatRequest.prompt)
+
+        do {
+            for try await message in stream {
+                let data = try JSONEncoder().encode(message)
+                let sseEvent = &quot;data: \(String(data: data, encoding: .utf8)!)\n\n&quot;
+                try await writer.write(.buffer(ByteBuffer(string: sseEvent)))
+            }
+        } catch {
+            let errorEvent = &quot;data: {\&quot;type\&quot;:\&quot;error\&quot;,\&quot;code\&quot;:\&quot;STREAM_ERROR\&quot;}\n\n&quot;
+            try? await writer.write(.buffer(ByteBuffer(string: errorEvent)))
+        }
+
+        try await writer.write(.end)
+    })
+
+    return response
+}</code></pre>
+<p>Three headers are critical for SSE: -
+<code>Content-Type: text/event-stream</code> tells the client this is an
+SSE connection, not a regular HTTP response. -
+<code>Cache-Control: no-cache</code> prevents proxies from buffering the
+stream. - <code>Connection: keep-alive</code> prevents the connection
+from being closed after the first chunk.</p>
+<p>Each SSE event is formatted as <code>data: {json}\n\n</code>. The
+double newline terminates the event. The client’s SSE parser splits on
+these double newlines to extract individual events. A missing newline
+means the event is not yet complete; the parser waits for more data.</p>
+<p>The heartbeat ping is a periodic SSE comment:</p>
+<pre class="swift"><code>// Heartbeat task running alongside the stream
+let heartbeat = Task {
+    while !Task.isCancelled {
+        try await Task.sleep(nanoseconds: 30_000_000_000)
+        try await writer.write(.buffer(ByteBuffer(string: &quot;: heartbeat\n\n&quot;)))
+    }
+}
+defer { heartbeat.cancel() }</code></pre>
+<p>The <code>:</code> prefix marks it as an SSE comment. The client
+receives it (triggering <code>lastActivity.touch()</code>) but does not
+parse it as a message. This keeps the connection alive through load
+balancers that close idle connections after 30-60 seconds.</p>
+<hr />
+<h3 id="debugging-the-streaming-pipeline-a-methodology">Debugging the
+Streaming Pipeline: A Methodology</h3>
+<p>When a token does not appear on screen, the bug could be in any of
+five layers. Here is the methodology I developed for isolating streaming
+issues.</p>
+<p><strong>Step 1: Check if Claude is responding at all.</strong> Run
+the Python wrapper directly:</p>
+<pre class="bash"><code>python3 scripts/sdk-wrapper.py &#39;{&quot;prompt&quot;:&quot;Say hi&quot;,&quot;options&quot;:{}}&#39;</code></pre>
+<p>If this produces NDJSON output, layers 4-5 are working. If silence,
+check for <code>CLAUDECODE=1</code> in the environment.</p>
+<p><strong>Step 2: Check if the backend is forwarding.</strong> Use curl
+to hit the SSE endpoint:</p>
+<pre class="bash"><code>curl -N -X POST http://localhost:9999/api/v1/chat/stream \
+  -H &quot;Content-Type: application/json&quot; \
+  -d &#39;{&quot;prompt&quot;:&quot;Say hi&quot;}&#39;</code></pre>
+<p>The <code>-N</code> flag disables curl’s output buffering. You should
+see <code>data: {...}</code> lines appearing in real time. If they
+arrive in a burst after a delay, the Python stdout buffering fix is
+missing.</p>
+<p><strong>Step 3: Check if the SSE client is parsing.</strong> Add a
+temporary debug observer in the ChatViewModel:</p>
+<pre class="swift"><code>// Temporary debug: print every SSE line received
+for try await line in asyncBytes.lines {
+    print(&quot;[SSE DEBUG] \(line)&quot;)
+    // ... normal processing
+}</code></pre>
+<p>If lines appear in the console but messages do not appear in the UI,
+the issue is in <code>parseAndAddMessage</code> or the observation
+binding.</p>
+<p><strong>Step 4: Check the observation binding.</strong> The
+<code>withObservationTracking</code> pattern can silently fail if the
+tracked properties are not actually changing:</p>
+<pre class="swift"><code>// Debug: log when observation fires
+withObservationTracking {
+    _ = client.messages.count  // Track count, not just array identity
+} onChange: {
+    print(&quot;[OBS DEBUG] Change detected, message count: \(client.messages.count)&quot;)
+    continuation.resume()
+}</code></pre>
+<p>If <code>onChange</code> never fires, the <code>@Observable</code>
+annotation may be missing or the property mutation is happening off the
+main actor.</p>
+<p><strong>Step 5: Check the message processing.</strong> The
+<code>processStreamMessage</code> method is where the <code>+=</code> vs
+<code>=</code> bug lives. Add a temporary assertion:</p>
+<pre class="swift"><code>case .text(let textBlock):
+    let oldText = currentMessage.text
+    currentMessage.text = textBlock.text
+    assert(textBlock.text.hasPrefix(oldText) || oldText.isEmpty,
+           &quot;Text regression: &#39;\(oldText)&#39; -&gt; &#39;\(textBlock.text)&#39;&quot;)</code></pre>
+<p>If the assertion fires, the assistant events are not monotonically
+growing – which would indicate a different bug in the upstream
+layers.</p>
+<p>This five-step methodology localizes bugs to a specific layer in
+under five minutes. Without it, debugging a five-layer streaming
+pipeline is a needle-in-a-haystack exercise.</p>
+<hr />
+<h3 id="error-handling-across-five-layers">Error Handling Across Five
+Layers</h3>
+<p>Each layer produces different error types. The bridge normalizes them
+all into <code>StreamError</code> for the client:</p>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 27%" />
+<col style="width: 22%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Error Type</th>
+<th>Example</th>
+<th>Client Sees</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SwiftUI/SSEClient</td>
+<td><code>URLError</code></td>
+<td>Connection refused</td>
+<td>“Cannot connect to server”</td>
+</tr>
+<tr>
+<td>Vapor Backend</td>
+<td>HTTP status code</td>
+<td>503 Service Unavailable</td>
+<td>“Server temporarily unavailable”</td>
+</tr>
+<tr>
+<td>Python Wrapper</td>
+<td>JSON on stderr</td>
+<td>SDK import error</td>
+<td>“Claude service configuration error”</td>
+</tr>
+<tr>
+<td>Claude CLI</td>
+<td>Exit code</td>
+<td>Nesting detection</td>
+<td>“Claude timed out” (silence = timeout)</td>
+</tr>
+<tr>
+<td>Anthropic API</td>
+<td>API error JSON</td>
+<td>Rate limit exceeded</td>
+<td>“Claude is busy, please try again”</td>
+</tr>
+</tbody>
+</table>
+<p>The most insidious errors are the silent ones. Claude CLI nesting
+detection produces exit code 0 with zero bytes of output. This looks
+like “success with no response” to every downstream layer. The timeout
+mechanism is the only thing that catches it – if no bytes arrive within
+30 seconds, the initial timeout fires and surfaces the error.</p>
+<p>Rate limit errors from the Anthropic API are transient and the user
+should retry. Authentication errors are permanent and require user
+action. The <code>isNetworkError</code> check in the SSE client
+distinguishes between these: network errors trigger automatic
+reconnection, application errors fail immediately.</p>
+<hr />
+<h3 id="memory-management-and-lifecycle">Memory Management and
+Lifecycle</h3>
+<p>The streaming bridge has careful memory management to avoid leaks
+during long-running sessions:</p>
+<pre class="swift"><code>// SSEClient cleanup
+public func cleanup() {
+    #if os(iOS)
+    if let observer = backgroundObserver {
+        NotificationCenter.default.removeObserver(observer)
+        backgroundObserver = nil
+    }
+    #endif
+    cancel()
+    session.invalidateAndCancel()
+}</code></pre>
+<p>The <code>cleanup()</code> method is called from the view’s
+<code>onDisappear</code>. It removes the background notification
+observer, cancels any active stream, and invalidates the URLSession.
+Without the URLSession invalidation, the session holds strong references
+to its delegate and configuration, preventing deallocation.</p>
+<p>The <code>ChatViewModel</code> uses <code>[weak self]</code> captures
+in all closures that might outlive the view:</p>
+<pre class="swift"><code>streamTask = Task { [weak self] in
+    await self?.performStream(request: request)
+}</code></pre>
+<p>Without <code>[weak self]</code>, the Task captures <code>self</code>
+strongly. If the user navigates away from the chat view while a stream
+is active, the view model would be kept alive by the running Task,
+continuing to process messages for a view that no longer exists. With
+<code>[weak self]</code>, the guard clause <code>while let self</code>
+exits the loop when the view model is deallocated.</p>
+<p>The <code>@ObservationIgnored</code> attribute on task properties
+prevents them from triggering unnecessary view updates:</p>
+<pre class="swift"><code>@ObservationIgnored private var streamTask: Task&lt;Void, Never&gt;?
+@ObservationIgnored private var observationTask: Task&lt;Void, Never&gt;?</code></pre>
+<p>Without this attribute, setting
+<code>streamTask = Task { ... }</code> would trigger an observation
+change, which would cause the view to re-render, which would call
+<code>withObservationTracking</code> again – a tight loop that wastes
+CPU for no visible effect.</p>
+<hr />
+<h3 id="cross-platform-considerations-ios-vs-macos">Cross-Platform
+Considerations: iOS vs macOS</h3>
+<p>The streaming bridge compiles for both iOS and macOS with minimal
+conditional compilation. The primary differences:</p>
+<p><strong>Background handling.</strong> iOS cancels SSE streams on
+background. macOS does not, because macOS apps typically remain active
+when not focused:</p>
+<pre class="swift"><code>#if os(iOS)
+backgroundObserver = NotificationCenter.default.addObserver(
+    forName: UIApplication.didEnterBackgroundNotification,
+    // ...
+)
+#endif</code></pre>
+<p><strong>Network constraints.</strong>
+<code>allowsConstrainedNetworkAccess</code> matters more on iOS where
+cellular data plans have caps. On macOS, the default <code>false</code>
+is less impactful since most Mac users are on Wi-Fi.</p>
+<p><strong>Process spawning.</strong> The
+<code>ClaudeExecutorService</code> runs identically on both platforms
+because <code>Foundation.Process</code> (née <code>NSTask</code>) is
+available on macOS. On iOS, subprocess spawning is not available – the
+executor service is a backend component that runs on the Mac, not on the
+iOS device. The iOS app communicates with it over HTTP.</p>
+<p>This architectural split – SSEClient on the device,
+ClaudeExecutorService on the Mac – is inherent to the streaming bridge
+design. The iOS app cannot run Claude CLI directly. It must go through a
+backend.</p>
+<hr />
+<h3 id="testing-streaming-code-what-unit-tests-cannot-catch">Testing
+Streaming Code: What Unit Tests Cannot Catch</h3>
+<p>The streaming bridge cannot be meaningfully verified with unit tests.
+The critical bugs – <code>+=</code> vs <code>=</code>, Python stdout
+buffering, environment variable nesting detection, NSTask termination
+status race – all exist at integration boundaries between layers. A unit
+test that mocks the SSE connection would never reveal that Python
+buffers stdout when connected to a pipe. A unit test that mocks the
+Process would never reveal the <code>terminationStatus</code> race
+condition.</p>
+<p>The verification approach for the streaming bridge is functional
+validation. Build the system. Run it. Send a message. Watch whether the
+response appears correctly on screen. Here is the sequence:</p>
+<p><strong>Step 1: Start the backend.</strong></p>
+<pre class="bash"><code>PORT=9999 swift run ILSBackend</code></pre>
+<p>Verify it is the correct backend binary:</p>
+<pre class="bash"><code>lsof -i :9999 -P -n
+# Binary path MUST contain &quot;ils-ios&quot;, not &quot;ils/ILSBackend&quot;</code></pre>
+<p>This verification exists because a previous version of the backend at
+a different path returns raw Claude Code data (bare arrays, snake_case)
+instead of proper <code>APIResponse</code> wrappers (camelCase). Wrong
+binary, wrong data format, broken streaming.</p>
+<p><strong>Step 2: Verify the Python bridge works in
+isolation.</strong></p>
+<pre class="bash"><code>python3 scripts/sdk-wrapper.py &#39;{&quot;prompt&quot;:&quot;Say hello&quot;,&quot;options&quot;:{}}&#39;</code></pre>
+<p>Expected: NDJSON lines with <code>{"type":"system",...}</code>,
+<code>{"type":"assistant",...}</code>,
+<code>{"type":"result",...}</code>. If silence, check for
+<code>CLAUDECODE=1</code>:</p>
+<pre class="bash"><code>env | grep CLAUDE</code></pre>
+<p><strong>Step 3: Build and install the iOS app.</strong></p>
+<pre class="bash"><code>xcodebuild -project ILSApp/ILSApp.xcodeproj -scheme ILSApp \
+  -destination &#39;id=50523130-57AA-48B0-ABD0-4D59CE455F14&#39; -quiet</code></pre>
+<p><strong>Step 4: Send a test message and verify.</strong></p>
+<p>Open the app in the simulator. Tap the chat input. Type “What is
+2+2?” and send. Watch the response stream in. Verify:</p>
+<ul>
+<li>Text appears progressively, not in a burst (Python buffering fix
+working)</li>
+<li>Text does not duplicate (the <code>=</code> fix working)</li>
+<li>Cost appears after completion (result message parsing working)</li>
+<li>Connection state shows “Connected” during streaming (state machine
+working)</li>
+</ul>
+<p><strong>Step 5: Test error recovery.</strong></p>
+<p>Kill the backend (<code>Ctrl+C</code>) while streaming. The SSE
+client should transition to “Reconnecting (attempt 1)…” within 45
+seconds (heartbeat timeout). Restart the backend. The client should
+reconnect automatically.</p>
+<p>This five-step sequence catches every bug class in the streaming
+bridge. No mock, stub, or test double would catch any of them. The bugs
+exist in the real interactions between real systems.</p>
+<hr />
+<h3 id="production-deployment-considerations">Production Deployment
+Considerations</h3>
+<p>Deploying the streaming bridge to production introduces concerns that
+do not exist in local development.</p>
+<p><strong>Reverse proxy timeouts.</strong> Nginx, Apache, and
+Cloudflare all have default request timeouts between 30 and 60 seconds.
+An SSE connection that lasts 5 minutes will be killed by a reverse proxy
+with a 60-second timeout. The fix is configuring the proxy to allow
+long-lived connections for the SSE endpoint:</p>
+<pre class="nginx"><code># Nginx configuration for SSE endpoint
+location /api/v1/chat/stream {
+    proxy_pass http://localhost:9999;
+    proxy_http_version 1.1;
+    proxy_set_header Connection &quot;&quot;;
+    proxy_buffering off;
+    proxy_read_timeout 3600s;  # 1 hour
+    proxy_send_timeout 3600s;
+}</code></pre>
+<p>The <code>proxy_buffering off</code> directive is critical. Without
+it, Nginx buffers the entire SSE response before forwarding it to the
+client. This converts real-time streaming into a request-response
+pattern where the client sees nothing until the stream completes.</p>
+<p><strong>HTTPS and certificate management.</strong> SSE connections
+over HTTPS work identically to HTTP, but certificate rotation can
+interrupt long-lived connections. If the server’s TLS certificate is
+renewed while an SSE connection is active, the connection may be
+terminated. The reconnection logic handles this transparently.</p>
+<p><strong>Cloudflare Tunnel.</strong> ILS supports remote access via
+Cloudflare Tunnel. This adds another layer of latency (50-100ms per
+token instead of 3ms) but provides HTTPS without certificate management.
+The <code>BridgeConfiguration</code> accepts any URL –
+<code>http://localhost:9999</code> for local,
+<code>https://your-tunnel.trycloudflare.com</code> for remote.</p>
+<p><strong>Concurrent sessions.</strong> The
+<code>ClaudeExecutorService</code> tracks active processes in a
+dictionary keyed by session ID. Each session spawns its own Python
+subprocess. On a machine with limited memory, too many concurrent
+sessions will exhaust RAM. The default configuration does not cap
+concurrent sessions – that responsibility belongs to the backend’s rate
+limiter.</p>
+<p><strong>Process cleanup.</strong> If the Vapor backend crashes or is
+killed with <code>SIGKILL</code>, orphaned Python processes may continue
+running. The <code>deinit</code> path cancels active processes, but
+<code>SIGKILL</code> does not trigger <code>deinit</code>. A production
+deployment should include a process monitoring script that kills
+orphaned <code>sdk-wrapper.py</code> processes:</p>
+<pre class="bash"><code># Kill orphaned SDK wrappers older than 10 minutes
+find /proc -maxdepth 1 -name &#39;[0-9]*&#39; -mmin +10 -exec sh -c \
+  &#39;grep -l sdk-wrapper.py /proc/{}/cmdline 2&gt;/dev/null &amp;&amp; kill {}&#39; \;</code></pre>
+<hr />
+<h3 id="the-streaming-bridge-as-a-swift-package">The Streaming Bridge as
+a Swift Package</h3>
+<p>The companion repo is structured as a standalone Swift Package
+Manager library:</p>
+<pre><code>claude-ios-streaming-bridge/
+├── Package.swift
+├── Sources/
+│   └── StreamingBridge/
+│       ├── Configuration.swift          # BridgeConfiguration
+│       ├── SSEClient.swift              # @Observable SSE client
+│       ├── ClaudeExecutorService.swift   # Process management
+│       └── StreamingTypes.swift          # Codable message types
+├── Example/
+│   └── Sources/
+│       └── ExampleApp/
+│           ├── ChatView.swift            # SwiftUI interface
+│           └── ChatViewModel.swift       # Observation bindings
+└── scripts/
+    └── sdk-wrapper.py                    # Python NDJSON bridge</code></pre>
+<p>To integrate into your own project:</p>
+<pre class="swift"><code>// Package.swift dependency
+dependencies: [
+    .package(url: &quot;https://github.com/nickbaumann98/claude-ios-streaming-bridge&quot;, from: &quot;1.0.0&quot;),
+],
+targets: [
+    .target(
+        name: &quot;MyApp&quot;,
+        dependencies: [
+            .product(name: &quot;StreamingBridge&quot;, package: &quot;claude-ios-streaming-bridge&quot;),
+        ]
+    ),
+]</code></pre>
+<p>Then in your SwiftUI app:</p>
+<pre class="swift"><code>import StreamingBridge
+
+@Observable
+class MyChatViewModel {
+    private let client: SSEClient
+
+    init() {
+        let config = BridgeConfiguration(
+            backendURL: &quot;http://localhost:9999&quot;,
+            initialTimeout: 30,
+            totalTimeout: 300,
+            heartbeatTimeout: 45
+        )
+        self.client = SSEClient(configuration: config)
+    }
+
+    func send(_ text: String) {
+        client.startStream(request: ChatStreamRequest(prompt: text))
+    }
+
+    // Observe client.messages, client.connectionState, client.isStreaming
+    // See Example/Sources/ExampleApp/ChatViewModel.swift for full pattern
+}</code></pre>
+<p>The package has zero third-party dependencies. It uses only
+Foundation, Observation, and (on iOS) UIKit for background notification
+handling. The Python wrapper script and a running Vapor backend are
+required at runtime but not at compile time.</p>
+<hr />
+<h3 id="lessons-for-your-own-streaming-bridges">Lessons for Your Own
+Streaming Bridges</h3>
+<p>If you are building a streaming integration with any AI service – not
+just Claude – these patterns apply:</p>
+<p><strong>1. Treat every layer boundary as a potential failure
+point.</strong> The bug will not be inside a layer. It will be at the
+boundary between two layers that each work correctly in isolation.</p>
+<p><strong>2. Use three timeouts, not one.</strong> Initial timeout (is
+the connection alive?), heartbeat timeout (has the connection gone
+stale?), and total timeout (have we exceeded a reasonable session
+length?). Each catches a different failure mode.</p>
+<p><strong>3. Never trust the operator.</strong> <code>+=</code> and
+<code>=</code> are both valid for text accumulation depending on whether
+the source is a delta or a snapshot. Document which one you chose and
+why, directly in the code, with a comment that explains the bug that
+happens if you pick the other one.</p>
+<p><strong>4. Flush your buffers explicitly.</strong> Any language that
+sits between two processes (Python, Ruby, Perl) will buffer stdout when
+connected to a pipe. Add explicit flushes on every write. This is not a
+performance concern – it is a correctness concern.</p>
+<p><strong>5. Wait for process exit before reading exit status.</strong>
+Pipe EOF and process termination are different events. Reading status
+before exit crashes the process on Apple platforms.</p>
+<p><strong>6. Strip inherited environment variables.</strong> If your
+application spawns subprocesses that might conflict with the parent
+process’s environment, explicitly clean the environment. Document which
+variables you strip and why.</p>
+<p><strong>7. Use exponential backoff with a user override.</strong>
+Automatic retries should back off exponentially. But the user should
+always be able to tap “Retry Now” and cancel the backoff. Store the
+backoff sleep in a cancellable task.</p>
+<p><strong>8. Cancel network activity on background.</strong> Mobile
+apps should not keep cellular radios active when the user is not looking
+at the screen. Register for background notifications and cancel
+long-lived connections.</p>
+<hr />
+<h3 id="what-i-learned">What I Learned</h3>
+<p>Building a native client for an AI service is fundamentally different
+from building a REST API client. The streaming nature changes
+everything.</p>
+<p>Error handling is not “check the status code.” It is “what happens
+when byte 47,000 of a 50,000-byte response drops silently?” Timeouts are
+not one number. They are three numbers for three different failure
+modes. Text accumulation is not “append the new thing.” It is “determine
+whether the new thing is a delta or a snapshot and apply the correct
+operator.”</p>
+<p>The five-layer architecture exists because a real bug in a real
+system demanded each layer. The Python bridge exists because the Swift
+SDK does not work in NIO. The environment stripping exists because
+Claude CLI has nesting detection. The heartbeat watchdog exists because
+SSE connections go stale. The background cancellation exists because
+cellular radio drains battery. The <code>waitUntilExit()</code> exists
+because pipe EOF and process exit are different events.</p>
+<p>None of this was designed up front. Every layer was added in response
+to a production failure.</p>
+<p>The companion repo is a standalone Swift package. Add it to your
+project, configure the <code>BridgeConfiguration</code>, instantiate an
+<code>SSEClient</code>, and call <code>startStream()</code>. The five
+layers of complexity are encapsulated. Your SwiftUI view just observes
+<code>messages</code>.</p>
+<pre class="swift"><code>// Minimum viable integration
+let config = BridgeConfiguration(backendURL: &quot;http://localhost:9999&quot;)
+let client = SSEClient(configuration: config)
+client.startStream(request: ChatStreamRequest(prompt: &quot;Hello, Claude&quot;))
+
+// Observe client.messages in your SwiftUI view</code></pre>
+<p><a
+href="https://github.com/nickbaumann98/claude-ios-streaming-bridge">claude-ios-streaming-bridge
+on GitHub</a></p>
+<hr />
+<p><em>Part 4 of 11 in the <a
+href="https://github.com/krzemienski/agentic-development-guide">Agentic
+Development</a> series.</em></p>
+
+<hr>
+<h2>Diagrams &amp; Visual Assets</h2>
+
+
+<div class="social-cards">
+<h3>Social Media Cards</h3>
+<p style="color:#94a3b8;font-size:0.9em;">Open <code>assets/twitter-card.html</code> and <code>assets/linkedin-card.html</code> in a browser to preview social cards.</p>
+</div>
+
+<div class="series-nav">
+<span>Agentic Development: 10 Lessons from 8,481 AI Coding Sessions</span>
+<span style="color:#64748b;">Post 04 of 11</span>
+</div>
+</article>
+</body>
+</html>

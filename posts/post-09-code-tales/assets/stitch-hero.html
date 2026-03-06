@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI-Narrated Code Stories Hero</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#895af6",
+                        "background-light": "#f6f5f8",
+                        "background-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .dot-grid {
+            background-image: radial-gradient(circle, rgba(137, 90, 246, 0.15) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .glow-orb {
+            filter: blur(80px);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased overflow-x-hidden">
+<div class="relative min-h-screen flex flex-col items-center justify-start dot-grid">
+<!-- Background Orbs -->
+<div class="absolute top-1/4 -left-20 size-96 bg-primary/20 rounded-full glow-orb"></div>
+<div class="absolute bottom-1/4 -right-20 size-96 bg-indigo-500/10 rounded-full glow-orb"></div>
+<!-- Top Navigation -->
+<header class="w-full max-w-7xl px-8 py-6 flex items-center justify-between relative z-10">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-primary rounded flex items-center justify-center text-white">
+<span class="material-symbols-outlined">auto_awesome</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight">Agentic Dev</h2>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium text-slate-400 hover:text-white transition-colors" href="#">Series</a>
+<a class="text-sm font-medium text-slate-400 hover:text-white transition-colors" href="#">Docs</a>
+<a class="text-sm font-medium text-slate-400 hover:text-white transition-colors" href="#">Voices</a>
+<a class="text-sm font-medium text-slate-400 hover:text-white transition-colors" href="#">Pricing</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="px-5 py-2.5 bg-primary hover:bg-primary/90 text-white text-sm font-bold rounded-full transition-all">
+                    Get Started
+                </button>
+</div>
+</header>
+<!-- Main Hero Content -->
+<main class="w-full max-w-7xl px-8 flex flex-col items-center pt-12 pb-24 relative z-10">
+<!-- Hero Header -->
+<div class="text-center mb-16">
+<h1 class="text-5xl md:text-7xl font-black tracking-tight text-slate-100 mb-6">
+                    AI-Narrated Code Stories
+                </h1>
+<div class="flex items-center justify-center gap-3">
+<span class="px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider">636 sessions</span>
+<span class="px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider">9 voice styles</span>
+<span class="px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider">ElevenLabs V3</span>
+</div>
+</div>
+<!-- Transformation Flow Visual -->
+<div class="w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-slate-900/40 backdrop-blur-sm border border-slate-800 p-8 rounded-xl">
+<!-- Left: Git Log -->
+<div class="lg:col-span-4 flex flex-col gap-1 font-mono text-sm">
+<div class="flex gap-4 border-l-2 border-slate-700 pl-4 py-3 relative">
+<div class="absolute -left-[9px] top-4 size-4 rounded-full bg-slate-700 ring-4 ring-slate-900"></div>
+<div class="flex flex-col">
+<span class="text-primary font-bold">feat: implement agentic loops</span>
+<span class="text-slate-500 text-xs">commit 42f9a1 • 2m ago</span>
+</div>
+</div>
+<div class="flex gap-4 border-l-2 border-slate-700 pl-4 py-3 relative opacity-80">
+<div class="absolute -left-[9px] top-4 size-4 rounded-full bg-slate-700 ring-4 ring-slate-900"></div>
+<div class="flex flex-col">
+<span class="text-slate-300">refactor: clean up stream handler</span>
+<span class="text-slate-500 text-xs">commit 8b2c4d • 1h ago</span>
+</div>
+</div>
+<div class="flex gap-4 border-l-2 border-slate-700 pl-4 py-3 relative opacity-60">
+<div class="absolute -left-[9px] top-4 size-4 rounded-full bg-slate-700 ring-4 ring-slate-900"></div>
+<div class="flex flex-col">
+<span class="text-slate-300">fix: race condition in socket</span>
+<span class="text-slate-500 text-xs">commit 1a3e5f • 4h ago</span>
+</div>
+</div>
+<div class="flex gap-4 border-l-2 border-slate-700 pl-4 py-3 relative opacity-40">
+<div class="absolute -left-[9px] top-4 size-4 rounded-full bg-slate-700 ring-4 ring-slate-900"></div>
+<div class="flex flex-col">
+<span class="text-slate-300">docs: update architectural flow</span>
+<span class="text-slate-500 text-xs">commit 9c7d1e • Yesterday</span>
+</div>
+</div>
+<div class="flex gap-4 border-l-2 border-slate-700 pl-4 py-3 relative opacity-20">
+<div class="absolute -left-[9px] top-4 size-4 rounded-full bg-slate-700 ring-4 ring-slate-900"></div>
+<div class="flex flex-col">
+<span class="text-slate-300">feat: add elevenlabs integration</span>
+<span class="text-slate-500 text-xs">commit 3d2f1a • 2 days ago</span>
+</div>
+</div>
+</div>
+<!-- Center: Magical Portal -->
+<div class="lg:col-span-1 flex justify-center items-center">
+<div class="relative group">
+<div class="absolute inset-0 bg-primary blur-2xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
+<div class="relative z-10 size-16 rounded-full bg-primary flex items-center justify-center shadow-[0_0_30px_rgba(137,90,246,0.5)]">
+<span class="material-symbols-outlined text-white text-3xl">auto_fix_high</span>
+</div>
+</div>
+</div>
+<!-- Right: Audio Visualization -->
+<div class="lg:col-span-7 bg-slate-950/50 rounded-lg p-8 border border-slate-800 flex flex-col gap-6">
+<div class="flex items-center gap-6">
+<button class="size-16 rounded-full bg-primary flex items-center justify-center text-white flex-shrink-0 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-4xl fill-1">play_arrow</span>
+</button>
+<div class="flex-1">
+<h3 class="text-lg font-bold text-slate-100">The Evolution of Agentic Loops</h3>
+<p class="text-slate-400 text-sm">Noir Detective Voice • 02:23</p>
+</div>
+</div>
+<!-- Waveform Visualization -->
+<div class="flex items-center justify-between gap-1 h-20">
+<div class="w-1 bg-primary/40 h-8 rounded-full"></div>
+<div class="w-1 bg-primary/50 h-12 rounded-full"></div>
+<div class="w-1 bg-primary/60 h-16 rounded-full"></div>
+<div class="w-1 bg-primary h-20 rounded-full"></div>
+<div class="w-1 bg-primary/70 h-14 rounded-full"></div>
+<div class="w-1 bg-primary/50 h-10 rounded-full"></div>
+<div class="w-1 bg-primary/60 h-18 rounded-full"></div>
+<div class="w-1 bg-primary h-12 rounded-full"></div>
+<div class="w-1 bg-primary/40 h-6 rounded-full"></div>
+<div class="w-1 bg-primary/50 h-14 rounded-full"></div>
+<div class="w-1 bg-primary/70 h-16 rounded-full"></div>
+<div class="w-1 bg-primary/90 h-10 rounded-full"></div>
+<div class="w-1 bg-primary/30 h-12 rounded-full"></div>
+<div class="w-1 bg-primary/50 h-14 rounded-full"></div>
+<div class="w-1 bg-primary/80 h-18 rounded-full"></div>
+<div class="w-1 bg-primary h-14 rounded-full"></div>
+<div class="w-1 bg-primary/60 h-10 rounded-full"></div>
+<div class="w-1 bg-primary/40 h-12 rounded-full"></div>
+<div class="w-1 bg-primary/30 h-16 rounded-full"></div>
+<div class="w-1 bg-primary/20 h-8 rounded-full"></div>
+<div class="w-1 bg-slate-700 h-12 rounded-full"></div>
+<div class="w-1 bg-slate-700 h-10 rounded-full"></div>
+<div class="w-1 bg-slate-700 h-6 rounded-full"></div>
+<div class="w-1 bg-slate-700 h-14 rounded-full"></div>
+<div class="w-1 bg-slate-700 h-8 rounded-full"></div>
+<div class="w-1 bg-slate-700 h-10 rounded-full"></div>
+<div class="w-1 bg-slate-700 h-4 rounded-full"></div>
+<div class="w-1 bg-slate-700 h-8 rounded-full"></div>
+</div>
+</div>
+</div>
+<!-- Voice Style Icons Row -->
+<div class="w-full mt-16 flex flex-wrap justify-center gap-10">
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="size-14 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 group-hover:bg-primary/20 group-hover:text-primary group-hover:border-primary/50 transition-all">
+<span class="material-symbols-outlined">menu_book</span>
+</div>
+<span class="text-xs font-medium text-slate-500 group-hover:text-slate-200">Documentary</span>
+</div>
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="size-14 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 group-hover:bg-primary/20 group-hover:text-primary group-hover:border-primary/50 transition-all">
+<span class="material-symbols-outlined">detector</span>
+</div>
+<span class="text-xs font-medium text-slate-200">Noir Detective</span>
+</div>
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="size-14 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 group-hover:bg-primary/20 group-hover:text-primary group-hover:border-primary/50 transition-all">
+<span class="material-symbols-outlined">sports_soccer</span>
+</div>
+<span class="text-xs font-medium text-slate-500 group-hover:text-slate-200">Sports</span>
+</div>
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="size-14 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 group-hover:bg-primary/20 group-hover:text-primary group-hover:border-primary/50 transition-all">
+<span class="material-symbols-outlined">theaters</span>
+</div>
+<span class="text-xs font-medium text-slate-500 group-hover:text-slate-200">Cinematic</span>
+</div>
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="size-14 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 group-hover:bg-primary/20 group-hover:text-primary group-hover:border-primary/50 transition-all">
+<span class="material-symbols-outlined">science</span>
+</div>
+<span class="text-xs font-medium text-slate-500 group-hover:text-slate-200">Scientific</span>
+</div>
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="size-14 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 group-hover:bg-primary/20 group-hover:text-primary group-hover:border-primary/50 transition-all">
+<span class="material-symbols-outlined">history_edu</span>
+</div>
+<span class="text-xs font-medium text-slate-500 group-hover:text-slate-200">Storyteller</span>
+</div>
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="size-14 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 group-hover:bg-primary/20 group-hover:text-primary group-hover:border-primary/50 transition-all">
+<span class="material-symbols-outlined">rocket_launch</span>
+</div>
+<span class="text-xs font-medium text-slate-500 group-hover:text-slate-200">Action</span>
+</div>
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="size-14 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 group-hover:bg-primary/20 group-hover:text-primary group-hover:border-primary/50 transition-all">
+<span class="material-symbols-outlined">sentiment_calm</span>
+</div>
+<span class="text-xs font-medium text-slate-500 group-hover:text-slate-200">Meditation</span>
+</div>
+<div class="flex flex-col items-center gap-3 group cursor-pointer">
+<div class="size-14 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 group-hover:bg-primary/20 group-hover:text-primary group-hover:border-primary/50 transition-all">
+<span class="material-symbols-outlined">psychology</span>
+</div>
+<span class="text-xs font-medium text-slate-500 group-hover:text-slate-200">Philosophical</span>
+</div>
+</div>
+</main>
+<!-- Footer Info -->
+<footer class="mt-auto w-full max-w-7xl px-8 py-10 border-t border-slate-800/50 flex flex-col md:flex-row items-center justify-between text-slate-500 text-sm">
+<p>© 2024 Agentic Dev Series. All stories narrated by ElevenLabs V3.</p>
+<div class="flex items-center gap-6 mt-4 md:mt-0">
+<a class="hover:text-slate-300 transition-colors" href="#">Privacy</a>
+<a class="hover:text-slate-300 transition-colors" href="#">Terms</a>
+<a class="hover:text-slate-300 transition-colors" href="#">Github</a>
+</div>
+</footer>
+</div>
+</body></html>

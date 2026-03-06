@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AI Dev OS Master Hero Section</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#20d3ee",
+                        "background-light": "#f6f8f8",
+                        "background-dark": "#0f172a",
+                        "slate-custom": {
+                            900: "#0f172a",
+                            800: "#1e293b",
+                            100: "#f1f5f9",
+                            300: "#cbd5e1"
+                        }
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .dot-grid {
+            background-image: radial-gradient(circle, rgba(34, 211, 238, 0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+        .glow-orb-cyan {
+            background: radial-gradient(circle, rgba(34, 211, 238, 0.15) 0%, transparent 70%);
+        }
+        .glow-orb-indigo {
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+        }
+        .hex-shape {
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased overflow-x-hidden">
+<div class="relative min-h-screen flex flex-col items-center justify-between py-12 px-6 overflow-hidden">
+<div class="absolute inset-0 dot-grid opacity-30 pointer-events-none"></div>
+<div class="absolute top-1/4 -left-20 w-96 h-96 glow-orb-cyan pointer-events-none"></div>
+<div class="absolute bottom-1/4 -right-20 w-96 h-96 glow-orb-indigo pointer-events-none"></div>
+<header class="w-full max-w-7xl flex items-center justify-between z-10">
+<div class="flex items-center gap-3">
+<div class="bg-primary p-1 rounded">
+<span class="material-symbols-outlined text-slate-custom-900 font-bold">terminal</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight uppercase">AI Dev OS</h2>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium text-slate-custom-300 hover:text-primary transition-colors" href="#">Modules</a>
+<a class="text-sm font-medium text-slate-custom-300 hover:text-primary transition-colors" href="#">Architecture</a>
+<a class="text-sm font-medium text-slate-custom-300 hover:text-primary transition-colors" href="#">Docs</a>
+<a class="text-sm font-medium text-slate-custom-300 hover:text-primary transition-colors" href="#">Blog</a>
+</nav>
+<div class="flex items-center gap-4">
+<button class="px-5 py-2 rounded-lg bg-primary/10 border border-primary/20 text-primary text-sm font-semibold hover:bg-primary/20 transition-all">
+                    Launch Console
+                </button>
+</div>
+</header>
+<main class="flex-1 flex flex-col items-center justify-center w-full max-w-7xl z-10 relative mt-8">
+<div class="text-center mb-16">
+<h1 class="text-5xl md:text-7xl font-bold text-slate-custom-100 tracking-tighter mb-4">
+                    AI Development Operating System
+                </h1>
+<p class="text-lg md:text-xl text-slate-custom-300 max-w-2xl mx-auto font-light leading-relaxed">
+                    Everything connects. Everything orchestrates. A unified mesh of consensus, validation, and parallel execution for agentic development.
+                </p>
+</div>
+<div class="relative w-full max-w-4xl aspect-[16/9] flex items-center justify-center">
+<svg class="absolute inset-0 w-full h-full opacity-20 pointer-events-none" fill="none" viewbox="0 0 1000 600" xmlns="http://www.w3.org/2000/svg">
+<line stroke="white" stroke-width="1" x1="500" x2="300" y1="300" y2="150"></line>
+<line stroke="white" stroke-width="1" x1="500" x2="700" y1="300" y2="150"></line>
+<line stroke="white" stroke-width="1" x1="500" x2="850" y1="300" y2="300"></line>
+<line stroke="white" stroke-width="1" x1="500" x2="700" y1="300" y2="450"></line>
+<line stroke="white" stroke-width="1" x1="500" x2="300" y1="300" y2="450"></line>
+<line stroke="white" stroke-width="1" x1="500" x2="150" y1="300" y2="300"></line>
+</svg>
+<div class="relative z-20 flex flex-col items-center justify-center bg-slate-custom-800 border-2 border-primary/50 hex-shape w-48 h-56 shadow-[0_0_50px_rgba(32,211,238,0.2)]">
+<span class="material-symbols-outlined text-primary text-4xl mb-2">hub</span>
+<span class="text-xs uppercase tracking-widest text-primary font-bold">Core Node</span>
+<span class="text-white font-bold text-lg">AI Dev OS v1.0</span>
+<div class="flex items-center gap-1 mt-2">
+<div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+<span class="text-[10px] text-emerald-400 font-medium">MASTER ACTIVE</span>
+</div>
+</div>
+<div class="absolute top-[5%] left-[25%] flex flex-col items-center p-4 bg-slate-custom-900/80 border border-slate-custom-800 rounded-xl backdrop-blur-sm group hover:border-primary transition-all">
+<div class="hex-shape w-12 h-14 bg-primary/20 flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-primary text-xl">handshake</span>
+</div>
+<span class="text-xs font-bold text-slate-custom-100">Consensus</span>
+<div class="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 shadow-[0_0_8px_#34d399]"></div>
+</div>
+<div class="absolute top-[5%] right-[25%] flex flex-col items-center p-4 bg-slate-custom-900/80 border border-slate-custom-800 rounded-xl backdrop-blur-sm group hover:border-primary transition-all">
+<div class="hex-shape w-12 h-14 bg-primary/20 flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-primary text-xl">shield</span>
+</div>
+<span class="text-xs font-bold text-slate-custom-100">Validation</span>
+<div class="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 shadow-[0_0_8px_#34d399]"></div>
+</div>
+<div class="absolute top-1/2 -right-[5%] -translate-y-1/2 flex flex-col items-center p-4 bg-slate-custom-900/80 border border-slate-custom-800 rounded-xl backdrop-blur-sm group hover:border-primary transition-all">
+<div class="hex-shape w-12 h-14 bg-primary/20 flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-primary text-xl">memory</span>
+</div>
+<span class="text-xs font-bold text-slate-custom-100">Orchestration</span>
+<div class="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 shadow-[0_0_8px_#34d399]"></div>
+</div>
+<div class="absolute bottom-[5%] right-[25%] flex flex-col items-center p-4 bg-slate-custom-900/80 border border-slate-custom-800 rounded-xl backdrop-blur-sm group hover:border-primary transition-all">
+<div class="hex-shape w-12 h-14 bg-primary/20 flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-primary text-xl">diagonal_line</span>
+</div>
+<span class="text-xs font-bold text-slate-custom-100">Parallel Exec</span>
+<div class="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 shadow-[0_0_8px_#34d399]"></div>
+</div>
+<div class="absolute bottom-[5%] left-[25%] flex flex-col items-center p-4 bg-slate-custom-900/80 border border-slate-custom-800 rounded-xl backdrop-blur-sm group hover:border-primary transition-all">
+<div class="hex-shape w-12 h-14 bg-primary/20 flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-primary text-xl">layers</span>
+</div>
+<span class="text-xs font-bold text-slate-custom-100">Prompt Stack</span>
+<div class="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 shadow-[0_0_8px_#34d399]"></div>
+</div>
+<div class="absolute top-1/2 -left-[5%] -translate-y-1/2 flex flex-col items-center p-4 bg-slate-custom-900/80 border border-slate-custom-800 rounded-xl backdrop-blur-sm group hover:border-primary transition-all">
+<div class="hex-shape w-12 h-14 bg-primary/20 flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-primary text-xl">lan</span>
+</div>
+<span class="text-xs font-bold text-slate-custom-100">Pipeline</span>
+<div class="w-1.5 h-1.5 rounded-full bg-emerald-400 mt-2 shadow-[0_0_8px_#34d399]"></div>
+</div>
+</div>
+<div class="mt-16 flex gap-4">
+<button class="bg-primary text-slate-custom-900 font-bold px-8 py-3 rounded-lg hover:brightness-110 transition-all flex items-center gap-2">
+                    Start Developing
+                    <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+<button class="bg-slate-custom-800 text-white font-bold px-8 py-3 rounded-lg border border-slate-custom-700 hover:bg-slate-custom-700 transition-all">
+                    View Docs
+                </button>
+</div>
+</main>
+<footer class="w-full max-w-5xl z-10 mt-12">
+<div class="bg-slate-custom-800/50 border border-slate-custom-800 rounded-xl px-6 py-4 flex flex-wrap items-center justify-between backdrop-blur-md">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-2">
+<span class="text-primary font-bold">6</span>
+<span class="text-slate-custom-300 text-sm">Active Modules</span>
+</div>
+<div class="w-px h-4 bg-slate-custom-700"></div>
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+<span class="text-slate-custom-100 text-sm font-medium">All systems operational</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-slate-custom-300 text-sm font-mono">v1.0 stable</span>
+<div class="w-px h-4 bg-slate-custom-700"></div>
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-lg">public</span>
+<span class="text-slate-custom-300 text-sm">Global Cluster</span>
+</div>
+</div>
+</div>
+</footer>
+<div class="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20">
+<div class="absolute top-1/4 left-1/4 w-1 h-1 bg-white rounded-full"></div>
+<div class="absolute top-3/4 left-1/3 w-1 h-1 bg-primary rounded-full"></div>
+<div class="absolute top-1/2 right-1/4 w-1 h-1 bg-white rounded-full"></div>
+<div class="absolute top-1/5 right-1/3 w-1 h-1 bg-primary rounded-full"></div>
+<div class="absolute bottom-1/4 right-1/2 w-1 h-1 bg-white rounded-full"></div>
+</div>
+</div>
+</body></html>

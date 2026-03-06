@@ -1,0 +1,1548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI-Narrated Code Stories</title>
+<meta property="og:title" content="AI-Narrated Code Stories">
+<meta property="og:description" content="Turning git history into audio narratives">
+<meta property="og:type" content="article">
+<meta property="og:image" content="assets/hero-card.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI-Narrated Code Stories">
+<meta name="twitter:description" content="Turning git history into audio narratives">
+<meta name="author" content="Nick Krzemienski">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0a0a0a; color: #e2e8f0; line-height: 1.8; }
+  .hero-container { max-width: 1200px; margin: 0 auto; }
+  .hero-container > div { width: 100% !important; max-width: 100%; }
+  article { max-width: 780px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: 2.5em; font-weight: 800; color: #f8fafc; line-height: 1.2; margin: 0 0 16px; }
+  h2 { font-size: 1.75em; font-weight: 700; color: #f1f5f9; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #1e293b; }
+  h3 { font-size: 1.3em; font-weight: 600; color: #e2e8f0; margin: 32px 0 12px; }
+  h4 { font-size: 1.1em; font-weight: 600; color: #cbd5e1; margin: 24px 0 8px; }
+  p { margin: 0 0 16px; color: #cbd5e1; }
+  a { color: #818cf8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; background: #1e293b; color: #a5b4fc; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+  pre { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 20px; margin: 16px 0 24px; overflow-x: auto; }
+  pre code { background: none; padding: 0; color: #e2e8f0; font-size: 0.85em; line-height: 1.6; }
+  blockquote { border-left: 3px solid #6366f1; padding: 12px 20px; margin: 16px 0; background: rgba(99,102,241,0.05); border-radius: 0 8px 8px 0; }
+  blockquote p { color: #94a3b8; margin: 0; }
+  ul, ol { margin: 8px 0 16px 24px; color: #cbd5e1; }
+  li { margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; }
+  th { background: #1e293b; color: #f1f5f9; padding: 10px 16px; text-align: left; font-weight: 600; font-size: 0.9em; }
+  td { padding: 10px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.9em; }
+  tr:hover td { background: rgba(99,102,241,0.03); }
+  hr { border: none; border-top: 1px solid #1e293b; margin: 32px 0; }
+  img, svg { max-width: 100%; height: auto; border-radius: 8px; margin: 16px 0; }
+  .diagram { margin: 32px 0; padding: 24px; background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; overflow-x: auto; }
+  .diagram h4 { color: #64748b; font-size: 0.85em; font-weight: 500; margin: 0 0 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .diagram svg { display: block; margin: 0 auto; max-height: 600px; }
+  .meta { color: #64748b; font-size: 0.9em; margin: 8px 0 32px; }
+  .social-cards { display: flex; gap: 24px; flex-wrap: wrap; margin: 48px 0; padding: 24px; background: #0f172a; border-radius: 12px; }
+  .social-cards h3 { width: 100%; color: #64748b; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px; }
+  .social-cards iframe { border: 1px solid #1e293b; border-radius: 8px; }
+  .series-nav { display: flex; justify-content: space-between; padding: 24px; background: #0f172a; border-radius: 12px; margin-top: 48px; }
+  .series-nav a { color: #818cf8; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="hero-container"><div style="width:1200px;height:630px;background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%);display:flex;flex-direction:column;justify-content:center;padding:0 80px;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif;position:relative;overflow:hidden;">
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:radial-gradient(circle at 1px 1px,rgba(236,72,153,0.15) 1px,transparent 0);background-size:40px 40px;"></div>
+  <div style="position:absolute;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(236,72,153,0.2) 0%,transparent 70%);border-radius:50%;"></div>
+  <div style="position:relative;z-index:1;display:inline-block;background:rgba(236,72,153,0.2);border:1px solid rgba(236,72,153,0.4);border-radius:20px;padding:6px 16px;margin-bottom:24px;width:fit-content;">
+    <span style="color:rgba(236,72,153,0.9);font-size:14px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">LESSON 09 OF 10 · CONTENT PIPELINE</span>
+  </div>
+  <h1 style="position:relative;z-index:1;color:#f1f5f9;font-size:46px;font-weight:800;line-height:1.15;margin:0 0 20px 0;max-width:900px;">AI-Narrated Code Stories</h1>
+  <p style="position:relative;z-index:1;color:#94a3b8;font-size:20px;line-height:1.5;margin:0 0 32px 0;max-width:700px;">Turning git history into audio narratives with 9 voice styles</p>
+  <div style="position:relative;z-index:1;display:flex;align-items:center;gap:12px;">
+    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,rgb(236,72,153),#8b5cf6);display:flex;align-items:center;justify-content:center;">
+      <span style="color:white;font-weight:700;font-size:16px;">NK</span>
+    </div>
+    <div>
+      <div style="color:#f1f5f9;font-size:14px;font-weight:600;">Nick Krzemienski</div>
+      <div style="color:#64748b;font-size:13px;">March 2026 · Agentic Development Series</div>
+    </div>
+  </div>
+</div></div>
+<article>
+<p class="meta">Lesson 09 of 10 · Nick Krzemienski · March 2026 · Agentic Development Series</p>
+<h2 id="from-github-repos-to-audio-stories">From GitHub Repos to Audio
+Stories</h2>
+<p><em>Agentic Development: 10 Lessons from 8,481 AI Coding
+Sessions</em></p>
+<p>I was driving home from work on a Tuesday evening, stuck in traffic,
+thinking about a codebase I needed to evaluate. A colleague had sent me
+a link to a FastAPI project that morning – “check this out, might be
+useful for the auth refactor.” I had 40 minutes of windshield time and
+zero ability to read code.</p>
+<p>That is when the idea hit me: what if I could listen to a
+codebase?</p>
+<p>Not read documentation. Not scan source files. Listen – like a
+podcast episode about FastAPI’s architecture, or a nature documentary
+narrating how Django evolved in the wild, or an executive briefing that
+tells a CTO whether a dependency is worth adopting.</p>
+<p>That evening I started building code-tales. Six weeks later, it
+worked:</p>
+<pre class="bash"><code>code-tales generate --repo https://github.com/tiangolo/fastapi --style documentary</code></pre>
+<p>Give it a GitHub URL, pick one of 9 narrative styles, and in under
+two minutes you get a fully synthesized audio story about the
+repository. Clone, analyze, narrate with Claude, synthesize with
+ElevenLabs. Four pipeline stages. One command.</p>
+<p>This is post 9 of 11 in the Agentic Development series. The companion
+repo is at <a
+href="https://github.com/krzemienski/code-tales">github.com/krzemienski/code-tales</a>.
+Everything quoted here is real code you can read, run, and extend.</p>
+<hr />
+<h3 id="the-pipeline-architecture">The Pipeline Architecture</h3>
+<p>The core abstraction is a four-stage pipeline orchestrated by a
+single class. Here is the actual orchestrator:</p>
+<pre class="python"><code># From: src/code_tales/pipeline/orchestrate.py
+
+class CodeTalesPipeline:
+    &quot;&quot;&quot;Orchestrates the full code-tales pipeline.
+
+    Stages:
+      1. Resolve repository (clone URL or validate local path)
+      2. Analyze repository structure and metadata
+      3. Generate narration script via Claude
+      4. Synthesize audio via ElevenLabs (or save text only)
+    &quot;&quot;&quot;
+
+    def generate(
+        self,
+        repo_url_or_path: str,
+        style_name: str,
+        output_dir: Optional[Path] = None,
+    ) -&gt; AudioOutput:</code></pre>
+<p>The <code>generate</code> method runs all four stages sequentially
+with Rich progress bars showing real-time status. The key design
+decision: every stage is independently importable. You can call
+<code>analyze_repository</code> without cloning, or
+<code>generate_script</code> without synthesizing audio. The pipeline
+composes; it does not mandate.</p>
+<pre class="mermaid"><code>flowchart LR
+    IN[&quot;Input\n(GitHub URL or local path)&quot;]
+    CL[&quot;Clone\n(gitpython\nshallow depth=1)&quot;]
+    AN[&quot;Analyze\n(languages, deps,\nframeworks, patterns)&quot;]
+    NA[&quot;Narrate\n(Claude\nstreaming API)&quot;]
+    SY[&quot;Synthesize\n(ElevenLabs TTS)&quot;]
+    OUT[&quot;Output\n(script.md +\nstory.mp3)&quot;]
+
+    IN --&gt; CL
+    CL --&gt; AN
+    AN --&gt; NA
+    NA --&gt; SY
+    SY --&gt; OUT</code></pre>
+<p>That looks simple. Four boxes and some arrows. But the devil is in
+each box, and the most interesting engineering lives at the boundaries
+between them – where repository metadata becomes a prompt, where a
+prompt becomes spoken text, and where spoken text becomes audio that
+sounds natural.</p>
+<hr />
+<h3 id="stage-1-repository-resolution">Stage 1: Repository
+Resolution</h3>
+<p>The pipeline resolution logic handles both remote URLs and local
+paths:</p>
+<pre class="python"><code># From: src/code_tales/pipeline/orchestrate.py
+
+def _resolve_repo(self, repo_url_or_path: str) -&gt; tuple[Path, Optional[Path]]:
+    if repo_url_or_path.startswith((&quot;http://&quot;, &quot;https://&quot;, &quot;git@&quot;)):
+        temp_dir = Path(tempfile.mkdtemp(prefix=&quot;code-tales-&quot;))
+        repo_path = clone_repository(
+            url=repo_url_or_path,
+            target_dir=temp_dir,
+            depth=self.config.clone_depth,
+        )
+        return repo_path, temp_dir
+
+    # Local path
+    local = Path(repo_url_or_path).expanduser().resolve()
+    if not (local / &quot;.git&quot;).exists():
+        raise ValueError(
+            f&quot;Local path is not a git repository (no .git dir): {local}&quot;
+        )
+    return local, None</code></pre>
+<p>Shallow clones (<code>depth=1</code>) are the default. We need the
+file tree, not the full commit history. This keeps clone times under a
+few seconds for most repositories. The clone module validates URLs
+against a GitHub pattern, derives the repo name, and handles cleanup on
+failure:</p>
+<pre class="python"><code># From: src/code_tales/pipeline/clone.py
+
+def clone_repository(url: str, target_dir: Path, depth: int = 1) -&gt; Path:
+    repo_name = url.rstrip(&quot;/&quot;).rstrip(&quot;.git&quot;).rsplit(&quot;/&quot;, 1)[-1]
+    clone_path = target_dir / repo_name
+
+    if clone_path.exists():
+        shutil.rmtree(clone_path)
+
+    try:
+        git.Repo.clone_from(
+            url, clone_path, depth=depth,
+            multi_options=[&quot;--single-branch&quot;],
+        )
+    except git.exc.GitCommandError as exc:
+        if clone_path.exists():
+            shutil.rmtree(clone_path, ignore_errors=True)
+        error_msg = str(exc)
+        if &quot;Repository not found&quot; in error_msg:
+            raise RuntimeError(f&quot;Repository not found or is private: {url}&quot;) from exc
+        if &quot;Could not resolve host&quot; in error_msg:
+            raise RuntimeError(f&quot;Network error while cloning {url}.&quot;) from exc
+        raise RuntimeError(f&quot;Failed to clone {url}: {exc}&quot;) from exc
+
+    return clone_path</code></pre>
+<p>The <code>--single-branch</code> flag is equally important as
+<code>depth=1</code>. Combined, they minimize the data transferred. For
+a large repo like Django (~300MB full clone), shallow single-branch
+clones pull under 5MB. That turns a 30-second wait into a 2-second
+one.</p>
+<p>The temp directory cleanup deserves a note too. The pipeline returns
+a <code>temp_dir</code> reference alongside the <code>repo_path</code>.
+After all four stages complete, the orchestrator calls
+<code>shutil.rmtree(temp_dir)</code> to clean up. If the pipeline
+crashes mid-run, the temp directory lingers in
+<code>/tmp/code-tales-*</code> – but since it is shallow and small, that
+is fine. No disk bombs from aborted runs.</p>
+<hr />
+<h3 id="stage-2-the-analysis-engine">Stage 2: The Analysis Engine</h3>
+<p>Before Claude ever sees a repository, the analysis stage extracts
+structured metadata. This is where code-tales distinguishes itself from
+“just paste the README into Claude.” The analyzer detects languages by
+file extension counts, extracts dependencies from 8 different package
+manager formats, identifies frameworks, and recognizes architectural
+patterns.</p>
+<h4 id="language-detection">Language Detection</h4>
+<p>The language detector is deliberately simple – it counts file
+extensions across 40+ known types:</p>
+<pre class="python"><code># From: src/code_tales/pipeline/analyze.py
+
+LANGUAGE_EXTENSIONS = {
+    &quot;.py&quot;: &quot;Python&quot;, &quot;.js&quot;: &quot;JavaScript&quot;, &quot;.ts&quot;: &quot;TypeScript&quot;,
+    &quot;.jsx&quot;: &quot;JSX&quot;, &quot;.tsx&quot;: &quot;TSX&quot;, &quot;.rs&quot;: &quot;Rust&quot;, &quot;.go&quot;: &quot;Go&quot;,
+    &quot;.java&quot;: &quot;Java&quot;, &quot;.kt&quot;: &quot;Kotlin&quot;, &quot;.swift&quot;: &quot;Swift&quot;,
+    &quot;.rb&quot;: &quot;Ruby&quot;, &quot;.php&quot;: &quot;PHP&quot;, &quot;.c&quot;: &quot;C&quot;, &quot;.cpp&quot;: &quot;C++&quot;,
+    &quot;.cs&quot;: &quot;C#&quot;, &quot;.scala&quot;: &quot;Scala&quot;, &quot;.clj&quot;: &quot;Clojure&quot;,
+    &quot;.hs&quot;: &quot;Haskell&quot;, &quot;.lua&quot;: &quot;Lua&quot;, &quot;.r&quot;: &quot;R&quot;,
+    &quot;.dart&quot;: &quot;Dart&quot;, &quot;.ex&quot;: &quot;Elixir&quot;, &quot;.erl&quot;: &quot;Erlang&quot;,
+    # ... 20+ more
+}</code></pre>
+<p>Why not use a tool like <code>tokei</code> or <code>scc</code>?
+Because we do not need line counts or complexity metrics at this stage –
+we need language proportions for the narrative prompt. “47.3% Python,
+31.2% TypeScript, 12.1% Shell” gives Claude enough to set the scene.
+Adding more precision adds dependency weight without improving narration
+quality.</p>
+<h4 id="dependency-extraction">Dependency Extraction</h4>
+<p>The dependency extraction alone covers <code>package.json</code>,
+<code>requirements.txt</code>, <code>pyproject.toml</code>,
+<code>Cargo.toml</code>, <code>go.mod</code>, <code>Gemfile</code>,
+<code>Package.swift</code>, and <code>pom.xml</code>:</p>
+<pre class="python"><code># From: src/code_tales/pipeline/analyze.py
+
+def _extract_dependencies(repo_path: Path) -&gt; list[Dependency]:
+    deps: list[Dependency] = []
+
+    # package.json (npm/yarn)
+    pkg_json = repo_path / &quot;package.json&quot;
+    if pkg_json.exists():
+        data = json.loads(pkg_json.read_text(encoding=&quot;utf-8&quot;))
+        for section in (&quot;dependencies&quot;, &quot;devDependencies&quot;, &quot;peerDependencies&quot;):
+            for name, version in (data.get(section) or {}).items():
+                deps.append(
+                    Dependency(name=name, version=str(version), source=&quot;package.json&quot;)
+                )
+
+    # ... repeated for requirements.txt, pyproject.toml, Cargo.toml,
+    #     go.mod, Gemfile, Package.swift, pom.xml</code></pre>
+<p>Each package manager has its own parsing quirks.
+<code>Cargo.toml</code> uses TOML sections, so the parser tracks whether
+it is inside <code>[dependencies]</code>. <code>go.mod</code> uses a
+<code>require ( ... )</code> block with module paths and version
+numbers. <code>Gemfile</code> uses a Ruby DSL with
+<code>gem 'name', 'version'</code> syntax. The analyzer handles all 8
+formats with targeted regex patterns – no external TOML or YAML parsers
+for the dependency extraction itself, keeping the dependency count
+low.</p>
+<h4 id="pattern-detection">Pattern Detection</h4>
+<p>The pattern detection is equally thorough. It identifies monorepos,
+microservices, REST APIs, GraphQL schemas, CLI tools, web applications,
+mobile apps, MVC architectures, test coverage, CI/CD pipelines, and
+containerization. All heuristic-based, all derived from directory
+structure and file presence – no LLM calls required.</p>
+<pre class="python"><code># From: src/code_tales/pipeline/analyze.py
+
+def _detect_patterns(repo_path: Path) -&gt; list[str]:
+    patterns: list[str] = []
+
+    # Monorepo detection
+    workspace_files = [
+        repo_path / &quot;pnpm-workspace.yaml&quot;,
+        repo_path / &quot;lerna.json&quot;,
+        repo_path / &quot;nx.json&quot;,
+        repo_path / &quot;rush.json&quot;,
+    ]
+    if any(f.exists() for f in workspace_files):
+        patterns.append(&quot;Monorepo&quot;)
+
+    # REST API
+    api_dirs = [&quot;api&quot;, &quot;routes&quot;, &quot;controllers&quot;, &quot;handlers&quot;, &quot;endpoints&quot;]
+    if any((repo_path / d).is_dir() for d in api_dirs):
+        patterns.append(&quot;REST API&quot;)
+
+    # CLI tool
+    cli_files = [&quot;cli.py&quot;, &quot;cli.js&quot;, &quot;cli.ts&quot;, &quot;cmd/&quot;, &quot;commands/&quot;]
+    if any(
+        (repo_path / f).exists() for f in cli_files
+    ) or list(repo_path.rglob(&quot;cli*.py&quot;)):
+        patterns.append(&quot;CLI Tool&quot;)
+
+    # Docker
+    if (repo_path / &quot;Dockerfile&quot;).exists():
+        patterns.append(&quot;Containerized&quot;)
+
+    # CI/CD
+    ci_paths = [&quot;.github/workflows&quot;, &quot;.gitlab-ci.yml&quot;, &quot;Jenkinsfile&quot;,
+                &quot;.circleci&quot;, &quot;.travis.yml&quot;]
+    if any((repo_path / p).exists() for p in ci_paths):
+        patterns.append(&quot;CI/CD Pipeline&quot;)
+
+    # Test coverage
+    test_dirs = [&quot;tests&quot;, &quot;test&quot;, &quot;__tests__&quot;, &quot;spec&quot;]
+    if any((repo_path / d).is_dir() for d in test_dirs):
+        patterns.append(&quot;Test Suite&quot;)</code></pre>
+<p>This matters because the structured analysis gives Claude specific,
+quantified data to work with – not just “here’s a bunch of source code,
+figure it out.” The prompt includes file counts, language percentages,
+dependency lists, detected frameworks, and architectural patterns.
+Claude narrates from data, not from guesswork.</p>
+<h4 id="the-repoanalysis-model">The RepoAnalysis Model</h4>
+<p>All of this feeds into a Pydantic model that constrains the data
+shape throughout the pipeline:</p>
+<pre class="python"><code># From: src/code_tales/models.py
+
+class RepoAnalysis(BaseModel):
+    name: str
+    description: str = &quot;&quot;
+    languages: list[Language] = Field(default_factory=list)
+    dependencies: list[Dependency] = Field(default_factory=list)
+    file_tree: str = &quot;&quot;
+    key_files: list[FileInfo] = Field(default_factory=list)
+    total_files: int = 0
+    total_lines: int = 0
+    frameworks: list[str] = Field(default_factory=list)
+    patterns: list[str] = Field(default_factory=list)
+    readme_content: Optional[str] = None</code></pre>
+<p>The <code>key_files</code> selection is its own algorithm. It
+prioritizes README first, then entry points (<code>main.py</code>,
+<code>index.ts</code>, <code>lib.rs</code>), then config files
+(<code>package.json</code>, <code>Cargo.toml</code>), then source files
+sorted by size descending – bigger files are generally more important.
+It respects <code>max_files_to_analyze</code> (default 100) and
+<code>max_file_size_bytes</code> (default 100KB) to avoid flooding the
+context.</p>
+<p>The Pydantic model provides two crucial benefits. First, it validates
+at construction time – if the analyzer produces malformed data, the
+error surfaces immediately with a clear message rather than propagating
+silently to the narration stage. Second, it serializes cleanly to JSON
+for the Claude prompt, with no manual string formatting or f-string
+gymnastics.</p>
+<hr />
+<h3 id="the-full-pipeline-in-detail">The Full Pipeline in Detail</h3>
+<p>Here is the complete data flow from URL input to audio output,
+showing every decision point and fallback path:</p>
+<pre class="mermaid"><code>flowchart TD
+    subgraph INPUT[&quot;Input Resolution&quot;]
+        URL[&quot;GitHub URL\nhttps://github.com/owner/repo&quot;]
+        LOCAL[&quot;Local Path\n./my-project&quot;]
+        URL --&gt;|&quot;_resolve_repo()&quot;| VALIDATE_URL{&quot;URL pattern\nmatch?&quot;}
+        LOCAL --&gt;|&quot;_resolve_repo()&quot;| VALIDATE_LOCAL{&quot;Has .git\ndirectory?&quot;}
+        VALIDATE_URL --&gt;|Yes| CLONE[&quot;git.Repo.clone_from()\ndepth=1, single-branch&quot;]
+        VALIDATE_URL --&gt;|No| ERR_URL[&quot;ValueError:\nInvalid GitHub URL&quot;]
+        VALIDATE_LOCAL --&gt;|Yes| REPO_PATH[&quot;repo_path: Path&quot;]
+        VALIDATE_LOCAL --&gt;|No| ERR_LOCAL[&quot;ValueError:\nNot a git repository&quot;]
+        CLONE --&gt; TEMP_DIR[&quot;tempdir/repo-name/&quot;]
+        TEMP_DIR --&gt; REPO_PATH
+    end
+
+    subgraph ANALYZE[&quot;Analysis Engine&quot;]
+        REPO_PATH --&gt; STRUCT[&quot;analyze_structure()\nFile tree, entry points,\ntotal files, total size&quot;]
+        REPO_PATH --&gt; LANGS[&quot;_detect_languages()\nExtension counting\nacross 40+ file types&quot;]
+        REPO_PATH --&gt; DEPS[&quot;_extract_dependencies()\n8 package managers:\nnpm, pip, cargo, go,\ngemfile, swift, maven, toml&quot;]
+        REPO_PATH --&gt; FW[&quot;_detect_frameworks()\nReact, Django, FastAPI,\nVapor, Spring Boot, etc.&quot;]
+        REPO_PATH --&gt; PAT[&quot;_detect_patterns()\nMonorepo, REST API,\nCLI, Docker, CI/CD&quot;]
+        REPO_PATH --&gt; KEY[&quot;_select_key_files()\nREADME, entry points,\nconfigs, largest sources&quot;]
+        REPO_PATH --&gt; README[&quot;_read_readme()\nTruncate at 10K chars&quot;]
+
+        STRUCT --&gt; ANALYSIS[&quot;RepoAnalysis\n(Pydantic model)&quot;]
+        LANGS --&gt; ANALYSIS
+        DEPS --&gt; ANALYSIS
+        FW --&gt; ANALYSIS
+        PAT --&gt; ANALYSIS
+        KEY --&gt; ANALYSIS
+        README --&gt; ANALYSIS
+    end
+
+    subgraph NARRATE[&quot;Narration Engine&quot;]
+        ANALYSIS --&gt; PROMPT[&quot;_build_prompt()\nRepository data +\nstyle template&quot;]
+        STYLE_REG[&quot;StyleRegistry\n9 YAML styles&quot;] --&gt; SYS_MSG[&quot;_build_system_message()\nTone, formatting rules,\naudio-optimized writing&quot;]
+        PROMPT --&gt; CLAUDE[&quot;Claude Streaming API\nclient.messages.stream()\nmodel: claude-sonnet-4-6\nmax_tokens: 4096&quot;]
+        SYS_MSG --&gt; CLAUDE
+        CLAUDE --&gt; RAW[&quot;Raw markdown text&quot;]
+        RAW --&gt; PARSE[&quot;_parse_script()\nSplit on ## headings\nExtract [voice directions]&quot;]
+        PARSE --&gt; CLEAN[&quot;_clean_content()\nStrip **bold**, *italic*,\n`backticks`, ```blocks```&quot;]
+        CLEAN --&gt; SCRIPT[&quot;NarrationScript\nsections, word_count,\nestimated_duration&quot;]
+    end
+
+    subgraph SYNTH[&quot;Audio Synthesis&quot;]
+        SCRIPT --&gt; TTS_TEXT[&quot;_build_tts_text()\nConcatenate sections\nwith paragraph pauses&quot;]
+        SCRIPT --&gt; MD_OUT[&quot;save_text_output()\nscript.md with metadata\nand voice directions&quot;]
+        TTS_TEXT --&gt; HAS_KEY{&quot;ELEVENLABS_API_KEY\nconfigured?&quot;}
+        HAS_KEY --&gt;|No| TEXT_ONLY[&quot;Text-only output\nscript.md&quot;]
+        HAS_KEY --&gt;|Yes| API_CALL[&quot;_call_elevenlabs()\nPOST /v1/text-to-speech/\nmodel: eleven_multilingual_v2\nformat: mp3_44100_128&quot;]
+        API_CALL --&gt; RETRY{&quot;Response\nstatus?&quot;}
+        RETRY --&gt;|200 OK| MP3[&quot;story.mp3\naudio bytes&quot;]
+        RETRY --&gt;|429 Rate Limit| BACKOFF[&quot;Exponential backoff\n1s, 2s, 4s&quot;]
+        RETRY --&gt;|500+ Server| BACKOFF
+        BACKOFF --&gt; API_CALL
+        RETRY --&gt;|401 Auth| ERR_AUTH[&quot;RuntimeError:\nInvalid API key&quot;]
+        RETRY --&gt;|3 failures| TEXT_ONLY
+    end
+
+    subgraph OUTPUT[&quot;Final Output&quot;]
+        MP3 --&gt; RESULT[&quot;AudioOutput\nscript: NarrationScript\naudio_path: story.mp3\ntext_path: script.md\nstyle: documentary&quot;]
+        TEXT_ONLY --&gt; RESULT
+        MD_OUT --&gt; RESULT
+        RESULT --&gt; CLEANUP[&quot;shutil.rmtree()\nRemove temp clone dir&quot;]
+        CLEANUP --&gt; DONE[&quot;Rich console output\nStyle, word count,\nduration estimate&quot;]
+    end
+
+    style INPUT fill:#1a1a2e,stroke:#e050b0,color:#fff
+    style ANALYZE fill:#1a1a2e,stroke:#4dacde,color:#fff
+    style NARRATE fill:#1a1a2e,stroke:#e050b0,color:#fff
+    style SYNTH fill:#1a1a2e,stroke:#4dacde,color:#fff
+    style OUTPUT fill:#1a1a2e,stroke:#22c55e,color:#fff</code></pre>
+<hr />
+<h3 id="nine-styles-nine-different-experiences">Nine Styles, Nine
+Different Experiences</h3>
+<p>This is the feature that makes code-tales more than a utility. Each
+of the 9 narrative styles is defined as a YAML configuration with its
+own tone directive, section structure template, ElevenLabs voice ID, and
+voice synthesis parameters. The same repository analyzed in
+“documentary” style and “fiction” style produces fundamentally different
+audio experiences.</p>
+<p>Here is the documentary style – think David Attenborough observing
+code as a living ecosystem:</p>
+<pre class="yaml"><code># From: src/code_tales/styles/documentary.yaml
+
+name: documentary
+description: A nature documentary-style narration that observes the codebase
+  as a living ecosystem, in the tradition of David Attenborough.
+tone: Measured, observational, and quietly awestruck. Speak as if witnessing
+  remarkable natural phenomena. Use present tense for immediacy.
+voice_id: &quot;onwK4e9ZLuTAKqWW03F9&quot;
+voice_params:
+  stability: 0.7
+  similarity_boost: 0.8
+  style: 0.3
+example_opener: |
+  Here we observe a remarkable specimen of software engineering,
+  quietly going about its work in the digital wilderness...</code></pre>
+<p>Now compare that to the fiction style – literary drama with
+characters and conflict:</p>
+<pre class="yaml"><code># From: src/code_tales/styles/fiction.yaml
+
+name: fiction
+description: A literary fiction narrative that transforms code into a
+  dramatic story with characters, conflict, and emotional arc.
+tone: Lyrical, evocative, and dramatic. Write as if describing a novel&#39;s
+  setting and characters. Use vivid metaphors and literary devices.
+voice_id: &quot;EXAVITQu4vr4xnSDxMaL&quot;
+voice_params:
+  stability: 0.3
+  similarity_boost: 0.7
+  style: 0.8
+example_opener: |
+  In the vast digital landscape, there existed a repository that dared
+  to dream in a language most could not speak...</code></pre>
+<p>Notice the voice parameter differences. Documentary uses high
+stability (0.7) and low style (0.3) – controlled, authoritative
+delivery. Fiction drops stability to 0.3 and cranks style to 0.8 – more
+expressive, more emotional range. These are not arbitrary numbers. They
+map directly to ElevenLabs’ voice synthesis parameters that control how
+much freedom the TTS model has in its delivery.</p>
+<p>Here is the decision tree for choosing a style:</p>
+<pre class="mermaid"><code>flowchart TD
+    START[&quot;Choose Narrative Style\nfor Repository&quot;] --&gt; Q1{&quot;What is the\nprimary audience?&quot;}
+
+    Q1 --&gt;|&quot;Technical engineers\nevaluating adoption&quot;| Q_TECH{&quot;Depth\npreference?&quot;}
+    Q_TECH --&gt;|&quot;Dense, precise,\nno fluff&quot;| TECHNICAL[&quot;technical\n\nstability: 0.9\nsimilarity: 0.9\nstyle: 0.0\n\nVoice: Authoritative\nSections: Overview,\nArchitecture, API,\nPerformance&quot;]
+    Q_TECH --&gt;|&quot;Step-by-step\neducational&quot;| TUTORIAL[&quot;tutorial\n\nstability: 0.8\nsimilarity: 0.9\nstyle: 0.1\n\nVoice: Patient, warm\nSections: Prerequisites,\nCore Concepts, Deep Dive,\nHands-On Patterns&quot;]
+
+    Q1 --&gt;|&quot;Executive / leadership\nnon-technical&quot;| EXECUTIVE[&quot;executive\n\nstability: 0.8\nsimilarity: 0.9\nstyle: 0.2\n\nVoice: Crisp, action-oriented\nSections: Exec Summary,\nKey Metrics, Risk Assessment,\nRecommendations&quot;]
+
+    Q1 --&gt;|&quot;General developer\ncommunity&quot;| Q_TONE{&quot;Preferred\ntone?&quot;}
+    Q_TONE --&gt;|&quot;Casual, fun,\nhot takes&quot;| PODCAST[&quot;podcast\n\nstability: 0.5\nsimilarity: 0.7\nstyle: 0.6\n\nVoice: Enthusiastic\nSections: The Hook,\nFirst Impressions,\nDeep Dive, Hot Takes&quot;]
+    Q_TONE --&gt;|&quot;Dramatic,\nstory-driven&quot;| Q_DRAMA{&quot;Narrative\nstructure?&quot;}
+    Q_TONE --&gt;|&quot;Balanced,\nanalytical&quot;| Q_FORMAT{&quot;Preferred\nformat?&quot;}
+
+    Q_DRAMA --&gt;|&quot;Hero&#39;s journey\nepic quest&quot;| STORYTELLING[&quot;storytelling\n\nstability: 0.4\nsimilarity: 0.7\nstyle: 0.7\n\nVoice: Epic, inspiring\nSections: Once Upon a Time,\nCall to Adventure,\nThe Journey, Breakthrough,\nThe Legacy&quot;]
+    Q_DRAMA --&gt;|&quot;Literary fiction\ncharacters + conflict&quot;| FICTION[&quot;fiction\n\nstability: 0.3\nsimilarity: 0.7\nstyle: 0.8\n\nVoice: Lyrical, evocative\nSections: The World,\nThe Characters,\nThe Conflict,\nThe Resolution&quot;]
+    Q_DRAMA --&gt;|&quot;Nature documentary\nAttenborough-style&quot;| DOCUMENTARY[&quot;documentary\n\nstability: 0.7\nsimilarity: 0.8\nstyle: 0.3\n\nVoice: Measured, awestruck\nSections: The Ecosystem,\nThe Inhabitants,\nThe Behavior,\nThe Future&quot;]
+
+    Q_FORMAT --&gt;|&quot;Expert Q&amp;A\nconversational&quot;| INTERVIEW[&quot;interview\n\nstability: 0.7\nsimilarity: 0.8\nstyle: 0.4\n\nVoice: Inquisitive, warm\nSections: Introduction,\nBackground, Architecture,\nDesign Decisions,\nFuture Direction&quot;]
+    Q_FORMAT --&gt;|&quot;Pro/con\nstructured argument&quot;| DEBATE[&quot;debate\n\nstability: 0.6\nsimilarity: 0.7\nstyle: 0.5\n\nVoice: Rigorous, balanced\nSections: Opening Statements,\nCase For, Case Against,\nCross-Examination,\nClosing Arguments&quot;]
+
+    subgraph VOICE_PARAMS[&quot;ElevenLabs Voice Parameter Guide&quot;]
+        direction LR
+        VP_STAB[&quot;stability\n0.0 = expressive, variable\n1.0 = consistent, controlled&quot;]
+        VP_SIM[&quot;similarity_boost\n0.0 = diverse\n1.0 = faithful to voice&quot;]
+        VP_STY[&quot;style\n0.0 = neutral delivery\n1.0 = dramatic, emotional&quot;]
+    end
+
+    style TECHNICAL fill:#111,stroke:#4dacde,color:#fff
+    style TUTORIAL fill:#111,stroke:#4dacde,color:#fff
+    style EXECUTIVE fill:#111,stroke:#e050b0,color:#fff
+    style PODCAST fill:#111,stroke:#22c55e,color:#fff
+    style STORYTELLING fill:#111,stroke:#f59e0b,color:#fff
+    style FICTION fill:#111,stroke:#f59e0b,color:#fff
+    style DOCUMENTARY fill:#111,stroke:#f59e0b,color:#fff
+    style INTERVIEW fill:#111,stroke:#22c55e,color:#fff
+    style DEBATE fill:#111,stroke:#22c55e,color:#fff
+    style VOICE_PARAMS fill:#1a1a1a,stroke:#606060,color:#a0a0a0</code></pre>
+<h3 id="the-full-roster">The Full Roster</h3>
+<p>Each style defines not just a tone, but a complete <strong>section
+structure</strong> that guides Claude’s output. Here is every style with
+its voice parameters and structure:</p>
+<table>
+<colgroup>
+<col style="width: 12%" />
+<col style="width: 19%" />
+<col style="width: 21%" />
+<col style="width: 12%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Style</th>
+<th>Stability</th>
+<th>Similarity</th>
+<th>Style</th>
+<th>Structure Template</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>technical</strong></td>
+<td>0.9</td>
+<td>0.9</td>
+<td>0.0</td>
+<td>Overview, Architecture, Implementation, API Surface, Performance,
+Conclusion</td>
+</tr>
+<tr>
+<td><strong>tutorial</strong></td>
+<td>0.8</td>
+<td>0.9</td>
+<td>0.1</td>
+<td>Prerequisites, Getting Started, Core Concepts, Deep Dive, Hands-On
+Patterns, Next Steps</td>
+</tr>
+<tr>
+<td><strong>executive</strong></td>
+<td>0.8</td>
+<td>0.9</td>
+<td>0.2</td>
+<td>Executive Summary, Key Metrics, Architecture Overview, Risk
+Assessment, Recommendations</td>
+</tr>
+<tr>
+<td><strong>documentary</strong></td>
+<td>0.7</td>
+<td>0.8</td>
+<td>0.3</td>
+<td>The Ecosystem, The Inhabitants, The Behavior, The Future</td>
+</tr>
+<tr>
+<td><strong>interview</strong></td>
+<td>0.7</td>
+<td>0.8</td>
+<td>0.4</td>
+<td>Introduction, Background Q&amp;A, Architecture Deep Dive, Design
+Decisions, Future Direction</td>
+</tr>
+<tr>
+<td><strong>debate</strong></td>
+<td>0.6</td>
+<td>0.7</td>
+<td>0.5</td>
+<td>Opening Statements, Case For, Case Against, Cross-Examination,
+Closing Arguments</td>
+</tr>
+<tr>
+<td><strong>podcast</strong></td>
+<td>0.5</td>
+<td>0.7</td>
+<td>0.6</td>
+<td>The Hook, First Impressions, Deep Dive, Hot Takes</td>
+</tr>
+<tr>
+<td><strong>storytelling</strong></td>
+<td>0.4</td>
+<td>0.7</td>
+<td>0.7</td>
+<td>Once Upon a Time, Call to Adventure, The Journey, The Breakthrough,
+The Legacy</td>
+</tr>
+<tr>
+<td><strong>fiction</strong></td>
+<td>0.3</td>
+<td>0.7</td>
+<td>0.8</td>
+<td>The World, The Characters, The Conflict, The Resolution</td>
+</tr>
+</tbody>
+</table>
+<p>Look at the stability column. It goes from 0.9 (technical – robotic
+consistency) down to 0.3 (fiction – maximum expressiveness). And the
+style column goes from 0.0 (technical – zero dramatic flair) to 0.8
+(fiction – maximum dramatic flair). These two parameters create a
+diagonal from “authoritative lecture” to “dramatic performance.”</p>
+<h4 id="what-the-same-repo-sounds-like-in-different-styles">What the
+Same Repo Sounds Like in Different Styles</h4>
+<p>To make this concrete, here is what the opening of a FastAPI
+narration sounds like across three styles:</p>
+<p><strong>Documentary:</strong> “Here we observe a remarkable specimen
+of software engineering, quietly going about its work in the digital
+wilderness. FastAPI – a creature of extraordinary speed and elegance –
+has carved out a niche in the Python ecosystem that few could have
+predicted. With 47.3 percent of its codebase written in Python and a
+dependency tree rooted in Starlette and Pydantic, this framework has
+evolved mechanisms for automatic API documentation that border on the
+miraculous.”</p>
+<p><strong>Podcast:</strong> “Hey everyone, welcome back! So I have been
+digging into this really interesting repo this week and honestly, I had
+to record an episode about it. FastAPI. You have probably heard the name
+thrown around a lot lately. Twenty-three thousand lines of Python, and
+the thing that blew my mind? It generates OpenAPI docs automatically
+from your type hints. Like, you just write normal Python and it figures
+out the API schema. Let me walk you through how it actually does
+that.”</p>
+<p><strong>Executive:</strong> “FastAPI is a high-performance Python web
+framework with 23,000 lines of code, 12 direct dependencies, and
+automatic API documentation generation. Key metrics: 47 percent Python,
+REST API and CLI Tool architectural patterns detected, comprehensive
+test suite present. Risk assessment: dependency on Starlette and
+Pydantic creates a two-node critical chain. Recommendation: suitable for
+production API workloads with the caveat that the async-first design
+requires team familiarity with Python’s asyncio ecosystem.”</p>
+<p>Same data. Same repository. Three completely different experiences.
+The documentary makes you feel like you are watching a nature film. The
+podcast makes you feel like you are chatting with a friend. The
+executive gives you a boardroom-ready summary.</p>
+<h4 id="additional-styles-in-depth">Additional Styles in Depth</h4>
+<p>The podcast style captures a completely different register:</p>
+<pre class="yaml"><code># From: src/code_tales/styles/podcast.yaml
+
+name: podcast
+tone: Casual, enthusiastic, and opinionated. Sound like you&#39;ve actually
+  used this project and have genuine thoughts. Use filler phrases
+  naturally. Share hot takes.
+voice_params:
+  stability: 0.5
+  similarity_boost: 0.7
+  style: 0.6
+example_opener: |
+  Hey everyone, welcome back! So I&#39;ve been digging into this really
+  interesting repo this week and honestly, I had to record an
+  episode about it...</code></pre>
+<p>And the storytelling style frames the repository as a hero’s
+journey:</p>
+<pre class="yaml"><code># From: src/code_tales/styles/storytelling.yaml
+
+name: storytelling
+description: A hero&#39;s journey narrative that frames the repository
+  as an epic tale of problem-solving, discovery, and triumph.
+tone: Epic, inspiring, and emotionally resonant. Frame software
+  development as a heroic quest. Celebrate the builders.
+voice_params:
+  stability: 0.4
+  similarity_boost: 0.7
+  style: 0.7
+example_opener: |
+  Every great piece of software begins with a problem that someone
+  refused to ignore -- a gap between how the world worked and how
+  it could work...</code></pre>
+<p>The debate style is particularly interesting for technical
+evaluation. It forces Claude to argue both for and against adopting the
+repository, creating a balanced perspective that a single-narrative
+style cannot achieve:</p>
+<pre class="yaml"><code># From: src/code_tales/styles/debate.yaml
+
+name: debate
+description: A structured debate examining the repository from multiple
+  angles, with arguments for and against its design decisions.
+tone: Rigorous, balanced, and intellectually honest. Present the
+  strongest case for both sides. Let the listener decide.
+voice_params:
+  stability: 0.6
+  similarity_boost: 0.7
+  style: 0.5</code></pre>
+<p>The style system is extensible via YAML. Drop a new
+<code>.yaml</code> file in the styles directory – or load one from any
+path at runtime – and you have a new narrative voice. The companion repo
+includes a full example of a custom “noir detective” style:</p>
+<pre class="yaml"><code># From: examples/custom-style.yaml
+
+name: noir
+description: A hard-boiled detective noir narration that treats code
+  investigation like a gritty crime scene examination.
+tone: Cynical, world-weary, and poetic in a gritty way. Use short,
+  punchy sentences. Noir metaphors abound.
+voice_id: &quot;2EiwWnXFnvU5JabPnv8n&quot;
+voice_params:
+  stability: 0.6
+  similarity_boost: 0.75
+  style: 0.4
+example_opener: |
+  It was a dark and stormy deployment. I&#39;d been in this business
+  long enough to know that no codebase is innocent...</code></pre>
+<p>The style registry handles loading, validation, and lookup:</p>
+<pre class="python"><code># From: src/code_tales/styles/registry.py
+
+class StyleRegistry:
+    def load_builtin_styles(self) -&gt; dict[str, StyleConfig]:
+        yaml_files = sorted(_STYLES_DIR.glob(&quot;*.yaml&quot;))
+        for yaml_file in yaml_files:
+            style = self._load_yaml(yaml_file)
+            self._styles[style.name] = style
+        return self._styles
+
+    def get_style(self, name: str) -&gt; StyleConfig:
+        if name not in self._styles:
+            available = &quot;, &quot;.join(sorted(self._styles.keys()))
+            raise KeyError(
+                f&quot;Style &#39;{name}&#39; not found. Available styles: {available}&quot;
+            )
+        return self._styles[name]
+
+    def load_custom_style(self, path: Path) -&gt; StyleConfig:
+        if not path.exists():
+            raise FileNotFoundError(f&quot;Custom style file not found: {path}&quot;)
+        style = self._load_yaml(path)
+        self._styles[style.name] = style
+        return style</code></pre>
+<p>Every style YAML must include five required fields:
+<code>name</code>, <code>description</code>, <code>tone</code>,
+<code>structure_template</code>, and <code>voice_id</code>. The
+<code>voice_params</code> dict and <code>example_opener</code> are
+optional. The registry validates on load and gives clear errors if
+fields are missing.</p>
+<hr />
+<h3 id="stage-3-the-narration-engine">Stage 3: The Narration Engine</h3>
+<p>The narration stage builds a detailed prompt from the analysis data
+and sends it to Claude’s streaming API. The system message sets the
+narrative voice with explicit rules for audio-optimized writing:</p>
+<pre class="python"><code># From: src/code_tales/pipeline/narrate.py
+
+def _build_system_message(style: StyleConfig) -&gt; str:
+    return f&quot;&quot;&quot;You are a creative writer crafting an audio narration script.
+
+Your narrative style: {style.name}
+Tone: {style.tone}
+
+CRITICAL FORMATTING RULES:
+1. Structure your response using markdown headings (## Section Name).
+2. Add voice directions in [brackets] (e.g., [speak slowly], [with enthusiasm]).
+3. Write for audio -- avoid bullet points, tables, and markdown formatting.
+4. Use natural speech patterns, contractions, and flowing sentences.
+5. Each section should be 1-3 paragraphs of spoken text.
+6. Do NOT include any preamble -- begin directly with the first section.
+7. Make the content engaging and specific to this actual repository.
+8. Opening line should be compelling and draw the listener in immediately.&quot;&quot;&quot;</code></pre>
+<p>The user prompt includes the full repository analysis – languages,
+dependencies, frameworks, patterns, file tree, README excerpt, and the
+style’s structure template. This is the moment where the analysis engine
+pays off. Claude receives structured data like “47.3% Python, 12
+dependencies including FastAPI and Pydantic, REST API + CLI Tool
+patterns detected, 23,000 lines across 145 files” and turns it into
+flowing narration.</p>
+<pre class="python"><code># From: src/code_tales/pipeline/narrate.py
+
+with client.messages.stream(
+    model=config.claude_model,
+    max_tokens=config.max_script_tokens,
+    system=system_message,
+    messages=[{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: prompt}],
+) as stream:
+    raw_text = stream.get_final_message().content[0].text</code></pre>
+<p>Streaming prevents HTTP timeouts on long scripts. The error handling
+wraps four specific Anthropic exceptions –
+<code>AuthenticationError</code>, <code>RateLimitError</code>,
+<code>APIConnectionError</code>, and <code>APIStatusError</code> – each
+producing a clear error message rather than a raw stack trace.</p>
+<p>The parser then splits Claude’s response on markdown headings,
+extracts voice directions from bracketed text (like
+<code>[speak slowly]</code> or <code>[with enthusiasm]</code>), and
+strips formatting artifacts:</p>
+<pre class="python"><code># From: src/code_tales/pipeline/narrate.py
+
+def _clean_content(content: str) -&gt; str:
+    # Remove bold/italic markers
+    content = re.sub(r&quot;\*\*([^*]+)\*\*&quot;, r&quot;\1&quot;, content)
+    content = re.sub(r&quot;\*([^*]+)\*&quot;, r&quot;\1&quot;, content)
+    # Remove inline code backticks
+    content = re.sub(r&quot;`([^`]+)`&quot;, r&quot;\1&quot;, content)
+    # Remove code blocks
+    content = re.sub(r&quot;```[\s\S]*?```&quot;, &quot;&quot;, content)
+    # Remove underscore-based formatting
+    content = re.sub(r&quot;__([^_]+)__&quot;, r&quot;\1&quot;, content)
+    content = re.sub(r&quot;_([^_]+)_&quot;, r&quot;\1&quot;, content)
+    return content.strip()</code></pre>
+<p>This is one of those details that seems trivial but matters
+enormously. If you leave markdown formatting in the text that goes to
+TTS, the synthesized audio sounds wrong. Asterisks create unnatural
+pauses. Backticks confuse the speech model. The cleaning step bridges
+two fundamentally different output modalities.</p>
+<p>The parser also calculates word count and estimated duration using a
+150 words-per-minute speaking pace. A typical script runs 500-1500 words
+(3-10 minutes of audio). The duration estimate is displayed in the CLI
+output so you know what to expect before synthesis begins.</p>
+<hr />
+<h3 id="stage-4-the-audio-synthesis-layer">Stage 4: The Audio Synthesis
+Layer</h3>
+<p>ElevenLabs integration includes retry logic with exponential backoff,
+per-style voice selection, and graceful degradation to text-only
+output:</p>
+<pre class="mermaid"><code>sequenceDiagram
+    participant CLI as code-tales CLI
+    participant PIPE as CodeTalesPipeline
+    participant SYNTH as synthesize.py
+    participant API as ElevenLabs API
+    participant FS as Filesystem
+
+    CLI-&gt;&gt;PIPE: pipeline.generate(repo, style)
+    Note over PIPE: Stages 1-3 complete:&lt;br/&gt;RepoAnalysis + NarrationScript ready
+
+    PIPE-&gt;&gt;SYNTH: synthesize_audio(script, style, output_path, config)
+
+    rect rgb(26, 26, 46)
+        Note over SYNTH: Always save text first
+        SYNTH-&gt;&gt;FS: save_text_output(script, path.md)
+        FS--&gt;&gt;SYNTH: text_path
+        Note over FS: # Documentary Story: FastAPI&lt;br/&gt;**Style:** documentary&lt;br/&gt;**Words:** 1,247&lt;br/&gt;**Duration:** 8m 18s&lt;br/&gt;---&lt;br/&gt;## The Ecosystem&lt;br/&gt;*[Voice: speak slowly]*&lt;br/&gt;Here we observe a remarkable...
+    end
+
+    alt No ELEVENLABS_API_KEY
+        SYNTH--&gt;&gt;PIPE: return text_path (text-only mode)
+    else API key configured
+        rect rgb(26, 26, 46)
+            Note over SYNTH: Build TTS-optimized text
+            SYNTH-&gt;&gt;SYNTH: _build_tts_text(script)
+            Note over SYNTH: For each section:&lt;br/&gt;1. Append &quot;heading.&quot;&lt;br/&gt;2. Append content&lt;br/&gt;3. Join with &quot;\n\n&quot;&lt;br/&gt;(paragraph pause)
+        end
+
+        rect rgb(46, 26, 26)
+            Note over SYNTH: Select voice from style config
+            Note over SYNTH: documentary -&gt; onwK4e9ZLuTAKqWW03F9&lt;br/&gt;stability: 0.7&lt;br/&gt;similarity_boost: 0.8&lt;br/&gt;style: 0.3&lt;br/&gt;speaker_boost: true
+        end
+
+        SYNTH-&gt;&gt;API: POST /v1/text-to-speech/{voice_id}
+        Note over API: Headers:&lt;br/&gt;xi-api-key: ***&lt;br/&gt;Content-Type: application/json&lt;br/&gt;Accept: audio/mpeg&lt;br/&gt;&lt;br/&gt;Body:&lt;br/&gt;model_id: eleven_multilingual_v2&lt;br/&gt;voice_settings: {stability, similarity, style}&lt;br/&gt;output_format: mp3_44100_128&lt;br/&gt;text: &quot;The Ecosystem. Here we observe...&quot;
+
+        alt 200 OK
+            API--&gt;&gt;SYNTH: audio bytes (MP3)
+            SYNTH-&gt;&gt;FS: output_path.write_bytes(audio)
+            Note over FS: fastapi-documentary.mp3&lt;br/&gt;(~2.4 MB for 8 min audio)
+            FS--&gt;&gt;SYNTH: audio_path
+            SYNTH--&gt;&gt;PIPE: return audio_path
+
+        else 429 Rate Limited
+            API--&gt;&gt;SYNTH: 429 Too Many Requests
+            Note over SYNTH: Attempt 1/3&lt;br/&gt;Delay: 1.0s
+            SYNTH-&gt;&gt;SYNTH: time.sleep(1.0)
+            SYNTH-&gt;&gt;API: POST /v1/text-to-speech/{voice_id} (retry)
+
+            alt 200 OK on retry
+                API--&gt;&gt;SYNTH: audio bytes
+                SYNTH-&gt;&gt;FS: write audio
+                SYNTH--&gt;&gt;PIPE: return audio_path
+            else Still failing
+                Note over SYNTH: All 3 attempts failed&lt;br/&gt;Graceful degradation
+                SYNTH--&gt;&gt;PIPE: return text_path (fallback)
+            end
+
+        else 401 Unauthorized
+            API--&gt;&gt;SYNTH: 401 Invalid API Key
+            SYNTH--&gt;&gt;SYNTH: raise RuntimeError
+            Note over SYNTH: Log error, return text_path
+            SYNTH--&gt;&gt;PIPE: return text_path (fallback)
+        end
+    end
+
+    PIPE-&gt;&gt;PIPE: Build AudioOutput
+    Note over PIPE: AudioOutput(&lt;br/&gt;  script=NarrationScript,&lt;br/&gt;  audio_path=*.mp3 or None,&lt;br/&gt;  text_path=*.md,&lt;br/&gt;  style=&quot;documentary&quot;,&lt;br/&gt;  generated_at=datetime.utcnow()&lt;br/&gt;)
+    PIPE--&gt;&gt;CLI: return AudioOutput
+    Note over CLI: Rich console output:&lt;br/&gt;Story generated!&lt;br/&gt;Script: output/fastapi-documentary.md&lt;br/&gt;Audio: output/fastapi-documentary.mp3&lt;br/&gt;Style: documentary | Words: 1,247 | Duration: 8m 18s</code></pre>
+<p>The API call itself sends the full TTS text as a single request:</p>
+<pre class="python"><code># From: src/code_tales/pipeline/synthesize.py
+
+payload = {
+    &quot;text&quot;: text,
+    &quot;model_id&quot;: &quot;eleven_multilingual_v2&quot;,
+    &quot;voice_settings&quot;: {
+        &quot;stability&quot;: voice_params.get(&quot;stability&quot;, 0.5),
+        &quot;similarity_boost&quot;: voice_params.get(&quot;similarity_boost&quot;, 0.75),
+        &quot;style&quot;: voice_params.get(&quot;style&quot;, 0.0),
+        &quot;use_speaker_boost&quot;: True,
+    },
+    &quot;output_format&quot;: &quot;mp3_44100_128&quot;,
+}
+
+for attempt in range(_MAX_RETRIES):
+    with httpx.Client(timeout=120.0) as client:
+        response = client.post(url, json=payload, headers=headers)
+    if response.status_code == 200:
+        return response.content
+    if response.status_code == 429:
+        delay = _RETRY_BASE_DELAY * (2 ** attempt)
+        time.sleep(delay)
+        continue</code></pre>
+<p>The text output is always generated regardless of whether audio
+synthesis succeeds. If you do not have an ElevenLabs API key, you still
+get a complete narration script as markdown. This is a deliberate design
+choice: the narration itself – Claude’s written story about the codebase
+– has value even without audio.</p>
+<h3 id="cost-per-story">Cost per Story</h3>
+<p>Here is a rough breakdown for a typical code-tales run against a
+mid-size repository:</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Cost</th>
+<th>Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Clone (shallow, depth=1)</td>
+<td>Free</td>
+<td>2-5s</td>
+</tr>
+<tr>
+<td>Analysis (local, no API)</td>
+<td>Free</td>
+<td>1-3s</td>
+</tr>
+<tr>
+<td>Claude narration (~1000 words)</td>
+<td>~$0.02-0.05</td>
+<td>5-15s</td>
+</tr>
+<tr>
+<td>ElevenLabs TTS (~1000 words)</td>
+<td>~$0.10-0.30</td>
+<td>10-30s</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>~$0.12-0.35</strong></td>
+<td><strong>~20-55s</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The narration is cheap. The TTS is where the cost lives. If you are
+iterating on styles or prompts, use <code>--no-audio</code> to skip
+synthesis until you are happy with the script. A full iteration cycle
+(clone, analyze, narrate, read script, adjust style, narrate again)
+costs under $0.10 when you skip audio. Only synthesize when you are
+satisfied with the text.</p>
+<p>For batch runs across many repositories (say, evaluating 20 repos for
+a technology assessment), the costs add up. Twenty documentary-style
+stories at $0.25 each is $5.00. That is less than the cost of one
+engineer spending an afternoon skimming README files – and the audio
+output is more comprehensive.</p>
+<hr />
+<h3 id="the-audio-debugging-saga">The Audio Debugging Saga</h3>
+<p>Code-tales was built using the parallel AI development patterns
+described earlier in this series. 636 commits across 90 worktree
+branches. 91 specification documents. 37 validation gates.</p>
+<p>The audio debugging saga deserves special mention because it
+illustrates a class of bugs unique to cross-modality pipelines.</p>
+<p><strong>Bug 1: The Missing Pauses.</strong> When sections were
+concatenated for TTS, the natural pause markers between sections were
+being dropped during the markdown cleaning step. This produced audio
+where one section ran directly into the next without any breathing room.
+You would hear “The Future. Here we observe a remarkable” – the end of
+one section slamming into the start of the next.</p>
+<p>Nine commits to diagnose and fix. The root cause: the cleaning step
+was stripping all extra whitespace, including the paragraph breaks that
+ElevenLabs uses as natural pause cues. The fix was to build the TTS text
+separately from the display text, preserving paragraph breaks as natural
+pauses:</p>
+<pre class="python"><code># From: src/code_tales/pipeline/synthesize.py
+
+_PAUSE_BETWEEN_SECTIONS = &quot;\n\n&quot;  # Natural paragraph break for TTS
+
+def _build_tts_text(script: NarrationScript) -&gt; str:
+    parts: list[str] = []
+    for section in script.sections:
+        parts.append(section.heading + &quot;.&quot;)
+        parts.append(section.content)
+    return _PAUSE_BETWEEN_SECTIONS.join(parts)</code></pre>
+<p>Simple in retrospect. Nine commits to arrive at two newline
+characters. That is debugging audio pipelines for you.</p>
+<p><strong>Bug 2: The Heading Period.</strong> Section headings were
+being sent to TTS without trailing punctuation. “The Ecosystem” was
+spoken as a confused fragment – the voice trailed off as if expecting
+more text. Adding a period after each heading
+(<code>section.heading + "."</code>) gave the TTS engine a clear
+sentence boundary. The voice drops naturally, pauses, then begins the
+next paragraph.</p>
+<p>This was a two-line fix that took four commits to discover. The
+initial hypothesis was that the voice model was confused by short text
+segments. Then we tried adding a colon instead of a period – that
+produced a rising intonation, like the heading was a question. The
+period produced the definitive dropping tone we wanted. Punctuation is a
+design surface in audio pipelines.</p>
+<p><strong>Bug 3: The Asterisk Stutter.</strong> When Claude’s output
+included <code>**bold text**</code>, the cleaning regex was supposed to
+strip the asterisks. But for nested formatting like
+<code>***bold italic***</code>, the regex matched incorrectly, leaving
+stray asterisks in the TTS text. ElevenLabs interprets standalone
+asterisks as a brief glottal stop – like a tiny hiccup in the audio. The
+fix: process double-star markers before single-star, and add
+underscore-based markers (<code>__bold__</code>, <code>_italic_</code>)
+to the cleaning list.</p>
+<p><strong>Bug 4: The Code Block Whisper.</strong> This one was
+insidious. Occasionally, Claude would include a short code snippet in
+its narration despite the system message explicitly saying “no code
+blocks.” The cleaning regex stripped the triple-backtick fences but left
+the code content. When ElevenLabs encountered something like “def main
+colon return zero” it would speak each word with equal emphasis,
+producing a flat, robotic stretch of audio embedded in an otherwise
+natural narration. The fix was twofold: strengthen the system message
+(“NEVER include code blocks, function signatures, or variable names in
+backticks”) and add a fallback cleaning step that detects remaining
+code-like patterns and removes them.</p>
+<p><strong>Bug 5: The Encoding Surprise.</strong> Some README files
+contain non-ASCII characters – em dashes, curly quotes, accented
+letters. The ElevenLabs API handles these fine, but the intermediate
+text processing was converting them to ASCII replacements. An em dash
+became “–”, curly quotes became straight quotes, and accented letters
+became their unaccented versions. For documentary-style narration this
+was barely noticeable. For fiction-style narration – where tone and
+rhythm matter – it flattened the voice’s expressiveness. The fix was
+ensuring UTF-8 encoding throughout the entire pipeline, with explicit
+<code>encoding="utf-8"</code> on every file read and write.</p>
+<p>Each of these bugs was invisible when reading the script text. They
+only manifested as audio artifacts. This is the fundamental challenge of
+cross-modality pipelines: your QA process must include listening to the
+output, not just reading it. We ended up creating a “listening gate” in
+the validation pipeline: after generating a story, a human reviewer
+listens to the first 30 seconds and the last 30 seconds, checking for
+unnatural pauses, stutters, flat delivery, or encoding artifacts.</p>
+<hr />
+<h3 id="building-your-own-code-narrator-step-by-step">Building Your Own
+Code Narrator: Step-by-Step</h3>
+<p>Here is how to go from zero to a working code-tales installation:</p>
+<p><strong>Step 1: Install</strong></p>
+<pre class="bash"><code>git clone https://github.com/krzemienski/code-tales.git
+cd code-tales
+pip install -e .</code></pre>
+<p><strong>Step 2: Set API keys</strong></p>
+<pre class="bash"><code># Required: Claude for narration
+export ANTHROPIC_API_KEY=&quot;sk-ant-...&quot;
+
+# Optional: ElevenLabs for audio synthesis
+export ELEVENLABS_API_KEY=&quot;xi-...&quot;</code></pre>
+<p><strong>Step 3: Generate your first story</strong></p>
+<pre class="bash"><code># With audio
+code-tales generate --repo https://github.com/tiangolo/fastapi --style documentary
+
+# Text only (no ElevenLabs key needed)
+code-tales generate --repo https://github.com/tiangolo/fastapi --style podcast --no-audio
+
+# Local repository
+code-tales generate --path ./my-project --style technical</code></pre>
+<p><strong>Step 4: Preview without synthesis</strong></p>
+<pre class="bash"><code># Prints the narration script to stdout — great for iteration
+code-tales preview --repo https://github.com/django/django --style executive</code></pre>
+<p><strong>Step 5: List available styles</strong></p>
+<pre class="bash"><code>code-tales list-styles</code></pre>
+<p>This prints a Rich table with all 9 styles, their descriptions, tone
+summaries, and voice IDs.</p>
+<p><strong>Step 6: Create a custom style</strong></p>
+<p>Create a YAML file anywhere on disk:</p>
+<pre class="yaml"><code># my-custom-style.yaml
+name: noir
+description: Hard-boiled detective narration of code investigation.
+tone: Cynical, world-weary, punchy sentences.
+structure_template: |
+  ## {repo_name}: A Case File
+  ## The Scene
+  ## The Evidence
+  ## The Suspects
+  ## The Verdict
+voice_id: &quot;2EiwWnXFnvU5JabPnv8n&quot;
+voice_params:
+  stability: 0.6
+  similarity_boost: 0.75
+  style: 0.4</code></pre>
+<p>Load it via the Python API:</p>
+<pre class="python"><code>from code_tales.styles.registry import get_registry
+
+registry = get_registry()
+registry.load_custom_style(Path(&quot;my-custom-style.yaml&quot;))</code></pre>
+<p>Or drop it in <code>src/code_tales/styles/</code> and it will be
+picked up automatically.</p>
+<p><strong>Step 7: Configure for your workflow</strong></p>
+<p>All configuration flows through environment variables via a Pydantic
+config model:</p>
+<pre class="python"><code># From: src/code_tales/config.py
+
+class CodeTalesConfig(BaseModel):
+    anthropic_api_key: Optional[str] = None
+    elevenlabs_api_key: Optional[str] = None
+    output_dir: Path = Field(default_factory=lambda: Path(&quot;./output&quot;))
+    clone_depth: int = 1
+    max_files_to_analyze: int = 100
+    max_file_size_bytes: int = 100_000
+    claude_model: str = &quot;claude-sonnet-4-6&quot;
+    max_script_tokens: int = 4096</code></pre>
+<p>Every field has a sensible default. The <code>from_env()</code>
+classmethod reads environment variables with <code>CODE_TALES_</code>
+prefixes for all non-API-key settings, so you can tune behavior without
+touching code:</p>
+<pre class="bash"><code># Analyze more files (default: 100)
+export CODE_TALES_MAX_FILES=200
+
+# Allow larger files (default: 100KB)
+export CODE_TALES_MAX_FILE_SIZE=500000
+
+# Use a different Claude model
+export CODE_TALES_MODEL=&quot;claude-opus-4-6&quot;
+
+# Generate longer scripts
+export CODE_TALES_MAX_TOKENS=8192</code></pre>
+<hr />
+<h3 id="quality-control-accuracy-and-engagement">Quality Control:
+Accuracy and Engagement</h3>
+<p>The biggest risk in automated narration is hallucination. Claude
+might invent features, miscount files, or describe patterns that do not
+exist. The analysis engine is the primary defense: by feeding Claude
+quantified data rather than raw source code, we constrain the space of
+plausible narration.</p>
+<p>But defense in depth matters. Here are the quality checks built into
+the pipeline:</p>
+<ol type="1">
+<li><p><strong>Data grounding.</strong> The prompt explicitly includes
+file counts, language percentages, dependency names, and detected
+patterns. Claude is instructed to narrate from this data, not from
+general knowledge about similar projects.</p></li>
+<li><p><strong>Structure templates.</strong> Each style’s section
+structure forces Claude to cover specific topics. The executive style
+must include “Key Metrics” – you cannot skip the numbers. The technical
+style must include “Performance Characteristics” – you cannot hand-wave
+about speed.</p></li>
+<li><p><strong>Word count limits.</strong>
+<code>max_script_tokens = 4096</code> caps the narration length. This
+prevents the rambling that happens when Claude has unlimited space.
+Constraints produce tighter, more engaging scripts.</p></li>
+<li><p><strong>Human preview.</strong> The <code>preview</code> command
+lets you read the script before paying for TTS synthesis. Read it, check
+the claims against the repo, iterate on the style if needed.</p></li>
+<li><p><strong>Cross-referencing.</strong> For high-stakes narrations
+(executive briefings that will inform adoption decisions), run the same
+repo through two different styles and compare the factual claims. If
+documentary says “12 dependencies” and executive says “15 dependencies,”
+something is wrong and you should investigate.</p></li>
+<li><p><strong>The listening gate.</strong> After generating audio, a
+human reviewer listens to the first 30 seconds and the last 30 seconds.
+This catches encoding artifacts, unnatural pauses, flat delivery from
+leaked code snippets, and heading transitions that sound like sentence
+fragments. You cannot QA audio by reading the script – the bugs are in
+the transition between modalities.</p></li>
+<li><p><strong>Deterministic analysis.</strong> The analysis stage uses
+zero randomness. Given the same repository at the same commit, the
+analysis output is identical. This means you can diff analysis outputs
+across runs to verify that changes to the analysis engine do not alter
+the data that feeds narration. Non-deterministic analysis would make
+quality control impossible at scale.</p></li>
+</ol>
+<p>The engagement side is handled by the style system. The tone
+directives, structure templates, and example openers give Claude enough
+guidance to produce genuinely different narrative experiences. A
+documentary about FastAPI sounds nothing like a podcast about FastAPI,
+which sounds nothing like a noir detective investigation of FastAPI.
+Same data, completely different listening experiences.</p>
+<hr />
+<h3 id="batch-processing-and-ci-integration">Batch Processing and CI
+Integration</h3>
+<p>Single-repo narration is useful, but the real power emerges when you
+process repositories in batch. Technology evaluations, dependency
+audits, and onboarding playlists all involve generating narrations for
+multiple repositories at once.</p>
+<p>The batch interface accepts a JSON manifest:</p>
+<pre class="json"><code>{
+  &quot;batch_id&quot;: &quot;q1-2025-dependency-audit&quot;,
+  &quot;output_dir&quot;: &quot;./audit-output&quot;,
+  &quot;default_style&quot;: &quot;executive&quot;,
+  &quot;repositories&quot;: [
+    {
+      &quot;url&quot;: &quot;https://github.com/prisma/prisma&quot;,
+      &quot;styles&quot;: [&quot;executive&quot;, &quot;technical&quot;]
+    },
+    {
+      &quot;url&quot;: &quot;https://github.com/drizzle-team/drizzle-orm&quot;,
+      &quot;styles&quot;: [&quot;executive&quot;, &quot;technical&quot;]
+    },
+    {
+      &quot;url&quot;: &quot;https://github.com/kysely-org/kysely&quot;,
+      &quot;styles&quot;: [&quot;executive&quot;]
+    }
+  ]
+}</code></pre>
+<p>Run it with:</p>
+<pre class="bash"><code>code-tales batch --manifest audit-manifest.json --parallel 3</code></pre>
+<p>The <code>--parallel</code> flag controls how many repositories are
+processed simultaneously. Each repository goes through the full pipeline
+(clone, analyze, narrate, synthesize) independently. The parallelism is
+at the repository level, not the stage level – this avoids overwhelming
+the Claude API with concurrent narration requests while still providing
+significant speedup.</p>
+<p>The batch output is organized by repository and style:</p>
+<pre><code>audit-output/
+  prisma/
+    executive.md
+    executive.mp3
+    technical.md
+    technical.mp3
+    analysis.json
+  drizzle-orm/
+    executive.md
+    executive.mp3
+    technical.md
+    technical.mp3
+    analysis.json
+  kysely/
+    executive.md
+    executive.mp3
+    analysis.json
+  manifest-report.json</code></pre>
+<p>The <code>manifest-report.json</code> file tracks which repositories
+succeeded, which failed, and why. This is important for large batches
+where a single clone failure or API timeout should not halt the entire
+run:</p>
+<pre class="json"><code>{
+  &quot;batch_id&quot;: &quot;q1-2025-dependency-audit&quot;,
+  &quot;total_repos&quot;: 3,
+  &quot;succeeded&quot;: 3,
+  &quot;failed&quot;: 0,
+  &quot;total_cost&quot;: &quot;$1.47&quot;,
+  &quot;total_duration&quot;: &quot;3m 42s&quot;,
+  &quot;results&quot;: [
+    {&quot;repo&quot;: &quot;prisma&quot;, &quot;status&quot;: &quot;success&quot;, &quot;styles&quot;: 2, &quot;cost&quot;: &quot;$0.62&quot;},
+    {&quot;repo&quot;: &quot;drizzle-orm&quot;, &quot;status&quot;: &quot;success&quot;, &quot;styles&quot;: 2, &quot;cost&quot;: &quot;$0.58&quot;},
+    {&quot;repo&quot;: &quot;kysely&quot;, &quot;status&quot;: &quot;success&quot;, &quot;styles&quot;: 1, &quot;cost&quot;: &quot;$0.27&quot;}
+  ]
+}</code></pre>
+<p>For CI integration, the batch command exits with code 0 only if all
+repositories succeed. Code 1 means at least one failed. This lets you
+wire code-tales into a CI pipeline that generates updated documentation
+narrations whenever a repository’s main branch changes:</p>
+<pre class="yaml"><code># .github/workflows/narrate-on-release.yml
+name: Generate narration on release
+on:
+  release:
+    types: [published]
+
+jobs:
+  narrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: &#39;3.12&#39;
+      - run: pip install code-tales
+      - run: |
+          code-tales generate \
+            --path . \
+            --style technical \
+            --no-audio \
+            --output release-notes/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: narration-script
+          path: release-notes/</code></pre>
+<p>The <code>--no-audio</code> flag in CI makes sense – you want the
+narration script generated automatically, but audio synthesis can happen
+offline where you can review the script first. Some teams generate the
+text in CI and then synthesize audio manually for the narrations they
+want to publish.</p>
+<p>For teams that want fully automated audio, add the ElevenLabs key as
+a repository secret:</p>
+<pre class="yaml"><code>      - run: |
+          code-tales generate \
+            --path . \
+            --style documentary \
+            --output release-narrations/
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}</code></pre>
+<hr />
+<h3 id="analysis-engine-internals-what-gets-measured">Analysis Engine
+Internals: What Gets Measured</h3>
+<p>The analysis stage deserves a deeper look because it determines the
+upper bound of narration quality. Every claim Claude makes in the
+narration is grounded in analysis data. If the analysis misses
+something, the narration cannot mention it. If the analysis is wrong,
+the narration propagates the error.</p>
+<p>Here is what the analyzer measures for each repository:</p>
+<p><strong>Language breakdown.</strong> Not just “Python project” but
+“47.3% Python, 12.1% JavaScript, 8.4% Shell, 32.2% other.” The
+percentages come from counting bytes per file extension, excluding
+vendored directories (<code>node_modules/</code>, <code>vendor/</code>,
+<code>.git/</code>). This gives Claude precise numbers to cite instead
+of vague characterizations.</p>
+<p><strong>Dependency graph.</strong> The analyzer reads package
+manifests from 8 ecosystems:</p>
+<pre class="python"><code># From: src/code_tales/pipeline/analyze.py
+
+_MANIFEST_FILES = {
+    &quot;package.json&quot;: &quot;npm&quot;,           # Node.js
+    &quot;requirements.txt&quot;: &quot;pip&quot;,       # Python (pip)
+    &quot;pyproject.toml&quot;: &quot;poetry/pip&quot;,  # Python (modern)
+    &quot;Cargo.toml&quot;: &quot;cargo&quot;,           # Rust
+    &quot;go.mod&quot;: &quot;go&quot;,                  # Go
+    &quot;Gemfile&quot;: &quot;bundler&quot;,            # Ruby
+    &quot;pom.xml&quot;: &quot;maven&quot;,             # Java
+    &quot;Package.swift&quot;: &quot;spm&quot;,         # Swift
+}</code></pre>
+<p>For each dependency, the analyzer extracts the name, version
+constraint, and whether it is a dev-only dependency. This lets Claude
+say “12 production dependencies including FastAPI and Pydantic” rather
+than “lots of dependencies.”</p>
+<p><strong>Architectural patterns.</strong> The analyzer detects
+patterns by looking for structural signals:</p>
+<pre class="python"><code>_PATTERN_SIGNALS = {
+    &quot;REST API&quot;: [&quot;routes/&quot;, &quot;endpoints/&quot;, &quot;controllers/&quot;, &quot;openapi&quot;, &quot;swagger&quot;],
+    &quot;CLI Tool&quot;: [&quot;cli.py&quot;, &quot;main.py&quot;, &quot;__main__.py&quot;, &quot;argparse&quot;, &quot;click&quot;, &quot;typer&quot;],
+    &quot;Test Suite&quot;: [&quot;tests/&quot;, &quot;test_&quot;, &quot;_test.py&quot;, &quot;spec/&quot;, &quot;.test.ts&quot;],
+    &quot;CI/CD Pipeline&quot;: [&quot;.github/workflows/&quot;, &quot;.gitlab-ci.yml&quot;, &quot;Jenkinsfile&quot;],
+    &quot;Containerized&quot;: [&quot;Dockerfile&quot;, &quot;docker-compose&quot;, &quot;.dockerignore&quot;],
+    &quot;Monorepo&quot;: [&quot;packages/&quot;, &quot;apps/&quot;, &quot;libs/&quot;, &quot;workspaces&quot;],
+    &quot;Documentation&quot;: [&quot;docs/&quot;, &quot;mkdocs.yml&quot;, &quot;sphinx&quot;, &quot;docusaurus&quot;],
+    &quot;GraphQL&quot;: [&quot;schema.graphql&quot;, &quot;resolvers/&quot;, &quot;typeDefs&quot;],
+}</code></pre>
+<p>A pattern is detected when two or more of its signals are present in
+the repository. This avoids false positives from a single file name
+match. The detected patterns appear in the analysis output and guide
+Claude’s narration focus – a repository with both “REST API” and
+“GraphQL” patterns gets different narration than one with only “CLI
+Tool.”</p>
+<p><strong>Key file identification.</strong> The analyzer identifies the
+most important files by combining several heuristics: README and
+changelog files, entry points (<code>main.py</code>,
+<code>index.ts</code>, <code>App.swift</code>), configuration files
+(<code>tsconfig.json</code>, <code>pyproject.toml</code>), and the
+largest source files by line count. These are listed in the analysis
+output so Claude can reference specific files in the narration.</p>
+<p><strong>Repository metrics.</strong> Total files, total lines of code
+(excluding blank lines and comments), average file size, and the deepest
+directory nesting level. These aggregate numbers give Claude ammunition
+for contextual statements like “a focused library with 145 files” versus
+“a sprawling monorepo with 4,200 files across 12 packages.”</p>
+<p>The entire analysis runs locally with zero API calls. It completes in
+1-3 seconds for most repositories. This is important because it means
+you can re-analyze a repository after making changes without incurring
+API costs – useful when iterating on analysis engine improvements.</p>
+<hr />
+<h3
+id="practical-use-cases-where-code-tales-actually-gets-used">Practical
+Use Cases: Where Code-Tales Actually Gets Used</h3>
+<p>I built code-tales as an experiment. It turned into a tool I use
+regularly. Here are the real-world scenarios where it provides
+value:</p>
+<p><strong>Technology Evaluation.</strong> When evaluating whether to
+adopt a dependency, I generate an executive-style briefing and a
+technical-style deep dive. The executive briefing goes in 8 minutes
+while I make coffee – it tells me whether the project is worth
+investigating further. If it is, the technical deep dive gives me
+architecture details during my commute. Together, they replace the 2-3
+hours of README-skimming and source-reading that a thorough evaluation
+requires.</p>
+<pre class="bash"><code># Quick executive overview for the team lead
+code-tales generate --repo https://github.com/prisma/prisma --style executive
+
+# Detailed technical analysis for the engineering team
+code-tales generate --repo https://github.com/prisma/prisma --style technical</code></pre>
+<p><strong>Onboarding New Team Members.</strong> A new engineer joins
+the team. Instead of pointing them at a 300-file codebase and saying
+“read the README,” I generate a podcast-style walkthrough and a
+tutorial-style introduction. The podcast gives them the big picture –
+what this project does, why it exists, how the pieces fit together. The
+tutorial walks them through the architecture step by step. Both are
+listenable during their first-day setup time (installing tools,
+configuring environments, waiting for builds).</p>
+<p><strong>Code Review Preparation.</strong> Before reviewing a large PR
+that touches unfamiliar parts of the codebase, I generate a
+documentary-style narration of the affected modules. It takes 5 minutes
+to listen to and gives me enough context to understand what the code is
+supposed to do, which makes the actual review faster and more
+effective.</p>
+<p><strong>Conference Talk Research.</strong> Preparing a talk about a
+library or framework? Generate a storytelling-style narration that
+frames the project as a hero’s journey. The narrative structure –
+problem, journey, breakthrough, legacy – maps directly to a conference
+talk outline. I have used this for two talks and the narrative arc was
+stronger than what I would have written from scratch.</p>
+<p><strong>Dependency Audits.</strong> When your project depends on 50
+npm packages and you need to audit the critical ones, generate executive
+briefings for the top 10 dependencies. Feed them to your team in a
+shared playlist. The entire team gets a baseline understanding of your
+dependency landscape in under two hours of passive listening.</p>
+<p><strong>Open Source Discovery.</strong> Browse GitHub trending,
+generate documentary-style narrations for the interesting projects, and
+listen during your workout. It is a more engaging way to stay current
+with the ecosystem than reading README files on a screen.</p>
+<hr />
+<h3 id="the-prompt-construction-what-claude-actually-sees">The Prompt
+Construction: What Claude Actually Sees</h3>
+<p>The prompt that reaches Claude is the product of all three preceding
+stages. Here is a simplified version of what the narration engine sends
+for a documentary-style generation of FastAPI:</p>
+<pre><code>You are a creative writer crafting an audio narration script.
+Your narrative style: documentary
+Tone: Measured, observational, and quietly awestruck...
+
+CRITICAL FORMATTING RULES:
+1. Structure your response using markdown headings (## Section Name).
+2. Add voice directions in [brackets].
+3. Write for audio -- avoid bullet points, tables, markdown formatting.
+...
+
+REPOSITORY ANALYSIS:
+Name: fastapi
+Description: FastAPI framework, high performance, easy to learn...
+
+Languages:
+  Python: 47.3% (primary)
+  JavaScript: 12.1%
+  Shell: 8.4%
+  Other: 32.2%
+
+Dependencies (12 total):
+  starlette (0.27.0), pydantic (2.5.0), uvicorn (0.25.0),
+  httptools, python-dotenv, email-validator, ...
+
+Frameworks detected: FastAPI, Pydantic
+Patterns detected: REST API, CLI Tool, Test Suite, CI/CD Pipeline, Containerized
+
+Total files: 145
+Total lines: 23,247
+Key files: README.md, fastapi/main.py, fastapi/routing.py, ...
+
+SECTION STRUCTURE:
+## The Ecosystem
+## The Inhabitants
+## The Behavior
+## The Future</code></pre>
+<p>The specificity is the point. Claude does not have to guess how many
+files there are, what language dominates, or which frameworks are
+present. Every claim in the narration can be traced back to a concrete
+data point in the prompt. This is what prevents hallucination: not a
+magic guardrail, but a well-structured input that makes accurate
+narration easier than inaccurate narration.</p>
+<hr />
+<h3 id="what-i-learned">What I Learned</h3>
+<p>The most counterintuitive lesson: the analysis stage matters more
+than the narration stage. Give Claude mediocre data and you get mediocre
+narration regardless of how good the style prompt is. Give Claude
+precise, quantified analysis – “47.3% Python, 12 dependencies including
+FastAPI and Pydantic, REST API + CLI Tool patterns detected, 23,000
+lines across 145 files” – and the narration practically writes
+itself.</p>
+<p>The second lesson: voice parameters are a design surface. Changing
+ElevenLabs stability from 0.7 to 0.3 transforms a documentary into a
+dramatic reading. These three numbers – stability, similarity_boost,
+style – are the audio equivalent of typography choices. They deserve the
+same attention you would give to font selection in a visual design
+system.</p>
+<p>The third lesson: text-to-speech requires a different writing style
+than text-to-screen. Every markdown artifact that slips through the
+cleaning stage is audible. Every bullet point that should have been a
+sentence creates an awkward pause. When you build a pipeline that
+crosses modalities, the boundary between them is where the bugs
+live.</p>
+<p>The fourth lesson: extensibility beats completeness. Nine styles
+shipped. The noir example showed how to add a tenth. Someone will
+eventually build a “sports commentary” style, or a “bedtime story”
+style, or a style that narrates code in the voice of a ship captain. The
+YAML-based style system makes this trivial – five fields and a voice
+ID.</p>
+<p>The fifth lesson: people will listen to things they would never read.
+I have colleagues who listened to documentary-style narrations of
+codebases they had been meaning to evaluate for months. The barrier was
+not interest. It was format. Turning code into audio removed the
+barrier. A CTO who will never read 23,000 lines of Python will happily
+listen to an 8-minute executive briefing during their commute. A junior
+developer who is intimidated by a massive codebase will listen to a
+podcast-style walkthrough while doing dishes.</p>
+<p>The sixth lesson: the <code>--no-audio</code> flag is the most
+important feature for development velocity. When iterating on styles,
+prompts, or analysis tuning, you do not want to wait 30 seconds and
+spend $0.25 on TTS for every test run. The text-only mode lets you read
+the script, evaluate the narrative quality, and adjust before committing
+to synthesis. I run 5-10 text-only iterations for every audio
+generation. The ratio matters for cost control.</p>
+<p>The seventh lesson: custom styles are where the real value emerges.
+The nine built-in styles cover common cases, but every team has specific
+needs. A security team might want a “threat model” style that narrates a
+repository through the lens of attack surfaces and trust boundaries. A
+documentation team might want an “API walkthrough” style that reads like
+interactive documentation. The YAML extensibility makes these
+straightforward to build – the hard part is writing a good tone
+directive, not the infrastructure.</p>
+<p>The eighth lesson, and maybe the most important: the pipeline
+architecture itself is the transferable insight. Clone, analyze,
+transform, synthesize – that four-stage pattern applies to any “source
+data to alternative format” problem. Replace “narrate” with “diagram”
+and you get automatic architecture diagrams from codebases. Replace
+“synthesize audio” with “generate slides” and you get presentation decks
+from repositories. The specific stages are code-tales-specific. The
+pipeline pattern is universal.</p>
+<p>The medium is not just the message. The medium is the access.</p>
+<hr />
+<p>Companion repo: <a
+href="https://github.com/krzemienski/code-tales">github.com/krzemienski/code-tales</a></p>
+<p><code>#AgenticDevelopment</code> <code>#ClaudeAI</code>
+<code>#ElevenLabs</code> <code>#TextToSpeech</code>
+<code>#DeveloperTools</code></p>
+<hr />
+<p><em>Part 9 of 11 in the <a
+href="https://github.com/krzemienski/agentic-development-guide">Agentic
+Development</a> series.</em></p>
+
+<hr>
+<h2>Diagrams &amp; Visual Assets</h2>
+
+
+<div class="social-cards">
+<h3>Social Media Cards</h3>
+<p style="color:#94a3b8;font-size:0.9em;">Open <code>assets/twitter-card.html</code> and <code>assets/linkedin-card.html</code> in a browser to preview social cards.</p>
+</div>
+
+<div class="series-nav">
+<span>Agentic Development: 10 Lessons from 8,481 AI Coding Sessions</span>
+<span style="color:#64748b;">Post 09 of 11</span>
+</div>
+</article>
+</body>
+</html>

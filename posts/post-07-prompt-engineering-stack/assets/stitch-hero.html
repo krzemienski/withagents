@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>7-Layer Prompt Architecture Hero V2</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#5048e5",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .dot-grid {
+            background-image: radial-gradient(circle, #334155 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+        .glow-orb {
+            filter: blur(80px);
+            opacity: 0.15;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen relative overflow-x-hidden">
+<!-- Atmospheric Glow Orbs -->
+<div class="absolute top-[-10%] left-[-5%] w-96 h-96 rounded-full bg-primary glow-orb"></div>
+<div class="absolute bottom-[10%] right-[-5%] w-[500px] h-[500px] rounded-full bg-indigo-500 glow-orb"></div>
+<div class="relative z-10 layout-container flex flex-col min-h-screen dot-grid">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full border-b border-slate-800/50">
+<div class="flex items-center gap-10">
+<div class="flex items-center gap-3">
+<div class="bg-primary p-1.5 rounded-lg">
+<span class="material-symbols-outlined text-white text-xl">account_tree</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight">Agentic Dev</h2>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-sm font-medium text-slate-400 hover:text-white transition-colors" href="#">Framework</a>
+<a class="text-sm font-medium text-slate-400 hover:text-white transition-colors" href="#">Architecture</a>
+<a class="text-sm font-medium text-slate-400 hover:text-white transition-colors" href="#">Registry</a>
+<a class="text-sm font-medium text-slate-400 hover:text-white transition-colors" href="#">Docs</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden sm:flex items-center gap-2 bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-1.5 text-slate-400">
+<span class="material-symbols-outlined text-sm">search</span>
+<span class="text-xs">Quick Search</span>
+<span class="text-[10px] bg-slate-700 px-1 rounded ml-4 font-mono">⌘K</span>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white text-sm font-semibold px-5 py-2 rounded-lg transition-all shadow-lg shadow-primary/20">
+                    Get Started
+                </button>
+</div>
+</header>
+<!-- Main Hero Content -->
+<main class="flex-1 flex flex-col items-center justify-center px-4 py-16 max-w-7xl mx-auto w-full">
+<div class="text-center mb-16 space-y-4 max-w-3xl">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider mb-2">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+                    Technical Deep Dive
+                </div>
+<h1 class="text-5xl md:text-7xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-slate-400">
+                    The 7-Layer Prompt <br/>Architecture
+                </h1>
+<p class="text-lg text-slate-400 leading-relaxed font-light">
+                    A premium structured framework for modern agentic development, <br class="hidden md:block"/> 
+                    enabling high-precision developer tooling and context management.
+                </p>
+</div>
+<!-- OSI Model Visualization Container -->
+<div class="w-full max-w-4xl relative flex items-center justify-center">
+<!-- Vertical Arrow Label -->
+<div class="absolute left-0 top-0 h-full flex flex-col items-center justify-between py-4 pr-12 hidden lg:flex">
+<div class="flex flex-col items-center group">
+<span class="text-[10px] font-bold text-indigo-300/80 uppercase tracking-widest vertical-text mb-4">Specific</span>
+<div class="w-px h-24 bg-gradient-to-b from-indigo-500 to-indigo-500/0"></div>
+</div>
+<div class="flex flex-col items-center group">
+<div class="w-px h-24 bg-gradient-to-t from-indigo-900 to-indigo-900/0"></div>
+<span class="text-[10px] font-bold text-indigo-900 uppercase tracking-widest vertical-text mt-4">General</span>
+</div>
+<div class="absolute left-[-40px] top-1/2 -translate-y-1/2 rotate-[-90deg] whitespace-nowrap">
+<span class="text-[11px] font-medium text-slate-500 tracking-[0.2em] uppercase">Architecture Specificity</span>
+</div>
+</div>
+<!-- 7 Layer Stack -->
+<div class="flex flex-col gap-3 w-full md:w-[70%] z-20">
+<!-- Layer 7: Memory -->
+<div class="group relative bg-[#a5b4fc] text-indigo-950 p-4 rounded-xl flex items-center gap-6 shadow-xl shadow-indigo-500/10 hover:translate-y-[-2px] transition-transform cursor-pointer">
+<div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-indigo-950/10 rounded-lg">
+<span class="material-symbols-outlined text-2xl font-bold">memory</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center">
+<h3 class="font-bold text-lg">Layer 7: Memory</h3>
+<span class="text-[10px] font-black opacity-50 uppercase tracking-tighter">Application Layer</span>
+</div>
+<p class="text-xs font-medium opacity-80">Context persistence, short-term buffers, and vector retrieval.</p>
+</div>
+</div>
+<!-- Layer 6: Agents -->
+<div class="group relative bg-[#818cf8] text-indigo-950 p-4 rounded-xl flex items-center gap-6 shadow-xl shadow-indigo-500/10 hover:translate-y-[-2px] transition-transform cursor-pointer">
+<div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-indigo-950/10 rounded-lg">
+<span class="material-symbols-outlined text-2xl font-bold">smart_toy</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center">
+<h3 class="font-bold text-lg">Layer 6: Agents</h3>
+<span class="text-[10px] font-black opacity-50 uppercase tracking-tighter">Orchestration Layer</span>
+</div>
+<p class="text-xs font-medium opacity-80">Persona definitions and multi-agent coordination protocols.</p>
+</div>
+</div>
+<!-- Layer 5: Settings -->
+<div class="group relative bg-[#6366f1] text-white p-4 rounded-xl flex items-center gap-6 shadow-xl shadow-indigo-600/10 hover:translate-y-[-2px] transition-transform cursor-pointer">
+<div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-white/10 rounded-lg">
+<span class="material-symbols-outlined text-2xl font-bold">settings_input_component</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center">
+<h3 class="font-bold text-lg">Layer 5: Settings</h3>
+<span class="text-[10px] font-black opacity-50 uppercase tracking-tighter">Session Layer</span>
+</div>
+<p class="text-xs font-medium opacity-70">Model parameters, temperature, and session-specific toggles.</p>
+</div>
+</div>
+<!-- Layer 4: Hooks -->
+<div class="group relative bg-[#4f46e5] text-white p-4 rounded-xl flex items-center gap-6 shadow-xl shadow-indigo-700/10 hover:translate-y-[-2px] transition-transform cursor-pointer">
+<div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-white/10 rounded-lg">
+<span class="material-symbols-outlined text-2xl font-bold">bolt</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center">
+<h3 class="font-bold text-lg">Layer 4: Hooks</h3>
+<span class="text-[10px] font-black opacity-50 uppercase tracking-tighter">Transport Layer</span>
+</div>
+<p class="text-xs font-medium opacity-70">Event triggers, pre-flight checks, and post-generation cleanup.</p>
+</div>
+</div>
+<!-- Layer 3: Skills -->
+<div class="group relative bg-[#4338ca] text-white p-4 rounded-xl flex items-center gap-6 shadow-xl shadow-indigo-800/10 hover:translate-y-[-2px] transition-transform cursor-pointer">
+<div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-white/10 rounded-lg">
+<span class="material-symbols-outlined text-2xl font-bold">handyman</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center">
+<h3 class="font-bold text-lg">Layer 3: Skills</h3>
+<span class="text-[10px] font-black opacity-50 uppercase tracking-tighter">Network Layer</span>
+</div>
+<p class="text-xs font-medium opacity-70">Tool definitions, executable code blocks, and API schemas.</p>
+</div>
+</div>
+<!-- Layer 2: Rules -->
+<div class="group relative bg-[#3730a3] text-white p-4 rounded-xl flex items-center gap-6 shadow-xl shadow-indigo-900/10 hover:translate-y-[-2px] transition-transform cursor-pointer">
+<div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-white/10 rounded-lg">
+<span class="material-symbols-outlined text-2xl font-bold">gavel</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center">
+<h3 class="font-bold text-lg">Layer 2: Rules</h3>
+<span class="text-[10px] font-black opacity-50 uppercase tracking-tighter">Data Link Layer</span>
+</div>
+<p class="text-xs font-medium opacity-70">Structural constraints, output formatting, and linting rules.</p>
+</div>
+</div>
+<!-- Layer 1: CLAUDE.md -->
+<div class="group relative bg-[#312e81] text-white p-4 rounded-xl flex items-center gap-6 shadow-2xl shadow-indigo-950/30 hover:translate-y-[-2px] transition-transform cursor-pointer border border-indigo-400/20">
+<div class="flex-shrink-0 w-12 h-12 flex items-center justify-center bg-white/10 rounded-lg">
+<span class="material-symbols-outlined text-2xl font-bold">description</span>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center">
+<h3 class="font-bold text-lg">Layer 1: CLAUDE.md</h3>
+<span class="text-[10px] font-black opacity-50 uppercase tracking-tighter">Physical Layer</span>
+</div>
+<p class="text-xs font-medium opacity-70">Core project identity, tech stack, and foundational mission.</p>
+</div>
+</div>
+</div>
+<!-- Right Side Stats -->
+<div class="absolute right-0 top-1/2 -translate-y-1/2 flex flex-col gap-4 hidden xl:flex">
+<div class="bg-slate-900/80 backdrop-blur border border-slate-700 p-4 rounded-xl w-48">
+<p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1">Response Speed</p>
+<div class="flex items-end gap-2">
+<p class="text-2xl font-bold">280</p>
+<p class="text-slate-400 text-xs mb-1">tok/s</p>
+</div>
+</div>
+<div class="bg-slate-900/80 backdrop-blur border border-slate-700 p-4 rounded-xl w-48">
+<p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider mb-1">Precision Rate</p>
+<div class="flex items-end gap-2">
+<p class="text-2xl font-bold text-green-400">99.4%</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Action Area -->
+<div class="mt-20 flex flex-wrap justify-center gap-6 items-center">
+<p class="text-slate-500 text-sm font-medium mr-4">Trusted by modern dev teams</p>
+<div class="flex items-center gap-8 grayscale opacity-50">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined">data_object</span>
+<span class="font-bold">JSONSchema</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined">terminal</span>
+<span class="font-bold">NextJS</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined">api</span>
+<span class="font-bold">Anthropic</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Status Bar -->
+<footer class="border-t border-slate-800/50 py-4 px-8 flex justify-between items-center bg-slate-950/50 backdrop-blur-sm">
+<div class="flex items-center gap-6 text-xs text-slate-500">
+<div class="flex items-center gap-2">
+<div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                    Systems Operational
+                </div>
+<div>Latest Version: v2.4.1-stable</div>
+</div>
+<div class="flex items-center gap-6">
+<a class="text-xs text-slate-500 hover:text-white transition-colors" href="#">Twitter / X</a>
+<a class="text-xs text-slate-500 hover:text-white transition-colors" href="#">GitHub</a>
+<a class="text-xs text-slate-500 hover:text-white transition-colors" href="#">Discord</a>
+</div>
+</footer>
+</div>
+<style>
+        .vertical-text {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+    </style>
+</body></html>

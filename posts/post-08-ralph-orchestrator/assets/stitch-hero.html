@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Ralph: The Endless AI Loop Hero</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#f59f0a",
+                        "background-light": "#f8f7f5",
+                        "background-dark": "#221c10",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .dot-grid {
+            background-image: radial-gradient(rgba(245, 159, 10, 0.1) 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+        .glow-orb-indigo {
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
+        }
+        .glow-orb-cyan {
+            background: radial-gradient(circle, rgba(34, 211, 238, 0.1) 0%, transparent 70%);
+        }
+        .loop-path {
+            stroke-dasharray: 8 8;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 overflow-hidden antialiased">
+<!-- Main Hero Section (1440x900 simulation) -->
+<div class="relative min-h-screen w-full flex flex-col items-center justify-center p-8 lg:p-16 overflow-hidden">
+<!-- Background Elements -->
+<div class="absolute inset-0 dot-grid opacity-40 pointer-events-none"></div>
+<div class="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] glow-orb-indigo pointer-events-none"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] glow-orb-cyan pointer-events-none"></div>
+<!-- Top Navigation / Series Badge -->
+<div class="absolute top-12 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-primary/10 border border-primary/20 px-4 py-2 rounded-full">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-xs font-semibold uppercase tracking-widest text-primary">Agentic Development Series: Part 04</span>
+</div>
+<!-- Heading Section -->
+<div class="relative z-10 text-center mb-16 max-w-4xl">
+<h1 class="text-5xl lg:text-7xl font-extrabold tracking-tight mb-6 bg-gradient-to-b from-slate-100 to-slate-400 bg-clip-text text-transparent">
+                Ralph: The AI That Never Stops
+            </h1>
+<p class="text-lg lg:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
+                Deep-diving into the mechanics of autonomous agent loops that plan, execute, and self-correct indefinitely.
+            </p>
+</div>
+<!-- Centerpiece: The Loop -->
+<div class="relative z-10 w-full max-w-3xl aspect-square flex items-center justify-center">
+<!-- Rotating Loop Visualization -->
+<div class="absolute inset-0 flex items-center justify-center">
+<svg class="w-full h-full max-w-[500px] transform transition-transform" viewbox="0 0 400 400">
+<!-- The Continuous Loop Path -->
+<circle class="text-primary/10" cx="200" cy="200" fill="none" r="160" stroke="currentColor" stroke-width="1"></circle>
+<!-- Animated Curved Arrows (represented as segments) -->
+<path class="opacity-80" d="M 200 40 A 160 160 0 0 1 360 200" fill="none" stroke="#f59f0a" stroke-linecap="round" stroke-width="3"></path>
+<path class="opacity-80" d="M 360 200 A 160 160 0 0 1 200 360" fill="none" stroke="#f59f0a" stroke-linecap="round" stroke-width="3"></path>
+<path class="opacity-80" d="M 200 360 A 160 160 0 0 1 40 200" fill="none" stroke="#f59f0a" stroke-linecap="round" stroke-width="3"></path>
+<path class="opacity-80" d="M 40 200 A 160 160 0 0 1 200 40" fill="none" stroke="#f59f0a" stroke-linecap="round" stroke-width="3"></path>
+<!-- Arrowheads -->
+<polygon fill="#f59f0a" points="200,35 205,45 195,45" transform="rotate(90 200 40)"></polygon>
+<polygon fill="#f59f0a" points="360,195 365,205 355,205" transform="rotate(180 360 200)"></polygon>
+<polygon fill="#f59f0a" points="200,355 205,365 195,365" transform="rotate(270 200 360)"></polygon>
+<polygon fill="#f59f0a" points="40,195 45,205 35,205" transform="rotate(0 40 200)"></polygon>
+</svg>
+</div>
+<!-- Central Counters -->
+<div class="relative flex flex-col items-center justify-center text-center bg-background-dark/50 backdrop-blur-xl border border-white/5 rounded-full w-64 h-64 shadow-2xl shadow-primary/10">
+<div class="text-5xl font-black text-[#22d3ee] tracking-tighter">72hr</div>
+<div class="text-sm font-medium text-slate-500 uppercase tracking-[0.2em] mt-1">Uptime</div>
+<div class="mt-4 px-4 py-1.5 bg-[#22d3ee]/10 rounded-full border border-[#22d3ee]/20">
+<span class="text-[#22d3ee] font-mono text-lg">847 iterations</span>
+</div>
+</div>
+<!-- Loop Stations -->
+<!-- Planner - Top -->
+<div class="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="w-16 h-16 rounded-2xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center shadow-lg shadow-blue-500/20">
+<span class="material-icons-round text-blue-400 text-3xl">architecture</span>
+</div>
+<span class="mt-3 font-semibold text-blue-400 text-sm tracking-wider uppercase">Planner</span>
+</div>
+<!-- Executor - Right -->
+<div class="absolute right-0 top-1/2 translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+<span class="material-icons-round text-emerald-400 text-3xl">terminal</span>
+</div>
+<span class="mt-3 font-semibold text-emerald-400 text-sm tracking-wider uppercase">Executor</span>
+</div>
+<!-- Verifier - Bottom -->
+<div class="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 flex flex-col items-center">
+<div class="w-16 h-16 rounded-2xl bg-purple-500/10 border border-purple-500/30 flex items-center justify-center shadow-lg shadow-purple-500/20">
+<span class="material-icons-round text-purple-400 text-3xl">verified_user</span>
+</div>
+<span class="mt-3 font-semibold text-purple-400 text-sm tracking-wider uppercase">Verifier</span>
+</div>
+<!-- Fixer - Left -->
+<div class="absolute left-0 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
+<div class="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/30 flex items-center justify-center shadow-lg shadow-primary/20">
+<span class="material-icons-round text-primary text-3xl">build_circle</span>
+</div>
+<span class="mt-3 font-semibold text-primary text-sm tracking-wider uppercase">Fixer</span>
+</div>
+</div>
+<!-- Tagline -->
+<div class="mt-24 text-center z-10">
+<p class="text-slate-400 font-medium tracking-wide">
+                Engineered for <span class="text-primary italic">resilience</span>. Optimized for <span class="text-primary italic">autonomy</span>.
+            </p>
+<div class="mt-8 flex gap-4 justify-center">
+<button class="bg-primary hover:bg-primary/90 text-background-dark font-bold px-8 py-3 rounded-lg transition-all flex items-center gap-2">
+                    Read the Case Study <span class="material-icons-round text-sm">arrow_forward</span>
+</button>
+<button class="bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold px-8 py-3 rounded-lg transition-all">
+                    View Docs
+                </button>
+</div>
+</div>
+<!-- Telegram Notification Card (Bottom-Right) -->
+<div class="fixed bottom-12 right-12 z-20 w-80 bg-[#1e293b] border border-white/10 rounded-xl shadow-2xl p-4 flex gap-4 items-start ring-1 ring-white/5">
+<div class="relative shrink-0">
+<div class="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center text-primary">
+<span class="material-icons-round">smart_toy</span>
+</div>
+<div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-[#1e293b] rounded-full"></div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-center mb-1">
+<h4 class="font-bold text-sm text-slate-100">Ralph Bot</h4>
+<span class="text-[10px] text-slate-500">Just now</span>
+</div>
+<p class="text-sm text-slate-400 leading-tight">
+                    Task completed. Fix count: 3. System state stable.
+                </p>
+<div class="mt-3 flex gap-2">
+<div class="h-1 flex-1 bg-primary/20 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-full"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Floating UI Accents -->
+<div class="absolute top-1/4 left-12 p-4 bg-white/5 border border-white/10 rounded-lg backdrop-blur-md hidden xl:block">
+<div class="flex items-center gap-2 mb-2">
+<div class="w-2 h-2 rounded-full bg-emerald-400"></div>
+<span class="text-[10px] font-bold uppercase tracking-tighter text-slate-400">Mainnet Activity</span>
+</div>
+<div class="space-y-2">
+<div class="h-2 w-32 bg-white/10 rounded-full"></div>
+<div class="h-2 w-24 bg-white/10 rounded-full"></div>
+</div>
+</div>
+<div class="absolute bottom-1/4 left-12 p-4 bg-white/5 border border-white/10 rounded-lg backdrop-blur-md hidden xl:block">
+<span class="text-[10px] font-bold uppercase tracking-tighter text-slate-400 block mb-2">Success Rate</span>
+<div class="text-2xl font-black text-primary">99.8%</div>
+</div>
+</div>
+<!-- Decorative Image Assets (Hidden but accessible for system metadata) -->
+<img alt="Background Texture" class="hidden" data-alt="Abstract neural network visualization with glowing lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDNohTZqH-AxESibagrPA-vYAp2xqaT5BNc6KqeXuuzf-cqbRe7fwR78WxPOwLZVzVugZmu2y_dLDbQHko_LW4vCo2OPa8a2zWkZVyCeoRJzCPrtc6BX2fA3Q3VbW78m4yXrIBVvGkLMMlJ3k62qwXpRoy0EWXqQpyHA3LlJC9-o4SAfM-TiPAMD5rH1CuLLMBR2FmlDczVOLjb6JH579-uWgHMBpFOzOZXCjibLxvbXcGUJf70a46f3mPsqCZvCA1TRFy4W5kwzP0"/>
+</body></html>

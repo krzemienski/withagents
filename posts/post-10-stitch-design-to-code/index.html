@@ -1,0 +1,1852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>From Figma to Production in One Command</title>
+<meta property="og:title" content="From Figma to Production in One Command">
+<meta property="og:description" content="MCP-powered design-to-code translation">
+<meta property="og:type" content="article">
+<meta property="og:image" content="assets/hero-card.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="From Figma to Production in One Command">
+<meta name="twitter:description" content="MCP-powered design-to-code translation">
+<meta name="author" content="Nick Krzemienski">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0a0a0a; color: #e2e8f0; line-height: 1.8; }
+  .hero-container { max-width: 1200px; margin: 0 auto; }
+  .hero-container > div { width: 100% !important; max-width: 100%; }
+  article { max-width: 780px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: 2.5em; font-weight: 800; color: #f8fafc; line-height: 1.2; margin: 0 0 16px; }
+  h2 { font-size: 1.75em; font-weight: 700; color: #f1f5f9; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #1e293b; }
+  h3 { font-size: 1.3em; font-weight: 600; color: #e2e8f0; margin: 32px 0 12px; }
+  h4 { font-size: 1.1em; font-weight: 600; color: #cbd5e1; margin: 24px 0 8px; }
+  p { margin: 0 0 16px; color: #cbd5e1; }
+  a { color: #818cf8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; background: #1e293b; color: #a5b4fc; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+  pre { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 20px; margin: 16px 0 24px; overflow-x: auto; }
+  pre code { background: none; padding: 0; color: #e2e8f0; font-size: 0.85em; line-height: 1.6; }
+  blockquote { border-left: 3px solid #6366f1; padding: 12px 20px; margin: 16px 0; background: rgba(99,102,241,0.05); border-radius: 0 8px 8px 0; }
+  blockquote p { color: #94a3b8; margin: 0; }
+  ul, ol { margin: 8px 0 16px 24px; color: #cbd5e1; }
+  li { margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; }
+  th { background: #1e293b; color: #f1f5f9; padding: 10px 16px; text-align: left; font-weight: 600; font-size: 0.9em; }
+  td { padding: 10px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.9em; }
+  tr:hover td { background: rgba(99,102,241,0.03); }
+  hr { border: none; border-top: 1px solid #1e293b; margin: 32px 0; }
+  img, svg { max-width: 100%; height: auto; border-radius: 8px; margin: 16px 0; }
+  .diagram { margin: 32px 0; padding: 24px; background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; overflow-x: auto; }
+  .diagram h4 { color: #64748b; font-size: 0.85em; font-weight: 500; margin: 0 0 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .diagram svg { display: block; margin: 0 auto; max-height: 600px; }
+  .meta { color: #64748b; font-size: 0.9em; margin: 8px 0 32px; }
+  .social-cards { display: flex; gap: 24px; flex-wrap: wrap; margin: 48px 0; padding: 24px; background: #0f172a; border-radius: 12px; }
+  .social-cards h3 { width: 100%; color: #64748b; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px; }
+  .social-cards iframe { border: 1px solid #1e293b; border-radius: 8px; }
+  .series-nav { display: flex; justify-content: space-between; padding: 24px; background: #0f172a; border-radius: 12px; margin-top: 48px; }
+  .series-nav a { color: #818cf8; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="hero-container"><div style="width:1200px;height:630px;background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%);display:flex;flex-direction:column;justify-content:center;padding:0 80px;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif;position:relative;overflow:hidden;">
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:radial-gradient(circle at 1px 1px,rgba(6,182,212,0.15) 1px,transparent 0);background-size:40px 40px;"></div>
+  <div style="position:absolute;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(6,182,212,0.2) 0%,transparent 70%);border-radius:50%;"></div>
+  <div style="position:relative;z-index:1;display:inline-block;background:rgba(6,182,212,0.2);border:1px solid rgba(6,182,212,0.4);border-radius:20px;padding:6px 16px;margin-bottom:24px;width:fit-content;">
+    <span style="color:rgba(6,182,212,0.9);font-size:14px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">LESSON 10 OF 10 · DESIGN TO CODE</span>
+  </div>
+  <h1 style="position:relative;z-index:1;color:#f1f5f9;font-size:46px;font-weight:800;line-height:1.15;margin:0 0 20px 0;max-width:900px;">From Figma to Production in One Command</h1>
+  <p style="position:relative;z-index:1;color:#94a3b8;font-size:20px;line-height:1.5;margin:0 0 32px 0;max-width:700px;">MCP-powered design translation with token hierarchies and validation loops</p>
+  <div style="position:relative;z-index:1;display:flex;align-items:center;gap:12px;">
+    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,rgb(6,182,212),#8b5cf6);display:flex;align-items:center;justify-content:center;">
+      <span style="color:white;font-weight:700;font-size:16px;">NK</span>
+    </div>
+    <div>
+      <div style="color:#f1f5f9;font-size:14px;font-weight:600;">Nick Krzemienski</div>
+      <div style="color:#64748b;font-size:13px;">March 2026 · Agentic Development Series</div>
+    </div>
+  </div>
+</div></div>
+<article>
+<p class="meta">Lesson 10 of 10 · Nick Krzemienski · March 2026 · Agentic Development Series</p>
+<h2 id="ai-generated-screens-zero-figma-files">21 AI-Generated Screens,
+Zero Figma Files</h2>
+<p><em>Agentic Development: 10 Lessons from 8,481 AI Coding
+Sessions</em></p>
+<p>I described an entire web application in plain English. The AI
+generated 21 production screens – with components, design tokens, and
+validation – in a single session. No Figma. No hand-written CSS. No
+designer in the loop.</p>
+<p>This is not a prototype. It is a complete brutalist-cyberpunk web
+application with 47 design tokens, 5 component primitives, 4 example
+compositions, and a 107-action Puppeteer validation suite that proves
+every screen renders correctly.</p>
+<p>This is post 10 of 11 in the Agentic Development series. The
+companion repo is at <a
+href="https://github.com/krzemienski/stitch-design-to-code">github.com/krzemienski/stitch-design-to-code</a>.
+Everything quoted here is real code from that repo.</p>
+<hr />
+<h3 id="the-session-that-changed-my-workflow">The Session That Changed
+My Workflow</h3>
+<p>Let me tell you how this actually happened, because the headline
+makes it sound too clean.</p>
+<p>I had been designing screens for a curated resource directory called
+“Awesome Lists.” The traditional flow: sketch layouts in Figma, pick
+colors, agonize over border radius decisions, export specs, translate to
+Tailwind, build React components, squint at the result, tweak, rebuild,
+squint again. For 21 screens, that is a two-week process at minimum.</p>
+<p>Then I tried something different. I wrote a JSON file describing
+every visual decision. I wrote a prompt template that embedded that JSON
+inline. I fed each prompt to Stitch MCP, reviewed the output, converted
+to React, and validated with Puppeteer. The first 7 screens took four
+hours. The remaining 14 took two. One session. One afternoon. Twenty-one
+production screens.</p>
+<p>The speed is not the interesting part. What is interesting is that
+the quality held. Every screen used the same color palette. Every button
+had the same hover glow. Every font was JetBrains Mono. The design
+system was not approximately consistent – it was computationally
+verified as consistent, by a Puppeteer suite that checked every single
+screen against the token spec.</p>
+<p>That is the story this post tells. Not “AI can make pretty pictures,”
+but “AI can execute a design system with perfect fidelity if you give it
+the right constraints.”</p>
+<hr />
+<h3 id="the-workflow">The Workflow</h3>
+<p>The cycle looks deceptively simple:</p>
+<ol type="1">
+<li>Craft a text prompt with the design system embedded</li>
+<li>Feed it to Stitch MCP (an AI design generation tool)</li>
+<li>Review the visual output for spec compliance</li>
+<li>Convert to React components with <code>data-testid</code>
+attributes</li>
+<li>Run Puppeteer validation against all 21 screens</li>
+<li>If anything fails, go back to step 1</li>
+</ol>
+<pre class="mermaid"><code>flowchart TD
+    CP[&quot;Craft Prompt\n(embed design system)&quot;]
+    SM[&quot;Stitch MCP\n(generate visual design)&quot;]
+    DO[&quot;Design Output\n(review spec compliance)&quot;]
+    RC[&quot;React Conversion\n(build components,\nadd data-testid)&quot;]
+    PV[&quot;Puppeteer Validation\n(107 actions / 21 screens)&quot;]
+    DEC{&quot;All Checks Pass?&quot;}
+    SH[&quot;Ship&quot;]
+
+    CP --&gt; SM
+    SM --&gt; DO
+    DO --&gt; RC
+    RC --&gt; PV
+    PV --&gt; DEC
+    DEC --&gt;|Yes| SH
+    DEC --&gt;|No| CP</code></pre>
+<p>The critical insight, learned the hard way: the prompt must contain
+the complete design system every single time. Not “see previous specs.”
+Not “same as before.” The full token set, repeated verbatim, in every
+prompt for every screen. Context window drift is real, and it manifests
+as subtle visual inconsistencies across screens generated in the same
+session.</p>
+<p>I will show you exactly what that drift looks like – and how an
+automated branding check caught it – later in this post. First, let me
+walk through the design system that makes the whole thing work.</p>
+<hr />
+<h3 id="the-design-token-system-47-decisions-in-one-json-file">The
+Design Token System: 47 Decisions in One JSON File</h3>
+<p>Every visual decision in the application is derived from 47 tokens
+defined in a single JSON file. This is not a suggestion. It is a
+constraint. When I say “every,” I mean there is zero visual information
+that exists outside this file. Here is the complete brutalist-cyberpunk
+palette:</p>
+<pre class="json"><code>// From: design-system/tokens.json
+
+{
+  &quot;colors&quot;: {
+    &quot;background&quot;: &quot;#000000&quot;,
+    &quot;primary&quot;: &quot;#e050b0&quot;,
+    &quot;secondary&quot;: &quot;#4dacde&quot;,
+    &quot;surface&quot;: &quot;#111111&quot;,
+    &quot;surfaceAlt&quot;: &quot;#1a1a1a&quot;,
+    &quot;surfaceHover&quot;: &quot;#222222&quot;,
+    &quot;text&quot;: &quot;#ffffff&quot;,
+    &quot;textSecondary&quot;: &quot;#a0a0a0&quot;,
+    &quot;textMuted&quot;: &quot;#606060&quot;,
+    &quot;border&quot;: &quot;#2a2a2a&quot;,
+    &quot;borderAccent&quot;: &quot;#3a3a3a&quot;,
+    &quot;success&quot;: &quot;#22c55e&quot;,
+    &quot;warning&quot;: &quot;#f59e0b&quot;,
+    &quot;error&quot;: &quot;#ef4444&quot;,
+    &quot;primaryGlow&quot;: &quot;rgba(224, 80, 176, 0.3)&quot;,
+    &quot;secondaryGlow&quot;: &quot;rgba(77, 172, 222, 0.3)&quot;,
+    &quot;primarySubtle&quot;: &quot;rgba(224, 80, 176, 0.1)&quot;,
+    &quot;secondarySubtle&quot;: &quot;rgba(77, 172, 222, 0.1)&quot;
+  }
+}</code></pre>
+<p>Pure black background. Hot pink primary accent. Cyan secondary. No
+gray area – literally. The surface colors step from <code>#111111</code>
+to <code>#1a1a1a</code> to <code>#222222</code> in tight increments,
+creating depth through value rather than hue. The glow colors at 30%
+opacity (<code>primaryGlow</code>, <code>secondaryGlow</code>) produce
+the cyberpunk neon effect on hover states. The subtle variants at 10%
+opacity serve as background tints for badges and selected states.</p>
+<p>But the most distinctive design decision lives in the border radius
+tokens:</p>
+<pre class="json"><code>// From: design-system/tokens.json
+
+&quot;borderRadius&quot;: {
+  &quot;none&quot;: &quot;0px&quot;,
+  &quot;sm&quot;: &quot;0px&quot;,
+  &quot;base&quot;: &quot;0px&quot;,
+  &quot;md&quot;: &quot;0px&quot;,
+  &quot;lg&quot;: &quot;0px&quot;,
+  &quot;xl&quot;: &quot;0px&quot;,
+  &quot;2xl&quot;: &quot;0px&quot;,
+  &quot;full&quot;: &quot;0px&quot;
+}</code></pre>
+<p>Every single border radius value is <code>0px</code>. Not “mostly
+square with some rounding.” Zero. Everywhere. This is not laziness – it
+is a deliberate brutalist design choice. When components from shadcn/ui
+reference <code>borderRadius.md</code> or <code>borderRadius.lg</code>,
+they resolve to <code>0px</code>. The token system enforces the
+aesthetic at the configuration layer, not the component layer. The
+components do not need to know they are brutalist. They just are.</p>
+<p>Typography is equally opinionated:</p>
+<pre class="json"><code>// From: design-system/tokens.json
+
+&quot;typography&quot;: {
+  &quot;fontFamily&quot;: &quot;JetBrains Mono, monospace&quot;,
+  &quot;fontFamilyFallback&quot;: &quot;Courier New, Courier, monospace&quot;,
+  &quot;sizes&quot;: {
+    &quot;xs&quot;: &quot;0.75rem&quot;,
+    &quot;sm&quot;: &quot;0.875rem&quot;,
+    &quot;base&quot;: &quot;1rem&quot;,
+    &quot;lg&quot;: &quot;1.125rem&quot;,
+    &quot;xl&quot;: &quot;1.25rem&quot;,
+    &quot;2xl&quot;: &quot;1.5rem&quot;,
+    &quot;3xl&quot;: &quot;1.875rem&quot;,
+    &quot;4xl&quot;: &quot;2.25rem&quot;
+  },
+  &quot;weights&quot;: {
+    &quot;normal&quot;: &quot;400&quot;,
+    &quot;medium&quot;: &quot;500&quot;,
+    &quot;semibold&quot;: &quot;600&quot;,
+    &quot;bold&quot;: &quot;700&quot;
+  },
+  &quot;lineHeights&quot;: {
+    &quot;tight&quot;: &quot;1.25&quot;,
+    &quot;snug&quot;: &quot;1.375&quot;,
+    &quot;normal&quot;: &quot;1.5&quot;,
+    &quot;relaxed&quot;: &quot;1.625&quot;,
+    &quot;loose&quot;: &quot;2&quot;
+  },
+  &quot;letterSpacing&quot;: {
+    &quot;tight&quot;: &quot;-0.025em&quot;,
+    &quot;normal&quot;: &quot;0em&quot;,
+    &quot;wide&quot;: &quot;0.025em&quot;,
+    &quot;wider&quot;: &quot;0.05em&quot;,
+    &quot;widest&quot;: &quot;0.1em&quot;
+  }
+}</code></pre>
+<p>JetBrains Mono for headlines, body copy, buttons, labels, navigation
+– everything. Eight size steps from <code>0.75rem</code> to
+<code>2.25rem</code>. Four weight stops. Five line-height values. Five
+letter-spacing values. Combined with the <code>0px</code> border radius,
+this produces an aggressive terminal-aesthetic that looks like nothing
+else in the React ecosystem.</p>
+<p>The remaining tokens cover shadows, spacing, breakpoints,
+transitions, and z-index:</p>
+<pre class="json"><code>// From: design-system/tokens.json
+
+&quot;shadows&quot;: {
+  &quot;subtle&quot;: &quot;0 1px 3px rgba(0, 0, 0, 0.5)&quot;,
+  &quot;card&quot;: &quot;0 4px 16px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(42, 42, 42, 0.8)&quot;,
+  &quot;elevated&quot;: &quot;0 8px 32px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(42, 42, 42, 0.6)&quot;,
+  &quot;overlay&quot;: &quot;0 16px 64px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(42, 42, 42, 0.4)&quot;,
+  &quot;primaryGlow&quot;: &quot;0 0 20px rgba(224, 80, 176, 0.4), 0 0 40px rgba(224, 80, 176, 0.2)&quot;,
+  &quot;secondaryGlow&quot;: &quot;0 0 20px rgba(77, 172, 222, 0.4), 0 0 40px rgba(77, 172, 222, 0.2)&quot;,
+  &quot;primaryInner&quot;: &quot;inset 0 0 20px rgba(224, 80, 176, 0.15)&quot;,
+  &quot;secondaryInner&quot;: &quot;inset 0 0 20px rgba(77, 172, 222, 0.15)&quot;
+},
+&quot;transitions&quot;: {
+  &quot;fast&quot;: &quot;150ms ease&quot;,
+  &quot;base&quot;: &quot;200ms ease&quot;,
+  &quot;slow&quot;: &quot;300ms ease&quot;,
+  &quot;slower&quot;: &quot;500ms ease&quot;
+},
+&quot;zIndex&quot;: {
+  &quot;base&quot;: &quot;0&quot;,
+  &quot;raised&quot;: &quot;10&quot;,
+  &quot;dropdown&quot;: &quot;100&quot;,
+  &quot;sticky&quot;: &quot;200&quot;,
+  &quot;overlay&quot;: &quot;300&quot;,
+  &quot;modal&quot;: &quot;400&quot;,
+  &quot;toast&quot;: &quot;500&quot;
+}</code></pre>
+<p>The shadow system is where the cyberpunk aesthetic gains its depth.
+The <code>primaryGlow</code> shadow – <code>0 0 20px</code> at 40%
+opacity plus <code>0 0 40px</code> at 20% opacity – creates a two-layer
+neon bloom. The <code>primaryInner</code> shadow creates the inset glow
+you see on active cards. These shadows, combined with <code>0px</code>
+corners on a pure black background, produce a UI that feels like a
+Tron-inspired terminal.</p>
+<p>Here is how all 47 tokens relate to each other, from primitive values
+through semantic Tailwind utilities to component-level patterns:</p>
+<pre class="mermaid"><code>flowchart TD
+    subgraph PRIMITIVE[&quot;Primitive Tokens (tokens.json)&quot;]
+        direction TB
+        C_BG[&quot;colors.background\n#000000&quot;]
+        C_PRI[&quot;colors.primary\n#e050b0&quot;]
+        C_SEC[&quot;colors.secondary\n#4dacde&quot;]
+        C_SURF[&quot;colors.surface\n#111111&quot;]
+        C_SURFA[&quot;colors.surfaceAlt\n#1a1a1a&quot;]
+        C_SURFH[&quot;colors.surfaceHover\n#222222&quot;]
+        C_TXT[&quot;colors.text\n#ffffff&quot;]
+        C_TXTS[&quot;colors.textSecondary\n#a0a0a0&quot;]
+        C_TXTM[&quot;colors.textMuted\n#606060&quot;]
+        C_BRD[&quot;colors.border\n#2a2a2a&quot;]
+        C_BRDA[&quot;colors.borderAccent\n#3a3a3a&quot;]
+        C_SUC[&quot;colors.success\n#22c55e&quot;]
+        C_WARN[&quot;colors.warning\n#f59e0b&quot;]
+        C_ERR[&quot;colors.error\n#ef4444&quot;]
+        C_PGLOW[&quot;colors.primaryGlow\nrgba(224,80,176,0.3)&quot;]
+        C_SGLOW[&quot;colors.secondaryGlow\nrgba(77,172,222,0.3)&quot;]
+        C_PSUB[&quot;colors.primarySubtle\nrgba(224,80,176,0.1)&quot;]
+        C_SSUB[&quot;colors.secondarySubtle\nrgba(77,172,222,0.1)&quot;]
+
+        T_FONT[&quot;typography.fontFamily\nJetBrains Mono, monospace&quot;]
+        T_FALL[&quot;typography.fontFamilyFallback\nCourier New, Courier&quot;]
+        T_SIZES[&quot;typography.sizes\nxs: 0.75rem ... 4xl: 2.25rem&quot;]
+        T_WEIGHTS[&quot;typography.weights\nnormal: 400 ... bold: 700&quot;]
+
+        BR_ALL[&quot;borderRadius.*\n0px (ALL values)&quot;]
+
+        S_CARD[&quot;shadows.card\n0 4px 16px rgba(0,0,0,0.6)&quot;]
+        S_PGLOW[&quot;shadows.primaryGlow\n0 0 20px rgba(224,80,176,0.4)&quot;]
+
+        SP[&quot;spacing\n0: 0px ... 20: 5rem&quot;]
+        TR[&quot;transitions\nfast: 150ms ... slower: 500ms&quot;]
+        Z[&quot;zIndex\nbase: 0 ... toast: 500&quot;]
+    end
+
+    subgraph SEMANTIC[&quot;Semantic Tokens (tailwind-preset.js)&quot;]
+        direction TB
+        SC_BG[&quot;bg-background\n= tokens.colors.background&quot;]
+        SC_PRI[&quot;bg-primary / text-primary\n= tokens.colors.primary&quot;]
+        SC_SEC[&quot;bg-secondary / text-secondary\n= tokens.colors.secondary&quot;]
+        SC_SURF[&quot;bg-surface / bg-surface-alt\n= tokens.colors.surface / surfaceAlt&quot;]
+        SC_TXT[&quot;text-text / text-text-secondary\n= tokens.colors.text / textSecondary&quot;]
+        SC_BRD[&quot;border-border\n= tokens.colors.border&quot;]
+        SC_FONT[&quot;font-mono AND font-sans\n= JetBrains Mono (both!)&quot;]
+        SC_RAD[&quot;rounded-none / rounded-sm / rounded-lg\n= 0px (all identical)&quot;]
+        SC_SHAD[&quot;shadow-primary-glow\n= tokens.shadows.primaryGlow&quot;]
+        SC_GRAD[&quot;bg-hero-gradient\n= radial-gradient(primary + secondary)&quot;]
+        SC_GRID[&quot;bg-grid-pattern\n= 1px border lines at intervals&quot;]
+    end
+
+    subgraph COMPONENT[&quot;Component Tokens (CVA variants)&quot;]
+        direction TB
+        BTN_DEF[&quot;Button.default\nbg-primary text-black\nhover: shadow primaryGlow&quot;]
+        BTN_SEC[&quot;Button.secondary-outline\nborder-secondary text-secondary\nhover: bg-secondary text-black&quot;]
+        BTN_GHO[&quot;Button.ghost\nbg-transparent text-text-secondary\nhover: bg-surface text-text&quot;]
+        CARD_BASE[&quot;Card.base\nbg-surface border-border\nrounded-none font-mono&quot;]
+        CARD_HOVER[&quot;Card.hoverable\nhover: border-primary\nshadow primaryGlow, -translate-y-px&quot;]
+        INPUT_BASE[&quot;Input.base\nbg-surface border-border\nfocus: border-primary + glow ring&quot;]
+        BADGE_PRI[&quot;Badge.primary\nbg-primary-subtle border-primary\ntext-primary&quot;]
+        TABS_ACTIVE[&quot;TabsTrigger.active\nborder-b-2 border-primary\ntext-text&quot;]
+    end
+
+    C_PRI --&gt; SC_PRI
+    C_SEC --&gt; SC_SEC
+    C_BG --&gt; SC_BG
+    C_SURF --&gt; SC_SURF
+    C_TXT --&gt; SC_TXT
+    C_BRD --&gt; SC_BRD
+    T_FONT --&gt; SC_FONT
+    BR_ALL --&gt; SC_RAD
+    S_PGLOW --&gt; SC_SHAD
+    C_PGLOW --&gt; SC_GRAD
+
+    SC_PRI --&gt; BTN_DEF
+    SC_SEC --&gt; BTN_SEC
+    SC_SURF --&gt; CARD_BASE
+    SC_PRI --&gt; CARD_HOVER
+    SC_BRD --&gt; INPUT_BASE
+    SC_PRI --&gt; INPUT_BASE
+    C_PSUB --&gt; BADGE_PRI
+    SC_PRI --&gt; TABS_ACTIVE
+
+    style PRIMITIVE fill:#000,stroke:#2a2a2a,color:#a0a0a0
+    style SEMANTIC fill:#111,stroke:#e050b0,color:#fff
+    style COMPONENT fill:#1a1a1a,stroke:#4dacde,color:#fff</code></pre>
+<p>Three layers. Primitive tokens are raw values. Semantic tokens map
+those values to Tailwind utility classes. Component tokens compose
+semantic tokens into variant patterns via CVA. Change one primitive
+value and the change propagates through all three layers
+automatically.</p>
+<hr />
+<h3 id="the-tailwind-preset-making-the-design-system-inescapable">The
+Tailwind Preset: Making the Design System Inescapable</h3>
+<p>The tokens flow into Tailwind via a preset that maps every token to a
+utility class. This is where the design system becomes inescapable – not
+a suggestion, but the only option:</p>
+<pre class="javascript"><code>// From: design-system/tailwind-preset.js
+
+const tokens = require(&#39;./tokens.json&#39;);
+
+/** @type {import(&#39;tailwindcss&#39;).Config} */
+const preset = {
+  theme: {
+    extend: {
+      colors: {
+        background: tokens.colors.background,
+        primary: {
+          DEFAULT: tokens.colors.primary,
+          glow: tokens.colors.primaryGlow,
+          subtle: tokens.colors.primarySubtle,
+        },
+        secondary: {
+          DEFAULT: tokens.colors.secondary,
+          glow: tokens.colors.secondaryGlow,
+          subtle: tokens.colors.secondarySubtle,
+        },
+        surface: {
+          DEFAULT: tokens.colors.surface,
+          alt: tokens.colors.surfaceAlt,
+          hover: tokens.colors.surfaceHover,
+        },
+        text: {
+          DEFAULT: tokens.colors.text,
+          secondary: tokens.colors.textSecondary,
+          muted: tokens.colors.textMuted,
+        },
+        border: {
+          DEFAULT: tokens.colors.border,
+          accent: tokens.colors.borderAccent,
+        },
+        success: tokens.colors.success,
+        warning: tokens.colors.warning,
+        error: tokens.colors.error,
+      },
+      fontFamily: {
+        mono: [tokens.typography.fontFamily, tokens.typography.fontFamilyFallback],
+        sans: [tokens.typography.fontFamily, tokens.typography.fontFamilyFallback],
+      },
+      borderRadius: {
+        none: tokens.borderRadius.none,
+        sm: tokens.borderRadius.sm,
+        DEFAULT: tokens.borderRadius.base,
+        md: tokens.borderRadius.md,
+        lg: tokens.borderRadius.lg,
+        xl: tokens.borderRadius.xl,
+        &#39;2xl&#39;: tokens.borderRadius[&#39;2xl&#39;],
+        full: tokens.borderRadius.full,
+      },
+      boxShadow: {
+        subtle: tokens.shadows.subtle,
+        card: tokens.shadows.card,
+        elevated: tokens.shadows.elevated,
+        overlay: tokens.shadows.overlay,
+        &#39;primary-glow&#39;: tokens.shadows.primaryGlow,
+        &#39;secondary-glow&#39;: tokens.shadows.secondaryGlow,
+        &#39;primary-inner&#39;: tokens.shadows.primaryInner,
+        &#39;secondary-inner&#39;: tokens.shadows.secondaryInner,
+      },
+      backgroundImage: {
+        &#39;primary-gradient&#39;: `linear-gradient(135deg, ${tokens.colors.primary}20 0%, transparent 60%)`,
+        &#39;hero-gradient&#39;: `radial-gradient(ellipse at top, ${tokens.colors.primary}15 0%, transparent 60%), radial-gradient(ellipse at bottom right, ${tokens.colors.secondary}10 0%, transparent 50%)`,
+        &#39;grid-pattern&#39;: `linear-gradient(${tokens.colors.border} 1px, transparent 1px), linear-gradient(90deg, ${tokens.colors.border} 1px, transparent 1px)`,
+      },
+    },
+  },
+};</code></pre>
+<p>Notice two critical decisions:</p>
+<p>First, <code>fontFamily.sans</code> maps to JetBrains Mono. Even when
+components use Tailwind’s <code>font-sans</code> class, they get the
+monospaced font. The design system overrides Tailwind’s default
+sans-serif stack entirely. You cannot accidentally use a proportional
+font.</p>
+<p>Second, <code>backgroundImage</code> includes three token-derived
+gradient utilities. The <code>hero-gradient</code> combines the primary
+color at 15% opacity with the secondary at 10%, creating a subtle
+two-tone radial wash. The <code>grid-pattern</code> creates a wire-grid
+overlay using the border color at 1px intervals. One line in the config,
+reusable across every screen, and the terminal aesthetic is reinforced
+everywhere.</p>
+<hr />
+<h3
+id="token-driven-development-change-one-value-update-21-screens">Token-Driven
+Development: Change One Value, Update 21 Screens</h3>
+<p>Here is the part that makes this approach fundamentally different
+from traditional design-to-code. With Figma, changing the primary color
+means updating every component, every screen, every prototype, every
+exported asset. With token-driven development, it is one line:</p>
+<pre class="json"><code>&quot;primary&quot;: &quot;#e050b0&quot;</code></pre>
+<p>Change that to <code>"primary": "#00ff88"</code> and every screen
+switches from hot pink to neon green. Every button, every badge, every
+glow shadow, every gradient. The Tailwind preset reads from
+<code>tokens.json</code>. The components reference Tailwind utilities.
+The chain is unbroken.</p>
+<p>I tested this during development. Midway through the project, I
+experimented with a warmer primary (<code>#ff6b35</code>). I changed one
+value in <code>tokens.json</code>, ran the build, and ran the Puppeteer
+suite. All 21 screens rendered with the new orange accent. The suite
+caught two screens where I had hardcoded a <code>#e050b0</code> hex
+value instead of using the <code>bg-primary</code> utility – which is
+exactly the kind of inconsistency you want automation to find.</p>
+<p>The propagation path is deterministic:</p>
+<pre><code>tokens.json (1 change)
+  -&gt; tailwind-preset.js (reads tokens at build time)
+    -&gt; Tailwind CSS utilities (recompiled)
+      -&gt; Component classes (reference utilities)
+        -&gt; 21 screens (all render with new value)
+          -&gt; Puppeteer suite (validates all 21 screens)</code></pre>
+<p>Zero manual intervention between “change the color” and “verify all
+21 screens.” That is what token-driven development buys you.</p>
+<hr />
+<h3 id="the-component-layer-five-primitives-that-build-everything">The
+Component Layer: Five Primitives That Build Everything</h3>
+<p>From 47 tokens and one Tailwind preset, I built exactly 5 component
+primitives. Every screen in the application is composed from these 5
+components plus standard HTML elements. Here they are.</p>
+<h4 id="button-8-variants-8-sizes-cva-powered">Button: 8 Variants, 8
+Sizes, CVA-Powered</h4>
+<p>The Button component demonstrates how CVA (Class Variance Authority)
+combines with the token system to produce a flexible, type-safe
+component API:</p>
+<pre class="tsx"><code>// From: components/ui/button.tsx
+
+const buttonVariants = cva(
+  // Base styles
+  [
+    &#39;inline-flex items-center justify-center gap-2&#39;,
+    &#39;font-mono text-sm font-semibold&#39;,
+    &#39;border-0 outline-none&#39;,
+    &#39;transition-all duration-150&#39;,
+    &#39;cursor-pointer select-none&#39;,
+    &#39;disabled:pointer-events-none disabled:opacity-50&#39;,
+    &#39;focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background&#39;,
+    // Brutalist -- no border radius anywhere
+    &#39;rounded-none&#39;,
+  ].join(&#39; &#39;),
+  {
+    variants: {
+      variant: {
+        /** Hot pink fill -- primary CTA */
+        default: [
+          &#39;bg-primary text-black&#39;,
+          &#39;hover:bg-[#c040a0] hover:shadow-[0_0_20px_rgba(224,80,176,0.4)]&#39;,
+          &#39;active:scale-[0.98] active:bg-[#b03090]&#39;,
+        ].join(&#39; &#39;),
+
+        /** Destructive -- red for delete/danger actions */
+        destructive: [
+          &#39;bg-error text-white&#39;,
+          &#39;hover:bg-[#dc2626] hover:shadow-[0_0_16px_rgba(239,68,68,0.4)]&#39;,
+          &#39;active:scale-[0.98]&#39;,
+        ].join(&#39; &#39;),
+
+        /** Outline -- hot pink border, transparent bg */
+        outline: [
+          &#39;border border-primary text-primary bg-transparent&#39;,
+          &#39;hover:bg-primary hover:text-black hover:shadow-[0_0_16px_rgba(224,80,176,0.3)]&#39;,
+          &#39;active:scale-[0.98]&#39;,
+        ].join(&#39; &#39;),
+
+        /** Secondary -- cyan accent */
+        secondary: [
+          &#39;bg-secondary text-black&#39;,
+          &#39;hover:bg-[#3a9bc7] hover:shadow-[0_0_20px_rgba(77,172,222,0.4)]&#39;,
+          &#39;active:scale-[0.98]&#39;,
+        ].join(&#39; &#39;),
+
+        /** Cyan outline */
+        &#39;secondary-outline&#39;: [
+          &#39;border border-secondary text-secondary bg-transparent&#39;,
+          &#39;hover:bg-secondary hover:text-black hover:shadow-[0_0_16px_rgba(77,172,222,0.3)]&#39;,
+          &#39;active:scale-[0.98]&#39;,
+        ].join(&#39; &#39;),
+
+        /** Ghost -- subtle surface hover */
+        ghost: [
+          &#39;bg-transparent text-text-secondary&#39;,
+          &#39;hover:bg-surface hover:text-text&#39;,
+          &#39;active:scale-[0.98]&#39;,
+        ].join(&#39; &#39;),
+
+        /** Link -- inline text link style */
+        link: [
+          &#39;bg-transparent text-primary underline-offset-4&#39;,
+          &#39;hover:underline hover:text-[#c040a0]&#39;,
+          &#39;p-0 h-auto&#39;,
+        ].join(&#39; &#39;),
+
+        /** Danger ghost -- red text ghost */
+        &#39;ghost-danger&#39;: [
+          &#39;bg-transparent text-error&#39;,
+          &#39;hover:bg-[rgba(239,68,68,0.1)] hover:text-[#dc2626]&#39;,
+          &#39;active:scale-[0.98]&#39;,
+        ].join(&#39; &#39;),
+      },
+
+      size: {
+        xs: &#39;h-7 px-2 text-xs&#39;,
+        sm: &#39;h-8 px-3 text-xs&#39;,
+        default: &#39;h-10 px-4 text-sm&#39;,
+        lg: &#39;h-12 px-6 text-base&#39;,
+        xl: &#39;h-14 px-8 text-lg&#39;,
+        icon: &#39;h-10 w-10 p-0&#39;,
+        &#39;icon-sm&#39;: &#39;h-8 w-8 p-0&#39;,
+        &#39;icon-lg&#39;: &#39;h-12 w-12 p-0&#39;,
+      },
+    },
+  }
+);</code></pre>
+<p>The hover effects are where the brutalist aesthetic comes alive. The
+primary button gets a hot pink glow on hover –
+<code>shadow-[0_0_20px_rgba(224,80,176,0.4)]</code>. The
+secondary-outline variant fills with cyan on hover, inverting the text
+to black. Combined with the sharp <code>0px</code> corners and JetBrains
+Mono text, these glow effects create a cyberpunk UI that feels like
+interacting with a terminal from the future.</p>
+<p>The component supports Radix Slot for composition
+(<code>asChild</code>), a loading state with an inline SVG spinner, and
+proper <code>aria-disabled</code> handling:</p>
+<pre class="tsx"><code>// From: components/ui/button.tsx
+
+const Button = React.forwardRef&lt;HTMLButtonElement, ButtonProps&gt;(
+  ({ className, variant, size, asChild = false, loading = false, children, disabled, ...props }, ref) =&gt; {
+    const Comp = asChild ? Slot : &#39;button&#39;;
+
+    return (
+      &lt;Comp
+        ref={ref}
+        className={cn(buttonVariants({ variant, size }), className)}
+        disabled={disabled || loading}
+        aria-disabled={disabled || loading}
+        {...props}
+      &gt;
+        {loading ? (
+          &lt;&gt;
+            &lt;LoadingSpinner /&gt;
+            &lt;span className=&quot;opacity-70&quot;&gt;{children}&lt;/span&gt;
+          &lt;/&gt;
+        ) : (
+          children
+        )}
+      &lt;/Comp&gt;
+    );
+  }
+);</code></pre>
+<h4 id="card-accent-variants-hover-glow-elevation">Card: Accent
+Variants, Hover Glow, Elevation</h4>
+<p>The Card system supports three accent modes (<code>none</code>,
+<code>primary</code>, <code>secondary</code>), a <code>hoverable</code>
+prop that adds the signature pink glow lift, and an
+<code>elevated</code> prop that switches from <code>#111111</code> to
+<code>#1a1a1a</code> background:</p>
+<pre class="tsx"><code>// From: components/ui/card.tsx
+
+const Card = React.forwardRef&lt;HTMLDivElement, CardProps&gt;(
+  ({ className, accent = &#39;none&#39;, hoverable = false, elevated = false, ...props }, ref) =&gt; {
+    const accentStyles = {
+      none: &#39;border-border&#39;,
+      primary: &#39;border-primary shadow-[0_0_20px_rgba(224,80,176,0.15)]&#39;,
+      secondary: &#39;border-secondary shadow-[0_0_20px_rgba(77,172,222,0.15)]&#39;,
+    };
+
+    return (
+      &lt;div
+        ref={ref}
+        className={cn(
+          &#39;rounded-none border font-mono&#39;,
+          elevated ? &#39;bg-surface-alt&#39; : &#39;bg-surface&#39;,
+          accentStyles[accent],
+          hoverable &amp;&amp; [
+            &#39;transition-all duration-200 cursor-pointer&#39;,
+            &#39;hover:border-primary hover:shadow-[0_0_20px_rgba(224,80,176,0.2)]&#39;,
+            &#39;hover:-translate-y-px&#39;,
+          ],
+          className
+        )}
+        {...props}
+      /&gt;
+    );
+  }
+);</code></pre>
+<p>The <code>hover:-translate-y-px</code> is a subtle but important
+detail. One pixel of vertical lift combined with the glow shadow creates
+a “floating” effect that makes the card feel interactive without
+breaking the brutalist flatness. It is a brutalist card that
+acknowledges you are hovering over it – just barely.</p>
+<h4 id="input-focus-glow-ring-error-states-leftright-slots">Input: Focus
+Glow Ring, Error States, Left/Right Slots</h4>
+<p>The Input component includes a two-layer focus ring – a
+<code>1px</code> solid border switch to primary plus a <code>12px</code>
+glow spread:</p>
+<pre class="tsx"><code>// From: components/ui/input.tsx
+
+&#39;focus:outline-none focus:border-primary focus:shadow-[0_0_0_1px_#e050b0,0_0_12px_rgba(224,80,176,0.2)]&#39;,</code></pre>
+<p>That comma-separated shadow creates both a crisp <code>1px</code>
+ring and a soft glow in a single CSS declaration. The error state
+replaces the pink with red:</p>
+<pre class="tsx"><code>error &amp;&amp; &#39;border-error focus:border-error focus:shadow-[0_0_0_1px_#ef4444]&#39;,</code></pre>
+<p>Labels are uppercase, <code>text-xs</code>,
+<code>tracking-wider</code>, <code>text-text-secondary</code> – the
+terminal aesthetic applied to form labels.</p>
+<h4 id="tabs-three-visual-variants-plus-scrollable-strip">Tabs: Three
+Visual Variants Plus Scrollable Strip</h4>
+<p>The Tabs system wraps Radix UI primitives with three visual variants
+(<code>underline</code>, <code>pills</code>, <code>bordered</code>) and
+includes a standalone <code>ScrollableTabs</code> component for the
+20-tab admin dashboard:</p>
+<pre class="tsx"><code>// From: components/ui/tabs.tsx
+
+function ScrollableTabs({ tabs, activeTab, onTabChange, className }: ScrollableTabsProps) {
+  const scrollRef = React.useRef&lt;HTMLDivElement&gt;(null);
+
+  React.useEffect(() =&gt; {
+    const container = scrollRef.current;
+    const activeEl = container?.querySelector(&#39;[aria-selected=&quot;true&quot;]&#39;) as HTMLElement;
+    if (activeEl &amp;&amp; container) {
+      const left = activeEl.offsetLeft - container.clientWidth / 2 + activeEl.clientWidth / 2;
+      container.scrollTo({ left: Math.max(0, left), behavior: &#39;smooth&#39; });
+    }
+  }, [activeTab]);
+
+  // ...renders tabs with hot pink active border, auto-scrolls active tab into view
+}</code></pre>
+<p>The auto-scroll logic centers the active tab in the viewport. Without
+it, the 20th tab in the admin dashboard would be invisible unless you
+manually scrolled right. With it, clicking “Reports” smoothly scrolls
+the strip to reveal the tab and its content.</p>
+<h4 id="badge-16-variants-including-status-feature-and-role">Badge: 16
+Variants Including Status, Feature, and Role</h4>
+<p>The Badge component has 16 variants – from basic <code>default</code>
+and <code>primary</code> through semantic variants like
+<code>success</code>, <code>warning</code>, <code>error</code>, to
+special-purpose variants like <code>featured</code>,
+<code>verified</code>, <code>trending</code>, <code>admin</code>, and
+<code>mod</code>. It supports a status dot indicator, removable chips,
+and a <code>BadgeGroup</code> that truncates overflow with a “+N more”
+count.</p>
+<p>From these 5 primitives plus 4 example compositions (HomeHero,
+ResourceCard, AuthForm, AdminTabs), all 21 screens are constructed. The
+composition count is intentionally low. Fewer building blocks means more
+consistency, and consistency is the entire point of a design system.</p>
+<hr />
+<h3 id="the-full-generation-pipeline">The Full Generation Pipeline</h3>
+<p>The generation pipeline has six stages. I have shown the simple
+version already. Here is the complete flow, including the branding
+safeguard that saved the project:</p>
+<pre class="mermaid"><code>flowchart TD
+    subgraph DESIGN[&quot;Design System Definition&quot;]
+        TOKENS[&quot;tokens.json\n47 tokens: colors, typography,\nspacing, borderRadius, shadows,\nbreakpoints, transitions, zIndex&quot;]
+        PRESET[&quot;tailwind-preset.js\nMaps tokens to Tailwind utilities\nOverrides font-sans with monospace\nCustom gradients + grid patterns&quot;]
+        BRAND[&quot;brand tokens\nname: Awesome Lists\ntagline, domain, copyright&quot;]
+        TOKENS --&gt; PRESET
+        BRAND --&gt; PROMPTS
+    end
+
+    subgraph PROMPT_ENG[&quot;Prompt Engineering&quot;]
+        TEMPLATE[&quot;Prompt Template\n1. Product name (first sentence)\n2. Full DESIGN SYSTEM spec\n3. LAYOUT description\n4. KEY ELEMENTS list\n5. INTERACTIVE STATES&quot;]
+        PROMPTS[&quot;21 Screen Prompts\npublic-screens.md (7)\nauth-screens.md (3)\nuser-screens.md (4)\nadmin-screens.md (2)\nlegal-screens.md (2)\n+ category-detail (2)\n+ resource-detail (1)&quot;]
+        TOKENS -.-&gt;|&quot;Inline every time\n(prevents context drift)&quot;| PROMPTS
+        TEMPLATE --&gt; PROMPTS
+    end
+
+    subgraph GENERATION[&quot;Stitch MCP Generation&quot;]
+        PROMPTS --&gt; S1[&quot;Screen 1: Home\nHero + categories grid\n+ stats bar&quot;]
+        PROMPTS --&gt; S2[&quot;Screen 2: Resources\nFilter sidebar + card grid\n+ pagination&quot;]
+        PROMPTS --&gt; S3[&quot;Screen 3-7\nSearch, About, Categories\nCategory Detail, Resource Detail&quot;]
+        PROMPTS --&gt; S4[&quot;Screen 8-10\nLogin, Register,\nForgot Password&quot;]
+        PROMPTS --&gt; S5[&quot;Screen 11-14\nProfile, Bookmarks,\nFavorites, History&quot;]
+        PROMPTS --&gt; S6[&quot;Screen 15-16\nAdmin Dashboard (20 tabs)\nSuggest Edit&quot;]
+        PROMPTS --&gt; S7[&quot;Screen 17-21\nPrivacy, Terms,\n+ 3 remaining screens&quot;]
+
+        S1 --&gt; REVIEW1{&quot;Visual review:\nColors correct?\nFont = monospace?\nBorder radius = 0px?\nBrand name correct?&quot;}
+        S2 --&gt; REVIEW1
+        S3 --&gt; REVIEW1
+        S4 --&gt; REVIEW1
+        S5 --&gt; REVIEW1
+        S6 --&gt; REVIEW1
+        S7 --&gt; REVIEW1
+    end
+
+    subgraph CONVERT[&quot;React Conversion&quot;]
+        REVIEW1 --&gt;|Pass| PRIMITIVES[&quot;5 Component Primitives\nButton (CVA, 8 variants)\nCard (accent, hoverable)\nInput (label, error, icons)\nTabs (3 variants + scrollable)\nBadge (16 variants)&quot;]
+        PRIMITIVES --&gt; COMPOSITIONS[&quot;4 Example Compositions\nHomeHero (hero + stats)\nResourceCard (thumbnail + meta)\nAuthForm (login/register/forgot)\nAdminTabs (20-tab dashboard)&quot;]
+        COMPOSITIONS --&gt; SCREENS[&quot;21 Screen Components\nAll with data-testid attributes\nAll using design token classes\nAll importing from primitives&quot;]
+        SCREENS --&gt; TESTIDS[&quot;data-testid Architecture\nPlanned before generation:\nhero, hero-headline,\ncta-explore, category-grid,\nresource-card, admin-tabs,\ntab-overview ... tab-reports&quot;]
+    end
+
+    subgraph VALIDATE[&quot;Puppeteer Validation&quot;]
+        TESTIDS --&gt; CHECKS[&quot;107 Validation Actions\n7 action types:\nnavigate, screenshot,\nwaitForSelector, assert,\nevaluate, click, fill&quot;]
+        CHECKS --&gt; RUNNER[&quot;run-validation.js\nSequential execution\nHeadless Chromium\n1440x900 viewport&quot;]
+        RUNNER --&gt; RESULTS{&quot;All 107\nactions pass?&quot;}
+        RESULTS --&gt;|Yes| SHIP[&quot;Ship\n21 validated screens\n+ JSON report\n+ screenshots/&quot;]
+        RESULTS --&gt;|No| REPORT[&quot;Failure Report\nCheck name, route,\nerror message, duration&quot;]
+        REPORT --&gt; FIX[&quot;Fix: Identify which\ntoken/component/selector\nfailed and regenerate&quot;]
+        FIX --&gt; PROMPTS
+    end
+
+    subgraph BRAND_CHECK[&quot;Branding Safeguard&quot;]
+        SCREENS --&gt; GREP[&quot;grep -rn scan\nForbidden: Video Dashboard,\nPlaceholder, lorem ipsum&quot;]
+        GREP --&gt; BRAND_OK{&quot;Clean?&quot;}
+        BRAND_OK --&gt;|Yes| VALIDATE
+        BRAND_OK --&gt;|No| FIX_BRAND[&quot;Replace incorrect names\nwith tokens.brand.name&quot;]
+        FIX_BRAND --&gt; GREP
+    end
+
+    style DESIGN fill:#1a1a2e,stroke:#e050b0,color:#fff
+    style PROMPT_ENG fill:#1a1a2e,stroke:#4dacde,color:#fff
+    style GENERATION fill:#1a1a2e,stroke:#f59e0b,color:#fff
+    style CONVERT fill:#1a1a2e,stroke:#e050b0,color:#fff
+    style VALIDATE fill:#1a1a2e,stroke:#22c55e,color:#fff
+    style BRAND_CHECK fill:#1a1a2e,stroke:#ef4444,color:#fff</code></pre>
+<p>The branding safeguard stage was not in the original plan. It was
+added after the branding bug, which I will tell you about now.</p>
+<hr />
+<h3 id="the-branding-bug-the-most-instructive-failure">The Branding Bug:
+The Most Instructive Failure</h3>
+<p>Here is the most instructive failure from the entire project. During
+generation, Stitch MCP started producing screens with the product name
+“Awesome Video Dashboard” instead of the correct name “Awesome Lists.”
+The substitution happened at screen 1 and propagated to 8 screens before
+it was caught.</p>
+<p>Eight screens. With the wrong product name. Shipped in a single
+generation session.</p>
+<p>The root cause analysis from the branding checklist identified three
+contributing factors:</p>
+<pre class="markdown"><code>// From: docs/branding-checklist.md
+
+## Why It Happens in AI Workflows
+
+### 1. Context Window Drift
+When generating multiple screens in a long session (21+ screens),
+the AI model&#39;s &quot;attention&quot; to early instructions diminishes. The
+product name specified in the first prompt may be remembered less
+faithfully by the 15th screen generation.
+
+### 2. Training Data Default Patterns
+AI models have seen millions of example UIs with placeholder names
+like &quot;Awesome App,&quot; &quot;My Dashboard,&quot; &quot;Video Platform.&quot; When the
+specific product name isn&#39;t prominent in the prompt, the model
+falls back to these common patterns.
+
+### 3. Semantic Similarity Substitution
+&quot;Awesome Lists&quot; and &quot;Awesome Video Dashboard&quot; share the word
+&quot;Awesome.&quot; The model sometimes pattern-matches on the adjective
+and completes with a more &quot;common&quot; noun phrase from its training data.</code></pre>
+<p>This failure is instructive because it reveals a failure mode unique
+to AI design generation that has no analog in traditional design
+workflows. A human designer will not accidentally rename the product.
+But an AI model, operating across a long session with drifting context,
+absolutely will.</p>
+<p>The fix involves two changes. First, treat branding as a first-class
+design token:</p>
+<pre class="json"><code>// From: docs/branding-checklist.md
+
+{
+  &quot;brand&quot;: {
+    &quot;name&quot;: &quot;Awesome Lists&quot;,
+    &quot;tagline&quot;: &quot;The Ultimate Curated Resource Directory&quot;,
+    &quot;domain&quot;: &quot;awesomeLists.dev&quot;,
+    &quot;copyrightHolder&quot;: &quot;Nick Krzemienski&quot;
+  }
+}</code></pre>
+<p>Second, run an automated grep after every generation session:</p>
+<pre class="bash"><code>grep -rn &quot;Video Dashboard\|Placeholder\|lorem ipsum&quot; src/ components/ app/</code></pre>
+<p>Three lines of bash. That is the fix. The branding bug is a
+procedural problem, not a technical one. The AI is perfectly capable of
+using the correct product name – it just needs to be told explicitly,
+every time, in every prompt, and checked after every output.</p>
+<hr />
+<h3 id="the-validation-suite-107-programmatic-puppeteer-actions">The
+Validation Suite: 107 Programmatic Puppeteer Actions</h3>
+<p>This is where most AI design workflows fall apart. You generate
+beautiful screens, manually eyeball them, declare victory, and ship
+something that breaks in production. The stitch-design-to-code approach
+replaces eyeballing with 107 programmatic Puppeteer actions across all
+21 screens.</p>
+<p>The checks are defined declaratively in a single file:</p>
+<pre class="javascript"><code>// From: validation/puppeteer-checks.js
+
+{
+  name: &#39;home-design-tokens&#39;,
+  route: &#39;/&#39;,
+  actions: [
+    { type: &#39;navigate&#39;, expected: 200 },
+    {
+      type: &#39;evaluate&#39;,
+      expected: () =&gt; {
+        const body = document.body;
+        const bg = window.getComputedStyle(body).backgroundColor;
+        return bg === &#39;rgb(0, 0, 0)&#39;;
+      },
+    },
+  ],
+},</code></pre>
+<p>That check validates that the home page background is literally
+<code>rgb(0, 0, 0)</code> – pure black, as specified in the design
+tokens. Not “dark enough.” Not “looks black.” Computationally verified
+pure black. If someone accidentally adds a CSS rule that sets the body
+to <code>#0a0a0a</code>, this check fails.</p>
+<p>The suite covers 7 action types: <code>navigate</code> (HTTP status
+checks), <code>screenshot</code> (visual capture),
+<code>waitForSelector</code> (DOM presence), <code>assert</code>
+(visibility), <code>evaluate</code> (arbitrary JS assertions),
+<code>click</code> (interaction), and <code>fill</code> (form
+input).</p>
+<p>Here is a form interaction check that fills both fields and captures
+the result:</p>
+<pre class="javascript"><code>// From: validation/puppeteer-checks.js
+
+{
+  name: &#39;login-form-fill&#39;,
+  route: &#39;/auth/login&#39;,
+  actions: [
+    { type: &#39;navigate&#39;, expected: 200 },
+    { type: &#39;fill&#39;, selector: &#39;[data-testid=&quot;email-input&quot;]&#39;, value: &#39;test@example.com&#39; },
+    { type: &#39;fill&#39;, selector: &#39;[data-testid=&quot;password-input&quot;]&#39;, value: &#39;password123&#39; },
+    { type: &#39;screenshot&#39;, screenshot: &#39;login-filled.png&#39; },
+  ],
+},</code></pre>
+<p>And here is one that validates the admin dashboard has at least 20
+tabs – a structural assertion that would be impossible to verify by eye
+consistently:</p>
+<pre class="javascript"><code>// From: validation/puppeteer-checks.js
+
+{
+  name: &#39;admin-tab-count&#39;,
+  route: &#39;/admin&#39;,
+  actions: [
+    { type: &#39;navigate&#39;, expected: 200 },
+    { type: &#39;waitForSelector&#39;, selector: &#39;[data-testid=&quot;admin-tabs&quot;]&#39; },
+    { type: &#39;evaluate&#39;, expected: () =&gt; document.querySelectorAll(&#39;[data-testid^=&quot;tab-&quot;]&#39;).length &gt;= 20 },
+  ],
+},</code></pre>
+<p>The validation runner executes checks sequentially (for deterministic
+screenshots), reports pass/fail with timing, and writes a JSON
+report:</p>
+<pre class="javascript"><code>// From: validation/run-validation.js
+
+for (let i = 0; i &lt; filteredChecks.length; i++) {
+  const check = filteredChecks[i];
+  const progress = `[${String(i + 1).padStart(2, &#39;0&#39;)}/${filteredChecks.length}]`;
+  process.stdout.write(`  ${progress} ${check.name.padEnd(40, &#39;.&#39;)} `);
+
+  const result = await runCheck(browser, check);
+  results.push(result);
+
+  if (result.status === &#39;pass&#39;) {
+    process.stdout.write(`\x1b[32mPASS\x1b[0m (${result.duration}ms)\n`);
+  } else {
+    process.stdout.write(`\x1b[31mFAIL\x1b[0m (${result.duration}ms)\n`);
+    log(&#39;fail&#39;, `  → ${result.error}`);
+  }
+}</code></pre>
+<p>The runner includes server reachability checks, a <code>--ci</code>
+flag for CI pipeline integration, and a <code>--check</code> filter for
+running subsets. The output looks like a proper test suite:</p>
+<pre><code>  [01/55] home-render.............................. PASS (342ms)
+  [02/55] home-hero-content........................ PASS (287ms)
+  [03/55] home-cta-buttons......................... PASS (301ms)
+  ...
+  [54/55] terms-tldr............................... PASS (198ms)
+  [55/55] terms-accept-button...................... PASS (211ms)
+
+  RESULTS: 55 passed, 0 failed
+  Avg check duration: 267ms
+  Screenshots saved to: screenshots/</code></pre>
+<p>The distribution across screen groups:</p>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Screen Group</th>
+<th>Checks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Public screens (Home, Resources, Search, About, Categories x2,
+Resource Detail)</td>
+<td>36</td>
+</tr>
+<tr>
+<td>Auth screens (Login, Register, Forgot Password)</td>
+<td>14</td>
+</tr>
+<tr>
+<td>User screens (Profile, Bookmarks, Favorites, History)</td>
+<td>18</td>
+</tr>
+<tr>
+<td>Admin screens (Admin Dashboard with 20 tabs, Suggest Edit)</td>
+<td>29</td>
+</tr>
+<tr>
+<td>Legal screens (Privacy Policy, Terms of Service)</td>
+<td>8</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>105 checks across 107 actions</strong></td>
+</tr>
+</tbody>
+</table>
+<p>The Admin Dashboard alone has 25 checks – one per tab plus KPI card
+validation. When you have a 20-tab admin interface, you cannot visually
+verify all 20 tabs by hand every time you make a change. The Puppeteer
+suite clicks each tab, waits for the content to render, and screenshots
+the result. Every time.</p>
+<p>Here is the complete validation loop, showing how failures are
+categorized and fed back into the regeneration cycle:</p>
+<pre class="mermaid"><code>flowchart TD
+    START[&quot;Start Validation\nnode validation/run-validation.js&quot;] --&gt; SERVER_CHECK{&quot;Dev server\nreachable at\nlocalhost:3000?&quot;}
+    SERVER_CHECK --&gt;|No| FAIL_EARLY[&quot;Exit 1:\nCannot reach server\nRun npm run dev first&quot;]
+    SERVER_CHECK --&gt;|Yes| LAUNCH[&quot;Launch headless Chromium\npuppeteer.launch()\n--no-sandbox&quot;]
+
+    LAUNCH --&gt; INIT[&quot;Load 107 actions\nfrom puppeteer-checks.js\nOptional: --check filter&quot;]
+
+    INIT --&gt; LOOP_START[&quot;For each check\n(sequential for deterministic screenshots)&quot;]
+
+    LOOP_START --&gt; NAVIGATE[&quot;page.goto(BASE_URL + route)\nwaitUntil: networkidle2\ntimeout: 10000ms&quot;]
+
+    NAVIGATE --&gt; STATUS_CHECK{&quot;HTTP status\n=== expected?&quot;}
+    STATUS_CHECK --&gt;|No| CHECK_FAIL[&quot;FAIL: Expected HTTP 200,\ngot {actual status}&quot;]
+    STATUS_CHECK --&gt;|Yes| ACTION_LOOP[&quot;Execute remaining actions&quot;]
+
+    ACTION_LOOP --&gt; ACTION{&quot;Action\ntype?&quot;}
+
+    ACTION --&gt;|waitForSelector| WAIT[&quot;page.waitForSelector(selector)\ntimeout: 10s\nWaits for DOM element&quot;]
+    ACTION --&gt;|assert| ASSERT[&quot;page.$(selector)\nelement.isIntersectingViewport()\nVerify element visible&quot;]
+    ACTION --&gt;|evaluate| EVAL[&quot;page.evaluate(fn)\nRun arbitrary JS in browser\ne.g., getComputedStyle check\nor querySelectorAll count&quot;]
+    ACTION --&gt;|screenshot| SCREENSHOT[&quot;page.screenshot()\nSave to screenshots/ dir\nFull viewport capture&quot;]
+    ACTION --&gt;|click| CLICK[&quot;page.waitForSelector()\npage.click(selector)\nsetTimeout(300ms settle)&quot;]
+    ACTION --&gt;|fill| FILL[&quot;page.click(selector, clickCount:3)\npage.type(selector, value)\nSelect-all then type&quot;]
+
+    WAIT --&gt; NEXT_ACTION{&quot;More\nactions?&quot;}
+    ASSERT --&gt; NEXT_ACTION
+    EVAL --&gt; NEXT_ACTION
+    SCREENSHOT --&gt; NEXT_ACTION
+    CLICK --&gt; NEXT_ACTION
+    FILL --&gt; NEXT_ACTION
+
+    NEXT_ACTION --&gt;|Yes| ACTION
+    NEXT_ACTION --&gt;|No| CHECK_PASS[&quot;PASS ({duration}ms)&quot;]
+
+    CHECK_PASS --&gt; NEXT_CHECK{&quot;More\nchecks?&quot;}
+    CHECK_FAIL --&gt; NEXT_CHECK
+
+    NEXT_CHECK --&gt;|Yes| LOOP_START
+    NEXT_CHECK --&gt;|No| SUMMARY[&quot;Summary Report&quot;]
+
+    SUMMARY --&gt; REPORT[&quot;validation-report.json\ntimestamp, baseUrl,\ntotal, passed, failed,\nper-check results&quot;]
+
+    REPORT --&gt; ANALYZE{&quot;Failures\nfound?&quot;}
+    ANALYZE --&gt;|0 failures| DONE[&quot;All 107 actions PASS\n21 screens validated\nScreenshots captured&quot;]
+
+    ANALYZE --&gt;|Failures found| CATEGORIZE[&quot;Categorize Failures&quot;]
+    CATEGORIZE --&gt; CAT_TOKEN[&quot;Token Violation\ne.g., bg !== rgb(0,0,0)\nFix: Check tokens.json\nmapping in preset&quot;]
+    CATEGORIZE --&gt; CAT_SELECTOR[&quot;Missing Selector\ne.g., data-testid not found\nFix: Add testid to component&quot;]
+    CATEGORIZE --&gt; CAT_BRAND[&quot;Branding Drift\ne.g., title !== Awesome Lists\nFix: Re-state brand in prompt&quot;]
+    CATEGORIZE --&gt; CAT_LAYOUT[&quot;Layout Break\ne.g., element not visible\nFix: Regenerate screen\nwith full token spec&quot;]
+
+    CAT_TOKEN --&gt; REGEN[&quot;Regenerate affected screen\nwith corrected tokens\nin prompt&quot;]
+    CAT_SELECTOR --&gt; REGEN
+    CAT_BRAND --&gt; REGEN
+    CAT_LAYOUT --&gt; REGEN
+
+    REGEN --&gt; NAVIGATE
+
+    subgraph CHECKS_DIST[&quot;Check Distribution (107 actions)&quot;]
+        direction LR
+        PUB[&quot;Public: 36\nHome(7), Resources(5),\nSearch(5), About(4),\nCategories(5),\nCatDetail(5),\nResourceDetail(5)&quot;]
+        AUTH[&quot;Auth: 14\nLogin(5),\nRegister(5),\nForgot(4)&quot;]
+        USER[&quot;User: 18\nProfile(5),\nBookmarks(5),\nFavorites(4),\nHistory(4)&quot;]
+        ADMIN[&quot;Admin: 29\nDashboard(25),\nSuggestEdit(4)&quot;]
+        LEGAL[&quot;Legal: 8\nPrivacy(4),\nTerms(4)&quot;]
+    end
+
+    style START fill:#1a1a2e,stroke:#e050b0,color:#fff
+    style DONE fill:#111,stroke:#22c55e,color:#22c55e
+    style FAIL_EARLY fill:#111,stroke:#ef4444,color:#ef4444
+    style CHECK_PASS fill:#111,stroke:#22c55e,color:#22c55e
+    style CHECK_FAIL fill:#111,stroke:#ef4444,color:#ef4444
+    style CHECKS_DIST fill:#1a1a1a,stroke:#4dacde,color:#a0a0a0</code></pre>
+<hr />
+<h3 id="the-prompt-engineering-pattern">The Prompt Engineering
+Pattern</h3>
+<p>Every screen prompt follows the same structure: product name in the
+first sentence, full design system spec inline, layout description, and
+key elements list. This pattern worked for all 21 screens:</p>
+<pre><code>Design a [SCREEN NAME] for &quot;Your Product&quot; -- [one-line description].
+
+DESIGN SYSTEM:
+- Background: #000000 (pure black)
+- Primary Accent: #e050b0 (hot pink)
+- Secondary Accent: #4dacde (cyan)
+- Surface/Card: #111111 background, #1a1a1a elevated
+- Text: #ffffff primary, #a0a0a0 secondary
+- Font: JetBrains Mono, monospaced, used everywhere
+- Border radius: 0px -- brutalist aesthetic
+- Component library: shadcn/ui
+- Borders: 1px solid #2a2a2a
+
+LAYOUT:
+[Describe structure here]
+
+KEY ELEMENTS:
+[List all UI elements with specifics]</code></pre>
+<p>The redundancy is intentional. Yes, the design system spec is
+identical across all 21 prompts. Yes, it increases token usage. But it
+eliminates context window drift entirely. The 15th screen generation has
+the same design fidelity as the 1st because it has the same context.</p>
+<p>The prompts are organized into 5 files by screen group:
+<code>public-screens.md</code> (7 screens), <code>auth-screens.md</code>
+(3 screens), <code>user-screens.md</code> (4 screens),
+<code>admin-screens.md</code> (2 screens), and
+<code>legal-screens.md</code> (2 screens), plus inline prompts for
+category detail, resource detail, and remaining screens. Each file
+repeats the full design system spec for every screen. Wasteful? In
+tokens, yes. In consistency, no.</p>
+<hr />
+<h3 id="design-systems-without-design-tools">Design Systems Without
+Design Tools</h3>
+<p>Let me be direct about what this project proved and what it did
+not.</p>
+<p>It proved that you can generate a complete, consistent,
+production-quality web application UI from text descriptions alone, with
+zero visual design tools, if you have three things: a comprehensive
+token system, disciplined prompt engineering, and automated
+validation.</p>
+<p>It proved that the gap between “AI can generate UI” and “AI reliably
+generates the right UI” is entirely a prompt engineering and validation
+infrastructure gap. The AI is capable. The process around it needs to be
+rigorous.</p>
+<p>It proved that token-driven development – where every visual decision
+flows from a single source of truth – is more powerful with AI
+generation than it is with traditional workflows. The single-source
+constraint that makes Figma-to-code handoffs tedious is exactly what
+makes AI-to-code handoffs reliable.</p>
+<hr />
+<h3 id="velocity-comparison-stitch-vs-traditional-pipeline">Velocity
+Comparison: Stitch vs Traditional Pipeline</h3>
+<p>Here is the honest comparison:</p>
+<table>
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 33%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr>
+<th>Stage</th>
+<th>Traditional (Figma + Handoff)</th>
+<th>Stitch + Tokens</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Design system definition</td>
+<td>2-3 days (Figma components)</td>
+<td>2 hours (tokens.json)</td>
+</tr>
+<tr>
+<td>21 screen designs</td>
+<td>5-7 days (Figma screens)</td>
+<td>4-6 hours (prompt writing + generation)</td>
+</tr>
+<tr>
+<td>Component development</td>
+<td>3-5 days (React + Storybook)</td>
+<td>2-3 hours (CVA + token classes)</td>
+</tr>
+<tr>
+<td>Design-to-code reconciliation</td>
+<td>2-3 days (visual QA, pixel matching)</td>
+<td>0 (code IS the design)</td>
+</tr>
+<tr>
+<td>Validation</td>
+<td>Manual QA, 1-2 days</td>
+<td>Automated, 45 seconds</td>
+</tr>
+<tr>
+<td>Total</td>
+<td>~15-20 working days</td>
+<td>~1-2 working days</td>
+</tr>
+</tbody>
+</table>
+<p>The biggest saving is not in any single stage. It is in eliminating
+the reconciliation step entirely. In a traditional pipeline, the design
+and the code are two different artifacts that must be kept in sync. With
+token-driven AI generation, they are the same artifact. The tokens ARE
+the design AND the code.</p>
+<hr />
+<h3 id="limitations-and-when-you-still-need-figma">Limitations and When
+You Still Need Figma</h3>
+<p>I am not claiming Figma is dead. Here is when you still need it:</p>
+<p><strong>Complex interaction design.</strong> The prompts describe
+static layouts and simple hover/focus states. If your UI involves
+drag-and-drop, complex animations, gesture-based interactions, or state
+machines with many transitions, you need a tool that lets you prototype
+interactions visually.</p>
+<p><strong>User research and iteration.</strong> Figma’s collaborative
+features – comments, version history, stakeholder review – are essential
+for teams that iterate on designs based on user feedback. You cannot A/B
+test two layout variants by writing two prompts and comparing terminal
+output.</p>
+<p><strong>Illustration and custom graphics.</strong> The brutalist
+aesthetic works partly because it avoids illustrations entirely. If your
+design includes custom icons, illustrations, complex SVG compositions,
+or photo treatments, you need visual tools.</p>
+<p><strong>Brand-sensitive consumer products.</strong> For products
+where visual polish is a primary competitive advantage (fashion, luxury,
+consumer social), the level of control you get from Figma’s vector tools
+is still unmatched. Token-driven generation excels at consistent,
+systematic design – not hand-crafted visual artistry.</p>
+<p><strong>Multi-platform design.</strong> If you need to design the
+same product across web, iOS, and Android with platform-specific
+patterns, Figma’s multi-frame approach gives you side-by-side comparison
+that prompt-based generation cannot match.</p>
+<p>The sweet spot for token-driven AI generation is internal tools,
+admin dashboards, developer-facing products, and any application where
+consistency and speed matter more than bespoke visual craft. The Awesome
+Lists application – a curated resource directory with a terminal
+aesthetic – is a near-perfect fit. A luxury fashion e-commerce site is
+not.</p>
+<hr />
+<h3 id="the-numbers">The Numbers</h3>
+<table>
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Screens generated from text descriptions</td>
+<td>21</td>
+</tr>
+<tr>
+<td>Design tokens governing every visual decision</td>
+<td>47</td>
+</tr>
+<tr>
+<td>Puppeteer validation actions</td>
+<td>107 (374 individual assertions within those actions)</td>
+</tr>
+<tr>
+<td>shadcn/ui component primitives</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Example compositions</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Button variants / button sizes</td>
+<td>8 / 8</td>
+</tr>
+<tr>
+<td>Badge variants</td>
+<td>16</td>
+</tr>
+<tr>
+<td>Tab visual variants</td>
+<td>3 + 1 scrollable</td>
+</tr>
+<tr>
+<td>Card accent modes</td>
+<td>3 (none, primary, secondary)</td>
+</tr>
+<tr>
+<td>Figma files opened</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Lines of hand-written CSS</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Session transcript lines</td>
+<td>~13,432</td>
+</tr>
+<tr>
+<td>Branding bugs caught, documented, and solved</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Time to validate all 21 screens</td>
+<td>~45 seconds</td>
+</tr>
+<tr>
+<td>Time to change primary color across all screens</td>
+<td>1 line edit + rebuild</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="what-the-remaining-challenges-look-like">What the Remaining
+Challenges Look Like</h3>
+<p>The interesting conclusion from this project: the remaining
+challenges are procedural, not technical.</p>
+<p>The AI can generate production-quality React components from text
+descriptions. It can apply design tokens consistently. It can produce
+20-tab admin dashboards with proper <code>data-testid</code> attributes.
+The technology works.</p>
+<p>What does not work yet is the process around the technology. Branding
+drift requires explicit prevention. Long sessions require redundant
+context. Validation requires deliberate <code>data-testid</code>
+architecture planned before generation, not added after. The
+<code>data-testid</code> plan is as important as the visual design plan
+– without it, you generate screens you cannot validate.</p>
+<p>These are workflow problems, not capability problems. And workflow
+problems are solvable. The branding bug was fixed with a three-line grep
+script. Context drift was fixed with redundant prompts. Missing test IDs
+were fixed by planning the validation architecture before starting
+generation.</p>
+<p>The gap between “AI can generate UI” and “AI reliably generates the
+right UI” is entirely a prompt engineering and validation infrastructure
+gap. Stitch MCP handles the generation. Puppeteer handles the
+validation. The hard part – the part this repo documents – is everything
+in between: the token system that constrains the design space, the
+prompt structure that ensures consistency, the branding safeguards that
+prevent drift, and the validation suite that proves correctness.</p>
+<p>Companion repo: <a
+href="https://github.com/krzemienski/stitch-design-to-code">github.com/krzemienski/stitch-design-to-code</a></p>
+<hr />
+<p><em>Part 10 of 11 in the <a
+href="https://github.com/krzemienski/agentic-development-guide">Agentic
+Development</a> series.</em></p>
+
+<hr>
+<h2>Diagrams &amp; Visual Assets</h2>
+<div class="diagram" id="post10-generation-pipeline"><h4>post10-generation-pipeline</h4><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6192.425000000001 4791.05" width="6192.425000000001" height="4791.05" style="--bg:#0d1117;--fg:#e6edf3;--line:#3d444d;--accent:#4493f8;--muted:#9198a1;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 30%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="4.8" refX="8" refY="2.4" orient="auto">
+    <polygon points="0 0, 8 2.4, 0 4.8" fill="var(--_arrow)" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="4.8" refX="0" refY="2.4" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.4, 8 4.8" fill="var(--_arrow)" />
+  </marker>
+</defs>
+<rect x="3271.775" y="276" width="1476.1999999999998" height="152" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="3271.775" y="276" width="1476.1999999999998" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="3283.775" y="290" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">&quot;Design System Definition&quot;</text>
+<rect x="3517.45" y="40" width="2634.9750000000004" height="152" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="3517.45" y="40" width="2634.9750000000004" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="3529.45" y="54" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">&quot;Prompt Engineering&quot;</text>
+<rect x="40" y="748" width="3279.1500000000005" height="152" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="40" y="748" width="3279.1500000000005" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="52" y="762" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">&quot;Stitch MCP Generation&quot;</text>
+<rect x="133.73750000000018" y="984" width="3265.7875" height="1340.25" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="133.73750000000018" y="984" width="3265.7875" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="145.73750000000018" y="998" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">&quot;React Conversion&quot;</text>
+<rect x="4444.750000000002" y="532" width="1590.0374999999995" height="4199.05" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="4444.750000000002" y="532" width="1590.0374999999995" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="4456.750000000002" y="546" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">&quot;Puppeteer Validation&quot;</text>
+<rect x="3525.050000000001" y="512" width="2529.7374999999993" height="4239.05" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="3525.050000000001" y="512" width="2529.7374999999993" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="3537.050000000001" y="526" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">&quot;Branding Safeguard&quot;</text>
+<polyline points="4536.35,152 4536.35,172 3756.65,172 3756.65,352" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="4484.75,388 4484.75,606 5153.075000000001,606" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="4536.35,152 4536.35,172 4900.675000000001,172 4900.675000000001,606 5153.075000000001,606" fill="none" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="4 4" marker-end="url(#arrowhead)" />
+<polyline points="5588.9000000000015,152 5588.9000000000015,606 5235.125,606" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5194.1,624 5194.1,644 4652.4375,644 4652.4375,842 472.9500000000003,842" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5194.1,624 5194.1,644 4672.4375,644 4672.4375,842 979.4000000000002,842" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5194.1,624 5194.1,644 4692.4375,644 4692.4375,842 1557.35,842" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5194.1,624 5194.1,644 4712.4375,644 4712.4375,842 1956.5500000000002,842" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5194.1,624 5194.1,644 5820.6625,644 5820.6625,842 2405.8,842" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5194.1,624 5194.1,644 5840.6625,644 5840.6625,842 2855.05,842" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5194.1,624 5194.1,644 5860.6625,644 5860.6625,842 3297.1500000000005,842" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="267.47500000000025,860 267.47500000000025,1348.7056963558828 1396.794303644117,1348.7056963558828" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="738.1750000000002,860 738.1750000000002,1320.8789491179446 1424.6210508820554,1320.8789491179446" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="1280.375,860 1280.375,1247.8701710816777 1497.6298289183223,1247.8701710816777" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="1768.95,860 1768.95,1125.1240381043358 1750.6240381043358,1125.1240381043358" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="2193.175,860 2193.175,1268.4597586004693 1893.9597586004693,1268.4597586004693" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="2642.425,860 2642.425,1321.6411090141683 1947.1411090141683,1321.6411090141683" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="3088.1000000000004,860 3088.1000000000004,1348.0257090589173 1973.5257090589173,1348.0257090589173" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="1685.5,1795.25 1685.5,2012.25" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="1685.5,2048.25 1685.5,2248.25" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="1685.5,2284.25 1685.5,2344.25 3984.9,2344.25 3984.9,2484.25" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="3984.9,2520.25 3984.9,2540.25 5488.700000000001,2540.25 5488.700000000001,3304.45 5720.800000000001,3304.45" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5122.075000000001,3322.45 5122.075000000001,3522.45" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5122.075000000001,3558.45 5122.075000000001,3758.45" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5122.075000000001,3794.45 5122.075000000001,3994.45" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5048.738566303482,4148.7135663034815 5048.738566303482,4242.05 4879.575000000001,4242.05 4879.575000000001,4439.05" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5195.411433696519,4148.7135663034815 5195.411433696519,4242.05 5364.575000000001,4242.05 5364.575000000001,4439.05" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5364.575000000001,4475.05 5364.575000000001,4693.05 5480.2875,4693.05" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5746.5375,4675.05 5746.5375,4655.05 5880.6625,4655.05 5880.6625,606 5235.125,606" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="3984.9,2520.25 3984.9,2720.25" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="3984.9,2756.25 3984.9,2776.25 3794.275,2776.25 3794.275,2956.25" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="3846.7605017070355,3016.9644982929644 3846.7605017070355,3089.45 4771.4025,3089.45 4771.4025,3304.45 4523.35,3304.45" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="3794.275,3069.45 3794.275,3304.45 3793.725,3304.45" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="3984.9,3286.45 3984.9,3266.45 4204.825000000001,3266.45 4204.825000000001,2738.25 4251.15,2738.25" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<rect x="4763.975000000001" y="356.5" width="273.40000000000003" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="4900.675000000001" y="370" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">&quot;Inline every time\n(prevents context drift)&quot;</text>
+<rect x="1666.06" y="1890.25" width="38.88" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="1685.5" y="1903.75" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">Pass</text>
+<rect x="4862.995000000001" y="4317.05" width="33.16" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="4879.575000000001" y="4330.55" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">Yes</text>
+<rect x="5350.8550000000005" y="4317.05" width="27.44" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="5364.575000000001" y="4330.55" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">No</text>
+<rect x="4754.8225" y="3164.45" width="33.16" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="4771.4025" y="3177.95" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">Yes</text>
+<rect x="3780.5550000000003" y="3164.45" width="27.44" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="3794.275" y="3177.95" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">No</text>
+<rect x="4119.950000000001" y="116" width="832.8000000000001" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="3293.775" y="352" width="925.7500000000001" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="4243.525" y="352" width="482.45000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="5153.075000000001" y="588" width="82.05000000000001" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="5047.375000000002" y="116" width="1083.0500000000002" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="62.00000000000023" y="824" width="410.95000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="496.95000000000016" y="824" width="482.45000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="1003.4" y="824" width="553.95" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="1581.35" y="824" width="375.20000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="1980.5500000000002" y="824" width="425.25000000000006" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="2429.8" y="824" width="425.25000000000006" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="2879.05" y="824" width="418.1" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<polygon points="1685.5,1060 2053.125,1427.625 1685.5,1795.25 1317.875,1427.625" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="1104.65" y="2012.25" width="1161.7" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="1147.55" y="2248.25" width="1075.9" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="3547.05" y="2484.25" width="875.7" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="4523.35" y="3286.45" width="1197.45" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="4702.1" y="3522.45" width="839.95" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="4823.650000000001" y="3758.45" width="596.85" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<polygon points="5122.075000000001,3994.45 5235.875000000001,4108.25 5122.075000000001,4222.05 5008.275000000001,4108.25" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="4652.650000000001" y="4439.05" width="453.85" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="5130.500000000001" y="4439.05" width="468.15000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="5480.2875" y="4675.05" width="532.5" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="3718.65" y="2720.25" width="532.5" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<polygon points="3794.275,2956.25 3850.875,3012.85 3794.275,3069.45 3737.675,3012.85" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="3793.725" y="3286.45" width="382.35" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<text x="4536.35" y="134" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;tokens.json\n47 tokens: colors, typography,\nspacing, borderRadius, shadows,\nbreakpoints, transitions, zIndex&quot;</text>
+<text x="3756.65" y="370" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;tailwind-preset.js\nMaps tokens to Tailwind utilities\nOverrides font-sans with monospace\nCustom gradients + grid patterns&quot;</text>
+<text x="4484.75" y="370" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;brand tokens\nname: Awesome Lists\ntagline, domain, copyright&quot;</text>
+<text x="5194.1" y="606" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">PROMPTS</text>
+<text x="5588.9000000000015" y="134" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Prompt Template\n1. Product name (first sentence)\n2. Full DESIGN SYSTEM spec\n3. LAYOUT description\n4. KEY ELEMENTS list\n5. INTERACTIVE STATES&quot;</text>
+<text x="267.47500000000025" y="842" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Screen 1: Home\nHero + categories grid\n+ stats bar&quot;</text>
+<text x="738.1750000000002" y="842" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Screen 2: Resources\nFilter sidebar + card grid\n+ pagination&quot;</text>
+<text x="1280.375" y="842" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Screen 3-7\nSearch, About, Categories\nCategory Detail, Resource Detail&quot;</text>
+<text x="1768.9499999999998" y="842" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Screen 8-10\nLogin, Register,\nForgot Password&quot;</text>
+<text x="2193.175" y="842" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Screen 11-14\nProfile, Bookmarks,\nFavorites, History&quot;</text>
+<text x="2642.425" y="842" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Screen 15-16\nAdmin Dashboard (20 tabs)\nSuggest Edit&quot;</text>
+<text x="3088.1000000000004" y="842" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Screen 17-21\nPrivacy, Terms,\n+ 3 remaining screens&quot;</text>
+<text x="1685.5" y="1427.625" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Visual review:\nColors correct?\nFont = monospace?\nBorder radius = 0px?\nBrand name correct?&quot;</text>
+<text x="1685.5" y="2030.25" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;5 Component Primitives\nButton (CVA, 8 variants)\nCard (accent, hoverable)\nInput (label, error, icons)\nTabs (3 variants + scrollable)\nBadge (16 variants)&quot;</text>
+<text x="1685.5" y="2266.25" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;4 Example Compositions\nHomeHero (hero + stats)\nResourceCard (thumbnail + meta)\nAuthForm (login/register/forgot)\nAdminTabs (20-tab dashboard)&quot;</text>
+<text x="3984.9" y="2502.25" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;21 Screen Components\nAll with data-testid attributes\nAll using design token classes\nAll importing from primitives&quot;</text>
+<text x="5122.075000000001" y="3304.45" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;data-testid Architecture\nPlanned before generation:\nhero, hero-headline,\ncta-explore, category-grid,\nresource-card, admin-tabs,\ntab-overview ... tab-reports&quot;</text>
+<text x="5122.075000000001" y="3540.45" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;107 Validation Actions\n7 action types:\nnavigate, screenshot,\nwaitForSelector, assert,\nevaluate, click, fill&quot;</text>
+<text x="5122.075000000001" y="3776.45" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;run-validation.js\nSequential execution\nHeadless Chromium\n1440x900 viewport&quot;</text>
+<text x="5122.075000000001" y="4108.25" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;All 107\nactions pass?&quot;</text>
+<text x="4879.575000000001" y="4457.05" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Ship\n21 validated screens\n+ JSON report\n+ screenshots/&quot;</text>
+<text x="5364.575000000001" y="4457.05" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Failure Report\nCheck name, route,\nerror message, duration&quot;</text>
+<text x="5746.5375" y="4693.05" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Fix: Identify which\ntoken/component/selector\nfailed and regenerate&quot;</text>
+<text x="3984.9" y="2738.25" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;grep -rn scan\nForbidden: Video Dashboard,\nPlaceholder, lorem ipsum&quot;</text>
+<text x="3794.275" y="3012.85" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Clean?&quot;</text>
+<text x="3984.9" y="3304.45" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Replace incorrect names\nwith tokens.brand.name&quot;</text>
+</svg></div><div class="diagram" id="post10-stitch-workflow"><h4>post10-stitch-workflow</h4><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 563.575 754.7" width="563.575" height="754.7" style="--bg:#0d1117;--fg:#e6edf3;--line:#3d444d;--accent:#4493f8;--muted:#9198a1;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 30%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="4.8" refX="8" refY="2.4" orient="auto">
+    <polygon points="0 0, 8 2.4, 0 4.8" fill="var(--_arrow)" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="4.8" refX="0" refY="2.4" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.4, 8 4.8" fill="var(--_arrow)" />
+  </marker>
+</defs>
+<polyline points="375.30000000000007,76 375.30000000000007,96 256.20000000000005,96 256.20000000000005,116" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="256.20000000000005,152 256.20000000000005,192" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="256.20000000000005,228 256.20000000000005,285" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="256.20000000000005,321 256.20000000000005,361" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="256.20000000000005,397 256.20000000000005,484.5216461438756 327.7783538561245,484.5216461438756" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="375.30000000000007,621.7 375.30000000000007,678.7" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="422.8216461438756,484.5216461438756 422.8216461438756,417 494.4000000000001,417 494.4000000000001,58 523.575,58" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<rect x="358.7200000000001" y="636.7" width="33.16" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="375.30000000000007" y="650.2" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">Yes</text>
+<rect x="480.68000000000006" y="243" width="27.44" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="494.4000000000001" y="256.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">No</text>
+<rect x="227.02500000000006" y="40" width="296.55" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="104.35000000000002" y="116" width="303.70000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="93.62500000000003" y="192" width="325.15000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="40.00000000000003" y="285" width="432.40000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="61.45000000000002" y="361" width="389.50000000000006" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<polygon points="375.30000000000007,437 467.6500000000001,529.35 375.30000000000007,621.7 282.95000000000005,529.35" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="337.8500000000001" y="678.7" width="74.9" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<text x="375.30000000000007" y="58" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Craft Prompt\n(embed design system)&quot;</text>
+<text x="256.20000000000005" y="134" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Stitch MCP\n(generate visual design)&quot;</text>
+<text x="256.20000000000005" y="210" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Design Output\n(review spec compliance)&quot;</text>
+<text x="256.20000000000005" y="303" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;React Conversion\n(build components,\nadd data-testid)&quot;</text>
+<text x="256.20000000000005" y="379" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Puppeteer Validation\n(107 actions / 21 screens)&quot;</text>
+<text x="375.30000000000007" y="529.35" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;All Checks Pass?&quot;</text>
+<text x="375.30000000000007" y="696.7" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Ship&quot;</text>
+</svg></div><div class="diagram" id="post10-token-hierarchy"><h4>post10-token-hierarchy</h4><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8648.7 376" width="8648.7" height="376" style="--bg:#0d1117;--fg:#e6edf3;--line:#3d444d;--accent:#4493f8;--muted:#9198a1;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 30%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="4.8" refX="8" refY="2.4" orient="auto">
+    <polygon points="0 0, 8 2.4, 0 4.8" fill="var(--_arrow)" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="4.8" refX="0" refY="2.4" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.4, 8 4.8" fill="var(--_arrow)" />
+  </marker>
+</defs>
+<rect x="40" y="40" width="8568.7" height="96" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="40" y="40" width="8568.7" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="52" y="54" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">&quot;Primitive Tokens (tokens.json)&quot;</text>
+<rect x="611.7624999999998" y="140" width="4935.450000000001" height="96" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="611.7624999999998" y="140" width="4935.450000000001" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="623.7624999999998" y="154" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">&quot;Semantic Tokens (tailwind-preset.js)&quot;</text>
+<rect x="2069.325" y="240" width="4510.050000000001" height="96" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="2069.325" y="240" width="4510.050000000001" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="2081.325" y="254" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">&quot;Component Tokens (CVA variants)&quot;</text>
+<polyline points="4324.35,136 4324.35,156 3079.4875,156 3079.4875,176" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="3079.4875,236 3079.4875,306 2069.325,306" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="4324.35,136 4324.35,156 5569.212500000001,156 5569.212500000001,306 6579.375000000001,306" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<rect x="55.999999999999986" y="88" width="232.20000000000002" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="312.1999999999997" y="88" width="210.75000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="546.9499999999996" y="88" width="225.05" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="795.9999999999993" y="88" width="210.75000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="1030.7499999999995" y="88" width="232.20000000000002" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="1286.9499999999998" y="88" width="246.50000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="1557.4499999999996" y="88" width="189.3" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="1770.7499999999998" y="88" width="253.65" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="2048.3999999999996" y="88" width="225.05" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="2297.45" y="88" width="203.60000000000002" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="2525.05" y="88" width="246.50000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="2795.55" y="88" width="210.75000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="3030.3" y="88" width="210.75000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="3265.05" y="88" width="196.45000000000002" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="3485.5" y="88" width="332.3" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="3841.8" y="88" width="346.6" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="4212.4" y="88" width="346.6" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="4583" y="88" width="360.90000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="4967.900000000001" y="88" width="389.50000000000006" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="5381.4" y="88" width="410.95000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="5816.349999999999" y="88" width="375.20000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="6215.55" y="88" width="368.05" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="6607.6" y="88" width="275.1" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="6906.7" y="88" width="332.3" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="7263.000000000001" y="88" width="403.8" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="7690.8" y="88" width="246.50000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="7961.3" y="88" width="346.6" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="8331.900000000001" y="88" width="260.8" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="627.7624999999998" y="188" width="339.45000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="991.2124999999999" y="188" width="403.8" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="1419.0124999999998" y="188" width="446.70000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="1889.7124999999996" y="188" width="511.05" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="2424.7625" y="188" width="539.6500000000001" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="2988.4124999999995" y="188" width="310.85" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="3323.2625" y="188" width="396.65000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="3743.9125" y="188" width="482.45000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="4250.3625" y="188" width="396.65000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="4671.012500000001" y="188" width="446.70000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="5141.712500000001" y="188" width="389.50000000000006" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="2085.325" y="288" width="503.90000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="2613.225" y="288" width="682.6500000000001" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="3319.875" y="288" width="596.85" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="3940.7250000000004" y="288" width="468.15000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="4432.875" y="288" width="575.4000000000001" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="5032.275000000001" y="288" width="553.95" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="5610.225" y="288" width="482.45000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="6116.675000000001" y="288" width="446.70000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<text x="172.1" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;colors.background\n#000000&quot;</text>
+<text x="417.5749999999997" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;colors.primary\n#e050b0&quot;</text>
+<text x="659.4749999999996" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;colors.secondary\n#4dacde&quot;</text>
+<text x="901.3749999999993" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;colors.surface\n#111111&quot;</text>
+<text x="1146.8499999999995" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;colors.surfaceAlt\n#1a1a1a&quot;</text>
+<text x="1410.1999999999998" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;colors.surfaceHover\n#222222&quot;</text>
+<text x="1652.0999999999997" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;colors.text\n#ffffff&quot;</text>
+<text x="1897.5749999999998" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;colors.textSecondary\n#a0a0a0&quot;</text>
+<text x="2160.9249999999997" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;colors.textMuted\n#606060&quot;</text>
+<text x="2399.25" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;colors.border\n#2a2a2a&quot;</text>
+<text x="2648.3" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;colors.borderAccent\n#3a3a3a&quot;</text>
+<text x="2900.925" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;colors.success\n#22c55e&quot;</text>
+<text x="3135.675" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;colors.warning\n#f59e0b&quot;</text>
+<text x="3363.275" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;colors.error\n#ef4444&quot;</text>
+<text x="3651.65" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;colors.primaryGlow\nrgba(224,80,176,0.3)&quot;</text>
+<text x="4015.1000000000004" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;colors.secondaryGlow\nrgba(77,172,222,0.3)&quot;</text>
+<text x="4385.7" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;colors.primarySubtle\nrgba(224,80,176,0.1)&quot;</text>
+<text x="4763.45" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;colors.secondarySubtle\nrgba(77,172,222,0.1)&quot;</text>
+<text x="5162.650000000001" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;typography.fontFamily\nJetBrains Mono, monospace&quot;</text>
+<text x="5586.875" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;typography.fontFamilyFallback\nCourier New, Courier&quot;</text>
+<text x="6003.95" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;typography.sizes\nxs: 0.75rem ... 4xl: 2.25rem&quot;</text>
+<text x="6399.575" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;typography.weights\nnormal: 400 ... bold: 700&quot;</text>
+<text x="6745.150000000001" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;borderRadius.*\n0px (ALL values)&quot;</text>
+<text x="7072.849999999999" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;shadows.card\n0 4px 16px rgba(0,0,0,0.6)&quot;</text>
+<text x="7464.900000000001" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;shadows.primaryGlow\n0 0 20px rgba(224,80,176,0.4)&quot;</text>
+<text x="7814.05" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;spacing\n0: 0px ... 20: 5rem&quot;</text>
+<text x="8134.6" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;transitions\nfast: 150ms ... slower: 500ms&quot;</text>
+<text x="8462.300000000001" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;zIndex\nbase: 0 ... toast: 500&quot;</text>
+<text x="797.4874999999998" y="206" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;bg-background\n= tokens.colors.background&quot;</text>
+<text x="1193.1125" y="206" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;bg-primary / text-primary\n= tokens.colors.primary&quot;</text>
+<text x="1642.3624999999997" y="206" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;bg-secondary / text-secondary\n= tokens.colors.secondary&quot;</text>
+<text x="2145.2374999999997" y="206" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;bg-surface / bg-surface-alt\n= tokens.colors.surface / surfaceAlt&quot;</text>
+<text x="2694.5874999999996" y="206" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;text-text / text-text-secondary\n= tokens.colors.text / textSecondary&quot;</text>
+<text x="3143.8374999999996" y="206" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;border-border\n= tokens.colors.border&quot;</text>
+<text x="3521.5874999999996" y="206" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;font-mono AND font-sans\n= JetBrains Mono (both!)&quot;</text>
+<text x="3985.1375" y="206" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;rounded-none / rounded-sm / rounded-lg\n= 0px (all identical)&quot;</text>
+<text x="4448.6875" y="206" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;shadow-primary-glow\n= tokens.shadows.primaryGlow&quot;</text>
+<text x="4894.362500000001" y="206" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;bg-hero-gradient\n= radial-gradient(primary + secondary)&quot;</text>
+<text x="5336.462500000001" y="206" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;bg-grid-pattern\n= 1px border lines at intervals&quot;</text>
+<text x="2337.2749999999996" y="306" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Button.default\nbg-primary text-black\nhover: shadow primaryGlow&quot;</text>
+<text x="2954.55" y="306" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Button.secondary-outline\nborder-secondary text-secondary\nhover: bg-secondary text-black&quot;</text>
+<text x="3618.3" y="306" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Button.ghost\nbg-transparent text-text-secondary\nhover: bg-surface text-text&quot;</text>
+<text x="4174.8" y="306" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Card.base\nbg-surface border-border\nrounded-none font-mono&quot;</text>
+<text x="4720.575" y="306" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Card.hoverable\nhover: border-primary\nshadow primaryGlow, -translate-y-px&quot;</text>
+<text x="5309.250000000001" y="306" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Input.base\nbg-surface border-border\nfocus: border-primary + glow ring&quot;</text>
+<text x="5851.450000000001" y="306" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Badge.primary\nbg-primary-subtle border-primary\ntext-primary&quot;</text>
+<text x="6340.0250000000015" y="306" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;TabsTrigger.active\nborder-b-2 border-primary\ntext-text&quot;</text>
+</svg></div><div class="diagram" id="post10-validation-loop"><h4>post10-validation-loop</h4><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 7332.695 2363.85" width="7332.695" height="2363.85" style="--bg:#0d1117;--fg:#e6edf3;--line:#3d444d;--accent:#4493f8;--muted:#9198a1;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 30%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="4.8" refX="8" refY="2.4" orient="auto">
+    <polygon points="0 0, 8 2.4, 0 4.8" fill="var(--_arrow)" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="4.8" refX="0" refY="2.4" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.4, 8 4.8" fill="var(--_arrow)" />
+  </marker>
+</defs>
+<rect x="2285.8025000000002" y="40" width="836.2" height="336" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="2285.8025000000002" y="40" width="836.2" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="2297.8025000000002" y="54" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">&quot;Check Distribution (107 actions)&quot;</text>
+<polyline points="2056.3275,244 2056.3275,416" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="1961.3859014822385,684.5084014822388 1961.3859014822385,807.95 1826.34,807.95 1826.34,836.45" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="2222.8963887605046,612.8811112394955 2222.8963887605046,807.95 4366.745000000001,807.95 4366.745000000001,836.45" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="4366.745000000001,872.45 4366.745000000001,912.45" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="4366.745000000001,948.45 4366.745000000001,1052.075" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="4366.745000000001,1088.075 4366.745000000001,1180.2 3953.9700000000003,1180.2 3953.9700000000003,1226.7 4093.3450000000007,1226.7" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="4366.745000000001,1244.7 4366.745000000001,1284.7000000000003" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="4486.982122923231,1420.6628770767702 4486.982122923231,1569.4 6761.4325,1569.4 6761.4325,1597.9" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="4366.745000000001,1540.9 4366.745000000001,1597.9" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="4366.745000000001,1597.9 4366.745000000001,1569.4 6586.2975,1569.4 6586.2975,1072.2339519877462 2612.316048012254,1072.2339519877462" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="2455.065940531129,1073.9159405311284 2455.065940531129,1180.2 302.67499999999995,1180.2 302.67499999999995,1208.7" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="2456.3152236080246,1075.1652236080242 2456.3152236080246,1180.2 877.05,1180.2 877.05,1208.7" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="2459.682405207697,1078.5324052076962 2459.682405207697,1180.2 1580.125,1180.2 1580.125,1208.7" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="2474.370035403927,1093.2200354039267 2474.370035403927,1180.2 2254.6000000000004,1180.2 2254.6000000000004,1208.7" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="2591.3299645960738,1093.2200354039267 2591.3299645960738,1180.2 2811.1000000000004,1180.2 2811.1000000000004,1208.7" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="2605.5682119943526,1078.981788005648 2605.5682119943526,1180.2 3431.9500000000007,1180.2 3431.9500000000007,1208.7" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="302.67499999999995,1244.7 302.67499999999995,1406.3550235018752 2033.642476498125,1406.3550235018752" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="877.05,1244.7 877.05,1403.6792202089348 2036.3182797910654,1403.6792202089348" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="1580.125,1244.7 1580.125,1394.2541005111173 2045.743399488883,1394.2541005111173" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="2254.6000000000004,1244.7 2254.6000000000004,1369.3345803084715 2154.1320803084714,1369.3345803084715" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="2811.1000000000004,1244.7 2811.1000000000004,1397.899099258682 2182.696599258682,1397.899099258682" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="3431.9500000000007,1244.7 3431.9500000000007,1404.2025152411761 2189.000015241176,1404.2025152411761" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="2190.6860463381504,1405.8885463381505 2190.6860463381504,1264.7 3789.9800000000005,1264.7 3789.9800000000005,1076.6494525527426 2607.900547447258,1076.6494525527426" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="2112.3975,1498.0000000000002 2112.3975,1597.9" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="2112.3975,1633.9 2112.3975,1753.1561848372698 5433.32631516273,1753.1561848372698" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="6761.4325,1633.9 6761.4325,1749.3826125992707 5588.06511259927,1749.3826125992707" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5589.015793055779,1750.3332930557794 5589.015793055779,1653.9 7008.725,1653.9 7008.725,1070.075 4597.245000000001,1070.075" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5512.5824999999995,1837.15 5512.5824999999995,1894.15" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5512.5824999999995,1930.15 5512.5824999999995,1970.15" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5512.5824999999995,2006.15 5512.5824999999995,2132.1754383157704 6954.719561684229,2132.1754383157704" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="7040.745,2230.85 7040.745,2287.85" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="7097.150006062706,2102.5550060627056 7097.150006062706,2026.15 7217.045,2026.15 7217.045,854.45 5900.445000000001,854.45" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5809.370000000001,872.45 5809.370000000001,892.45 4976.870000000001,892.45 4976.870000000001,912.45" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5809.370000000001,872.45 5809.370000000001,892.45 5612.02,892.45 5612.02,912.45" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5809.370000000001,872.45 5809.370000000001,892.45 6222.145,892.45 6222.145,912.45" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5809.370000000001,872.45 5809.370000000001,892.45 6868.02,892.45 6868.02,912.45" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="4976.870000000001,948.45 4976.870000000001,1070.075 5589.595000000001,1070.075" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5612.02,948.45 5612.02,1070.075 5589.595000000001,1070.075" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="6222.145,948.45 6222.145,1070.075 6064.895,1070.075" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="6868.02,948.45 6868.02,1070.075 6064.895,1070.075" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="5827.245000000001,1088.075 5827.245000000001,1180.2 5294.445000000001,1180.2 5294.445000000001,1226.7 4640.145,1226.7" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<rect x="1812.62" y="794.45" width="27.44" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="1826.34" y="807.95" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">No</text>
+<rect x="4350.165000000001" y="794.45" width="33.16" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="4366.745000000001" y="807.95" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">Yes</text>
+<rect x="6747.7125" y="1555.9" width="27.44" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="6761.4325" y="1569.4" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">No</text>
+<rect x="4350.165000000001" y="1555.9" width="33.16" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="4366.745000000001" y="1569.4" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">Yes</text>
+<rect x="251.77499999999995" y="1166.7" width="101.8" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="302.67499999999995" y="1180.2" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">waitForSelector</text>
+<rect x="851.89" y="1166.7" width="50.32" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="877.05" y="1180.2" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">assert</text>
+<rect x="1549.245" y="1166.7" width="61.760000000000005" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="1580.125" y="1180.2" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">evaluate</text>
+<rect x="2218.0000000000005" y="1166.7" width="73.2" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="2254.6000000000004" y="1180.2" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">screenshot</text>
+<rect x="2788.8" y="1166.7" width="44.6" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="2811.1000000000004" y="1180.2" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">click</text>
+<rect x="3412.5100000000007" y="1166.7" width="38.88" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="3431.9500000000007" y="1180.2" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">fill</text>
+<rect x="3773.4000000000005" y="1213.2" width="33.16" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="3789.9800000000005" y="1226.7" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">Yes</text>
+<rect x="2098.6775000000002" y="1555.9" width="27.44" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="2112.3975" y="1569.4" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">No</text>
+<rect x="6992.145" y="1399.3000000000002" width="33.16" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="7008.725" y="1412.8000000000002" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">Yes</text>
+<rect x="5498.862499999999" y="1852.15" width="27.44" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="5512.5824999999995" y="1865.65" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">No</text>
+<rect x="7004.1449999999995" y="2245.85" width="73.2" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="7040.745" y="2259.35" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">0 failures</text>
+<rect x="7169.005" y="1555.9" width="96.08" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="7217.045" y="1569.4" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">Failures found</text>
+<rect x="1850.8525" y="208" width="410.95000000000005" height="36" rx="0" ry="0" fill="#1a1a2e" stroke="#e050b0" stroke-width="0.75" />
+<polygon points="2056.3275,416 2238.0525,597.725 2056.3275,779.45 1874.6025,597.725" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="1620.8649999999998" y="836.45" width="410.95000000000005" height="36" rx="0" ry="0" fill="#111" stroke="#ef4444" stroke-width="0.75" />
+<rect x="4136.245000000001" y="836.45" width="461.00000000000006" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="4100.495000000001" y="912.45" width="532.5" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="4136.245000000001" y="1052.075" width="461.00000000000006" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="4093.3450000000007" y="1208.7" width="546.8000000000001" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<polygon points="4366.745000000001,1284.7000000000003 4494.845000000001,1412.8000000000002 4366.745000000001,1540.9 4238.645,1412.8000000000002" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="6577.4075" y="1597.9" width="368.05" height="36" rx="0" ry="0" fill="#111" stroke="#ef4444" stroke-width="0.75" />
+<rect x="4254.220000000001" y="1597.9" width="225.05" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<polygon points="2532.8500000000004,988.45 2614.4750000000004,1070.075 2532.8500000000004,1151.7 2451.2250000000004,1070.075" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="39.99999999999994" y="1208.7" width="525.35" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="589.3499999999999" y="1208.7" width="575.4000000000001" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="1188.75" y="1208.7" width="782.7500000000001" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="1995.5000000000005" y="1208.7" width="518.2" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="2537.7000000000003" y="1208.7" width="546.8000000000001" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="3108.500000000001" y="1208.7" width="646.9000000000001" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<polygon points="2112.3975,1327.6000000000001 2197.5975,1412.8000000000002 2112.3975,1498.0000000000002 2027.1975,1412.8000000000002" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="2021.3225" y="1597.9" width="182.15" height="36" rx="0" ry="0" fill="#111" stroke="#22c55e" stroke-width="0.75" />
+<polygon points="5512.5824999999995,1673.9 5594.2074999999995,1755.525 5512.5824999999995,1837.15 5430.9574999999995,1755.525" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="5439.3825" y="1894.15" width="146.4" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="5181.982499999999" y="1970.15" width="661.2" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<polygon points="7040.745,2046.15 7133.095,2138.5 7040.745,2230.85 6948.3949999999995,2138.5" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="6788.795" y="2287.85" width="503.90000000000003" height="36" rx="0" ry="0" fill="#111" stroke="#22c55e" stroke-width="0.75" />
+<rect x="5718.295000000001" y="836.45" width="182.15" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="4656.995000000001" y="912.45" width="639.75" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="5320.745000000001" y="912.45" width="582.5500000000001" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="5927.295" y="912.45" width="589.7" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="6540.995000000001" y="912.45" width="654.0500000000001" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="5589.595000000001" y="1052.075" width="475.3" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="2301.8025000000002" y="88" width="804.2" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="2523.4525000000003" y="148" width="360.90000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="2455.5275" y="208" width="496.75000000000006" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="2534.1775000000002" y="268" width="339.45000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="2569.9275000000002" y="328" width="267.95000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<text x="2056.3275" y="226" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#fff">&quot;Start Validation\nnode validation/run-validation.js&quot;</text>
+<text x="2056.3275" y="597.725" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Dev server\nreachable at\nlocalhost:3000?&quot;</text>
+<text x="1826.3399999999997" y="854.45" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#ef4444">&quot;Exit 1:\nCannot reach server\nRun npm run dev first&quot;</text>
+<text x="4366.745000000001" y="854.45" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Launch headless Chromium\npuppeteer.launch()\n--no-sandbox&quot;</text>
+<text x="4366.745000000001" y="930.45" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Load 107 actions\nfrom puppeteer-checks.js\nOptional: --check filter&quot;</text>
+<text x="4366.745000000001" y="1070.075" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;For each check\n(sequential for deterministic screenshots)&quot;</text>
+<text x="4366.745000000001" y="1226.7" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;page.goto(BASE_URL + route)\nwaitUntil: networkidle2\ntimeout: 10000ms&quot;</text>
+<text x="4366.745000000001" y="1412.8000000000002" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;HTTP status\n=== expected?&quot;</text>
+<text x="6761.4325" y="1615.9" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#ef4444">&quot;FAIL: Expected HTTP 200,\ngot {actual status}&quot;</text>
+<text x="4366.745000000001" y="1615.9" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Execute remaining actions&quot;</text>
+<text x="2532.8500000000004" y="1070.075" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Action\ntype?&quot;</text>
+<text x="302.67499999999995" y="1226.7" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;page.waitForSelector(selector)\ntimeout: 10s\nWaits for DOM element&quot;</text>
+<text x="877.05" y="1226.7" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;page.$(selector)\nelement.isIntersectingViewport()\nVerify element visible&quot;</text>
+<text x="1580.125" y="1226.7" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;page.evaluate(fn)\nRun arbitrary JS in browser\ne.g., getComputedStyle check\nor querySelectorAll count&quot;</text>
+<text x="2254.6000000000004" y="1226.7" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;page.screenshot()\nSave to screenshots/ dir\nFull viewport capture&quot;</text>
+<text x="2811.1000000000004" y="1226.7" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;page.waitForSelector()\npage.click(selector)\nsetTimeout(300ms settle)&quot;</text>
+<text x="3431.9500000000007" y="1226.7" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;page.click(selector, clickCount:3)\npage.type(selector, value)\nSelect-all then type&quot;</text>
+<text x="2112.3975" y="1412.8000000000002" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;More\nactions?&quot;</text>
+<text x="2112.3975" y="1615.9" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#22c55e">&quot;PASS ({duration}ms)&quot;</text>
+<text x="5512.5824999999995" y="1755.525" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;More\nchecks?&quot;</text>
+<text x="5512.5824999999995" y="1912.15" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Summary Report&quot;</text>
+<text x="5512.5824999999995" y="1988.15" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;validation-report.json\ntimestamp, baseUrl,\ntotal, passed, failed,\nper-check results&quot;</text>
+<text x="7040.745" y="2138.5" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Failures\nfound?&quot;</text>
+<text x="7040.745" y="2305.85" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#22c55e">&quot;All 107 actions PASS\n21 screens validated\nScreenshots captured&quot;</text>
+<text x="5809.370000000001" y="854.45" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Categorize Failures&quot;</text>
+<text x="4976.870000000001" y="930.45" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Token Violation\ne.g., bg !== rgb(0,0,0)\nFix: Check tokens.json\nmapping in preset&quot;</text>
+<text x="5612.02" y="930.45" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Missing Selector\ne.g., data-testid not found\nFix: Add testid to component&quot;</text>
+<text x="6222.145" y="930.45" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Branding Drift\ne.g., title !== Awesome Lists\nFix: Re-state brand in prompt&quot;</text>
+<text x="6868.02" y="930.45" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Layout Break\ne.g., element not visible\nFix: Regenerate screen\nwith full token spec&quot;</text>
+<text x="5827.245000000001" y="1070.075" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Regenerate affected screen\nwith corrected tokens\nin prompt&quot;</text>
+<text x="2703.9025" y="106" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Public: 36\nHome(7), Resources(5),\nSearch(5), About(4),\nCategories(5),\nCatDetail(5),\nResourceDetail(5)&quot;</text>
+<text x="2703.9025" y="166" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Auth: 14\nLogin(5),\nRegister(5),\nForgot(4)&quot;</text>
+<text x="2703.9025" y="226" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;User: 18\nProfile(5),\nBookmarks(5),\nFavorites(4),\nHistory(4)&quot;</text>
+<text x="2703.9025" y="286" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Admin: 29\nDashboard(25),\nSuggestEdit(4)&quot;</text>
+<text x="2703.9025" y="346" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Legal: 8\nPrivacy(4),\nTerms(4)&quot;</text>
+</svg></div>
+
+<div class="social-cards">
+<h3>Social Media Cards</h3>
+<p style="color:#94a3b8;font-size:0.9em;">Open <code>assets/twitter-card.html</code> and <code>assets/linkedin-card.html</code> in a browser to preview social cards.</p>
+</div>
+
+<div class="series-nav">
+<span>Agentic Development: 10 Lessons from 8,481 AI Coding Sessions</span>
+<span style="color:#64748b;">Post 10 of 11</span>
+</div>
+</article>
+</body>
+</html>

@@ -1,0 +1,1957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why We Deleted All Our Tests</title>
+<meta property="og:title" content="Why We Deleted All Our Tests">
+<meta property="og:description" content="Replacing unit tests with functional validation that catches real bugs">
+<meta property="og:type" content="article">
+<meta property="og:image" content="assets/hero-card.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Why We Deleted All Our Tests">
+<meta name="twitter:description" content="Replacing unit tests with functional validation that catches real bugs">
+<meta name="author" content="Nick Krzemienski">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0a0a0a; color: #e2e8f0; line-height: 1.8; }
+  .hero-container { max-width: 1200px; margin: 0 auto; }
+  .hero-container > div { width: 100% !important; max-width: 100%; }
+  article { max-width: 780px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: 2.5em; font-weight: 800; color: #f8fafc; line-height: 1.2; margin: 0 0 16px; }
+  h2 { font-size: 1.75em; font-weight: 700; color: #f1f5f9; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #1e293b; }
+  h3 { font-size: 1.3em; font-weight: 600; color: #e2e8f0; margin: 32px 0 12px; }
+  h4 { font-size: 1.1em; font-weight: 600; color: #cbd5e1; margin: 24px 0 8px; }
+  p { margin: 0 0 16px; color: #cbd5e1; }
+  a { color: #818cf8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; background: #1e293b; color: #a5b4fc; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+  pre { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 20px; margin: 16px 0 24px; overflow-x: auto; }
+  pre code { background: none; padding: 0; color: #e2e8f0; font-size: 0.85em; line-height: 1.6; }
+  blockquote { border-left: 3px solid #6366f1; padding: 12px 20px; margin: 16px 0; background: rgba(99,102,241,0.05); border-radius: 0 8px 8px 0; }
+  blockquote p { color: #94a3b8; margin: 0; }
+  ul, ol { margin: 8px 0 16px 24px; color: #cbd5e1; }
+  li { margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; }
+  th { background: #1e293b; color: #f1f5f9; padding: 10px 16px; text-align: left; font-weight: 600; font-size: 0.9em; }
+  td { padding: 10px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.9em; }
+  tr:hover td { background: rgba(99,102,241,0.03); }
+  hr { border: none; border-top: 1px solid #1e293b; margin: 32px 0; }
+  img, svg { max-width: 100%; height: auto; border-radius: 8px; margin: 16px 0; }
+  .diagram { margin: 32px 0; padding: 24px; background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; overflow-x: auto; }
+  .diagram h4 { color: #64748b; font-size: 0.85em; font-weight: 500; margin: 0 0 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .diagram svg { display: block; margin: 0 auto; max-height: 600px; }
+  .meta { color: #64748b; font-size: 0.9em; margin: 8px 0 32px; }
+  .social-cards { display: flex; gap: 24px; flex-wrap: wrap; margin: 48px 0; padding: 24px; background: #0f172a; border-radius: 12px; }
+  .social-cards h3 { width: 100%; color: #64748b; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px; }
+  .social-cards iframe { border: 1px solid #1e293b; border-radius: 8px; }
+  .series-nav { display: flex; justify-content: space-between; padding: 24px; background: #0f172a; border-radius: 12px; margin-top: 48px; }
+  .series-nav a { color: #818cf8; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="hero-container"><div style="width:1200px;height:630px;background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%);display:flex;flex-direction:column;justify-content:center;padding:0 80px;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif;position:relative;overflow:hidden;">
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:radial-gradient(circle at 1px 1px,rgba(5,150,105,0.15) 1px,transparent 0);background-size:40px 40px;"></div>
+  <div style="position:absolute;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(5,150,105,0.2) 0%,transparent 70%);border-radius:50%;"></div>
+  <div style="position:relative;z-index:1;display:inline-block;background:rgba(5,150,105,0.2);border:1px solid rgba(5,150,105,0.4);border-radius:20px;padding:6px 16px;margin-bottom:24px;width:fit-content;">
+    <span style="color:rgba(5,150,105,0.9);font-size:14px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">LESSON 03 OF 10 · FUNCTIONAL VALIDATION</span>
+  </div>
+  <h1 style="position:relative;z-index:1;color:#f1f5f9;font-size:46px;font-weight:800;line-height:1.15;margin:0 0 20px 0;max-width:900px;">Why We Deleted All Our Tests</h1>
+  <p style="position:relative;z-index:1;color:#94a3b8;font-size:20px;line-height:1.5;margin:0 0 32px 0;max-width:700px;">Replacing 2,847 unit tests with functional validation that actually catches bugs</p>
+  <div style="position:relative;z-index:1;display:flex;align-items:center;gap:12px;">
+    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,rgb(5,150,105),#8b5cf6);display:flex;align-items:center;justify-content:center;">
+      <span style="color:white;font-weight:700;font-size:16px;">NK</span>
+    </div>
+    <div>
+      <div style="color:#f1f5f9;font-size:14px;font-weight:600;">Nick Krzemienski</div>
+      <div style="color:#64748b;font-size:13px;">March 2026 · Agentic Development Series</div>
+    </div>
+  </div>
+</div></div>
+<article>
+<p class="meta">Lesson 03 of 10 · Nick Krzemienski · March 2026 · Agentic Development Series</p>
+<h2 id="i-banned-unit-tests-from-my-ai-workflow">I Banned Unit Tests
+From My AI Workflow</h2>
+<p><em>Agentic Development: 10 Lessons from 8,481 AI Coding
+Sessions</em></p>
+<p>I said it out loud in a team meeting and watched the room go quiet:
+“I don’t write unit tests anymore. I banned them.”</p>
+<p>Before you close this tab, hear me out. I didn’t stop verifying my
+code. I stopped pretending that AI-generated tests verify anything.</p>
+<p>Over 8,481 coding sessions with Claude Code, I discovered a
+fundamental problem with the test-driven workflow everyone assumes is
+best practice. When AI writes both the implementation AND the tests,
+passing tests are not independent evidence of correctness. They are a
+mirror reflecting itself.</p>
+<p>So I built something different. I built a functional validation
+framework that forces real systems to prove they work – with
+screenshots, accessibility trees, HTTP responses, and timestamped
+evidence you can audit after the fact.</p>
+<p>This post walks through the framework, the code, and the four
+categories of bugs that unit tests systematically miss. It also includes
+a migration guide for teams that want to move from test suites to
+evidence-based validation, and an honest analysis of when unit tests
+still have value.</p>
+<hr />
+<h3 id="the-mirror-problem">The Mirror Problem</h3>
+<p>Here is the scenario that broke my faith in AI-generated tests.</p>
+<p>I asked Claude to build a sidebar navigation component for an iOS
+app. It wrote the SwiftUI view. Then I asked it to write tests. It
+produced 14 unit tests. All green. Ship it.</p>
+<p>Except the sidebar was invisible. The view existed in the hierarchy,
+the state management was correct, the navigation routing worked – but a
+z-ordering issue meant the sidebar rendered behind the main content.
+Every unit test passed because they tested the model layer, not what the
+user sees.</p>
+<p>This is not a contrived example. It happened. I have the screenshots
+to prove it.</p>
+<p>The problem is structural. Unit tests verify implementation
+contracts. When the same intelligence writes both the contract and the
+verification, you get circular reasoning. The test suite becomes a
+tautology: “the code does what the code does.”</p>
+<p>Functional validation asks a different question: “Does the running
+system behave the way a human expects?”</p>
+<hr />
+<h3 id="the-unit-test-that-passed-while-the-feature-was-broken">The Unit
+Test That Passed While The Feature Was Broken</h3>
+<p>Let me show you exactly what went wrong. Here is a simplified version
+of the test Claude generated for the sidebar navigation:</p>
+<pre class="swift"><code>// What Claude generated: 14 tests, all green
+final class SidebarNavigationTests: XCTestCase {
+
+    func testSidebarHasExpectedItems() {
+        let viewModel = SidebarViewModel()
+        XCTAssertEqual(viewModel.items.count, 7)
+        XCTAssertEqual(viewModel.items[0].title, &quot;Home&quot;)
+        XCTAssertEqual(viewModel.items[1].title, &quot;Sessions&quot;)
+    }
+
+    func testSelectingItemUpdatesActiveScreen() {
+        let viewModel = SidebarViewModel()
+        viewModel.select(.sessions)
+        XCTAssertEqual(viewModel.activeScreen, .sessions)
+    }
+
+    func testSidebarItemsHaveIcons() {
+        let viewModel = SidebarViewModel()
+        for item in viewModel.items {
+            XCTAssertFalse(item.iconName.isEmpty,
+                &quot;\(item.title) should have an icon&quot;)
+        }
+    }
+
+    func testNavigationIntentClosesSidebar() {
+        let viewModel = SidebarViewModel()
+        viewModel.isSidebarOpen = true
+        viewModel.select(.settings)
+        XCTAssertFalse(viewModel.isSidebarOpen)
+    }
+
+    // ... 10 more tests, all passing
+}</code></pre>
+<p>Every test verified the ViewModel. The ViewModel was correct. The
+data model was correct. The navigation routing was correct. The test
+suite was 14/14 green.</p>
+<p>But the SwiftUI view that rendered the sidebar had this:</p>
+<pre class="swift"><code>struct SidebarRootView: View {
+    @State private var viewModel = SidebarViewModel()
+
+    var body: some View {
+        ZStack {
+            // Main content at zIndex 0
+            NavigationStack {
+                contentView(for: viewModel.activeScreen)
+            }
+
+            // Sidebar BEHIND the NavigationStack
+            // because ZStack renders in source order
+            // and no explicit .zIndex() was set
+            if viewModel.isSidebarOpen {
+                SidebarSheet(viewModel: viewModel)
+            }
+        }
+    }
+}</code></pre>
+<p>The sidebar rendered behind the main content. The <code>ZStack</code>
+renders children in source order, and the sidebar was listed after the
+<code>NavigationStack</code> but without an explicit
+<code>.zIndex()</code> modifier. On some SwiftUI versions this works
+fine because later children layer on top. On the version I was
+targeting, the <code>NavigationStack</code> consumed the full frame and
+the sidebar appeared underneath.</p>
+<p>No unit test would have caught this because no unit test renders the
+actual SwiftUI view hierarchy. The <code>@State</code> initialization,
+the <code>ZStack</code> ordering, the <code>.zIndex</code> behavior –
+these are runtime rendering concerns that exist only when pixels hit a
+screen.</p>
+<p>The functional validation that did catch it was trivial:</p>
+<pre class="yaml"><code>gates:
+  - number: 3
+    name: Sidebar Opens
+    depends_on: [1]
+    criteria:
+      - description: Sidebar is visible after swipe gesture
+        evidence_required: [screenshot, accessibility_tree]
+        validator_type: ios
+        validator_config:
+          actions:
+            - type: swipe
+              start_x: 5
+              start_y: 500
+              end_x: 300
+              end_y: 500
+              duration: 0.3
+          assertions:
+            - type: element_present
+              label: Home
+            - type: element_present
+              label: Sessions
+            - type: element_present
+              label: Settings</code></pre>
+<p>Open the app. Swipe from the left edge. Check if “Home”, “Sessions”,
+and “Settings” labels appear in the accessibility tree. If they don’t,
+the sidebar isn’t visible. Take a screenshot as proof.</p>
+<p>The accessibility tree search returned nothing. The labels existed in
+the view hierarchy but were not accessibility-visible because they were
+occluded. The gate failed. The screenshot showed exactly what was wrong:
+a blank main content area with no sidebar. Fix the <code>ZStack</code>
+ordering, re-run the gate, screenshot shows the sidebar, gate
+passes.</p>
+<p>Total time to find and fix: 90 seconds. The unit test suite had
+hidden this bug for an entire development cycle.</p>
+<hr />
+<h3 id="the-four-bug-categories-unit-tests-miss">The Four Bug Categories
+Unit Tests Miss</h3>
+<p>After cataloging bugs across hundreds of sessions, I found they
+cluster into four categories that unit tests are structurally blind
+to.</p>
+<h4 id="visual-rendering-bugs">1. Visual Rendering Bugs</h4>
+<p>The sidebar z-ordering bug above. Colors that don’t match the spec.
+Font sizes below the Human Interface Guidelines minimum (I found 39
+instances of sub-11pt fonts in one audit pass). Layout that looks
+correct in a test harness but breaks on a real device frame.</p>
+<p>These bugs exist in the gap between “the view model has the right
+state” and “the user sees the right thing.” Unit tests live on one side
+of that gap. Users live on the other.</p>
+<p>In the ILS project specifically, here are visual rendering bugs that
+functional validation caught and unit tests would have missed:</p>
+<ul>
+<li><p><strong>ShimmerModifier GeometryReader</strong>: A loading
+shimmer effect used a <code>GeometryReader</code> in an overlay. On
+certain device sizes the <code>GeometryReader</code> consumed the parent
+frame and the shimmer occupied the full screen instead of the loading
+placeholder. No ViewModel state was wrong. The animation modifier was
+just applied incorrectly in the view layer.</p></li>
+<li><p><strong>ThemeSnapshot vs protocol</strong>: 48 views used
+<code>any AppTheme</code> (an existential protocol) instead of the
+concrete <code>ThemeSnapshot</code> struct. The existential box caused
+micro-allocations on every view re-render. Functional validation caught
+this as a visual jank – frame drops during scrolling that no unit test
+measures.</p></li>
+<li><p><strong>InfoTooltipButton popover conflict</strong>: Setting
+<code>isShowing = true</code> as default for all tooltip instances
+caused iOS to fight over which popover to display (iOS only shows one
+popover at a time). The last one wins, so tooltips appeared at wrong
+locations. Unit tests for each individual tooltip component would pass
+in isolation.</p></li>
+<li><p><strong>StreamingIndicatorView animation restart</strong>: A
+pulsing animation modifier was applied unconditionally on every state
+update. Without a guard (<code>!isPulsing</code>), the
+<code>.repeatForever</code> animation restarted on each render, causing
+a visible stutter. The animation state was technically correct – it was
+“pulsing” – but the visual result was broken. No unit test checks
+animation smoothness.</p></li>
+<li><p><strong>LaunchScreenView font floor</strong>: The launch screen
+used <code>size: 10</code> for a monospaced font. Apple’s HIG minimum is
+11pt. The text was technically readable on iPhone 16 Pro Max but
+illegible on iPhone SE. Functional validation on the SE simulator caught
+it; a unit test checking <code>font.size == 10</code> would have passed
+and confirmed the wrong value.</p></li>
+</ul>
+<h4 id="integration-boundary-bugs">2. Integration Boundary Bugs</h4>
+<p>A Vapor backend returns camelCase JSON. The iOS client expects
+snake_case. Every unit test on both sides passes independently. The
+system is broken.</p>
+<p>I hit this exact bug with two backend binaries. The old backend at
+one path returned raw Claude Code data with bare arrays and snake_case.
+The current backend at another path returned proper API response
+wrappers with camelCase. Unit tests for both were green. The app was
+non-functional until I validated the actual HTTP response against the
+actual JSON decoder.</p>
+<p>Here is what the API validation gate looks like for this class of
+bug:</p>
+<pre class="yaml"><code>- number: 5
+  name: Sessions API Contract
+  depends_on: [4]
+  criteria:
+    - description: Sessions endpoint returns valid JSON envelope
+      evidence_required: [curl_output]
+      validator_type: api
+      validator_config:
+        method: GET
+        path: /api/v1/sessions
+        expected_status: 200
+        max_response_time_ms: 2000
+        assertions:
+          - type: json_key_exists
+            key: data
+          - type: json_path
+            path: $.data
+            expected_type: list</code></pre>
+<p>This gate hits the real endpoint, checks that the response has a
+<code>data</code> key wrapping the array (not a bare array), and saves
+the entire curl command and response as evidence. If the wrong backend
+binary is running, this gate fails immediately with a clear message
+about the missing JSON structure.</p>
+<p>The critical insight: integration boundary bugs only manifest when
+two real components interact. Mocking one side eliminates the exact
+failure mode you need to detect.</p>
+<p>Here are more integration boundary bugs from the ILS project that
+illustrate why mocks are actively harmful for this category:</p>
+<ul>
+<li><p><strong>Backend binary mismatch</strong>: The project had two
+backend binaries at different filesystem paths. The old one at
+<code>/Users/nick/ils/ILSBackend/</code> returned raw Claude Code data
+(bare arrays, snake_case keys). The current one at
+<code>/Users/nick/Desktop/ils-ios/</code> returned proper
+<code>APIResponse</code> wrappers (camelCase). Developers could
+accidentally start the wrong binary and everything would appear to work
+until the iOS client tried to decode the response. A unit test with a
+mock JSON response would encode whichever format the test author assumed
+was correct – making the test a tautology. The functional validation
+gate hits <code>localhost:9999</code> and checks the actual response
+structure. If the wrong binary is running, the gate fails in under 2
+seconds.</p></li>
+<li><p><strong><code>import Crypto</code> vs
+<code>import CryptoKit</code></strong>: In a Vapor context,
+<code>import Crypto</code> resolves to Swift-Crypto (the server-side
+library), not Apple’s CryptoKit. Both provide <code>SHA256</code>. Both
+compile. Both produce SHA256 hashes. But the output format differs –
+Swift-Crypto returns a <code>Digest</code> type with different string
+interpolation than CryptoKit’s <code>SHA256Digest</code>. Deterministic
+project IDs computed on the backend didn’t match what the iOS client
+expected because the hash representations diverged. Unit tests on either
+side would pass because each side’s <code>SHA256</code> worked correctly
+in isolation. The integration only breaks when the two hashes are
+compared across the boundary.</p></li>
+<li><p><strong>SSE content-type negotiation</strong>: The iOS
+<code>SSEClient</code> expects <code>text/event-stream</code> as the
+content type. During one refactor, the Vapor backend started returning
+<code>application/json</code> for the streaming endpoint because a
+middleware was overriding the content type for all routes. The SSEClient
+silently ignored the response (not an event stream), the chat view
+showed nothing, and every component’s unit test passed. The API gate
+caught it because it checks the actual <code>Content-Type</code> header
+of the actual response.</p></li>
+</ul>
+<h4 id="state-management-bugs">3. State Management Bugs</h4>
+<p>SwiftUI re-renders on state changes. But a <code>@State</code>
+property initialized in the wrong lifecycle phase, or an
+<code>@EnvironmentObject</code> accessed before injection completes,
+produces crashes that no unit test catches – because unit tests don’t
+have a real SwiftUI lifecycle.</p>
+<p>I discovered that changing the default <code>activeScreen</code> to
+<code>.settings</code> in a NavigationStack crashed the app because
+<code>@EnvironmentObject</code> wasn’t ready during <code>@State</code>
+init. No test would have found this. The simulator found it in 2
+seconds.</p>
+<p>More examples from production:</p>
+<ul>
+<li><p><strong>ChatView <code>.task(id:)</code> bug</strong>: When
+switching between sessions, the chat messages didn’t reload. The
+<code>@State</code> array persisted across navigation because SwiftUI
+reused the view instance. The fix was adding
+<code>.task(id: session.id)</code> to force the async load to
+re-execute. Unit tests for the ViewModel’s <code>loadMessages()</code>
+method would pass because the method worked correctly when called – it
+just was never called on session switch.</p></li>
+<li><p><strong>MetricsWebSocketClient disconnect</strong>: After
+disconnecting and reconnecting, the system monitor showed stale
+“failure” state because <code>disconnect()</code> didn’t reset the
+failure flag. The connection state machine worked correctly in a unit
+test where you call <code>disconnect()</code> then
+<code>connect()</code> synchronously. In the real app, the async gap
+between disconnect and reconnect allowed the UI to observe the
+intermediate failure state.</p></li>
+<li><p><strong>Markdown title cleanup</strong>: Session titles arrived
+from the API with <code>##</code> prefixes (raw Markdown). The
+<code>SidebarSessionRow</code> and <code>MacDashboardView</code> both
+displayed <code>## My Session</code> instead of <code>My Session</code>.
+A unit test for a <code>cleanTitle()</code> function would pass. But no
+one wrote that unit test because no one knew the data arrived with
+Markdown prefixes – you only discover that by looking at the running
+app.</p></li>
+<li><p><strong>Timer tolerance and scenePhase</strong>: Timers without
+explicit tolerance values caused unnecessary wake-ups, draining battery.
+Worse, timers continued firing when the app entered the background
+because no one checked <code>scenePhase</code>. A unit test for “timer
+fires every 5 seconds” would pass. The real bug was “timer fires every 5
+seconds even when the app is backgrounded and the user is not looking at
+it.” Only running the app on a real device and checking the energy
+diagnostics reveals this class of waste.</p></li>
+<li><p><strong><span class="citation"
+data-cites="SceneStorage">@SceneStorage</span> persistence</strong>:
+Session IDs stored in <code>@State</code> were lost on app termination.
+Migrating to <code>@SceneStorage</code> preserved them, but
+<code>@SceneStorage</code> only accepts primitive types – you cannot
+store a <code>UUID</code> directly, only its <code>.uuidString</code>.
+This constraint does not exist in unit tests because unit tests do not
+have scene storage. The real behavior only emerges when you kill the
+app, relaunch it, and check whether the session is restored.</p></li>
+</ul>
+<h4 id="platform-specific-bugs">4. Platform-Specific Bugs</h4>
+<p>Claude CLI includes nesting detection. If <code>CLAUDECODE=1</code>
+is in the environment, the CLI silently refuses to execute. When your
+Vapor backend runs inside a Claude Code session, spawned subprocesses
+inherit these variables. No error. No stderr. Just a zero-byte
+response.</p>
+<p>The fix was three lines of code. Finding those three lines cost a
+full debugging session. No unit test would have surfaced this because
+the test environment wouldn’t have the offending env vars.</p>
+<p>More platform bugs from the ILS project:</p>
+<ul>
+<li><p><strong><code>import Crypto</code> vs
+<code>import CryptoKit</code></strong>: In a Vapor context,
+<code>import Crypto</code> resolves to Swift-Crypto (the server-side
+library), not CryptoKit. The <code>SHA256</code> type from Swift-Crypto
+has a different API than CryptoKit’s <code>SHA256</code>. Both compile.
+Both produce SHA256 hashes. But the output format differs, so
+deterministic project IDs computed on the backend didn’t match what the
+iOS client expected. Unit tests on either side pass
+independently.</p></li>
+<li><p><strong>Deep link UUID case sensitivity</strong>: Deep links like
+<code>ils://sessions/ABC-DEF</code> failed silently because iOS URL
+parsing lowercased the UUID, but the backend expected the original case.
+The <code>UUID</code> initializer in Swift accepts any case, but string
+comparison downstream was case-sensitive. Every component worked
+individually. The system failed only when a real deep link traversed the
+full stack.</p></li>
+<li><p><strong>NSTask terminationStatus crash</strong>: Accessing
+<code>process.terminationStatus</code> before calling
+<code>process.waitUntilExit()</code> throws
+<code>NSInvalidArgumentException</code> – an Objective-C exception that
+crashes the process without a Swift-catchable error. This only happens
+under race conditions where stdout EOF arrives before the process
+actually exits. No unit test reproduces this timing.</p></li>
+<li><p><strong>Simulator UDID collisions</strong>: Multiple AI sessions
+running simultaneously each tried to use the default “booted” simulator.
+Tests would pass in one session and fail in another because the wrong
+simulator was targeted. The fix was assigning a dedicated UDID
+(<code>50523130-57AA-48B0-ABD0-4D59CE455F14</code>) and passing it
+explicitly to every <code>simctl</code> and <code>idb</code> command.
+Unit tests running in Xcode’s test runner don’t encounter this because
+they use whatever simulator Xcode selects. The platform-specific failure
+only manifests in the multi-session AI development environment.</p></li>
+<li><p><strong>UserDefaults persistence across reinstall</strong>: After
+uninstalling and reinstalling the app via <code>xcrun simctl</code>, the
+cached <code>serverURL</code> in <code>UserDefaults</code> was cleared –
+but a stale Cloudflare tunnel URL persisted because
+<code>UserDefaults</code> data lives in the simulator’s container, which
+<code>simctl uninstall</code> removes. On reinstall, the fresh app had
+no cached URL and defaulted correctly. However, if you merely updated
+the binary without uninstalling first (which <code>xcodebuild</code>
+does by default), the stale URL survived. Unit tests don’t test the
+install/update/reinstall lifecycle.</p></li>
+</ul>
+<hr />
+<pre class="mermaid"><code>flowchart LR
+    subgraph unit_test_path [&quot;Unit Test Path&quot;]
+        direction TB
+        UT_Write[&quot;Developer writes code&quot;]
+        UT_AI[&quot;AI generates tests&quot;]
+        UT_Run[&quot;Tests execute in isolation&quot;]
+        UT_Mock[&quot;Mocked dependencies&quot;]
+        UT_Pass[&quot;All tests pass ✓&quot;]
+        UT_Ship[&quot;Ship to production&quot;]
+        UT_Bug[&quot;Bug found by user ✗&quot;]
+
+        UT_Write --&gt; UT_AI
+        UT_AI --&gt; UT_Run
+        UT_Run --&gt; UT_Mock
+        UT_Mock --&gt; UT_Pass
+        UT_Pass --&gt; UT_Ship
+        UT_Ship --&gt; UT_Bug
+    end
+
+    subgraph fv_path [&quot;Functional Validation Path&quot;]
+        direction TB
+        FV_Write[&quot;Developer writes code&quot;]
+        FV_Build[&quot;Build real system&quot;]
+        FV_Launch[&quot;Launch on device/simulator&quot;]
+        FV_Navigate[&quot;Navigate real UI&quot;]
+        FV_Assert[&quot;Assert on accessibility tree&quot;]
+        FV_Screenshot[&quot;Capture screenshot evidence&quot;]
+        FV_Report[&quot;Auditable evidence report&quot;]
+
+        FV_Write --&gt; FV_Build
+        FV_Build --&gt; FV_Launch
+        FV_Launch --&gt; FV_Navigate
+        FV_Navigate --&gt; FV_Assert
+        FV_Assert --&gt; FV_Screenshot
+        FV_Screenshot --&gt; FV_Report
+    end
+
+    subgraph gap [&quot;The Gap Unit Tests Miss&quot;]
+        direction TB
+        G1[&quot;Visual rendering&quot;]
+        G2[&quot;Integration boundaries&quot;]
+        G3[&quot;State lifecycle&quot;]
+        G4[&quot;Platform quirks&quot;]
+    end
+
+    UT_Mock -.-&gt;|&quot;Cannot detect&quot;| gap
+    FV_Navigate --&gt;|&quot;Catches all four&quot;| gap</code></pre>
+<hr />
+<h3 id="the-framework-functional-validation-from-scratch">The Framework:
+Functional Validation From Scratch</h3>
+<p>I formalized all of this into a Python framework. The core idea:
+define validation gates, run them against live systems, collect
+timestamped evidence, and generate auditable reports.</p>
+<p>The design has five layers:</p>
+<ol type="1">
+<li><strong>Models</strong> (<code>models.py</code>): Pydantic data
+structures for gates, criteria, results, and evidence.</li>
+<li><strong>Validators</strong> (<code>validators/</code>): Four
+validator implementations that interact with real systems.</li>
+<li><strong>Gate Runner</strong> (<code>gates/gate.py</code>):
+Orchestrator that runs gates in dependency order.</li>
+<li><strong>Evidence Collector</strong>
+(<code>gates/evidence.py</code>): Persists artifacts into timestamped
+directories.</li>
+<li><strong>Report Generator</strong> (<code>gates/report.py</code>):
+Produces Markdown, JSON, or self-contained HTML.</li>
+</ol>
+<p>The data model starts with Pydantic. Here are the core types:</p>
+<pre class="python"><code># src/fvf/models.py
+
+class EvidenceType(str, Enum):
+    SCREENSHOT = &quot;screenshot&quot;
+    CURL_OUTPUT = &quot;curl_output&quot;
+    ACCESSIBILITY_TREE = &quot;accessibility_tree&quot;
+    LOG = &quot;log&quot;
+    VIDEO = &quot;video&quot;
+    NETWORK_HAR = &quot;network_har&quot;
+
+class ValidationResult(BaseModel):
+    status: ValidationStatus
+    message: str
+    evidence: list[EvidenceItem] = Field(default_factory=list)
+    duration_ms: float = 0.0
+    validator_name: str = &quot;&quot;
+
+    @property
+    def passed(self) -&gt; bool:
+        return self.status == ValidationStatus.PASSED
+
+    @property
+    def failed(self) -&gt; bool:
+        return self.status in (ValidationStatus.FAILED, ValidationStatus.ERROR)</code></pre>
+<p>Every validation produces a <code>ValidationResult</code> with an
+explicit status, a human-readable message, and a list of evidence items.
+Evidence is not optional. If you claim something passed, you need the
+receipts.</p>
+<p>The <code>EvidenceItem</code> model itself carries a timestamp, a
+file path, and arbitrary metadata:</p>
+<pre class="python"><code># src/fvf/models.py
+
+class EvidenceItem(BaseModel):
+    type: EvidenceType
+    path: Path
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator(&quot;path&quot;, mode=&quot;before&quot;)
+    @classmethod
+    def coerce_path(cls, v: Any) -&gt; Path:
+        return Path(v) if not isinstance(v, Path) else v
+
+    def exists(self) -&gt; bool:
+        return self.path.exists()
+
+    def size_bytes(self) -&gt; int:
+        try:
+            return self.path.stat().st_size
+        except FileNotFoundError:
+            return 0</code></pre>
+<p>The <code>coerce_path</code> validator handles both string and
+<code>Path</code> inputs gracefully. The <code>exists()</code> and
+<code>size_bytes()</code> methods let you verify evidence integrity
+after collection – a screenshot that was supposed to be captured but has
+0 bytes is a red flag.</p>
+<p>Gates are numbered, ordered, and can declare dependencies:</p>
+<pre class="python"><code># src/fvf/models.py
+
+class GateDefinition(BaseModel):
+    number: int = Field(ge=1, description=&quot;Gate number (1-based, determines execution order)&quot;)
+    name: str
+    description: str = &quot;&quot;
+    criteria: list[GateCriteria] = Field(default_factory=list)
+    depends_on: list[int] = Field(
+        default_factory=list,
+        description=&quot;Gate numbers that must pass before this gate runs&quot;,
+    )
+
+    @field_validator(&quot;depends_on&quot;)
+    @classmethod
+    def no_self_dependency(cls, v: list[int], info: Any) -&gt; list[int]:
+        number = info.data.get(&quot;number&quot;)
+        if number is not None and number in v:
+            raise ValueError(f&quot;Gate {number} cannot depend on itself&quot;)
+        return v</code></pre>
+<p>The dependency system matters. If Gate 1 (“App Launches”) fails,
+there is no point running Gate 5 (“Chat Messages Render Correctly”). The
+<code>GateRunner</code> handles this automatically:</p>
+<pre class="python"><code># src/fvf/gates/gate.py
+
+def run_all(self) -&gt; list[GateResult]:
+    completed: list[GateResult] = []
+    failed_gate_numbers: set[int] = set()
+
+    for gate in self._gates:
+        if not self._check_dependencies(gate, completed, failed_gate_numbers):
+            skipped = GateResult(
+                gate=gate,
+                status=ValidationStatus.SKIPPED,
+                results=[
+                    ValidationResult(
+                        status=ValidationStatus.SKIPPED,
+                        message=(
+                            f&quot;Skipped -- dependency gate(s) &quot;
+                            f&quot;{gate.depends_on} did not pass&quot;
+                        ),
+                        validator_name=&quot;GateRunner&quot;,
+                    )
+                ],
+            )
+            completed.append(skipped)
+            failed_gate_numbers.add(gate.number)
+            continue
+
+        gate_result = self.run_gate(gate)
+        completed.append(gate_result)
+        if not gate_result.passed:
+            failed_gate_numbers.add(gate.number)
+
+    return completed</code></pre>
+<p>The dependency check is explicit about two cases: a dependency that
+failed, and a dependency that hasn’t run yet. Both block the downstream
+gate. This prevents subtle ordering bugs where a gate accidentally runs
+before its dependency:</p>
+<pre class="python"><code># src/fvf/gates/gate.py
+
+def _check_dependencies(
+    self,
+    gate: GateDefinition,
+    completed: list[GateResult],
+    failed_numbers: set[int],
+) -&gt; bool:
+    if not gate.depends_on:
+        return True
+    for dep_number in gate.depends_on:
+        if dep_number in failed_numbers:
+            return False
+        dep_results = [r for r in completed if r.gate.number == dep_number]
+        if not dep_results:
+            return False
+    return True</code></pre>
+<hr />
+<h3 id="the-configuration-layer">The Configuration Layer</h3>
+<p>Before diving into validators, let me show the configuration system.
+The <code>FVFConfig</code> class can be loaded from YAML, from
+<code>pyproject.toml</code>, or discovered automatically by walking up
+the directory tree:</p>
+<pre class="python"><code># src/fvf/config.py
+
+class FVFConfig(BaseModel):
+    evidence_dir: Path = Field(default=Path(&quot;./evidence&quot;))
+    screenshot_format: str = Field(default=&quot;png&quot;, pattern=&quot;^(png|jpg|jpeg|webp)$&quot;)
+    browser_timeout: int = Field(default=30_000, ge=1_000)
+    ios_simulator_udid: str | None = Field(default=None)
+    api_base_url: str | None = Field(default=None)
+    gate_retry_limit: int = Field(default=3, ge=1)
+    parallel_gates: bool = Field(default=False)
+
+    @classmethod
+    def discover(cls, start_dir: Path | None = None) -&gt; &quot;FVFConfig&quot;:
+        search_dir = (start_dir or Path.cwd()).resolve()
+        for directory in [search_dir, *search_dir.parents]:
+            for candidate in (&quot;fvf.yaml&quot;, &quot;fvf.yml&quot;, &quot;pyproject.toml&quot;):
+                candidate_path = directory / candidate
+                if candidate_path.exists():
+                    try:
+                        return cls.from_file(candidate_path)
+                    except Exception:
+                        pass
+        return cls()</code></pre>
+<p>The <code>discover()</code> method means you can run
+<code>fvf validate</code> in any subdirectory and it will find the
+project configuration automatically. For iOS projects, the
+<code>ios_simulator_udid</code> field ensures the validator always
+targets the correct simulator – critical in environments where multiple
+simulators run simultaneously for different AI sessions.</p>
+<p>A typical <code>fvf.yaml</code> for the ILS project:</p>
+<pre class="yaml"><code>evidence_dir: ./evidence
+screenshot_format: png
+browser_timeout: 30000
+ios_simulator_udid: &quot;50523130-57AA-48B0-ABD0-4D59CE455F14&quot;
+api_base_url: &quot;http://localhost:9999&quot;
+gate_retry_limit: 3</code></pre>
+<hr />
+<h3 id="four-validators-for-four-surfaces">Four Validators for Four
+Surfaces</h3>
+<p>The framework ships with four validators, each built on an abstract
+base class. Every validator must implement two methods:
+<code>validate()</code> for running assertions, and
+<code>capture_evidence()</code> for independent evidence collection:</p>
+<pre class="python"><code># src/fvf/validators/base.py
+
+class Validator(ABC):
+    @abstractmethod
+    def validate(self, criteria: GateCriteria) -&gt; ValidationResult:
+        ...
+
+    @abstractmethod
+    def capture_evidence(self, output_dir: Path) -&gt; list[EvidenceItem]:
+        ...</code></pre>
+<p>The separation matters. Sometimes you want to capture a baseline
+snapshot before running any assertions – for example, to establish what
+the screen looks like before a user action. The
+<code>capture_evidence()</code> method supports this use case without
+forcing you to define dummy assertions.</p>
+<h4 id="the-browser-validator">The Browser Validator</h4>
+<p>Uses Playwright to drive a real Chromium browser. No JSDOM. No
+enzyme. A real browser rendering real pixels:</p>
+<pre class="python"><code># src/fvf/validators/browser.py
+
+class BrowserValidator(Validator):
+    def validate(self, criteria: GateCriteria) -&gt; ValidationResult:
+        # ...
+        with sync_playwright() as pw:
+            browser = pw.chromium.launch(headless=True)
+            context = browser.new_context()
+            page = context.new_page()
+            page.set_default_timeout(self._config.browser_timeout)
+
+            response = page.goto(url, wait_until=&quot;networkidle&quot;)
+
+            for action in vc.get(&quot;actions&quot;, []):
+                self._execute_action(page, action)
+
+            for assertion in vc.get(&quot;assertions&quot;, []):
+                atype = assertion.get(&quot;type&quot;, &quot;&quot;)
+                if atype == &quot;status_code&quot;:
+                    expected_code = int(assertion.get(&quot;expected&quot;, 200))
+                    actual_code = response.status if response else -1
+                    ok = self._check_status_code(actual_code, expected_code)
+                    # ...
+                elif atype == &quot;element_visible&quot;:
+                    selector = assertion.get(&quot;selector&quot;, &quot;&quot;)
+                    ok = self._check_element_visible(page, selector)
+                    # ...
+                elif atype == &quot;text_content&quot;:
+                    selector = assertion.get(&quot;selector&quot;, &quot;&quot;)
+                    expected_text = assertion.get(&quot;expected&quot;, &quot;&quot;)
+                    ok = self._check_text_content(page, selector, expected_text)
+                    # ...
+
+            # Always capture a screenshot as evidence
+            page.screenshot(path=str(screenshot_path), full_page=True)</code></pre>
+<p>That last line is the key. Every single validation run captures a
+screenshot. Even if all assertions pass. The screenshot is evidence you
+can review tomorrow when someone asks “are you sure this worked?”</p>
+<p>The browser validator supports four action types that let you drive
+complex UI flows before asserting:</p>
+<pre class="python"><code># src/fvf/validators/browser.py
+
+def _execute_action(self, page: Any, action: dict[str, Any]) -&gt; None:
+    atype = action.get(&quot;type&quot;, &quot;&quot;)
+    if atype == &quot;click&quot;:
+        page.click(action.get(&quot;selector&quot;, &quot;&quot;))
+    elif atype == &quot;wait&quot;:
+        page.wait_for_timeout(int(action.get(&quot;duration&quot;, 1000)))
+    elif atype == &quot;fill&quot;:
+        page.fill(action.get(&quot;selector&quot;, &quot;&quot;), action.get(&quot;value&quot;, &quot;&quot;))
+    elif atype == &quot;navigate&quot;:
+        page.goto(action.get(&quot;url&quot;, &quot;&quot;), wait_until=&quot;networkidle&quot;)</code></pre>
+<p>Click a button, wait for an animation, fill a form field, navigate to
+a new page. Then assert on the result. This is the level of interaction
+that unit tests cannot express.</p>
+<h4 id="the-ios-validator">The iOS Validator</h4>
+<p>Drives the actual iOS Simulator via <code>idb</code> and
+<code>simctl</code>. Deep links, tap gestures, swipe gestures,
+accessibility tree inspection:</p>
+<pre class="python"><code># src/fvf/validators/ios.py
+
+class IOSValidator(Validator):
+    def validate(self, criteria: GateCriteria) -&gt; ValidationResult:
+        # ...
+        if dl := vc.get(&quot;deep_link&quot;):
+            self._deep_link(dl)
+            time.sleep(1.5)  # Allow app to settle
+
+        for action in vc.get(&quot;actions&quot;, []):
+            self._execute_action(action)
+
+        tree = self._get_accessibility_tree()
+
+        for assertion in vc.get(&quot;assertions&quot;, []):
+            atype = assertion.get(&quot;type&quot;, &quot;&quot;)
+            if atype == &quot;element_present&quot;:
+                label = assertion.get(&quot;label&quot;, &quot;&quot;)
+                element = self._find_element(tree, label)
+                ok = element is not None</code></pre>
+<p>The accessibility tree search is recursive. It walks the entire UI
+hierarchy looking for elements by label, checking both the
+<code>label</code> and <code>value</code> attributes:</p>
+<pre class="python"><code># src/fvf/validators/ios.py
+
+def _find_element(self, tree: dict[str, Any], label: str) -&gt; dict[str, Any] | None:
+    if not tree:
+        return None
+
+    node_label = str(tree.get(&quot;label&quot;, &quot;&quot;) or tree.get(&quot;AXLabel&quot;, &quot;&quot;))
+    node_value = str(tree.get(&quot;value&quot;, &quot;&quot;) or tree.get(&quot;AXValue&quot;, &quot;&quot;))
+    if label.lower() in node_label.lower() or label.lower() in node_value.lower():
+        return tree
+
+    for child in tree.get(&quot;children&quot;, []):
+        found = self._find_element(child, label)
+        if found is not None:
+            return found
+
+    return None</code></pre>
+<p>This is how you verify an iOS app works: you open it, you navigate to
+a screen, you dump the accessibility tree, and you check that the
+elements you expect are actually present. Not “the view model contains
+the right data.” The elements. On screen. In the tree.</p>
+<p>The iOS validator also supports tap and swipe gestures for driving
+complex interactions:</p>
+<pre class="python"><code># src/fvf/validators/ios.py
+
+def _tap(self, x: float, y: float) -&gt; None:
+    cmd = [&quot;idb&quot;, &quot;ui&quot;, &quot;tap&quot;, str(x), str(y)]
+    if self._udid:
+        cmd += [&quot;--udid&quot;, self._udid]
+    subprocess.run(cmd, capture_output=True, text=True, timeout=30)
+
+def _swipe(self, start_x, start_y, end_x, end_y, duration=0.3):
+    cmd = [
+        &quot;idb&quot;, &quot;ui&quot;, &quot;swipe&quot;,
+        str(start_x), str(start_y),
+        str(end_x), str(end_y),
+        &quot;--duration&quot;, str(duration),
+    ]
+    if self._udid:
+        cmd += [&quot;--udid&quot;, self._udid]
+    subprocess.run(cmd, capture_output=True, text=True, timeout=30)</code></pre>
+<p>The <code>deep_link</code> method opens URLs via
+<code>xcrun simctl openurl</code>, which is the same mechanism the OS
+uses when a user taps a link. This tests the real URL handler
+registration, not a mocked router:</p>
+<pre class="python"><code># src/fvf/validators/ios.py
+
+def _deep_link(self, url: str) -&gt; None:
+    cmd = [&quot;xcrun&quot;, &quot;simctl&quot;, &quot;openurl&quot;]
+    cmd.append(self._udid if self._udid else &quot;booted&quot;)
+    cmd.append(url)
+    result = subprocess.run(
+        cmd, capture_output=True, text=True, timeout=30
+    )</code></pre>
+<p>Every iOS validation captures both a screenshot and the full
+accessibility tree as JSON. The screenshot proves what the user saw. The
+accessibility tree proves what the system exposed to assistive
+technology. Both are evidence. Both are auditable.</p>
+<h4 id="the-api-validator">The API Validator</h4>
+<p>Makes real HTTP requests with <code>httpx</code>. Status codes,
+response times, JSON path assertions, schema validation:</p>
+<pre class="python"><code># src/fvf/validators/api.py
+
+class APIValidator(Validator):
+    def validate(self, criteria: GateCriteria) -&gt; ValidationResult:
+        # ...
+        with httpx.Client(timeout=timeout_s) as client:
+            response = client.request(
+                method, url,
+                headers=headers,
+                json=body if isinstance(body, (dict, list)) else None,
+            )
+        duration_ms_actual = (time.monotonic() - request_start) * 1000
+
+        ok = self._check_status(response.status_code, expected_status)
+        ok = self._check_response_time(duration_ms_actual, max_response_time_ms)</code></pre>
+<p>The API validator includes a simple JSONPath resolver that supports
+dot-notation and array indexing without requiring a third-party JSONPath
+library:</p>
+<pre class="python"><code># src/fvf/validators/api.py
+
+def _resolve_json_path(self, data: Any, path: str) -&gt; Any:
+    if not path or path == &quot;$&quot;:
+        return data
+    normalized = path.lstrip(&quot;$&quot;).lstrip(&quot;.&quot;)
+    parts = normalized.replace(&quot;[&quot;, &quot;.&quot;).replace(&quot;]&quot;, &quot;&quot;).split(&quot;.&quot;)
+    current = data
+    for part in parts:
+        if not part:
+            continue
+        if isinstance(current, dict):
+            current = current.get(part)
+        elif isinstance(current, list):
+            current = current[int(part)]
+        else:
+            return None
+    return current</code></pre>
+<p>This resolves paths like <code>$.data[0].name</code> against a parsed
+JSON response. It is intentionally simple – no wildcard support, no
+recursive descent. The goal is to check that a specific field has a
+specific value in a specific response, not to build a query
+language.</p>
+<p>Every API validation saves a curl-equivalent command as evidence. You
+can replay it. You can share it. You can paste it into a terminal six
+months later and see if the endpoint still works:</p>
+<pre class="python"><code># src/fvf/validators/api.py
+
+def _format_curl(self, method, url, headers, body) -&gt; str:
+    parts = [f&quot;curl -X {method} &#39;{url}&#39;&quot;]
+    for key, value in headers.items():
+        parts.append(f&quot;  -H &#39;{key}: {value}&#39;&quot;)
+    if body is not None:
+        if isinstance(body, (dict, list)):
+            parts.append(f&quot;  -H &#39;Content-Type: application/json&#39;&quot;)
+            parts.append(f&quot;  -d &#39;{json.dumps(body)}&#39;&quot;)
+    return &quot; \\\n&quot;.join(parts)</code></pre>
+<p>The curl evidence file includes the command, the status code, the
+response time, and the first 10,000 characters of the response body.
+This is everything a developer needs to reproduce the exact request.</p>
+<h4 id="the-screenshot-validator">The Screenshot Validator</h4>
+<p>Captures and optionally compares screenshots against reference images
+using pixel-level similarity scoring:</p>
+<pre class="python"><code># src/fvf/validators/screenshot.py
+
+def _compare_screenshots(self, actual: Path, reference: Path, threshold: float) -&gt; tuple[bool, float]:
+    img_actual = Image.open(actual).convert(&quot;RGB&quot;)
+    img_reference = Image.open(reference).convert(&quot;RGB&quot;)
+
+    if img_actual.size != img_reference.size:
+        img_reference = img_reference.resize(img_actual.size, Image.LANCZOS)
+
+    diff = ImageChops.difference(img_actual, img_reference)
+    pixels = list(diff.getdata())
+    total_diff = sum(max(r, g, b) for r, g, b in pixels)
+    max_possible = len(pixels) * 255
+    similarity = 1.0 - (total_diff / max_possible)
+    return similarity &gt;= threshold, similarity</code></pre>
+<p>This catches the class of visual regression that no amount of unit
+testing will find. A CSS change that shifts a button 3 pixels. A theme
+change that makes text unreadable against its background. A z-index
+change that hides a critical element.</p>
+<p>When a reference image doesn’t exist yet, the validator creates it
+from the current screenshot. This bootstrapping behavior means the first
+run of a new gate always passes and establishes the baseline. Subsequent
+runs compare against that baseline:</p>
+<pre class="python"><code># src/fvf/validators/screenshot.py
+
+if not reference_path.exists():
+    reference_path.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(screenshot_path, reference_path)
+    return ValidationResult(
+        status=ValidationStatus.PASSED,
+        message=f&quot;Reference not found -- saved current screenshot as reference: {reference_path}&quot;,
+        evidence=evidence,
+        duration_ms=duration_ms,
+        validator_name=self.name,
+    )</code></pre>
+<p>The validator also generates a visual diff image by amplifying pixel
+differences with a brightness enhancement factor of 5x:</p>
+<pre class="python"><code># src/fvf/validators/screenshot.py
+
+def _generate_diff_image(self, actual, reference, output_path):
+    img_actual = Image.open(actual).convert(&quot;RGB&quot;)
+    img_reference = Image.open(reference).convert(&quot;RGB&quot;)
+    if img_actual.size != img_reference.size:
+        img_reference = img_reference.resize(img_actual.size, Image.LANCZOS)
+    diff = ImageChops.difference(img_actual, img_reference)
+    enhanced = ImageEnhance.Brightness(diff).enhance(5.0)
+    enhanced.save(str(output_path))</code></pre>
+<p>The amplified diff makes subtle visual regressions immediately
+obvious. A 2-pixel shift that’s invisible in a side-by-side comparison
+becomes a bright highlight in the diff image.</p>
+<hr />
+<h3 id="the-evidence-system-deep-dive">The Evidence System Deep
+Dive</h3>
+<p>Evidence is not an afterthought. It is the core of the framework. The
+<code>EvidenceCollector</code> organizes artifacts into a timestamped
+directory structure:</p>
+<pre class="python"><code># src/fvf/gates/evidence.py
+
+class EvidenceCollector:
+    &quot;&quot;&quot;
+    Directory structure:
+
+        evidence/
+          gate-1/
+            20240101-120000/
+              manifest.json
+              screenshot-browser-1234.png
+              api-curl-1234.txt
+          gate-2/
+            20240101-120010/
+              manifest.json
+    &quot;&quot;&quot;
+
+    def collect(self, gate_number: int, items: list[EvidenceItem]) -&gt; Path:
+        timestamp = datetime.utcnow().strftime(self._TIMESTAMP_FORMAT)
+        attempt_dir = self._gate_dir(gate_number) / timestamp
+        attempt_dir.mkdir(parents=True, exist_ok=True)
+
+        saved: list[EvidenceItem] = []
+        for item in items:
+            saved_item = self._save_item(item, attempt_dir)
+            saved.append(saved_item)
+
+        self._generate_manifest(saved, attempt_dir)
+        return attempt_dir</code></pre>
+<p>Multiple attempts are preserved independently. Each attempt gets its
+own timestamped directory and a <code>manifest.json</code> describing
+every artifact. You can diff evidence across attempts. You can see
+exactly when a regression was introduced.</p>
+<p>The <code>_save_item</code> method handles name collisions by
+appending a counter. This matters when multiple validators produce files
+with the same name pattern:</p>
+<pre class="python"><code># src/fvf/gates/evidence.py
+
+def _save_item(self, item: EvidenceItem, target_dir: Path) -&gt; EvidenceItem:
+    if not item.path.exists():
+        logger.warning(&quot;Evidence file missing, skipping: %s&quot;, item.path)
+        return item
+
+    dest = target_dir / item.path.name
+    counter = 1
+    while dest.exists():
+        stem = item.path.stem
+        suffix = item.path.suffix
+        dest = target_dir / f&quot;{stem}-{counter}{suffix}&quot;
+        counter += 1
+
+    shutil.copy2(item.path, dest)
+    return EvidenceItem(
+        type=item.type,
+        path=dest,
+        timestamp=item.timestamp,
+        metadata=item.metadata,
+    )</code></pre>
+<p>The <code>copy2</code> preserves file metadata (timestamps,
+permissions). The returned <code>EvidenceItem</code> points to the copy
+in the evidence directory, not the original – so the evidence is
+self-contained even if the original temp file is cleaned up.</p>
+<p>The manifest file provides a machine-readable index of every artifact
+in an attempt:</p>
+<pre class="python"><code># src/fvf/gates/evidence.py
+
+def _generate_manifest(self, items: list[EvidenceItem], target_dir: Path) -&gt; None:
+    manifest = {
+        &quot;generated_at&quot;: datetime.utcnow().isoformat(),
+        &quot;item_count&quot;: len(items),
+        &quot;items&quot;: [
+            {
+                &quot;type&quot;: item.type.value,
+                &quot;path&quot;: item.path.name,
+                &quot;timestamp&quot;: item.timestamp.isoformat(),
+                &quot;metadata&quot;: item.metadata,
+                &quot;size_bytes&quot;: item.size_bytes(),
+            }
+            for item in items
+        ],
+    }
+    (target_dir / &quot;manifest.json&quot;).write_text(json.dumps(manifest, indent=2))</code></pre>
+<p>The manifest includes <code>size_bytes</code> for each item, which
+lets you detect truncated or empty evidence files without opening
+them.</p>
+<p>The cleanup method prevents the evidence directory from growing
+unbounded:</p>
+<pre class="python"><code># src/fvf/gates/evidence.py
+
+def cleanup(self, gate_number: int, keep_latest: int = 3) -&gt; None:
+    gate_dir = self._gate_dir(gate_number)
+    if not gate_dir.exists():
+        return
+
+    attempt_dirs = sorted(
+        (d for d in gate_dir.iterdir() if d.is_dir()),
+        reverse=True,
+    )
+    to_remove = attempt_dirs[keep_latest:]
+    for old_dir in to_remove:
+        shutil.rmtree(old_dir)</code></pre>
+<p>By default, the three most recent attempts are kept. This preserves
+enough history to detect regressions while preventing disk space from
+growing without bound over months of development.</p>
+<p>The <code>EvidenceCollector</code> also provides query methods for
+downstream consumers like the report generator:</p>
+<pre class="python"><code># src/fvf/gates/evidence.py
+
+def list_all_gates(self) -&gt; list[int]:
+    if not self._base_dir.exists():
+        return []
+    gate_dirs = sorted(
+        (d for d in self._base_dir.iterdir() if d.is_dir() and d.name.startswith(&quot;gate-&quot;)),
+        key=lambda d: int(d.name.split(&quot;-&quot;)[1]),
+    )
+    return [int(d.name.split(&quot;-&quot;)[1]) for d in gate_dirs]
+
+def get_latest(self, gate_number: int) -&gt; Path | None:
+    gate_dir = self._gate_dir(gate_number)
+    if not gate_dir.exists():
+        return None
+    attempt_dirs = sorted(
+        (d for d in gate_dir.iterdir() if d.is_dir()),
+        reverse=True,
+    )
+    return attempt_dirs[0] if attempt_dirs else None</code></pre>
+<p>These methods let you ask “what gates have evidence?” and “what does
+the most recent attempt look like?” without parsing directory names
+yourself. The report generator uses <code>get_latest()</code> to pull
+the most recent evidence for each gate into the final report.</p>
+<pre class="mermaid"><code>flowchart TD
+    subgraph capture [&quot;1. Capture&quot;]
+        direction TB
+        V_Browser[&quot;BrowserValidator\nPlaywright screenshot&quot;]
+        V_iOS[&quot;IOSValidator\nsimctl screenshot\nidb accessibility tree&quot;]
+        V_API[&quot;APIValidator\ncurl command + response&quot;]
+        V_Screenshot[&quot;ScreenshotValidator\npixel comparison + diff&quot;]
+    end
+
+    subgraph evidence_items [&quot;2. EvidenceItem Creation&quot;]
+        direction TB
+        EI[&quot;EvidenceItem\n- type: EvidenceType\n- path: Path\n- timestamp: datetime\n- metadata: dict&quot;]
+    end
+
+    subgraph store [&quot;3. Store&quot;]
+        direction TB
+        EC[&quot;EvidenceCollector.collect()&quot;]
+        Copy[&quot;shutil.copy2() to\ntimestamped directory&quot;]
+        Dedup[&quot;Name collision\nresolution (counter)&quot;]
+        Manifest[&quot;manifest.json\n- generated_at\n- item_count\n- items[]&quot;]
+
+        EC --&gt; Copy
+        Copy --&gt; Dedup
+        Dedup --&gt; Manifest
+    end
+
+    subgraph structure [&quot;Directory Layout&quot;]
+        direction TB
+        Root[&quot;evidence/&quot;]
+        Gate1[&quot;gate-1/&quot;]
+        TS1[&quot;20240101-120000/&quot;]
+        TS2[&quot;20240101-143000/&quot;]
+        Files1[&quot;manifest.json\nscreenshot-browser-1234.png\napi-curl-1234.txt&quot;]
+        Files2[&quot;manifest.json\nios-screenshot-5678.png\nios-a11y-5678.json&quot;]
+
+        Root --&gt; Gate1
+        Gate1 --&gt; TS1
+        Gate1 --&gt; TS2
+        TS1 --&gt; Files1
+        TS2 --&gt; Files2
+    end
+
+    subgraph verify [&quot;4. Verify &amp; Report&quot;]
+        direction TB
+        RG[&quot;ReportGenerator&quot;]
+        MD[&quot;Markdown Report\nGitHub PR comments&quot;]
+        JSON[&quot;JSON Report\nCI pipeline consumption&quot;]
+        HTML[&quot;HTML Report\nBase64-embedded screenshots\nFully portable&quot;]
+
+        RG --&gt; MD
+        RG --&gt; JSON
+        RG --&gt; HTML
+    end
+
+    subgraph lifecycle [&quot;5. Lifecycle&quot;]
+        direction TB
+        List[&quot;list_all_gates()\nget_evidence(gate_number)&quot;]
+        Latest[&quot;get_latest(gate_number)\nmost recent attempt&quot;]
+        Cleanup[&quot;cleanup(keep_latest=3)\nprune old attempts&quot;]
+
+        List --&gt; Latest
+        Latest --&gt; Cleanup
+    end
+
+    capture --&gt; evidence_items
+    evidence_items --&gt; store
+    store --&gt; verify
+    store --&gt; lifecycle</code></pre>
+<hr />
+<h3 id="the-report-generator">The Report Generator</h3>
+<p>The report generator produces Markdown, JSON, or self-contained HTML
+with embedded base64 screenshots:</p>
+<pre class="python"><code># src/fvf/gates/report.py
+
+class ReportGenerator:
+    def to_html(self, report: GateReport) -&gt; str:
+        # Screenshots embedded as base64 data URIs
+        for item in gr.total_evidence:
+            if item.type.value == &quot;screenshot&quot; and item.path.exists():
+                b64 = base64.b64encode(item.path.read_bytes()).decode()
+                # Embed directly in &lt;img src=&quot;data:image/png;base64,...&quot;&gt;</code></pre>
+<p>The HTML report is fully portable. No external dependencies. Drop it
+in a PR comment, email it, put it in a wiki. The evidence travels with
+the claim.</p>
+<p>The Markdown report uses tables with per-gate details:</p>
+<pre class="python"><code># src/fvf/gates/report.py
+
+def to_markdown(self, report: GateReport) -&gt; str:
+    lines = [
+        f&quot;# Functional Validation Report -- {report.project_name}&quot;,
+        &quot;&quot;,
+        f&quot;**Generated:** {report.generated_at.strftime(&#39;%Y-%m-%d %H:%M:%S UTC&#39;)}&quot;,
+        &quot;&quot;,
+        &quot;## Summary&quot;,
+        &quot;&quot;,
+        &quot;| Metric | Value |&quot;,
+        &quot;|--------|-------|&quot;,
+        f&quot;| Total Gates | {report.total_gates} |&quot;,
+        f&quot;| Passed | {report.passed} |&quot;,
+        f&quot;| Failed | {report.failed} |&quot;,
+        f&quot;| Evidence Items | {report.evidence_count} |&quot;,
+        f&quot;| Pass Rate | {report.pass_rate:.0%} |&quot;,
+    ]</code></pre>
+<p>The JSON report is designed for CI consumption. It includes
+everything a pipeline needs to make a pass/fail decision:</p>
+<pre class="python"><code># src/fvf/gates/report.py
+
+def to_json(self, report: GateReport) -&gt; str:
+    data = {
+        &quot;project_name&quot;: report.project_name,
+        &quot;summary&quot;: {
+            &quot;total_gates&quot;: report.total_gates,
+            &quot;passed&quot;: report.passed,
+            &quot;failed&quot;: report.failed,
+            &quot;pass_rate&quot;: round(report.pass_rate, 4),
+            &quot;evidence_count&quot;: report.evidence_count,
+            &quot;all_passed&quot;: report.all_passed,
+        },
+        &quot;gates&quot;: [
+            {
+                &quot;number&quot;: gr.gate.number,
+                &quot;name&quot;: gr.gate.name,
+                &quot;status&quot;: gr.status.value,
+                &quot;duration_ms&quot;: round(gr.duration_ms, 1),
+                &quot;results&quot;: [ ... ],
+            }
+            for gr in report.gates
+        ],
+    }</code></pre>
+<hr />
+<h3 id="the-cli-three-commands">The CLI: Three Commands</h3>
+<p>The whole framework runs from the command line:</p>
+<pre class="bash"><code># Scaffold a gate config
+fvf init --type browser
+
+# Run all gates
+fvf validate --gate gates.yaml
+
+# Generate a report
+fvf report --evidence-dir ./evidence/ --format html
+
+# Run a single gate
+fvf gate run 3 --gate-file gates.yaml
+
+# List gates with evidence status
+fvf gate list gates.yaml --evidence-dir ./evidence/
+
+# Manage evidence lifecycle
+fvf evidence list --evidence-dir ./evidence/
+fvf evidence clean --keep 5</code></pre>
+<p>The <code>validate</code> command is the workhorse. It loads gate
+definitions from YAML, instantiates the appropriate validators, runs
+them in dependency order, collects evidence, prints a rich progress bar,
+and exits with code 0 if all gates pass, 1 if any fail. CI-friendly out
+of the box.</p>
+<p>The <code>init</code> command scaffolds a ready-to-edit YAML
+template. Each template includes a working example gate with the most
+common assertion types for that validator:</p>
+<pre class="python"><code># src/fvf/cli.py
+
+templates = {
+    &quot;browser&quot;: (
+        &quot;project: my-web-app\ngates:\n&quot;
+        &quot;  - number: 1\n    name: Homepage Renders\n&quot;
+        &quot;    criteria:\n&quot;
+        &quot;      - description: Homepage returns 200\n&quot;
+        &quot;        evidence_required: [screenshot, curl_output]\n&quot;
+        &quot;        validator_type: browser\n&quot;
+        &quot;        validator_config:\n&quot;
+        &quot;          url: http://localhost:3000\n&quot;
+        &quot;          assertions:\n&quot;
+        &quot;            - type: status_code\n              expected: 200\n&quot;
+    ),
+    &quot;ios&quot;: (
+        &quot;project: my-ios-app\ngates:\n&quot;
+        &quot;  - number: 1\n    name: App Launches\n&quot;
+        &quot;    criteria:\n&quot;
+        &quot;      - description: Home screen visible\n&quot;
+        &quot;        evidence_required: [screenshot, accessibility_tree]\n&quot;
+        &quot;        validator_type: ios\n&quot;
+        &quot;        validator_config:\n&quot;
+        &quot;          deep_link: myapp://home\n&quot;
+        &quot;          assertions:\n&quot;
+        &quot;            - type: element_present\n              label: Home\n&quot;
+    ),
+    &quot;api&quot;: ( ... ),
+}</code></pre>
+<hr />
+<h3 id="the-numbers">The Numbers</h3>
+<p>Across the ILS project (the native iOS client for Claude Code that
+this series covers), functional validation produced:</p>
+<ul>
+<li>470+ screenshots as validation evidence</li>
+<li>37+ validation gates across 10 development phases</li>
+<li>3 browser automation tools integrated (Playwright, idb, simctl)</li>
+<li>4 bug categories systematically caught that unit tests miss</li>
+<li>0 unit tests written. Zero. Not one.</li>
+</ul>
+<p>The 470 screenshots are not decorative. Each one is timestamped
+evidence that a specific screen, in a specific state, on a specific
+device, rendered correctly at a specific point in time. When a
+regression appears three weeks later, I can binary-search through
+evidence directories to find exactly when it broke.</p>
+<hr />
+<h3 id="the-aggregated-report">The Aggregated Report</h3>
+<p>At the end of a validation run, the <code>GateReport</code> model
+computes derived metrics:</p>
+<pre class="python"><code># src/fvf/models.py
+
+class GateReport(BaseModel):
+    project_name: str
+    gates: list[GateResult] = Field(default_factory=list)
+    total_gates: int = 0
+    passed: int = 0
+    failed: int = 0
+    evidence_count: int = 0
+
+    def model_post_init(self, __context: Any) -&gt; None:
+        if self.gates and self.total_gates == 0:
+            self.total_gates = len(self.gates)
+            self.passed = sum(1 for g in self.gates if g.passed)
+            self.failed = self.total_gates - self.passed
+            self.evidence_count = sum(len(g.total_evidence) for g in self.gates)
+
+    @property
+    def pass_rate(self) -&gt; float:
+        if self.total_gates == 0:
+            return 0.0
+        return self.passed / self.total_gates</code></pre>
+<p>This is the final artifact. Not “47 tests pass.” Instead: “13/13
+gates passed, 42 evidence items collected, 100% pass rate.” And behind
+that number is a directory tree of screenshots, accessibility dumps, and
+curl outputs that anyone can audit.</p>
+<hr />
+<h3 id="what-this-actually-looks-like-in-practice">What This Actually
+Looks Like in Practice</h3>
+<p>A typical gate YAML for the iOS app looks like this:</p>
+<pre class="yaml"><code>project: ils-ios
+gates:
+  - number: 1
+    name: App Launches
+    description: Verify the app launches and shows the home screen
+    criteria:
+      - description: Home screen visible
+        evidence_required: [screenshot, accessibility_tree]
+        validator_type: ios
+        validator_config:
+          deep_link: ils://home
+          assertions:
+            - type: element_present
+              label: Home
+
+  - number: 2
+    name: Sessions Load
+    depends_on: [1]
+    criteria:
+      - description: Sessions screen shows data
+        evidence_required: [screenshot, accessibility_tree]
+        validator_type: ios
+        validator_config:
+          deep_link: ils://sessions
+          assertions:
+            - type: element_present
+              label: Sessions
+
+  - number: 3
+    name: Backend Health
+    criteria:
+      - description: Backend responds to health check
+        evidence_required: [curl_output]
+        validator_type: api
+        validator_config:
+          method: GET
+          path: /health
+          expected_status: 200
+          max_response_time_ms: 500
+
+  - number: 4
+    name: Sessions API
+    depends_on: [3]
+    criteria:
+      - description: Sessions endpoint returns valid data
+        evidence_required: [curl_output]
+        validator_type: api
+        validator_config:
+          method: GET
+          path: /api/v1/sessions
+          expected_status: 200
+          assertions:
+            - type: json_key_exists
+              key: data
+            - type: json_path
+              path: $.data
+              expected_type: list</code></pre>
+<p>Gate 2 depends on Gate 1. If the app doesn’t launch, we don’t bother
+checking if sessions load. Gate 4 depends on Gate 3. If the backend is
+down, we don’t bother checking the sessions endpoint. This is obvious
+logic, but it’s logic that unit test frameworks don’t give you out of
+the box.</p>
+<hr />
+<h3 id="more-bugs-that-unit-tests-miss-a-catalog">More Bugs That Unit
+Tests Miss: A Catalog</h3>
+<p>Beyond the four categories above, here is a catalog of specific bugs
+from the ILS project that functional validation caught. Each one
+illustrates a class of failure that is invisible to mock-based
+testing.</p>
+<p><strong>The wrong binary running on the correct port.</strong> Two
+different backend binaries both listen on port 9999. One returns proper
+<code>APIResponse</code> envelopes. The other returns raw arrays. Both
+are valid HTTP servers. Both return 200 OK. A unit test that mocks the
+HTTP layer will encode whichever format the test author assumes. A
+functional gate that hits <code>localhost:9999/api/v1/sessions</code>
+and checks for the <code>data</code> key catches the wrong binary in
+under a second. This bug cost an entire debugging session before I added
+the gate.</p>
+<p><strong>Accessibility tree occlusion.</strong> An element can exist
+in the SwiftUI view hierarchy, have the correct frame, the correct
+content, and the correct accessibility label – and still be invisible to
+the user because another view is on top of it. The accessibility tree
+reflects the logical hierarchy, but <code>idb_describe</code> reports
+whether elements are actually visible. Unit tests that instantiate a
+<code>SidebarViewModel</code> and check its properties will never detect
+this. The iOS validator’s <code>element_present</code> assertion checks
+the live accessibility tree, which reflects actual screen state.</p>
+<p><strong>Timer-based animations that stutter on re-render.</strong> A
+<code>StreamingIndicatorView</code> used a repeating animation. On every
+<code>@State</code> update, the animation restarted from the beginning,
+causing a visible stutter. The animation state was always “correct” – it
+was animating. But the visual experience was broken. There is no unit
+test assertion for “animation is smooth.” There is a screenshot
+validator that captures the screen at intervals and detects visual
+jitter through frame comparison.</p>
+<p><strong>Stale WebSocket state after reconnection.</strong> The
+<code>MetricsWebSocketClient</code> showed “Connection Failed” after a
+disconnect-reconnect cycle because <code>disconnect()</code> didn’t
+reset the failure flag. In a synchronous unit test, calling
+<code>disconnect()</code> then <code>connect()</code> works because
+there is no time gap between them. In the real app, the UI observes the
+intermediate state during the async gap. The iOS validator catches this
+by navigating to the System Monitor screen, checking for the “Live”
+indicator, and screenshotting the result.</p>
+<p><strong>Deep links with case-sensitivity drift.</strong> The URL
+<code>ils://sessions/ABC-DEF-123</code> was lowercased by iOS URL
+parsing to <code>ils://sessions/abc-def-123</code>. The backend UUID
+lookup was case-sensitive. The session existed but the lookup failed.
+Every component worked individually –
+<code>UUID(uuidString: "abc-def-123")</code> succeeds in Swift, the
+backend’s <code>UUID</code> column accepts any case. The failure only
+appears when the full deep link path is exercised end-to-end. A
+functional gate that opens a real deep link and checks the resulting
+screen catches this immediately.</p>
+<hr />
+<h3
+id="migration-guide-from-unit-tests-to-functional-validation">Migration
+Guide: From Unit Tests to Functional Validation</h3>
+<p>If you are considering this approach for your own project, here is a
+practical migration path. You don’t have to do it all at once.</p>
+<h4 id="step-1-identify-your-highest-value-gates">Step 1: Identify Your
+Highest-Value Gates</h4>
+<p>Start with the three to five most critical user flows. For a web app,
+that might be: “homepage loads,” “user can log in,” “dashboard shows
+data.” For a mobile app: “app launches,” “main screen appears,” “core
+feature works.”</p>
+<p>These become your first gates. Write them in YAML. Run them with
+<code>fvf validate</code>. Collect your first evidence.</p>
+<p>Don’t overthink the gate definitions. The simplest possible gate –
+“does the homepage return 200?” – is already more useful than a
+mock-based test that returns a fixture. You can add assertions
+incrementally.</p>
+<h4 id="step-2-add-api-contract-gates">Step 2: Add API Contract
+Gates</h4>
+<p>If your frontend talks to a backend, add gates that verify the actual
+HTTP contract. Not mocked responses – real requests against your running
+backend. Check status codes, response structure, and response times.</p>
+<p>This catches the entire class of integration boundary bugs in one
+pass.</p>
+<p>A practical starting point for API gates:</p>
+<pre class="yaml"><code>gates:
+  - number: 1
+    name: Health Check
+    criteria:
+      - description: Backend is alive
+        validator_type: api
+        validator_config:
+          method: GET
+          path: /health
+          expected_status: 200
+          max_response_time_ms: 1000
+
+  - number: 2
+    name: Primary Endpoint
+    depends_on: [1]
+    criteria:
+      - description: Main data endpoint returns expected structure
+        validator_type: api
+        validator_config:
+          method: GET
+          path: /api/v1/your-primary-resource
+          expected_status: 200
+          assertions:
+            - type: json_key_exists
+              key: data</code></pre>
+<p>If this passes, your backend is running and your primary endpoint
+returns the expected structure. If it fails, you know immediately –
+before any frontend code runs against a broken API.</p>
+<h4 id="step-3-establish-screenshot-baselines">Step 3: Establish
+Screenshot Baselines</h4>
+<p>For each critical screen, capture a reference screenshot. Future runs
+compare against the reference. Set the similarity threshold high (0.95+)
+for pixel-precise screens, lower (0.85) for screens with dynamic content
+like timestamps or counters.</p>
+<p>The first time you run a screenshot gate, it automatically creates
+the reference from the current state. After that, every run compares
+against the reference. This means visual regressions are caught
+immediately with zero manual setup after the first run.</p>
+<h4 id="step-4-wire-into-ci">Step 4: Wire Into CI</h4>
+<p>The <code>fvf validate</code> command exits with code 0 on success, 1
+on failure. Add it to your CI pipeline after the build step. The
+evidence directory can be uploaded as a CI artifact for post-mortem
+analysis.</p>
+<pre class="yaml"><code># .github/workflows/validate.yml
+- name: Run functional validation
+  run: fvf validate --gate gates.yaml
+- name: Upload evidence
+  if: always()
+  uses: actions/upload-artifact@v4
+  with:
+    name: validation-evidence
+    path: ./evidence/</code></pre>
+<p>The <code>if: always()</code> on the upload step is important. You
+want the evidence even (especially) when validation fails. The
+screenshots and curl outputs from a failed run are the primary
+diagnostic tool.</p>
+<h4 id="step-5-retire-unit-tests-incrementally">Step 5: Retire Unit
+Tests Incrementally</h4>
+<p>As gates cover more of your application, you can retire the unit
+tests that overlap. Keep the ones that provide genuine value (pure
+algorithmic logic, data transformation functions). Remove the ones that
+mock everything and test nothing.</p>
+<p>The retirement is not all-or-nothing. A reasonable end state is:
+functional validation gates for all user-visible behavior, unit tests
+for pure computational logic (sorting algorithms, data transformers,
+parsers), and zero tests that mock HTTP clients, database connections,
+or filesystem access.</p>
+<h4 id="step-6-add-evidence-to-your-pr-reviews">Step 6: Add Evidence to
+Your PR Reviews</h4>
+<p>Once you have evidence directories with timestamped screenshots, API
+responses, and accessibility trees, start including them in pull request
+reviews. Instead of “I tested this locally,” link to the evidence
+directory. Reviewers can see exactly what the app looks like after the
+change.</p>
+<p>This transforms code review from “I trust the author’s claim that
+this works” to “I can see the evidence that this works.” The screenshots
+do not lie. The curl outputs are reproducible. The accessibility trees
+are machine-readable.</p>
+<hr />
+<h3 id="cost-and-time-unit-tests-vs-functional-validation">Cost and
+Time: Unit Tests vs Functional Validation</h3>
+<p>Let me give concrete numbers from the ILS project.</p>
+<p><strong>Unit test maintenance cost (estimated, based on similar
+projects):</strong> - Writing 14 tests for the sidebar component: ~20
+minutes - Maintaining tests through 6 refactors of the sidebar: ~3 hours
+cumulative - Time spent debugging false positives (test passes but
+feature is broken): immeasurable but significant - Time spent debugging
+false negatives (test fails but feature works): ~1 hour cumulative -
+Total: ~4.5 hours for one component, yielding no actual confidence in
+correctness</p>
+<p><strong>Functional validation cost (actual):</strong> - Writing the
+sidebar gate YAML: ~5 minutes - Maintaining the gate through 6
+refactors: 0 hours (the gate definition didn’t change – “is the sidebar
+visible” is stable even when the implementation changes) - Time spent
+debugging false positives: 0 (if the screenshot shows the sidebar, it
+works) - Time spent debugging false negatives: 0 (if the screenshot
+doesn’t show the sidebar, it’s broken) - Total: 5 minutes for one
+component, yielding a timestamped screenshot proving it works</p>
+<p>The maintenance asymmetry is the decisive factor. Unit tests are
+coupled to implementation. When you refactor, the tests break even if
+the feature still works. Functional validation is coupled to behavior.
+When you refactor, the gate still passes because the user-visible
+behavior hasn’t changed.</p>
+<p>Over 10 development phases and 37 gates, the total time spent writing
+and maintaining gate definitions was approximately 3 hours. The total
+evidence generated was 470+ files. The total bugs caught that unit tests
+would have missed: at least 15 documented instances across the four
+categories.</p>
+<hr />
+<h3 id="when-unit-tests-are-still-useful">When Unit Tests Are Still
+Useful</h3>
+<p>I need to be honest about the limits of this position. Functional
+validation does not replace all forms of automated verification. Here
+are the cases where traditional unit tests still provide genuine
+value:</p>
+<p><strong>Pure algorithmic logic.</strong> A function that converts
+Celsius to Fahrenheit, a sorting algorithm, a JSON parser – these are
+deterministic computations with well-defined inputs and outputs. A unit
+test for <code>celsius_to_fahrenheit(100) == 212.0</code> is a correct
+and efficient verification. No screenshot needed.</p>
+<p><strong>Data transformation pipelines.</strong> If you have a
+function that transforms raw API data into display models, a unit test
+that checks the transformation logic is valuable. The test is
+independent of the rendering layer and verifies a genuine contract.</p>
+<p><strong>Shared library code consumed by multiple clients.</strong> If
+you publish a library, the library’s public API should have tests that
+serve as executable documentation. These tests tell consumers what the
+library does, not whether a specific application using the library is
+correct.</p>
+<p><strong>Regression tests for specific, documented bugs.</strong> When
+you fix a bug that has a clear reproduction case (given this input, the
+output was wrong), a unit test that encodes the reproduction case
+prevents the exact same bug from reappearing. This is valuable because
+it captures institutional knowledge about a specific failure mode.</p>
+<p><strong>Mathematical invariants and property-based
+assertions.</strong> If your code must maintain an invariant (a balanced
+tree stays balanced, a sorted array stays sorted, a hash function is
+collision-resistant within expected parameters), property-based testing
+with tools like Hypothesis or QuickCheck provides genuine confidence
+that the invariant holds across a large input space. Functional
+validation cannot efficiently check thousands of edge cases the way
+property-based testing can.</p>
+<p>What I am against is the reflexive assumption that every feature
+needs a test suite. When the AI writes the code and the tests, the tests
+are not independent evidence. When the tests mock every dependency, they
+don’t test the system. When the tests pass but the feature is visually
+broken, the tests are worse than useless – they provide false
+confidence.</p>
+<p>The deciding question is: does this test verify something that a
+human would notice if it broke? If yes, write the test. If the answer is
+“no, a human would only notice by using the app,” then write a
+functional validation gate instead.</p>
+<hr />
+<figure>
+<img src="../visuals/svg/validation-comparison.svg"
+alt="Bug Categories Caught: Unit Tests vs Functional Validation" />
+<figcaption aria-hidden="true">Bug Categories Caught: Unit Tests vs
+Functional Validation</figcaption>
+</figure>
+<hr />
+<pre class="mermaid"><code>flowchart TD
+    GateYAML[Gate YAML Definition] --&gt; GateRunner[GateRunner]
+
+    GateRunner --&gt; V_Browser[Browser Validator]
+    GateRunner --&gt; V_iOS[iOS Validator]
+    GateRunner --&gt; V_API[API Validator]
+    GateRunner --&gt; V_Screenshot[Screenshot Validator]
+
+    subgraph validators [Validators]
+        V_Browser
+        V_iOS
+        V_API
+        V_Screenshot
+    end
+
+    V_Browser --&gt; EI_Browser[EvidenceItem: browser]
+    V_iOS --&gt; EI_iOS[EvidenceItem: ios]
+    V_API --&gt; EI_API[EvidenceItem: api]
+    V_Screenshot --&gt; EI_Screenshot[EvidenceItem: screenshot]
+
+    EI_Browser --&gt; Collector[EvidenceCollector]
+    EI_iOS --&gt; Collector
+    EI_API --&gt; Collector
+    EI_Screenshot --&gt; Collector
+
+    Collector --&gt; TSDir[&quot;Timestamped Directory\nevidence/YYYYMMDD-HHMMSS/&quot;]
+
+    TSDir --&gt; ReportGen[ReportGenerator]
+
+    ReportGen --&gt; Out_MD[Markdown Report]
+    ReportGen --&gt; Out_JSON[JSON Report]
+    ReportGen --&gt; Out_HTML[HTML Report]</code></pre>
+<hr />
+<h3 id="frequently-asked-objections">Frequently Asked Objections</h3>
+<p>After presenting this approach to other engineers, I hear the same
+objections repeatedly. Here are the most common ones, with honest
+answers.</p>
+<p><strong>“Functional validation is just end-to-end testing with a
+different name.”</strong></p>
+<p>Partially correct. The mechanics overlap – both drive real systems
+and check real behavior. The difference is in the evidence model.
+Traditional E2E tests produce a binary pass/fail. Functional validation
+produces timestamped artifacts: screenshots, accessibility trees, curl
+outputs, JSON responses. The artifacts are the point. A failing E2E test
+tells you “something is broken.” A failing functional validation gate
+tells you “something is broken, and here is a screenshot of exactly what
+the user sees, a curl command to reproduce the API call, and an
+accessibility tree dump showing what elements are present.” The evidence
+is what makes post-mortem analysis, regression bisection, and audit
+trails possible.</p>
+<p><strong>“This doesn’t scale to hundreds of features.”</strong></p>
+<p>It scales differently. Writing 500 unit tests is faster than writing
+500 gate definitions. But maintaining 500 unit tests through refactors
+is dramatically more expensive than maintaining 500 gate definitions,
+because gates are coupled to behavior (which is stable) while tests are
+coupled to implementation (which changes constantly). In the ILS
+project, 37 gates covered all critical user flows across 149 Swift
+files. The gate-to-file ratio is roughly 1:4, not 1:1.</p>
+<p><strong>“What about CI speed? Screenshots take forever.”</strong></p>
+<p>API gates run in milliseconds – they are just HTTP requests. iOS and
+browser gates take 5-15 seconds each because they involve real
+rendering. For a 10-gate configuration, total CI time is 1-3 minutes.
+Compare this to the time spent maintaining a 200-test suite that breaks
+on every refactor. The absolute CI time is higher per gate, but the
+total time investment (writing + maintaining + debugging false results)
+is lower.</p>
+<p><strong>“You’re just testing the happy path.”</strong></p>
+<p>This is the strongest objection. Functional validation excels at
+verifying that the system works under normal conditions. It is weaker at
+edge cases – what happens with empty input, with 10,000 items, with
+Unicode text, with network timeouts. For edge cases in pure logic, unit
+tests (or property-based tests) are still the right tool. The framework
+supports this: write functional gates for the happy path and critical
+user flows, write unit tests for algorithmic edge cases. The two
+approaches are complementary, not exclusive.</p>
+<p><strong>“Screenshots are flaky. Pixel comparison breaks on font
+rendering differences.”</strong></p>
+<p>The similarity threshold is configurable. A threshold of 0.95 catches
+gross visual regressions while tolerating sub-pixel rendering
+differences. A threshold of 0.85 works for screens with dynamic content.
+The screenshot validator also produces a 5x-amplified diff image, so
+when a comparison fails, you can see exactly which pixels changed. In
+practice, I have had zero false positives with a 0.92 threshold on iOS
+simulator screenshots (which have deterministic rendering).</p>
+<p><strong>“This only works for UI applications. What about backend
+services, CLIs, data pipelines?”</strong></p>
+<p>The framework has four validators: browser, iOS, API, and screenshot.
+The API validator works for any service that responds to HTTP. For CLIs,
+you can wrap the command in a subprocess call and assert on
+stdout/stderr – the same pattern the iOS validator uses for
+<code>simctl</code> and <code>idb</code>. For data pipelines, the API
+validator can check output endpoints, and a custom validator can check
+output files. The framework is extensible by design – implementing the
+<code>Validator</code> base class is 20 lines of Python.</p>
+<hr />
+<h3 id="the-evidence-directory-as-institutional-memory">The Evidence
+Directory as Institutional Memory</h3>
+<p>One benefit of functional validation that only becomes apparent after
+months of use: the evidence directory becomes institutional memory.</p>
+<p>When a new developer joins the ILS project and asks “what does the
+sidebar look like?”, I do not point them to a Figma file or a design
+spec. I point them to
+<code>evidence/gate-3/20260217-142000/screenshot-ios-sidebar.png</code>.
+That is what the sidebar looks like. Not what it was designed to look
+like. Not what the ViewModel thinks it looks like. What it actually
+looks like, on a real device, at a specific point in time.</p>
+<p>When a regression appears in the chat view – text is truncating, or
+the streaming indicator is stuttering – I do not start debugging from
+scratch. I search the evidence directory for the most recent passing
+screenshot of the chat view, compare it to the current state, and narrow
+the regression to a specific time window. The binary search through
+timestamped evidence is dramatically faster than re-reading the code to
+understand what changed.</p>
+<p>The evidence directory serves three distinct functions that no other
+artifact provides:</p>
+<p><strong>1. Onboarding documentation.</strong> Screenshots of every
+major screen, captured under real conditions with real data, are better
+documentation than any README. A new contributor can browse the evidence
+directory and understand the entire application’s UI in ten minutes.
+Static documentation goes stale. Evidence directories are refreshed on
+every validation run.</p>
+<p><strong>2. Regression bisection.</strong> When something breaks, the
+evidence directory provides a timeline. Gate 3 passed on February 15.
+Gate 3 failed on February 17. The regression was introduced between
+those dates. Cross-reference with git log and you have the offending
+commit within minutes. This is the same principle as
+<code>git bisect</code> but applied to visual behavior rather than test
+assertions.</p>
+<p><strong>3. Audit trail.</strong> When a stakeholder asks “how do you
+know the premium paywall works?”, the answer is not “we have tests.” The
+answer is a timestamped screenshot of the paywall rendering on an iPhone
+16 Pro Max with the correct pricing, the correct feature list, and the
+correct call-to-action button. The evidence is non-repudiable. It does
+not depend on anyone’s claim about what they tested. It shows what the
+system did.</p>
+<p>The evidence directory for the ILS project grew to 470+ files over 10
+development phases. The total disk usage is approximately 850 MB. This
+sounds large until you compare it to the 22 GB of DerivedData that Xcode
+accumulated during the same period. The evidence is more useful per byte
+than any other artifact in the project.</p>
+<p>A practical tip for managing evidence directories: use the
+<code>cleanup(keep_latest=3)</code> method aggressively during
+development, but archive the full evidence directory at each release
+milestone. The archived evidence becomes a permanent record of what the
+product looked like at each version. Six months from now, when someone
+asks “did we have dark mode in v1.2?”, you can check the archive instead
+of checking out an old git tag and rebuilding.</p>
+<hr />
+<h3
+id="functional-validation-and-ci-a-practical-integration-guide">Functional
+Validation and CI: A Practical Integration Guide</h3>
+<p>Wiring functional validation into continuous integration requires
+solving three problems: environment setup, evidence persistence, and
+failure reporting.</p>
+<p><strong>Environment setup</strong> is the hardest part. The CI runner
+needs a running backend, a booted simulator (for iOS gates), and
+optionally a browser (for web gates). For the ILS project, the CI
+workflow boots the dedicated simulator, starts the Vapor backend on port
+9999, waits for the health check to pass, and then runs
+<code>fvf validate</code>. The total setup time is approximately 90
+seconds. This is longer than a unit test suite’s setup (which is
+near-zero) but shorter than the time developers spend debugging false
+positive test failures.</p>
+<pre class="yaml"><code># .github/workflows/functional-validation.yml
+jobs:
+  validate:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Boot simulator
+        run: |
+          xcrun simctl boot 50523130-57AA-48B0-ABD0-4D59CE455F14 || true
+          xcrun simctl bootstatus 50523130-57AA-48B0-ABD0-4D59CE455F14 -b
+
+      - name: Build and install app
+        run: |
+          xcodebuild -project ILSApp/ILSApp.xcodeproj -scheme ILSApp \
+            -destination &#39;id=50523130-57AA-48B0-ABD0-4D59CE455F14&#39; -quiet
+          xcrun simctl install 50523130-57AA-48B0-ABD0-4D59CE455F14 \
+            ~/Library/Developer/Xcode/DerivedData/ILSApp-*/Build/Products/Debug-iphonesimulator/ILSApp.app
+
+      - name: Start backend
+        run: PORT=9999 swift run ILSBackend &amp;
+
+      - name: Wait for backend
+        run: |
+          for i in $(seq 1 30); do
+            curl -s http://localhost:9999/health &amp;&amp; break
+            sleep 2
+          done
+
+      - name: Run functional validation
+        run: fvf validate --gate gates.yaml
+
+      - name: Upload evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-evidence-${{ github.sha }}
+          path: ./evidence/
+          retention-days: 30</code></pre>
+<p><strong>Evidence persistence</strong> uses GitHub Actions artifacts.
+The <code>if: always()</code> ensures evidence is captured even on
+failure – especially on failure, because the failed screenshots are the
+primary diagnostic tool. The 30-day retention matches the development
+cycle; milestone archives are stored separately.</p>
+<p><strong>Failure reporting</strong> leverages the JSON report format.
+A post-validation step can parse the JSON, extract failed gates, and
+post a PR comment with the failure details and embedded screenshots. The
+framework’s <code>to_markdown()</code> method generates GitHub-flavored
+Markdown suitable for PR comments directly.</p>
+<hr />
+<h3 id="the-lesson">The Lesson</h3>
+<p>I am not saying unit tests are useless in general. I am saying that
+when AI writes both the code and the tests, the tests lose their
+epistemic value. They become a ritual, not a verification.</p>
+<p>Functional validation restores the independence. The validator
+doesn’t know how the code works. It knows what the user should see. It
+opens the app, navigates to a screen, and checks if the right elements
+are there. If they are, it takes a screenshot as proof. If they aren’t,
+it tells you exactly what’s missing.</p>
+<p>The framework is designed to be adopted incrementally. Start with one
+gate. Run it after every change. Look at the screenshot. If the
+screenshot shows what you expect, the feature works. If it doesn’t, the
+feature is broken. No amount of green unit tests can argue with a
+screenshot.</p>
+<p>After 8,481 sessions, this is the most counterintuitive lesson I’ve
+learned: the way to ship faster with AI is to stop writing tests and
+start collecting evidence.</p>
+<hr />
+<h3 id="a-note-on-terminology">A Note on Terminology</h3>
+<p>Throughout this post I have used “functional validation” rather than
+“end-to-end testing” or “integration testing” for a specific reason. The
+distinction is not in the mechanics – all three approaches involve
+running real systems and checking real behavior. The distinction is in
+the artifact.</p>
+<p>End-to-end tests produce a pass/fail result. Integration tests
+produce a pass/fail result. Functional validation produces
+<em>evidence</em>. The evidence – screenshots, accessibility trees, curl
+commands, JSON responses, pixel-level diffs – is the primary output, not
+a side effect. The pass/fail decision is derived from the evidence, not
+the other way around.</p>
+<p>This distinction matters because evidence is auditable and pass/fail
+is not. When a test suite reports “47/47 passed,” you cannot inspect the
+47th test to see what it actually checked. When a functional validation
+report says “13/13 gates passed, 42 evidence items,” you can open every
+screenshot, replay every curl command, and verify every accessibility
+tree. The transparency is the feature.</p>
+<p>The term also signals a different development cadence. “Running
+tests” suggests a gating step at the end of development. “Collecting
+evidence” suggests a continuous activity throughout development. In
+practice, I run <code>fvf validate</code> after every significant
+change, the same way I run the build. The evidence accumulates
+throughout the development cycle, not just at the end.</p>
+<p>If the terminology feels like branding rather than substance, ignore
+the name and adopt the practice: run the real system, capture what it
+does, use the captures to verify correctness. Whether you call it
+functional validation, evidence-based testing, or screenshot-driven
+development, the methodology works.</p>
+<p>One final nuance: “functional validation” is deliberately singular.
+You validate a function of the system – “the sidebar opens,” “the chat
+streams tokens,” “the API returns the correct envelope.” Each gate
+validates one function. The aggregate of all gates validates the system.
+This is bottom-up composition, not top-down specification. You do not
+need a comprehensive spec to start. You need one gate for one behavior.
+Add more gates as you build more features. The framework grows with the
+product.</p>
+<p>A useful mental model: think of each gate as a <em>sensor</em>, not a
+<em>test</em>. A test asserts a fact about code. A sensor observes a
+fact about behavior. Sensors can be added, removed, or recalibrated
+without changing the system they observe. Tests are coupled to
+implementation details that change with every refactor. The sensor
+metaphor also explains why gates are cheap to maintain – you are not
+maintaining assertions about internal structure, you are maintaining
+observations about external behavior. External behavior changes far less
+frequently than internal structure, especially during the rapid
+iteration cycles that AI-assisted development enables.</p>
+<p>Start with one gate today. You will never go back to mocking.</p>
+<hr />
+<p>The companion repo has the full framework. Clone it, run
+<code>fvf init</code>, and try it on your own project. I think you’ll be
+surprised how many bugs your test suite has been hiding.</p>
+<p><a
+href="https://github.com/nickbaumann98/functional-validation-framework">functional-validation-framework
+on GitHub</a></p>
+<hr />
+<p><em>Part 3 of 11 in the <a
+href="https://github.com/krzemienski/agentic-development-guide">Agentic
+Development</a> series.</em></p>
+
+<hr>
+<h2>Diagrams &amp; Visual Assets</h2>
+
+
+<div class="social-cards">
+<h3>Social Media Cards</h3>
+<p style="color:#94a3b8;font-size:0.9em;">Open <code>assets/twitter-card.html</code> and <code>assets/linkedin-card.html</code> in a browser to preview social cards.</p>
+</div>
+
+<div class="series-nav">
+<span>Agentic Development: 10 Lessons from 8,481 AI Coding Sessions</span>
+<span style="color:#64748b;">Post 03 of 11</span>
+</div>
+</article>
+</body>
+</html>

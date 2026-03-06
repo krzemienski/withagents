@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>194 Worktrees | Agentic Development</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#5558f6",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .dot-grid {
+            background-image: radial-gradient(circle, #334155 1px, transparent 1px);
+            background-size: 32px 32px;
+        }
+        .git-viz-gradient {
+            background: linear-gradient(90deg, rgba(85, 88, 246, 0.1) 0%, rgba(99, 102, 241, 0.2) 50%, rgba(85, 88, 246, 0.05) 100%);
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 overflow-x-hidden">
+<div class="relative min-h-screen flex flex-col">
+<!-- Navigation -->
+<header class="relative z-20 flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full border-b border-slate-200 dark:border-slate-800/50">
+<div class="flex items-center gap-10">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-primary rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-white">account_tree</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight">Agentic Dev</h2>
+</div>
+<nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-500 dark:text-slate-400">
+<a class="hover:text-primary transition-colors" href="#">Blog</a>
+<a class="hover:text-primary transition-colors" href="#">Worktrees</a>
+<a class="hover:text-primary transition-colors" href="#">Documentation</a>
+<a class="hover:text-primary transition-colors" href="#">Changelog</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden lg:flex items-center bg-slate-100 dark:bg-slate-800/50 rounded-lg px-3 py-1.5 border border-slate-200 dark:border-slate-700">
+<span class="material-symbols-outlined text-slate-400 text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-32 placeholder:text-slate-500" placeholder="Quick search..." type="text"/>
+<span class="text-[10px] bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 rounded text-slate-500">⌘K</span>
+</div>
+<button class="px-5 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:brightness-110 transition-all">
+                    Get Started
+                </button>
+</div>
+</header>
+<!-- Hero Section -->
+<main class="relative flex-1 flex flex-col items-center justify-center px-4 overflow-hidden dot-grid">
+<!-- Abstract Git Visualization Background -->
+<div class="absolute inset-0 z-0 pointer-events-none opacity-40">
+<div class="absolute top-1/2 left-0 w-full h-[600px] -translate-y-1/2 flex items-center justify-center">
+<!-- Left: Parallel Fan -->
+<div class="absolute left-[-10%] w-1/2 h-full flex flex-col justify-between py-12">
+<div class="h-0.5 w-full bg-gradient-to-r from-cyan-500/0 via-cyan-500/50 to-primary/20 transform rotate-[15deg] translate-x-10"></div>
+<div class="h-0.5 w-full bg-gradient-to-r from-blue-500/0 via-blue-500/50 to-primary/20 transform rotate-[10deg] translate-x-5"></div>
+<div class="h-0.5 w-full bg-gradient-to-r from-indigo-500/0 via-indigo-500/50 to-primary/20"></div>
+<div class="h-0.5 w-full bg-gradient-to-r from-purple-500/0 via-purple-500/50 to-primary/20 transform -rotate-[10deg] translate-x-5"></div>
+<div class="h-0.5 w-full bg-gradient-to-r from-pink-500/0 via-pink-500/50 to-primary/20 transform -rotate-[15deg] translate-x-10"></div>
+<!-- Decorative thin lines to represent 194 -->
+<div class="absolute inset-0 flex flex-col justify-around opacity-20">
+<div class="h-[1px] w-full bg-primary/30"></div><div class="h-[1px] w-full bg-primary/30"></div><div class="h-[1px] w-full bg-primary/30"></div><div class="h-[1px] w-full bg-primary/30"></div><div class="h-[1px] w-full bg-primary/30"></div><div class="h-[1px] w-full bg-primary/30"></div><div class="h-[1px] w-full bg-primary/30"></div><div class="h-[1px] w-full bg-primary/30"></div>
+</div>
+</div>
+<!-- Center: Funnel/Converge -->
+<div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 size-[400px] bg-primary/10 rounded-full blur-[120px]"></div>
+<!-- Right: Main Branch -->
+<div class="absolute right-0 w-1/2 h-full flex items-center">
+<div class="h-1 w-full bg-gradient-to-r from-primary to-transparent shadow-[0_0_40px_rgba(85,88,246,0.6)] rounded-full"></div>
+</div>
+</div>
+</div>
+<div class="relative z-10 max-w-5xl w-full text-center space-y-12">
+<!-- Content -->
+<div class="space-y-6">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-wider">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+                        New Case Study Released
+                    </div>
+<h1 class="text-5xl md:text-7xl lg:text-8xl font-black tracking-tight leading-[1.1] text-slate-900 dark:text-white">
+                        194 Worktrees, <br/>
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-indigo-400 to-cyan-400">Zero Conflicts.</span>
+</h1>
+<p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
+                        Revolutionizing Agentic Development with massive parallel workflows. Orchestrate 194 autonomous agents with seamless merge logic and zero friction.
+                    </p>
+</div>
+<!-- Action Buttons -->
+<div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+<button class="w-full sm:w-auto px-8 py-4 bg-primary text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                        Explore the Series
+                        <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+<button class="w-full sm:w-auto px-8 py-4 bg-slate-200 dark:bg-slate-800 text-slate-900 dark:text-white font-bold rounded-xl hover:bg-slate-300 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2 border border-slate-300 dark:border-slate-700">
+                        Read the Docs
+                        <span class="material-symbols-outlined text-sm">menu_book</span>
+</button>
+</div>
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-12">
+<!-- Stat 1 -->
+<div class="relative group">
+<div class="absolute -inset-px bg-gradient-to-b from-cyan-400/20 to-transparent rounded-2xl blur-sm opacity-50"></div>
+<div class="relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-8 rounded-2xl text-left hover:border-cyan-500/50 transition-colors">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-cyan-500 bg-cyan-500/10 p-2 rounded-lg">hub</span>
+<span class="text-xs font-bold text-cyan-500">+100% capacity</span>
+</div>
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Parallel Agents</p>
+<h3 class="text-3xl font-black text-cyan-500 tracking-tight">194</h3>
+</div>
+</div>
+<!-- Stat 2 -->
+<div class="relative group">
+<div class="absolute -inset-px bg-gradient-to-b from-emerald-400/20 to-transparent rounded-2xl blur-sm opacity-50"></div>
+<div class="relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-8 rounded-2xl text-left hover:border-emerald-500/50 transition-colors">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-emerald-500 bg-emerald-500/10 p-2 rounded-lg">call_merge</span>
+<span class="text-xs font-bold text-emerald-500">Perfect Sync</span>
+</div>
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Merge Conflicts</p>
+<h3 class="text-3xl font-black text-emerald-500 tracking-tight">0</h3>
+</div>
+</div>
+<!-- Stat 3 -->
+<div class="relative group">
+<div class="absolute -inset-px bg-gradient-to-b from-primary/20 to-transparent rounded-2xl blur-sm opacity-50"></div>
+<div class="relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border border-slate-200 dark:border-slate-800 p-8 rounded-2xl text-left hover:border-primary/50 transition-colors">
+<div class="flex items-center justify-between mb-4">
+<span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">terminal</span>
+<span class="text-xs font-bold text-primary">+12% Monthly</span>
+</div>
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400 mb-1">Total Sessions</p>
+<h3 class="text-3xl font-black text-primary tracking-tight">3,066</h3>
+</div>
+</div>
+</div>
+</div>
+<!-- Scroll Indicator -->
+<div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-50">
+<span class="text-[10px] font-bold uppercase tracking-widest">Scroll to explore</span>
+<div class="w-[1px] h-12 bg-gradient-to-b from-primary to-transparent"></div>
+</div>
+</main>
+<!-- Newsletter Bar -->
+<footer class="relative z-20 bg-slate-100 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 py-8 px-8">
+<div class="max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-between gap-6">
+<div class="flex items-center gap-4 text-center lg:text-left">
+<div class="size-10 rounded-full flex items-center justify-center bg-primary/10">
+<span class="material-symbols-outlined text-primary">mail</span>
+</div>
+<div>
+<h4 class="font-bold text-slate-900 dark:text-white">Join the Agentic Dev Newsletter</h4>
+<p class="text-sm text-slate-500 dark:text-slate-400">Join 50,000+ developers staying ahead of the curve.</p>
+</div>
+</div>
+<div class="flex w-full lg:w-auto gap-2">
+<input class="w-full lg:w-72 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-lg text-sm px-4 focus:ring-primary focus:border-primary" placeholder="enter your email" type="email"/>
+<button class="bg-primary hover:brightness-110 text-white font-bold py-2 px-6 rounded-lg transition-all text-sm whitespace-nowrap">
+                        Subscribe
+                    </button>
+</div>
+</div>
+</footer>
+</div>
+</body></html>

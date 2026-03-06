@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;family=JetBrains+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#ea2a33",
+                        "background-light": "#f8f6f6",
+                        "background-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "0.5rem", "lg": "1rem", "xl": "1.5rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .dot-grid {
+            background-image: radial-gradient(circle, #334155 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+        .glow-orb {
+            filter: blur(120px);
+            opacity: 0.15;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased overflow-x-hidden">
+<div class="relative min-h-screen flex flex-col">
+<!-- Background Accents -->
+<div class="absolute inset-0 dot-grid opacity-30 pointer-events-none"></div>
+<div class="absolute top-[-10%] left-[-10%] size-[500px] bg-indigo-600 rounded-full glow-orb pointer-events-none"></div>
+<div class="absolute bottom-[-10%] right-[-10%] size-[600px] bg-primary rounded-full glow-orb pointer-events-none"></div>
+<!-- Navigation -->
+<header class="relative z-10 flex items-center justify-between px-8 py-6 border-b border-slate-800/50 backdrop-blur-sm">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-xl">terminal</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight">Debug Log</h2>
+</div>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-sm font-medium text-slate-400 hover:text-white transition-colors" href="#">Case Studies</a>
+<a class="text-sm font-medium text-slate-400 hover:text-white transition-colors" href="#">System Architecture</a>
+<a class="text-sm font-medium text-slate-400 hover:text-white transition-colors" href="#">Performance</a>
+</nav>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden lg:flex items-center bg-slate-800/50 border border-slate-700 rounded-lg px-3 py-1.5 gap-2">
+<span class="material-symbols-outlined text-slate-400 text-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-sm w-48 placeholder:text-slate-500" placeholder="Search archive..." type="text"/>
+<span class="text-[10px] bg-slate-700 text-slate-400 px-1.5 py-0.5 rounded">CMD+K</span>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white text-sm font-bold py-2 px-5 rounded-lg transition-all shadow-lg shadow-primary/20">
+                    Subscribe
+                </button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="relative z-10 flex-1 flex flex-col lg:flex-row max-w-[1440px] mx-auto w-full px-8 pt-12 gap-8">
+<!-- Left: Code Editor (2/3) -->
+<div class="lg:w-2/3 flex flex-col gap-8">
+<div class="space-y-4">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-bold uppercase tracking-widest">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+                        Incident Report #402
+                    </div>
+<h1 class="text-5xl lg:text-7xl font-black tracking-tighter leading-[1.1]">
+                        The <span class="text-primary">Two-Character</span> Bug <br/>That Took 3 Days
+                    </h1>
+<p class="text-slate-400 text-xl max-w-2xl leading-relaxed">
+                        A deep dive into the SSE parser glitch that haunted our production environment for 72 hours, resulting in a full SDK rewrite before finding the truth.
+                    </p>
+</div>
+<!-- Code Editor Window -->
+<div class="w-full bg-[#1e293b] rounded-xl border border-slate-700/50 shadow-2xl overflow-hidden flex flex-col font-mono text-sm">
+<div class="bg-slate-800 px-4 py-3 border-b border-slate-700 flex items-center justify-between">
+<div class="flex gap-1.5">
+<div class="size-3 rounded-full bg-red-500/50"></div>
+<div class="size-3 rounded-full bg-amber-500/50"></div>
+<div class="size-3 rounded-full bg-emerald-500/50"></div>
+</div>
+<div class="text-slate-400 text-xs">SSEParser.swift — Edited</div>
+<div class="size-4"></div>
+</div>
+<div class="p-6 overflow-x-auto">
+<div class="flex gap-6">
+<div class="text-slate-600 text-right select-none space-y-1">
+<div>24</div><div>25</div><div>26</div><div>27</div><div>28</div><div>29</div><div>30</div><div>31</div><div>32</div>
+</div>
+<div class="text-slate-300 space-y-1">
+<div><span class="text-pink-400">func</span> <span class="text-blue-400">parseStream</span>(_ chunk: <span class="text-emerald-400">String</span>) {</div>
+<div class="pl-4"><span class="text-pink-400">let</span> components = chunk.components(separatedBy: <span class="text-amber-300">":"</span>)</div>
+<div class="pl-4"><span class="text-slate-500">// Check for double newline as per SSE spec</span></div>
+<div class="pl-4 flex items-center gap-2">
+<span class="text-pink-400">if</span> buffer.endsWith(<span class="bg-primary/20 border border-primary/50 text-white px-1.5 py-0.5 rounded ring-4 ring-primary/20 shadow-[0_0_15px_rgba(234,42,51,0.4)]">"\n\n"</span>) {
+                                    <span class="text-slate-500 italic ml-2">// CRITICAL BUG FOUND HERE</span>
+</div>
+<div class="pl-8">dispatch(currentEvent)</div>
+<div class="pl-8">buffer = <span class="text-amber-300">""</span></div>
+<div class="pl-4">} <span class="text-pink-400">else</span> {</div>
+<div class="pl-8">buffer += chunk</div>
+<div class="pl-4">}</div>
+<div>}</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right: Pipeline Visualization (1/3) -->
+<div class="lg:w-1/3 flex flex-col gap-6">
+<!-- Timer Card -->
+<div class="bg-slate-900/50 border border-slate-800 rounded-xl p-6 relative overflow-hidden group">
+<div class="flex justify-between items-start mb-4">
+<span class="text-slate-500 text-xs font-bold uppercase tracking-widest">Time to Resolution</span>
+<span class="material-symbols-outlined text-primary text-xl">history_toggle_off</span>
+</div>
+<div class="text-5xl font-mono font-bold text-primary tracking-tighter drop-shadow-[0_0_8px_rgba(234,42,51,0.3)]">
+                        72:00:00
+                    </div>
+<div class="mt-2 text-slate-500 text-sm">Real-time production downtime</div>
+</div>
+<!-- Pipeline Viz -->
+<div class="flex-1 bg-slate-900/50 border border-slate-800 rounded-xl p-6 flex flex-col relative overflow-hidden">
+<div class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-8">Data Stream Pipeline</div>
+<div class="relative flex-1 flex flex-col items-center">
+<!-- Pipeline Tube -->
+<div class="absolute inset-y-0 w-24 bg-slate-800/30 rounded-full border border-slate-700/50"></div>
+<!-- Flowing Packets -->
+<div class="flex flex-col gap-12 items-center w-full z-10 pt-4">
+<!-- Healthy Packets -->
+<div class="w-16 h-10 bg-indigo-500 rounded-md border border-indigo-400/50 shadow-lg shadow-indigo-500/20 flex items-center justify-center">
+<span class="text-[10px] font-mono text-white/80">EVENT</span>
+</div>
+<div class="w-16 h-10 bg-indigo-500 rounded-md border border-indigo-400/50 shadow-lg shadow-indigo-500/20 flex items-center justify-center">
+<span class="text-[10px] font-mono text-white/80">DATA</span>
+</div>
+<!-- Glitching Packet -->
+<div class="relative w-16 h-10">
+<div class="absolute inset-0 bg-primary/40 blur-md animate-pulse"></div>
+<div class="relative w-full h-full bg-primary/20 border border-primary/50 rounded-md flex items-center justify-center overflow-hidden">
+<div class="flex flex-col items-center gap-0.5">
+<div class="w-8 h-0.5 bg-primary/60 rotate-12"></div>
+<div class="w-10 h-0.5 bg-primary/60 -rotate-6"></div>
+</div>
+<span class="absolute text-[8px] font-bold text-white uppercase tracking-tighter">DROPPED</span>
+</div>
+</div>
+<!-- Fragmented Pieces -->
+<div class="flex gap-2">
+<div class="size-3 bg-primary/30 rounded rotate-45"></div>
+<div class="size-2 bg-primary/30 rounded-full"></div>
+<div class="size-3 bg-primary/30 rounded -rotate-12"></div>
+</div>
+</div>
+<!-- Pulse effect -->
+<div class="absolute bottom-10 w-full h-1 bg-gradient-to-r from-transparent via-primary to-transparent opacity-20 blur-sm"></div>
+</div>
+<button class="mt-8 flex items-center justify-center gap-2 w-full py-3 bg-slate-800 hover:bg-slate-700 rounded-lg text-sm font-bold transition-colors border border-slate-700">
+<span class="material-symbols-outlined text-lg">play_circle</span>
+                        Simulate Failure
+                    </button>
+</div>
+</div>
+</main>
+<!-- Footer Timeline -->
+<footer class="relative z-10 max-w-[1440px] mx-auto w-full px-8 py-12">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+<!-- Day 1 -->
+<div class="flex items-start gap-4 group">
+<div class="flex flex-col items-center gap-2">
+<div class="size-10 rounded-full border-2 border-slate-700 bg-slate-900 flex items-center justify-center text-slate-500 font-mono text-sm">01</div>
+<div class="w-px h-full bg-slate-800"></div>
+</div>
+<div class="pb-4">
+<h4 class="text-white font-bold mb-1">Day 1: Timeout Tuning</h4>
+<p class="text-slate-500 text-sm leading-relaxed">Adjusted nginx keep-alive, increased proxy buffer sizes, and tuned TCP stack parameters. Minimal impact.</p>
+</div>
+</div>
+<!-- Day 2 -->
+<div class="flex items-start gap-4 group">
+<div class="flex flex-col items-center gap-2">
+<div class="size-10 rounded-full border-2 border-slate-700 bg-slate-900 flex items-center justify-center text-slate-500 font-mono text-sm">02</div>
+<div class="w-px h-full bg-slate-800"></div>
+</div>
+<div class="pb-4">
+<h4 class="text-white font-bold mb-1">Day 2: SDK Rewrite</h4>
+<p class="text-slate-500 text-sm leading-relaxed">Suspected race conditions in URLSession. Rewrote the entire networking layer from scratch using AsyncStream.</p>
+</div>
+</div>
+<!-- Day 3 -->
+<div class="flex items-start gap-4 group">
+<div class="flex flex-col items-center gap-2">
+<div class="size-10 rounded-full border-2 border-primary bg-primary/10 flex items-center justify-center text-primary font-mono text-sm shadow-[0_0_15px_rgba(234,42,51,0.2)]">03</div>
+</div>
+<div class="pb-4">
+<h4 class="text-white font-bold mb-1 flex items-center gap-2">
+                            Day 3: Found it — \n\n
+                            <span class="material-symbols-outlined text-emerald-400 text-lg">check_circle</span>
+</h4>
+<p class="text-slate-500 text-sm leading-relaxed">Discovered a missing newline in the server-side proxy which caused the client to buffer indefinitely waiting for the end-of-frame.</p>
+</div>
+</div>
+</div>
+</footer>
+</div>
+</body></html>
