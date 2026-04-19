@@ -104,10 +104,14 @@ for (const entry of entries) {
   });
 }
 
-// Sort descending by date
-const articles = Array.from(map.values()).sort(
-  (a, b) => new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime()
-);
+// Sort descending by date, with deterministic tie-breaker on title.
+// Guards against NaN from malformed frontmatter dates (treats invalid as epoch 0).
+const articles = Array.from(map.values()).sort((a, b) => {
+  const ta = Date.parse(a.dateISO) || 0;
+  const tb = Date.parse(b.dateISO) || 0;
+  if (tb !== ta) return tb - ta;
+  return a.title.localeCompare(b.title);
+});
 ---
 
 <BaseLayout
