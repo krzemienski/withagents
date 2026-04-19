@@ -1,3 +1,14 @@
+<!-- linkedin-format: article; plain-post-teaser follows -->
+<!-- PLAIN-POST TEASER (use this if posting as a native feed post instead of LinkedIn Article) -->
+<!--
+Forty-five active days. Five flagships. Two products shipped on the same day.
+
+The honest numbers on what the push produced — posts shipped, what dragged, what I would do differently, and the 90-day forward arc — are in the full retro.
+
+https://withagents.dev/writing/day-60-retro-45-60-day
+-->
+<!-- END PLAIN-POST TEASER — full Article content follows -->
+
 # Forty-five days later — the honest numbers, what worked, what did not, what ships next
 
 I started the push saying *the real system or nothing*. Day 60 is where I find out whether I held that line.
@@ -6,7 +17,7 @@ This is the closing devlog for the WithAgents launch. The Day 31 post was a shor
 
 ## What the push produced
 
-TODO(day-60-metrics): insert verified totals — posts shipped, LinkedIn Articles posted, X threads posted, READMEs patched.
+[metric pending post-push: total posts shipped, LinkedIn Articles posted, X threads posted, READMEs patched]
 
 The five flagships shipped in the order the calendar promised:
 
@@ -22,7 +33,7 @@ Ten light-edits against the original 18-post corpus landed on assigned days. Nin
 
 **The flagship quintet arc.** Five posts evenly spaced across 45 days is a different rhythm from a three-flagship plan. Day 10 landed the week readers were deciding whether to keep going; the 21-star CCB repo gave the piece a credibility anchor.
 
-**LinkedIn Articles beat Shorts decisively.** TODO(day-60-metrics) with actual read-time comparison. The R4 decision to drop Shorts from the channel matrix cost nothing and saved ~45 hours.
+**LinkedIn Articles beat Shorts decisively.** [metric pending post-push: Article vs Short read-time comparison] The R4 decision to drop Shorts from the channel matrix cost nothing and saved ~45 hours.
 
 **X API v2 paid tier was not optional.** Forty threads in 45 days is outside the free-tier envelope. The $100/month amortized inside Week 2.
 
@@ -40,7 +51,7 @@ Ten light-edits against the original 18-post corpus landed on assigned days. Nin
 
 **Three-products-in-one-day on Day 50 barely held.** Cognitive overload warning from the Day 48 voice review was real. If I run this again, three products get three days; the manifesto gets its own.
 
-**Consulting pipeline was harder to read than expected.** TODO(day-60-metrics) inbound-DM count, Calendly bookings, inquiry-to-conversation ratio. Quiet positioning trades loud commercial framing for credibility; credibility takes longer to monetize than noise. I stand by the decision. Whether 45 days was long enough for it to show up in a metric is still open.
+**Consulting pipeline was harder to read than expected.** [metric pending post-push: inbound-DM count, Calendly bookings, inquiry-to-conversation ratio] Quiet positioning trades loud commercial framing for credibility; credibility takes longer to monetize than noise. I stand by the decision. Whether 45 days was long enough for it to show up in a metric is still open.
 
 ## The 90-day forward arc
 
@@ -48,7 +59,7 @@ Ten light-edits against the original 18-post corpus landed on assigned days. Nin
 
 **2. Skills package V2 and the team-governance question.** V1 was ten skills for solo developers. V2's real question is how eight engineers adopt the same constitution and negotiate which rules block. Target: Day 120 meta-post on package governance.
 
-**3. Code Stories platform maturity.** TODO(day-60-metrics) with install counts. Whatever the numbers, the platform needs one more iteration before it clears the demo-to-product threshold. Target: Day 90 V2 post.
+**3. Code Stories platform maturity.** [metric pending post-push: CLI install count, platform signup count] Whatever the numbers, the platform needs one more iteration before it clears the demo-to-product threshold. Target: Day 90 V2 post.
 
 ## The discipline that held
 

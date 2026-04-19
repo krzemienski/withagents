@@ -51,9 +51,9 @@ The CLI is the durable artifact. The platform is the front door to the CLI.
 
 ---
 
-**Tweet 5/14** (284 chars)
+**Tweet 5/14** (275 chars)
 
-Product insight from building it: agent-generated narration reads repos like tables of contents. Boring.
+Product insight from building it: agent narration reads repos like a table of contents. Boring.
 
 Had to encode "pick the three commits where something nearly went wrong" before the agent would produce anything listenable.
 

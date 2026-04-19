@@ -10,7 +10,7 @@ Twenty-nine days into the 45-day WithAgents launch. Rest week starts today.
 Four flagships cleared. VF GA. CCB Evolution. Ralph origin. Skills package launch is next.
 
 **2/8** (220 chars)
-What shipped: TODO(day-31-metrics) the verified count lands in the canonical post.
+What shipped: [metric pending post-publish] — the verified count lands in the canonical post.
 
 Every active day got a blog + LinkedIn Article + X thread. No Shorts. The R4 channel matrix decision held. $100/mo X API tier was the right call.
 

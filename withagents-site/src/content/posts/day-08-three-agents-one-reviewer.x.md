@@ -80,4 +80,4 @@ The minimum viable version: 3 prompts, 3 CLI calls, 1 shell script that exits no
 
 A review with one architect and no dissenters is not a review.
 
-Full writeup + repo: https://withagents.dev/posts/day-08-three-agents-one-reviewer
+Full writeup + repo: https://withagents.dev/writing/day-08-three-agents-one-reviewer

@@ -10,7 +10,7 @@ Forty-five days in. Day 60 is where I find out whether I held the line I started
 The real system or nothing. This is the receipt.
 
 **2/12** (258 chars)
-TODO(day-60-metrics): posts shipped, LinkedIn Articles posted, X threads posted, READMEs patched — all land here at publish time.
+[metric pending post-push: posts shipped, LinkedIn Articles posted, X threads posted, READMEs patched]
 
 Five flagships shipped in calendar order: Day 01 ValidationForge GA, Day 10 CCB Evolution, Day 22 Ralph, Day 35 Skills, Day 50 finale.
 
@@ -22,7 +22,7 @@ The flagship quintet arc. Five peaks across 45 days is a different rhythm than t
 **4/12** (245 chars)
 What worked:
 
-LinkedIn Articles beat Shorts decisively. TODO(day-60-metrics) actual read-time comparison. The R4 decision to drop Shorts saved ~45 hours and cost nothing.
+LinkedIn Articles beat Shorts decisively. [metric pending post-push: actual read-time comparison] The R4 decision to drop Shorts saved ~45 hours and cost nothing.
 
 X API v2 paid tier was not optional. 40 threads in 45 days is outside free-tier.
 

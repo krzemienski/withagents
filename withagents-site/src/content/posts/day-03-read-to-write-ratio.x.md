@@ -86,4 +86,4 @@ Start asking: what is the shape of the Read that has to happen before this Write
 
 9.6 to 1. That is the thesis.
 
-Full writeup: https://withagents.dev/posts/day-03-read-to-write-ratio
+Full writeup: https://withagents.dev/writing/day-03-read-to-write-ratio

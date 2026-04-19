@@ -2,7 +2,7 @@
 title: "Forty-five days later — the honest numbers, what worked, what did not, what ships next"
 subtitle: "The closing devlog for the WithAgents launch push"
 slug: day-60-retro-45-60-day
-date: "2026-06-24"
+date: "2026-06-17"
 author: Nick Krzemienski
 kind: production-analysis
 tags:
@@ -22,11 +22,11 @@ excerpt: "Forty-five active days. Five flagships. The number of posts that shipp
 
 I started the push saying *the real system or nothing*. Day 60 is where I find out whether I held that line.
 
-This is a long one. The Day 31 devlog was a short mid-push field note. This one is the receipt: what the push produced, what the calendar actually delivered against what it promised, what dragged in public, and the 90-day arc the work now has the right to open. I am going to cite specific days, specific commits, specific posts, and specific repos. Where the live number has landed by the time this post is published, I will state it. Where it has not, I will leave a TODO(day-60-metrics) placeholder visible on the page so nobody reads a line that has not been measured yet.
+This is a long one. The Day 31 devlog was a short mid-push field note. This one is the receipt: what the push produced, what the calendar actually delivered against what it promised, what dragged in public, and the 90-day arc the work now has the right to open. I am going to cite specific days, specific commits, specific posts, and specific repos. Where the live number has landed by the time this post is published, I will state it. Where it has not, I will leave a [metric pending post-push] placeholder visible on the page so nobody reads a line that has not been measured yet.
 
 ## What the push actually produced
 
-TODO(day-60-metrics): replace this paragraph with verified totals: total posts shipped (target ~42), LinkedIn Articles posted (target ~42), X threads posted (target ~40), READMEs patched (target ~30), devlogs (2 or 3 depending on 45-vs-60-day extension).
+[metric pending post-push: total posts shipped, LinkedIn Articles posted, X threads posted, READMEs patched, devlog count]
 
 The five flagships shipped in the order the calendar promised:
 
@@ -42,7 +42,7 @@ Ten light-edits against the original 18-post blog corpus landed on their assigne
 
 **The flagship quintet arc.** Five posts evenly spaced across 45 days is a different rhythm from the three-flagship earlier plan. The Day 10 CCB flagship landed the week people were deciding whether to keep reading; the 21-star repo gave the piece a concrete credibility anchor. The Day 22 Ralph piece carried the second half. Without the intermediate Day 10 and Day 35 peaks, the push would have sagged between Day 01 and Day 50.
 
-**LinkedIn Articles beat Shorts, decisively.** TODO(day-60-metrics): insert the actual Article-median read-time and Short-median read-time comparison if both ran as an A/B; based on pre-push prediction, Articles land ~2.5x the read-through rate. The R4 decision to drop Shorts from the channel matrix cost nothing and saved ~45 hours of format-specific drafting.
+**LinkedIn Articles beat Shorts, decisively.** [metric pending post-push: Article-median read-time vs Short-median read-time] The R4 decision to drop Shorts from the channel matrix cost nothing and saved ~45 hours of format-specific drafting.
 
 **X API v2 paid tier was not optional.** Forty threads in 45 days is outside the free-tier envelope. Manual posting at that cadence would have taken a workday a week in lost productivity. The $100/month cost amortized inside Week 2.
 
@@ -52,7 +52,7 @@ Ten light-edits against the original 18-post blog corpus landed on their assigne
 
 ## What did not work
 
-**Reserve swap-ins consumed more of the finale than I expected.** ILS-iOS (Day 56) was conditional on a pickup session that did not land. Remodex (Day 57) was blocked on a naming decision that was not resolved. Reserve C (phone-to-desktop bridge) took Day 56. A pre-drafted Insight 11 post (*$47 overnight API bill*) took Day 57. Neither reserve landed the way a dedicated product post would have. TODO(day-60-metrics): verify whether Day 56 and Day 57 under-performed the calendar median by a meaningful margin.
+**Reserve swap-ins consumed more of the finale than I expected.** ILS-iOS (Day 56) was conditional on a pickup session that did not land. Remodex (Day 57) was blocked on a naming decision that was not resolved. Reserve C (phone-to-desktop bridge) took Day 56. A pre-drafted Insight 11 post (*$47 overnight API bill*) took Day 57. Neither reserve landed the way a dedicated product post would have. [metric pending post-push: whether Day 56 and Day 57 under-performed the calendar median]
 
 **The Shannon ecosystem expansion was structurally fragile.** Four posts, three live-repo checks, two stale READMEs that I rewrote as part of the post draft. The expansion was the right call, the four-post arc let the methodology story breathe, but the pre-push verification pass should have caught the stale READMEs. Adding *for every expanded-arc post, verify README alignment before writing the post* to the next push's checklist.
 
@@ -60,7 +60,7 @@ Ten light-edits against the original 18-post blog corpus landed on their assigne
 
 **Three-products-in-one-day on Day 50 barely held.** SessionForge milestone, Code Stories dual-SKU, closing manifesto. The cognitive-overload warning from Day 48 voice review was real: the three-part blog post works, but it runs long, and the LinkedIn Article-as-manifesto-alone is what actually carried the finale's attention. If I run this structure again, the three products get three days. The manifesto gets its own.
 
-**Consulting inquiry pipeline was harder to read than expected.** TODO(day-60-metrics): insert the verified inbound-DM count, Calendly booking count, and inquiry-to-conversation ratio. The quiet-applied-layer positioning decision (per BRIEF §3) traded loud commercial framing for credibility, and credibility takes longer to monetize than noise. I stand by the decision; I am not yet sure whether 45 days was long enough for it to show up in a metric.
+**Consulting inquiry pipeline was harder to read than expected.** [metric pending post-push: inbound-DM count, Calendly booking count, inquiry-to-conversation ratio] The quiet-applied-layer positioning decision traded loud commercial framing for credibility, and credibility takes longer to monetize than noise. I stand by the decision; I am not yet sure whether 45 days was long enough for it to show up in a metric.
 
 ## What the 90-day forward arc looks like
 
@@ -70,11 +70,11 @@ Three directions opened up. The next 90 days (Day 61 through Day 150) spends pro
 
 **2. Skills package V2 and the governance question from Day 29.** `withagents-skills` V1 shipped Day 35 with ten skills. The V2 expansion question is not "which skills go in": it is "how do eight engineers adopting the same constitution negotiate which rules block." The governance story is the Day 29 open question this retro inherits. Target: a Day 120 meta-post on skill-package governance for teams, not solo developers.
 
-**3. Code Stories platform maturity.** The dual-SKU launch on Day 50 landed. TODO(day-60-metrics): insert actual code-tales CLI install count, code-tales-platform signup count, and ElevenLabs-generated audio narration count. Whatever the numbers are, the platform needs one more iteration before it clears the demo-to-product threshold. Target: a Day 90 Code Stories V2 post: what changed, what people actually listened to, and what the consumer close on the 45-day push taught me about product-market alignment for the brand.
+**3. Code Stories platform maturity.** The dual-SKU launch on Day 50 landed. [metric pending post-push: code-tales CLI install count, code-tales-platform signup count, ElevenLabs-generated audio narration count] Whatever the numbers are, the platform needs one more iteration before it clears the demo-to-product threshold. Target: a Day 90 Code Stories V2 post: what changed, what people actually listened to, and what the consumer close on the 45-day push taught me about product-market alignment for the brand.
 
 ## The discipline I am most grateful the calendar held
 
-No number I did not re-derive. No claim I did not cite. Every post has a voice-review log under `plans/260419-0241-agentic-dog-brand-launch/reports/voice-review-{slug}.md` with em-dash density per thousand words, banlist hit count (every post shipped at zero), and opener-formula compliance. TODO(day-60-metrics): aggregate the voice-review log counts and cite the mean em-dash density across all 42 posts.
+No number I did not re-derive. No claim I did not cite. Every post has a voice-review log under `plans/260419-0241-agentic-dog-brand-launch/reports/voice-review-{slug}.md` with em-dash density per thousand words, banlist hit count (every post shipped at zero), and opener-formula compliance. [metric pending post-push: mean em-dash density across all posts]
 
 The push produced a body of work that is internally consistent and externally auditable. Everything cites something. Every product post points at a real repo. Every insight post points at a real JSONL line. Every flagship is anchored to an actual session that actually happened in the 23,479-session dataset. That is what I was hoping to hold, and the rest week after Day 60 is going to be the first time in two months I do not have to check whether the next day's post is drafted.
 

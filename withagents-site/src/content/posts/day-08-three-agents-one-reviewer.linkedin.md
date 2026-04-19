@@ -54,4 +54,4 @@ The minimum viable version is three prompts, three CLI invocations, and a shell 
 
 A design review with one architect and no dissenters is not a review. Agent consensus gates give you that second voice for fifteen cents and fifteen seconds.
 
-Full writeup + code: https://withagents.dev/posts/day-08-three-agents-one-reviewer
+Full writeup + code: https://withagents.dev/writing/day-08-three-agents-one-reviewer

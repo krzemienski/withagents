@@ -22,4 +22,4 @@ If you are designing an agent system, the question worth asking is not "how fast
 
 9.6 to 1. That is the thesis.
 
-Full data and reasoning: https://withagents.dev/posts/day-03-read-to-write-ratio
+Full data and reasoning: https://withagents.dev/writing/day-03-read-to-write-ratio
