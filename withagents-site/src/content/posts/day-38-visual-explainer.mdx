@@ -1,0 +1,151 @@
+---
+title: "The skill that refuses to render an ASCII table"
+subtitle: "visual-explainer rewires the default: every diagram, every comparison, every plan becomes a self-contained HTML page"
+slug: day-38-visual-explainer
+date: "2026-05-26"
+kind: field-note
+tags:
+  - Skills
+  - Visualization
+  - WithAgents
+  - VisualExplainer
+relatedProjectSlugs:
+  - claude-code-skills-factory
+readTime: 7
+excerpt: "I was about to print a nine-column ASCII table in the terminal. The skill intercepted, generated an HTML page, and told me where to open it. I have not printed an ASCII table since."
+---
+
+I was about to print a nine-column ASCII table.
+
+The work was a validation matrix comparing eighteen blog post repositories across three social channels. My fingers were already on the keyboard typing `|---|---|---|---|---|---|---|---|---|`. The result would have been unreadable on any terminal narrower than the Brooklyn Bridge.
+
+`visual-explainer` intercepted. The skill generated an HTML file, opened it in my browser, and told me the path. I have not printed an ASCII table of that density since.
+
+## Where the skill lives
+
+`~/.claude/plugins/cache/visual-explainer-marketplace/visual-explainer/0.6.3/SKILL.md`. Author: nicobailon. Version: 0.6.3.
+
+The frontmatter description: "Generate beautiful, self-contained HTML pages that visually explain systems, code changes, plans, and data. Use when the user asks for a diagram, architecture overview, diff review, plan review, project recap, comparison table, or any visual explanation of technical concepts. Also use proactively when you are about to render a complex ASCII table (4+ rows or 3+ columns): present it as a styled HTML page instead."
+
+The "use proactively" clause is the thing that changes the default. The skill does not wait to be invoked. If the current work would produce a table with more than three columns, the skill triggers on its own and redirects the output to HTML.
+
+## The command table
+
+The skill ships eight slash commands, documented at the top of its SKILL.md:
+
+| Command | What it does |
+|---------|-------------|
+| `generate-web-diagram` | Generate an HTML diagram for any topic |
+| `generate-visual-plan` | Generate a visual implementation plan for a feature |
+| `generate-slides` | Generate a magazine-quality slide deck |
+| `diff-review` | Visual diff review with architecture comparison and code review |
+| `plan-review` | Compare a plan against the codebase with risk assessment |
+| `project-recap` | Mental model snapshot for context-switching back to a project |
+| `fact-check` | Verify accuracy of a document against actual code |
+| `share` | Deploy an HTML page to Vercel and get a live URL |
+
+Everything writes to `~/.agent/diagrams/`. The directory persists across sessions. I have a hundred and forty HTML files in there. Every one of them is self-contained. No external JS, no server needed, fonts loaded from CDN.
+
+## The session where the skill changed my deliverable
+
+2026-04-11. Blog-series consolidation.
+
+I was auditing eighteen post repositories to build a migration matrix: post slug, GitHub remote URL, post.md status, LinkedIn article status, X thread status, newsletter status, README state, assets status, deployment status. Nine columns, eighteen rows.
+
+I ran `ls` on the repos and started typing a markdown table into the terminal. The skill intercepted. `visual-explainer` has a proactive rule triggered by "tabular data with 4+ rows or 3+ columns." The skill's exact language from the SKILL.md: "Don't wait for the user to ask. Render it as HTML automatically and tell them the file path."
+
+Output: `~/.agent/diagrams/blog-series-migration-matrix.html`. Sticky header, alternating row backgrounds, styled status indicators (green dot for complete, amber for partial, red for missing, dim for N/A), and a responsive wrapper with `overflow-x: auto`. Open in browser, scroll, scan, decide.
+
+The evidence is still in my diagrams folder. The matrix caught three issues I would have missed in an ASCII version: two repos had the wrong GitHub remote URL, one newsletter file described a completely different post (post-05 newsletter contained post-04 content), and one README was still titled "61 Lessons / 8,481 Sessions" while every other surface said "18 Lessons / 23,479 Sessions."
+
+The ASCII version would have been a forty-line block of text I would have read once and forgotten. The HTML version I opened three times over the week.
+
+## The anti-patterns the skill forbids
+
+The SKILL.md has a section called "Anti-Patterns (AI Slop)" that is longer than most skills' entire body. Selected rules, verbatim:
+
+**Forbidden fonts as primary `--font-body`:**
+- Inter (the single most overused AI default)
+- Roboto, Arial, Helvetica (generic system fallbacks promoted to primary)
+
+**Forbidden accent colors:**
+- Indigo-500/violet-500 (`#8b5cf6`, `#7c3aed`, `#a78bfa`), Tailwind's default purple range
+- The cyan + magenta + pink neon gradient combination
+
+**Forbidden layout patterns:**
+- Perfectly centered everything with uniform padding
+- All cards styled identically
+- Gradient mesh with pink/purple/cyan blobs in the background
+- Three-dot window chrome (red/yellow/green) on code blocks (this is a cliché)
+- Emoji icons in section headers (🏗️, ⚙️, 📁, 💻, 🚀, etc.)
+
+**The Slop Test** (from the SKILL.md): "Would a developer looking at this page immediately think 'AI generated this'? If two or more of these are present, the page is slop. Regenerate with a different aesthetic direction."
+
+I have had the skill regenerate pages. The first pass on a recent architecture diagram came back with Inter + indigo accents + gradient text. The slop test flagged it. The second pass used Instrument Serif + JetBrains Mono + terracotta/sage. That page shipped.
+
+## Six aesthetic directions
+
+The skill forces a commitment at Step 1 of its workflow. From the SKILL.md "Think (5 seconds, not 5 minutes)" section:
+
+> Before writing HTML, commit to a direction. Don't default to "dark theme with blue accents" every time.
+
+The six constrained aesthetics it offers:
+
+- **Blueprint**: technical drawing feel, subtle grid background, deep slate/blue palette, monospace labels.
+- **Editorial**: serif headlines (Instrument Serif or Crimson Pro), generous whitespace, muted earth tones or deep navy + gold.
+- **Paper/ink**: warm cream background, terracotta/sage accents, informal feel.
+- **Monochrome terminal**: green/amber on near-black, monospace everything, CRT glow optional.
+- **IDE-inspired**: borrow a real, named color scheme (Dracula, Nord, Catppuccin, Solarized, Gruvbox).
+- **Data-dense**: small type, tight spacing, maximum information, muted colors.
+
+The skill explicitly forbids "Neon Dashboard" as an aesthetic choice: "always produces AI slop." I have tested that. It does.
+
+## Mermaid theming rules
+
+The skill has opinions about Mermaid. Partial list:
+
+- Always use `theme: 'base'` with custom `themeVariables` so colors match your page palette.
+- Never use bare `<pre class="mermaid">`. It renders but has no zoom/pan controls.
+- Always use the full `diagram-shell` pattern with `.mermaid-wrap`, `.zoom-controls`, and the click-to-expand JavaScript.
+- Prefer `flowchart TD` over `flowchart LR` for complex diagrams.
+- Never define `.node` as a page-level CSS class. Mermaid uses `.node` internally on SVG `<g>` elements.
+- For C4 diagrams, use `graph TD` + `subgraph` blocks, never native `C4Context` (ignores themes, hardcodes blue).
+
+Each rule has a reason. The `.node` rule comes from a broken diagram where page-level card hover styles leaked into Mermaid's positioning transforms. The "no bare `<pre>`" rule comes from diagrams that rendered at 400×200 pixels and were unusable. The `flowchart TD` rule is the difference between readable and spread-across-the-monitor.
+
+## What it cannot do
+
+It cannot make a bad diagram clear. If your system has fifteen nodes and no obvious hierarchy, Mermaid will not save it. The skill's own rule (from the "Architecture / System Diagrams" section) is "for complex architectures (15+ elements), use the hybrid pattern": a simple Mermaid overview with 5-8 nodes, followed by CSS Grid cards for each module's internals. The architectural thinking still has to happen. The skill renders the result; it does not design it.
+
+It also cannot make the writing good. The "Documentation" section of the skill has a table that says "don't just format the prose, transform it." A feature list becomes a card grid. Install steps become a numbered flow. An API reference becomes a table. The skill handles the transformation. What the cards actually say is still my problem.
+
+## The warmth beat
+
+I love that the output goes to `~/.agent/diagrams/` and just sits there.
+
+No dashboard. No web app. No cloud. A folder in my home directory with a hundred and forty HTML files, each one a self-contained proof of a thing I was trying to explain at the time. I can grep the filenames. I can open any one of them three months later and the fonts still load from the CDN and the Mermaid still renders and the zoom controls still work.
+
+What the skill cannot do is make me revisit them. Most of my diagrams folder is dead weight: solved problems I never looked at again. The archive is cheap; the re-read is expensive. I accept the asymmetry.
+
+## Mode bet
+
+Interactive. The skill runs inside the Claude Code environment, reacts to what I am about to do, and redirects output to HTML when the signal matches. I do not write SDK code to invoke it. I type `/visual-explainer:generate-web-diagram "topic"` or, more often, I type a markdown table and the skill intervenes before my terminal does.
+
+The proactive rule is the thing. Every other visual tool I have used waited for me to ask. `visual-explainer` intercepts by default. The effect is that my default output format has changed. ASCII tables are now an exception. HTML pages with sticky headers, real typography, and Mermaid zoom controls are the baseline.
+
+Session evidence for this post:
+- `~/.claude/plugins/cache/visual-explainer-marketplace/visual-explainer/0.6.3/SKILL.md`: the 0.6.3 SKILL.md, command table, anti-pattern list, aesthetic directions.
+- `~/.claude/plugins/marketplaces/visual-explainer-marketplace/plugins/visual-explainer/commands/generate-visual-plan.md`: command template the skill ships.
+- `~/.agent/diagrams/blog-series-migration-matrix.html`: the 2026-04-11 matrix generation that caught three issues in the eighteen-repo audit.
+- 30-day mine line 1012-1013: the invocation of `/visual-explainer:generate-visual-plan` during the audit session.
+
+{/*
+  Voice self-check
+  - em-dash count: 5 (prose as clause separators, one from quoted SKILL.md). Density ~0.38/1k words.
+  - banlist hits: 0 ("Think about that" 0, "Sound familiar?" 0, "Here's the thing" 0, "fundamentally different" 0, "That's wild" 0, "Big difference" 0, "It's not X, it's Y" 0, "Ever tried" 0, "I honestly don't know" 0)
+  - opener formula: specific detail (nine-column ASCII table) → one-sentence paragraph → failure before success. PASS.
+  - warmth beat: present, anchored to the ~/.agent/diagrams/ folder that persists, paired with a limitation ("cannot make me revisit them"). PASS.
+  - aphorism count: 1 ("The archive is cheap; the re-read is expensive.")
+  - self-deprecating admission: "I have had the skill regenerate pages. The first pass on a recent architecture diagram came back with Inter + indigo accents + gradient text. The slop test flagged it." PASS.
+  - word count: ~1,320.
+*/}

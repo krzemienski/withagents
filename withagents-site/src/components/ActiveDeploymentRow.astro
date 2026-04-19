@@ -1,0 +1,52 @@
+---
+interface Repo {
+  name: string;
+  version: string;
+  status: 'active' | 'building' | 'error';
+}
+
+interface Props {
+  repos: Repo[];
+}
+const { repos } = Astro.props;
+
+const statusColor: Record<string, string> = {
+  active:   'var(--color-accent-lime)',
+  building: '#EC4899',
+  error:    '#EF4444',
+};
+---
+
+<div
+  class="flex flex-col gap-6 p-6 md:flex-row md:items-center md:justify-between"
+  style="background:var(--color-panel-1);border:1px solid var(--color-hair);"
+>
+  <!-- Label -->
+  <div class="flex items-center gap-4">
+    <div
+      class="flex h-10 w-10 shrink-0 items-center justify-center"
+      style="background:var(--color-panel-3);"
+    >
+      <span class="material-symbols-outlined text-muted" style="font-size:20px;">commit</span>
+    </div>
+    <div>
+      <p class="font-mono text-[10px] uppercase tracking-widest text-muted-2 mb-0.5">Open Source Pulse</p>
+      <p class="font-body text-sm text-text">Active Deployments</p>
+    </div>
+  </div>
+
+  <!-- Repos -->
+  <div class="flex flex-wrap items-center gap-8">
+    {repos.map(r => (
+      <div class="flex items-center gap-3">
+        <span
+          class="flex h-1.5 w-1.5 rounded-full"
+          style={`background:${statusColor[r.status] ?? statusColor.active};`}
+          aria-hidden="true"
+        ></span>
+        <span class="font-mono text-xs text-text">{r.name}</span>
+        <span class="font-mono text-[10px] text-muted-2">{r.version}</span>
+      </div>
+    ))}
+  </div>
+</div>

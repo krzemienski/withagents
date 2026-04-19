@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>diagram-frame — agentic.dog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg-void: #0a0a0a;
+    --bg-alt: #111827;
+    --bg-elev: #0c1220;
+    --border-faint: #1f2937;
+    --border-glow: #374151;
+    --accent-pink: #ff006e;
+    --accent-green: #39ff14;
+    --accent-yellow: #faff00;
+    --text-cool: #e5e7eb;
+    --text-muted: #9ca3af;
+    --text-faint: #6b7280;
+    --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    --font-sans: 'Inter', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg-void);
+    color: var(--text-cool);
+    font-family: var(--font-sans);
+    background-image: repeating-linear-gradient(
+      180deg,
+      rgba(255,255,255,0.012) 0,
+      rgba(255,255,255,0.012) 1px,
+      transparent 1px, transparent 3px
+    );
+    min-height: 100vh;
+  }
+
+  .stage {
+    padding: 48px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .caption {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent-green);
+    margin-bottom: -8px;
+  }
+  .caption .cmd { color: var(--text-muted); }
+
+  .frame {
+    width: 100%;
+    max-width: 860px;
+    background: var(--bg-alt);
+    border: 1px solid var(--border-faint);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .chrome {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: var(--bg-elev);
+    border-bottom: 1px solid var(--border-faint);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f56; }
+  .dot-y { background: #ffbd2e; }
+  .dot-g { background: #27c93f; }
+  .path {
+    margin-left: 10px;
+    color: var(--text-muted);
+  }
+  .lang-tag {
+    margin-left: auto;
+    color: var(--accent-yellow);
+    background: rgba(250, 255, 0, 0.06);
+    border: 1px solid rgba(250, 255, 0, 0.25);
+    padding: 2px 7px;
+    border-radius: 3px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .diagram {
+    padding: 28px 22px 24px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text-cool);
+    overflow-x: auto;
+  }
+  .diagram pre {
+    margin: 0;
+    white-space: pre;
+    color: var(--text-muted);
+  }
+  .diagram pre .node { color: var(--text-cool); font-weight: 500; }
+  .diagram pre .pink { color: var(--accent-pink); font-weight: 500; }
+  .diagram pre .green { color: var(--accent-green); }
+  .diagram pre .yellow { color: var(--accent-yellow); }
+  .diagram pre .rule { color: var(--border-glow); }
+
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    border-top: 1px solid var(--border-faint);
+    background: var(--bg-elev);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .footer .legend {
+    display: flex;
+    gap: 14px;
+  }
+  .legend .k { color: var(--text-muted); margin-right: 5px; }
+  .legend .v-pink { color: var(--accent-pink); }
+  .legend .v-green { color: var(--accent-green); }
+  .legend .v-yellow { color: var(--accent-yellow); }
+</style>
+</head>
+<body>
+<div class="stage">
+
+  <div class="caption">❯ <span class="cmd">render ./diagrams/validationforge-pipeline.ascii</span></div>
+
+  <div class="frame">
+    <div class="chrome">
+      <span class="dot dot-r"></span>
+      <span class="dot dot-y"></span>
+      <span class="dot dot-g"></span>
+      <span class="path">~/diagrams/validationforge-pipeline.ascii</span>
+      <span class="lang-tag">ascii</span>
+    </div>
+
+    <div class="diagram">
+<pre>
+<span class="rule">┌─────────────────────────────────────────────────────────────────────────┐</span>
+<span class="rule">│</span>  <span class="green">┌──────────────┐</span>      <span class="yellow">┌──────────────┐</span>      <span class="pink">┌──────────────┐</span>  <span class="rule">│</span>
+<span class="rule">│</span>  <span class="green">│  agent run   │</span> ───▶ <span class="yellow">│  no-mock gate│</span> ───▶ <span class="pink">│ screenshot + │</span>  <span class="rule">│</span>
+<span class="rule">│</span>  <span class="green">│  claude-code │</span>      <span class="yellow">│  validation  │</span>      <span class="pink">│ log evidence │</span>  <span class="rule">│</span>
+<span class="rule">│</span>  <span class="green">└──────┬───────┘</span>      <span class="yellow">└──────┬───────┘</span>      <span class="pink">└──────┬───────┘</span>  <span class="rule">│</span>
+<span class="rule">│</span>         <span class="rule">│</span>                     <span class="rule">│</span>                     <span class="rule">│</span>          <span class="rule">│</span>
+<span class="rule">│</span>         ▼                     ▼                     ▼          <span class="rule">│</span>
+<span class="rule">│</span>    <span class="node">[session]</span>         <span class="node">[real build run]</span>        <span class="node">[verdict]</span>     <span class="rule">│</span>
+<span class="rule">│</span>                              <span class="rule">│</span>                                   <span class="rule">│</span>
+<span class="rule">│</span>                              ▼                                   <span class="rule">│</span>
+<span class="rule">│</span>                       <span class="pink">PASS / FAIL</span>                               <span class="rule">│</span>
+<span class="rule">│</span>                   <span class="rule">(no mocks, no stubs)</span>                           <span class="rule">│</span>
+<span class="rule">└─────────────────────────────────────────────────────────────────────────┘</span>
+
+<span class="rule">──</span> <span class="green">legend</span> <span class="rule">──</span>  <span class="green">●</span> agent action   <span class="yellow">●</span> gate check   <span class="pink">●</span> evidence artifact
+</pre>
+    </div>
+
+    <div class="footer">
+      <span>frame pattern v1.0</span>
+      <span class="legend">
+        <span><span class="k">agent</span><span class="v-green">●</span></span>
+        <span><span class="k">gate</span><span class="v-yellow">●</span></span>
+        <span><span class="k">artifact</span><span class="v-pink">●</span></span>
+      </span>
+      <span>ascii / mermaid / excalidraw</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,88 @@
+---
+title: "The diagram is a spec, not a decoration"
+subtitle: "Why live-mermaid-editor renders on keystroke and validates before it paints"
+slug: day-47-live-mermaid-editor
+date: "2026-04-19"
+author: Nick Krzemienski
+kind: field-note
+tags:
+  - WithAgents
+  - Diagrams
+  - Mermaid
+  - WebSocket
+relatedProjectSlugs:
+  - operator-ui
+readTime: 5
+excerpt: "A 300ms debounce. A syntax validator that runs before the renderer. A split pane where the diagram updates on every keystroke without crashing the browser. A small tool that is entirely one rule."
+---
+
+300ms debounce. Syntax validator before the renderer. WebSocket pushes the validated diagram state back to the browser. The editor never crashes on invalid input, the render never flashes a stale diagram, and the file you export is the exact SVG the last valid keystroke produced.
+
+That is the entire `live-mermaid-editor`. One rule, enforced in four places.
+
+The rule is: **the diagram is a spec, not a decoration.** If a diagram is going into a PRD, a runbook, or a post, it has to be correct before it renders. Correct means the Mermaid syntax parsed cleanly in the validator pass, and the renderer received a tree it could draw. The editor exists because I got tired of writing invalid Mermaid in a Notion block and noticing three days later that the preview had been quietly blank.
+
+## The split-pane, without the flicker
+
+Left pane: a CodeMirror editor you type Mermaid into. Right pane: the rendered SVG. Between them: a WebSocket.
+
+The obvious implementation renders on every keystroke. That crashes the browser inside of 30 seconds on real diagrams. A 200-node ER diagram re-parses and re-lays out on every character, and Mermaid's layout engine is not cheap.
+
+The 300ms debounce is the cheapest fix that works. The editor buffers keystrokes. When the buffer is quiet for 300ms, it ships the buffered code through the WebSocket to the server. The server validates syntax first (cheap), then renders (expensive), then pushes the SVG back. The right pane only updates on a valid render. Invalid Mermaid sits in the editor with a single-line error bar under it, not a broken preview.
+
+That sequence is why the editor does not flash the last-valid diagram while you're mid-typing the next one. The pane stays on the last valid render until a new valid render is ready. The error bar is the only UI that changes on invalid input.
+
+## Seven templates, because blank canvas kills diagrams
+
+The templates bundled at launch:
+
+- `flowchart`: TD graph with decisions and exits
+- `sequence`: 3-party message exchange
+- `classDiagram`: inheritance hierarchy
+- `stateDiagram-v2`: Idle → Processing → Success/Error with retry
+- `gantt`: 2-phase project timeline
+- `erDiagram`: USER / ORDER / PRODUCT with foreign keys
+- `pie`: quick proportional breakdown
+
+These exist because the thing that kills a diagram is the blank canvas. A blank text area is a decision about structure before you have content. A template is a correct starting point you edit into your structure. I picked the seven shapes I use most in PRDs, runbooks, and post diagrams.
+
+The template endpoint is a flat `GET /api/templates/:name`. No variables. No interpolation. The point is to reduce friction, not to build a templating engine.
+
+## The WebSocket is not load-bearing, yet
+
+Real talk on the WebSocket: it does not need to be one. A plain POST would work for single-user editing, which is 100% of today's use. The WebSocket is there because the next thing I want to build is multi-party editing. One operator drafts a runbook diagram. A second operator watches in read-only mode, seeing updates live.
+
+That feature has not shipped. The WebSocket is the only piece of infrastructure that supports it without a rewrite. Everything else is a small server-side Mermaid wrapper.
+
+The honest version of this paragraph is: I built infrastructure for a feature that does not exist yet. That is a thing you should watch me for in future posts. I slip into that failure mode and it costs me sessions. In this case the extra cost was small (ws + Express instead of Express alone), the optionality is real, and the multi-party mode is actually on the calendar.
+
+If you see me doing the same thing for a bigger slice of infrastructure, call it out.
+
+## Export is where the tool earns its keep
+
+`GET` the state. `POST` the validated code. Export SVG or PNG. The export is the deliverable. The editor is the path.
+
+SVG export writes the exact DOM the renderer produced. PNG export rasterizes it at 2x for a retina-safe deliverable. Neither path re-parses the source. The export takes the already-rendered SVG element and serializes it. One source of truth.
+
+This is the load-bearing decision of the whole tool. A lot of Mermaid editors re-parse and re-render at export time. That opens a gap where the diagram you see and the diagram you ship can diverge. You edit in the browser, hit export, and the export silently uses a different version of the Mermaid library than the preview did. The live editor pins one library version, one render path, one export serialization. You ship what you saw.
+
+## Where it fits the mode-bet
+
+This is an **Interactive**-mode tool by design. You write Mermaid code, the environment (editor + validator + renderer + exporter) does the work of keeping it correct. No SDK to embed. No headless loop to trigger. A single page with a split pane and strict feedback.
+
+Interactive tools win when the environment enforces the rule you cared about when you started. The rule for this tool is that the diagram is a spec. Everything else is plumbing to protect the rule.
+
+---
+
+**Repo:** https://github.com/krzemienski/live-mermaid-editor · `npm install && npm start` · http://localhost:3200
+
+**Next post (Day 49):** `github-to-audio-pipeline`. A five-stage content transformation chain that turns repositories into audio narratives, and the stage isolation pattern that keeps it from collapsing on a partial failure.
+
+{/* VOICE SELF-CHECK
+   em-dashes: 4 (words ~920) = 4.3/1k — within ≤5/1k cap
+   banlist hits: 0
+   opener: "300ms debounce" — specific number, technical detail, no preamble
+   warmth beat: none — clean analytical tone
+   self-deprecating admission: "I built infrastructure for a feature that does not exist yet... call it out if you see me doing the same thing for a bigger slice"
+   aphorism: one — "Interactive tools win when the environment enforces the rule you cared about when you started"
+*/}

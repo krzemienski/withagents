@@ -1,0 +1,351 @@
+---
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface SeedArticle {
+  source: 'seed';
+  slug: string;
+  kind: string;
+  title: string;
+  subtitle: string;
+  date: string;
+  dateISO: string;
+  readTime: string;
+  body: string[];
+  pullQuote: string;
+  codeSnippet?: string;
+  codeLabel?: string;
+}
+
+interface CollectionArticle {
+  source: 'collection';
+  slug: string;
+  kind: string;
+  title: string;
+  subtitle: string;
+  date: string;
+  dateISO: string;
+  readTime: string;
+  entry: CollectionEntry<'posts'>;
+}
+
+type Article = SeedArticle | CollectionArticle;
+
+// ─── Static paths ─────────────────────────────────────────────────────────────
+// IMPORTANT: getStaticPaths is hoisted into an isolated module chunk by Astro's
+// build pipeline. All data it needs must be inlined inside the function body —
+// no references to variables or functions defined outside it will survive.
+
+export async function getStaticPaths() {
+  // Inline seed data — must live here due to Astro's getStaticPaths isolation
+  const seeds: SeedArticle[] = [
+    {
+      source: 'seed',
+      slug: 'agent-workflows-operating-systems',
+      kind: 'Essay',
+      title: 'Agent workflows should read like operating systems, not demos.',
+      subtitle: 'Why borrowing paradigms from POSIX and kernel design leads to more resilient agentic behaviors than prompting alone.',
+      date: 'April 12, 2026',
+      dateISO: '2026-04-12',
+      readTime: '8 min read',
+      pullQuote: 'Hope is not a coordination protocol.',
+      body: [
+        'The current generation of agent demos shares a structural flaw: they are written as scripts, not systems. A script runs once, top to bottom, with the assumption that the environment cooperates. An operating system assumes adversarial conditions, interrupted execution, shared resources, and the need to resume from a known state after failure.',
+        'When we design agent workflows, we keep reaching for the script model because it is the one that demos well. A linear sequence of LLM calls, prettily chained, produces impressive outputs in controlled conditions. Production is not a controlled condition.',
+        'The read-to-write ratio in real agent sessions is 9.6:1. Agents spend almost ten times as many tokens reading context, tool results, and prior state as they do producing outputs. This is not a problem to optimize away — it is the nature of operating in a complex environment.',
+        'What operating systems teach us is that the real engineering work is in the interfaces between components, not the components themselves. POSIX gave us pipes, file descriptors, and signals — not because Unix wanted to constrain what programs could do, but because explicit interfaces make systems inspectable, composable, and recoverable.',
+        'Agent systems need the same discipline. Not as a constraint on capability, but as a prerequisite for reliability. An agent workflow that can only be reasoned about by reading the full prompt history is not a system — it is a transcript.',
+      ],
+      codeSnippet: '# Session log excerpt\n[00:00.00] INIT runbook:incident_triage_v2\n[00:04.42] DONE runbook complete, 0 errors',
+      codeLabel: 'session_log_excerpt.txt',
+    },
+    {
+      source: 'seed',
+      slug: 'layer-between-chat-and-automation',
+      kind: 'Essay',
+      title: 'The layer between chat and automation is where the real product work lives.',
+      subtitle: 'Moving beyond conversational interfaces requires a fundamental rethink of state management and deterministic execution.',
+      date: 'March 28, 2026',
+      dateISO: '2026-03-28',
+      readTime: '12 min read',
+      pullQuote: 'The layer between chat and automation is where product quality is determined.',
+      body: [
+        'The current landscape of AI interfaces is predominantly locked into the "magic text box" paradigm. Users are presented with an open-ended input field and expected to conjure perfectly engineered prompts to achieve their goals.',
+        'We call this the Chat Trap. It outsources the cognitive load of system orchestration directly to the user.',
+        'To break free from the Chat Trap, we must construct a robust middle layer between the raw LLM capabilities and the user interface.',
+        'The companies building lasting AI products are not the ones with the best models — they are the ones who understood earliest that the model is infrastructure, not the product.',
+      ],
+      codeSnippet: 'def route_user_intent(input_state):\n    intent = parser.classify(input_state["raw_input"])\n    return GraphBuilder.from_intent(intent)',
+      codeLabel: 'intent_router.py',
+    },
+    {
+      source: 'seed',
+      slug: 'context-persistence-product-design',
+      kind: 'Field Note',
+      title: 'Why context persistence is a product design problem, not just a retrieval problem.',
+      subtitle: 'Memory in LLMs is not just an engineering hurdle — how and when an agent recalls information dictates the trust model with the user.',
+      date: 'March 15, 2026',
+      dateISO: '2026-03-15',
+      readTime: '6 min read',
+      pullQuote: 'What an agent remembers is a product decision. What it forgets is an architectural one.',
+      body: [
+        'Every retrieval-augmented system has a hidden product assumption baked into its architecture: it assumes that similarity is a proxy for relevance.',
+        'The product design question is not "how do we retrieve the right context?" — it is "what should an agent remember about a user, and when should it forget?"',
+        'Context persistence done well is invisible. Done badly, it feels like surveillance.',
+      ],
+      codeSnippet: 'const ctx = await memory.recall("user_display_preferences", {\n  maxAge: "30d",\n  provenance: true,\n});',
+      codeLabel: 'context_retrieval.ts',
+    },
+    {
+      source: 'seed',
+      slug: 'trusting-agent-stack-production',
+      kind: 'Production Analysis',
+      title: 'What to look for before trusting an agent stack in production.',
+      subtitle: 'A framework for evaluating reliability, fallback mechanisms, and determinism in emerging agentic frameworks.',
+      date: 'February 20, 2026',
+      dateISO: '2026-02-20',
+      readTime: '10 min read',
+      pullQuote: 'The absence of a paper trail is not a feature. It is a warning sign.',
+      body: [
+        'Evaluating an agentic framework for production use requires a different lens than evaluating a library. A library fails loudly, at call time, with a traceable stack.',
+        'The questions that matter in production evaluation are: Can you reproduce what happened? Can you identify which step produced the wrong output? Can you rerun from a known-good checkpoint?',
+        'Every framework that cannot answer yes to all of these questions is accumulating a reliability debt that will come due in production.',
+      ],
+      codeSnippet: '# Production readiness checklist\n[ ] Full execution traces stored durably\n[ ] Deterministic replay from any checkpoint\n[ ] Human-approval gates at any step',
+      codeLabel: 'prod_readiness_checklist.sh',
+    },
+    {
+      source: 'seed',
+      slug: 'agent-interfaces-inspectable',
+      kind: 'Essay',
+      title: 'How to design agent interfaces that remain inspectable under load.',
+      subtitle: 'The operators who survive agentic system failures are the ones who can read a trace. Design for that moment.',
+      date: 'February 3, 2026',
+      dateISO: '2026-02-03',
+      readTime: '7 min read',
+      pullQuote: 'Inspectability is not a feature you add after the system works. It is the condition under which the system can be said to work at all.',
+      body: [
+        'The hardest part of operating an agentic system at scale is not building it. It is the moment, inevitably, when something goes wrong in a way you did not anticipate.',
+        'Most agent frameworks are designed for the happy path. The trace, if it exists at all, is a debugging artifact.',
+        'Inspectability must be on by default. Every execution, every tool call, every gate, every branch: logged, structured, queryable, and retained.',
+      ],
+      codeSnippet: 'const agent = new Agent({\n  model: "claude-3-5-sonnet",\n  trace: { enabled: true, structured: true, retention: "90d" },\n});',
+      codeLabel: 'agent_config.ts',
+    },
+  ];
+
+  const entries = await getCollection('posts');
+
+  // Dedupe by slug — collection entries override seeds
+  const map = new Map<string, Article>();
+  for (const seed of seeds) {
+    map.set(seed.slug, seed);
+  }
+
+  for (const entry of entries) {
+    const data = entry.data;
+    const kindLabel =
+      data.kind === 'field-note'
+        ? 'Field Note'
+        : data.kind === 'production-analysis'
+        ? 'Production Analysis'
+        : data.kind.charAt(0).toUpperCase() + data.kind.slice(1);
+
+    const dateISO = data.date;
+    const dateDisplay = new Date(dateISO).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'UTC',
+    });
+
+    map.set(data.slug, {
+      source: 'collection',
+      slug: data.slug,
+      kind: kindLabel,
+      title: data.title,
+      subtitle: data.subtitle ?? '',
+      date: dateDisplay,
+      dateISO,
+      readTime: data.readTime ? `${data.readTime} min read` : '5 min read',
+      entry,
+    } satisfies CollectionArticle);
+  }
+
+  return Array.from(map.values()).map((article) => ({
+    params: { slug: article.slug },
+    props: { article },
+  }));
+}
+
+// ─── Page props ───────────────────────────────────────────────────────────────
+
+const { article } = Astro.props as { article: Article };
+
+// Related sidebar: hardcoded seed slugs, exclude current
+const RELATED_SEEDS = [
+  { slug: 'agent-workflows-operating-systems', kind: 'Essay', title: 'Agent workflows should read like operating systems, not demos.', date: 'April 12, 2026', readTime: '8 min read' },
+  { slug: 'layer-between-chat-and-automation', kind: 'Essay', title: 'The layer between chat and automation is where the real product work lives.', date: 'March 28, 2026', readTime: '12 min read' },
+  { slug: 'context-persistence-product-design', kind: 'Field Note', title: 'Why context persistence is a product design problem, not just a retrieval problem.', date: 'March 15, 2026', readTime: '6 min read' },
+  { slug: 'trusting-agent-stack-production', kind: 'Production Analysis', title: 'What to look for before trusting an agent stack in production.', date: 'February 20, 2026', readTime: '10 min read' },
+  { slug: 'agent-interfaces-inspectable', kind: 'Essay', title: 'How to design agent interfaces that remain inspectable under load.', date: 'February 3, 2026', readTime: '7 min read' },
+];
+const related = RELATED_SEEDS.filter((s) => s.slug !== article.slug).slice(0, 3);
+
+// Render MDX body for collection entries (Astro v6 Content Layer API: render(entry))
+const Content = article.source === 'collection'
+  ? (await render(article.entry)).Content
+  : null;
+---
+
+<BaseLayout
+  title={`${article.title.replace(/\.$/, '')} — WithAgents`}
+  description={article.subtitle}
+>
+  <Nav current="writing" />
+
+  <main class="relative z-10 w-full flex-grow flex flex-col">
+    <div class="mx-auto w-full max-w-[1440px] px-4 py-12 flex flex-col gap-12 md:flex-row md:px-6 lg:gap-24">
+
+      <!-- Sticky sidebar TOC -->
+      <aside class="hidden w-56 flex-shrink-0 md:block">
+        <div class="sticky top-32 space-y-8">
+          <div>
+            <p class="font-mono text-[10px] uppercase tracking-widest text-muted-2 mb-4">In this article</p>
+            <nav class="flex flex-col gap-3" style="border-left:1px solid var(--color-hair);" aria-label="Table of contents">
+              <a href="#overview" class="font-body text-sm text-muted hover:text-accent transition-colors pl-4 focus-visible:outline-accent">Overview</a>
+              <a href="#body" class="font-body text-sm text-muted hover:text-accent transition-colors pl-4 focus-visible:outline-accent">Analysis</a>
+              {article.source === 'seed' && article.codeSnippet && (
+                <a href="#code" class="font-body text-sm text-muted hover:text-accent transition-colors pl-4 focus-visible:outline-accent">Evidence</a>
+              )}
+            </nav>
+          </div>
+          <div class="p-4" style="background:var(--color-panel-1);border:1px solid var(--color-hair);">
+            <p class="font-mono text-[10px] uppercase tracking-widest text-muted-2 mb-3">Share</p>
+            <div class="flex gap-3">
+              <button aria-label="Share article" class="text-muted hover:text-text transition-colors focus-visible:outline-accent">
+                <span class="material-symbols-outlined" style="font-size:20px;">share</span>
+              </button>
+              <button aria-label="Bookmark article" class="text-muted hover:text-text transition-colors focus-visible:outline-accent">
+                <span class="material-symbols-outlined" style="font-size:20px;">bookmark</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main article -->
+      <article class="flex-grow max-w-3xl">
+        <!-- Article header -->
+        <header class="mb-16" id="overview">
+          <div class="flex items-center gap-4 font-mono text-xs uppercase tracking-widest text-accent mb-6">
+            <span>WithAgents</span>
+            <span class="h-1 w-1 rounded-full" style="background:var(--color-panel-2);"></span>
+            <time class="text-muted" datetime={article.dateISO}>{article.date}</time>
+            <span class="h-1 w-1 rounded-full" style="background:var(--color-panel-2);"></span>
+            <span class="text-muted">{article.readTime}</span>
+          </div>
+
+          <h1 class="font-display text-4xl font-bold tracking-tighter leading-tight text-text mb-6 md:text-5xl lg:text-6xl">
+            {article.title}
+          </h1>
+
+          <p class="font-body text-xl text-muted leading-relaxed">{article.subtitle}</p>
+        </header>
+
+        <!-- Seed path: string[] paragraphs + pull quote + optional code block -->
+        {article.source === 'seed' && (
+          <>
+            <div class="flex flex-col gap-8 mb-16" id="body">
+              {article.body.map((para) => (
+                <p class="font-body text-lg text-muted leading-relaxed">{para}</p>
+              ))}
+            </div>
+
+            <blockquote
+              class="px-6 py-4 my-12 font-body text-xl font-medium text-text italic"
+              style="border-left:2px solid var(--color-accent);background:rgba(139,92,246,0.05);"
+            >
+              "{article.pullQuote}"
+            </blockquote>
+
+            {article.codeSnippet && (
+              <section class="mb-16" id="code">
+                <div style="background:var(--color-panel-1);border:1px solid var(--color-hair);">
+                  <div
+                    class="flex items-center gap-2 px-4 py-2 font-mono text-xs text-muted"
+                    style="background:var(--color-panel-2);border-bottom:1px solid var(--color-hair);"
+                  >
+                    <span class="h-2.5 w-2.5 rounded-full" style="background:var(--color-panel-3);"></span>
+                    <span class="h-2.5 w-2.5 rounded-full" style="background:var(--color-panel-3);"></span>
+                    <span class="h-2.5 w-2.5 rounded-full" style="background:var(--color-panel-3);"></span>
+                    <span class="ml-2 text-muted-2">{article.codeLabel}</span>
+                  </div>
+                  <pre class="p-6 font-mono text-sm text-muted overflow-x-auto leading-relaxed whitespace-pre-wrap">{article.codeSnippet}</pre>
+                </div>
+              </section>
+            )}
+          </>
+        )}
+
+        <!-- Collection path: rendered MDX -->
+        {article.source === 'collection' && Content && (
+          <div
+            class="prose prose-invert prose-lg max-w-none mb-16 font-body text-muted leading-relaxed"
+            id="body"
+            style="
+              --tw-prose-body: var(--color-muted, #94a3b8);
+              --tw-prose-headings: var(--color-text, #f1f5f9);
+              --tw-prose-links: var(--color-accent, #8b5cf6);
+              --tw-prose-bold: var(--color-text, #f1f5f9);
+              --tw-prose-code: var(--color-text, #f1f5f9);
+              --tw-prose-pre-bg: var(--color-panel-1, #1e293b);
+              --tw-prose-quotes: var(--color-muted, #94a3b8);
+            "
+          >
+            <Content />
+          </div>
+        )}
+
+        <!-- Back to index -->
+        <div class="mt-16 pt-8" style="border-top:1px solid var(--color-hair);">
+          <a href="/writing" class="inline-flex items-center gap-2 font-mono text-xs text-muted hover:text-accent transition-colors focus-visible:outline-accent">
+            <span class="material-symbols-outlined" style="font-size:14px;">arrow_back</span>
+            Back to the Index
+          </a>
+        </div>
+      </article>
+    </div>
+
+    <!-- Continue reading -->
+    <div class="mx-auto w-full max-w-[1440px] px-6 py-16">
+      <h2 class="font-mono text-xs uppercase tracking-widest text-muted-2 mb-8">Continue reading</h2>
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+        {related.map((r) => (
+          <a
+            href={`/writing/${r.slug}`}
+            class="group flex flex-col gap-3 p-6 transition-colors duration-200 focus-visible:outline-accent"
+            style="background:var(--color-panel-1);border:1px solid var(--color-hair);"
+            onmouseenter="this.style.background='var(--color-panel-2)'"
+            onmouseleave="this.style.background='var(--color-panel-1)'"
+          >
+            <span class="font-mono text-[10px] uppercase tracking-widest text-muted" style="background:var(--color-panel-3);padding:2px 6px;display:inline-block;">
+              {r.kind}
+            </span>
+            <h3 class="font-display text-base font-semibold text-text transition-colors group-hover:text-accent leading-snug">
+              {r.title}
+            </h3>
+            <p class="font-mono text-xs text-muted-2 mt-auto">{r.date} · {r.readTime}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>

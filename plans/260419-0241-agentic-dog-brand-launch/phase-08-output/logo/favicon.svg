@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="WithAgents">
+  <title>WithAgents favicon</title>
+  <desc>Simplified w/ monogram tuned for 16-32px legibility.</desc>
+  <rect width="32" height="32" rx="6" fill="#0A0A0D"/>
+  <!-- w -->
+  <path d="M 6 11 L 9 22 L 12 15 L 15 22 L 18 11"
+        fill="none"
+        stroke="#F5F5F7"
+        stroke-width="2.6"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+  <!-- / (Ultraviolet) -->
+  <line x1="21" y1="9" x2="26" y2="23"
+        stroke="#8B5CF6"
+        stroke-width="2.8"
+        stroke-linecap="round"/>
+</svg>

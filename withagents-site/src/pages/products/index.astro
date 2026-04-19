@@ -1,0 +1,208 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+---
+
+<BaseLayout
+  title="Products — WithAgents"
+  description="Precision instruments for building, deploying, and managing agentic workflows at scale."
+>
+  <Nav current="products" />
+
+  <main class="relative z-10 w-full">
+    <div class="mx-auto max-w-[1440px] px-6 py-12 md:py-20 flex flex-col gap-24">
+
+      <!-- Header -->
+      <header class="flex flex-col gap-4 max-w-3xl">
+        <div class="flex items-center gap-2 font-mono text-xs text-muted uppercase tracking-wider">
+          <a href="/" class="hover:text-accent transition-colors focus-visible:outline-accent">Home</a>
+          <span class="material-symbols-outlined" style="font-size:14px;color:var(--color-muted-2);">chevron_right</span>
+          <span class="text-text">Products</span>
+        </div>
+        <h1 class="font-display text-5xl font-bold text-text tracking-tight leading-tight md:text-7xl">
+          Products.
+        </h1>
+        <p class="font-body text-xl text-muted font-light mt-4 leading-relaxed">
+          Precision instruments for building, deploying, and managing agentic workflows at scale.
+        </p>
+      </header>
+
+      <!-- Product Catalog -->
+      <section class="flex flex-col gap-24 md:gap-32">
+
+        <!-- Runbooks -->
+        <article class="grid grid-cols-1 gap-8 items-center lg:grid-cols-12 lg:gap-16">
+          <div class="flex flex-col gap-6 order-2 lg:order-1 lg:col-span-5">
+            <div>
+              <span class="font-mono text-xs uppercase tracking-widest text-accent" style="background:var(--color-panel-3);padding:4px 12px;">
+                Workflow Engine
+              </span>
+            </div>
+            <h2 class="font-display text-4xl font-bold text-text tracking-tight">Runbooks</h2>
+            <p class="font-body text-lg text-muted leading-relaxed">
+              Opinionated workflows for triage, analysis, and execution across real internal systems. Define complex sequences of actions with deterministic control points.
+            </p>
+            <div class="flex gap-4 mt-4">
+              <a
+                href="/products/runbooks"
+                class="group inline-flex items-center gap-1 font-mono text-sm text-accent hover:text-accent-alt transition-colors focus-visible:outline-accent"
+              >
+                Explore Runbooks
+                <span class="material-symbols-outlined transition-transform group-hover:translate-x-1" style="font-size:18px;">arrow_forward</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Mock: trace log -->
+          <div
+            class="order-1 lg:order-2 lg:col-span-7 p-6 md:p-10"
+            style="background:var(--color-panel-1);border:1px solid rgba(255,255,255,0.06);"
+          >
+            <div
+              class="font-mono text-sm flex flex-col overflow-hidden"
+              style="background:var(--color-panel-2);border:1px solid rgba(255,255,255,0.08);"
+            >
+              <!-- titlebar -->
+              <div
+                class="flex justify-between items-center px-4 py-2 text-xs text-muted"
+                style="background:var(--color-panel-3);border-bottom:1px solid rgba(255,255,255,0.06);"
+              >
+                <span>trace_execution_log.json</span>
+                <span class="flex items-center gap-1" style="color:var(--color-accent-lime);">
+                  <span class="material-symbols-outlined" style="font-size:14px;">check_circle</span>
+                  Active
+                </span>
+              </div>
+              <!-- log lines -->
+              <div class="p-4 flex flex-col gap-2 text-xs text-text overflow-x-auto">
+                <div><span class="text-muted-2">1</span> <span class="text-accent">INFO</span>  [00:00.00] Initializing runbook: <span style="color:#EC4899;">incident_triage_v2</span></div>
+                <div><span class="text-muted-2">2</span> <span class="text-accent">INFO</span>  [00:00.15] Connecting to target systems...</div>
+                <div><span class="text-muted-2">3</span> <span class="text-accent">INFO</span>  [00:00.42] Gathering metrics from Prometheus.</div>
+                <div class="pl-4 my-2" style="border-left:2px solid var(--color-panel-3);">
+                  <div class="text-muted"><span style="color:var(--color-accent-lime);">SUCCESS</span> Received 45 data points. Analyzing anomaly patterns.</div>
+                </div>
+                <div><span class="text-muted-2">4</span> <span class="text-accent">INFO</span>  [00:01.10] Requesting human approval for remediation.</div>
+                <div><span class="text-muted-2">5</span> <span style="color:#FACC15;">WAITING</span> [00:01.12] Blocking execution...</div>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- Memory Layer -->
+        <article class="grid grid-cols-1 gap-8 items-center lg:grid-cols-12 lg:gap-16">
+          <!-- Mock: abstract layers diagram -->
+          <div
+            class="lg:col-span-7 p-6 md:p-10 flex items-center justify-center"
+            style="background:var(--color-panel-1);border:1px solid rgba(255,255,255,0.06);min-height:280px;"
+          >
+            <div class="relative w-full flex flex-col items-center gap-4 opacity-80">
+              <div class="w-3/4 h-10 flex items-center justify-center font-mono text-xs text-accent" style="background:var(--color-panel-3);border:1px solid rgba(139,92,246,0.25);transform:skewX(-8deg);">
+                Semantic Cache Layer
+              </div>
+              <div class="w-3/4 h-10 flex items-center justify-center font-mono text-xs text-muted" style="background:var(--color-panel-2);border:1px solid rgba(255,255,255,0.08);transform:skewX(-8deg);">
+                Structured Retrieval
+              </div>
+              <div class="w-3/4 h-10 flex items-center justify-center font-mono text-xs text-muted-2" style="background:var(--color-panel-1);border:1px solid rgba(255,255,255,0.05);transform:skewX(-8deg);">
+                Persistent Store
+              </div>
+              <div class="font-mono text-[10px] uppercase tracking-widest mt-2" style="color:var(--color-accent-lime);">Context Synced</div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-6 lg:col-span-5">
+            <div>
+              <span class="font-mono text-xs uppercase tracking-widest text-accent" style="background:var(--color-panel-3);padding:4px 12px;">
+                Context Engine
+              </span>
+            </div>
+            <h2 class="font-display text-4xl font-bold text-text tracking-tight">Memory Layer</h2>
+            <p class="font-body text-lg text-muted leading-relaxed">
+              Practical patterns for preserving context across sessions, tools, and multi-step work. Semantic caching meets structured retrieval.
+            </p>
+            <a
+              href="/products/memory-layer"
+              class="group inline-flex items-center gap-1 font-mono text-sm text-accent hover:text-accent-alt transition-colors focus-visible:outline-accent"
+            >
+              Explore Memory Layer
+              <span class="material-symbols-outlined transition-transform group-hover:translate-x-1" style="font-size:18px;">arrow_forward</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- Operator UI -->
+        <article class="grid grid-cols-1 gap-8 items-center lg:grid-cols-12 lg:gap-16">
+          <div class="flex flex-col gap-6 order-2 lg:order-1 lg:col-span-5">
+            <div>
+              <span class="font-mono text-xs uppercase tracking-widest text-accent" style="background:var(--color-panel-3);padding:4px 12px;">
+                Interface Layer
+              </span>
+            </div>
+            <h2 class="font-display text-4xl font-bold text-text tracking-tight">Operator UI</h2>
+            <p class="font-body text-lg text-muted leading-relaxed">
+              Clean interfaces for inspecting runs, stepping in when needed, and keeping systems legible. Human-in-the-loop review at fleet scale.
+            </p>
+            <a
+              href="/products/operator-ui"
+              class="group inline-flex items-center gap-1 font-mono text-sm text-accent hover:text-accent-alt transition-colors focus-visible:outline-accent"
+            >
+              Explore Operator UI
+              <span class="material-symbols-outlined transition-transform group-hover:translate-x-1" style="font-size:18px;">arrow_forward</span>
+            </a>
+          </div>
+
+          <!-- Mock: operator dashboard -->
+          <div
+            class="order-1 lg:order-2 lg:col-span-7 p-6 md:p-10"
+            style="background:var(--color-panel-1);border:1px solid rgba(255,255,255,0.06);"
+          >
+            <div style="background:var(--color-panel-2);border:1px solid rgba(255,255,255,0.08);">
+              <div class="flex items-center justify-between px-4 py-2 font-mono text-xs text-muted" style="background:var(--color-panel-3);border-bottom:1px solid rgba(255,255,255,0.06);">
+                <span>operator_dashboard</span>
+                <span class="flex items-center gap-1" style="color:var(--color-accent-lime);">● 3 agents live</span>
+              </div>
+              <div class="p-4 flex flex-col gap-3 font-mono text-xs">
+                {[
+                  { id: 'agent-01', task: 'incident_triage', status: 'running', progress: 72 },
+                  { id: 'agent-02', task: 'log_analysis', status: 'waiting', progress: 45 },
+                  { id: 'agent-03', task: 'report_gen', status: 'complete', progress: 100 },
+                ].map(a => (
+                  <div class="flex items-center gap-4">
+                    <span class="text-muted-2 w-16">{a.id}</span>
+                    <span class="text-muted w-28 truncate">{a.task}</span>
+                    <div class="flex-1 h-1" style="background:var(--color-panel-3);">
+                      <div
+                        class="h-full"
+                        style={`width:${a.progress}%;background:${a.status === 'complete' ? 'var(--color-accent-lime)' : a.status === 'waiting' ? '#FACC15' : 'var(--color-accent)'};`}
+                      ></div>
+                    </div>
+                    <span class={`w-16 text-right ${a.status === 'complete' ? 'text-accent-lime' : a.status === 'waiting' ? 'text-yellow-400' : 'text-accent'}`}>{a.status}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- Common Architecture footer -->
+      <section style="border-top:1px solid var(--color-hair);padding-top:64px;">
+        <h2 class="font-mono text-xs uppercase tracking-widest text-muted mb-12">Common Architecture</h2>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+          {[
+            { title: 'Systems-First', desc: 'Every product is built on explicit state management and deterministic control flow.' },
+            { title: 'Inspectable', desc: 'Full execution traces. No black boxes. Every decision is logged and reviewable.' },
+            { title: 'Human-in-the-Loop', desc: 'Interrupt, review, and resume at any point. Designed for operator oversight.' },
+          ].map(p => (
+            <div class="flex flex-col gap-3 p-8" style="background:var(--color-panel-1);border:1px solid var(--color-hair);">
+              <h3 class="font-display text-lg font-semibold text-text tracking-tight">{p.title}</h3>
+              <p class="font-body text-sm text-muted leading-relaxed">{p.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>

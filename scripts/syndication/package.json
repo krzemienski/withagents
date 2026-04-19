@@ -1,0 +1,22 @@
+{
+  "name": "@withagents/syndication",
+  "version": "0.1.0",
+  "description": "withagents.dev multi-channel syndication runner",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "dispatch:dry": "npx tsx scheduler/runner.ts --today --dry-run",
+    "dispatch:today": "npx tsx scheduler/runner.ts --today",
+    "dispatch:day": "npx tsx scheduler/runner.ts --day"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "twitter-api-v2": "^1.17.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.4.0"
+  }
+}

@@ -1,0 +1,72 @@
+---
+interface Props {
+  name: string;
+  tagline: string;
+  stars: string;
+  lang: string;
+  license: string;
+  lastUpdated: string;
+  description: string;
+  githubUrl: string;
+  docsUrl?: string;
+  accentColor?: string;
+}
+const {
+  name, tagline, stars, lang, license, lastUpdated,
+  description, githubUrl, docsUrl, accentColor = 'var(--color-accent)',
+} = Astro.props;
+---
+
+<article
+  class="group flex flex-col gap-4 p-6 transition-all duration-300 focus-within:outline-accent"
+  style="background:var(--color-panel-2);border:1px solid rgba(255,255,255,0.06);"
+  onmouseenter="this.style.borderColor='rgba(255,255,255,0.10)'"
+  onmouseleave="this.style.borderColor='rgba(255,255,255,0.06)'"
+>
+  <!-- Header -->
+  <div class="flex items-start justify-between">
+    <span class="font-mono text-[10px] uppercase tracking-widest" style={`background:var(--color-panel-3);padding:3px 8px;color:${accentColor};`}>
+      {tagline}
+    </span>
+    <a href={githubUrl} target="_blank" rel="noopener" aria-label={`View ${name} on GitHub`} class="text-muted transition-colors group-hover:text-text focus-visible:outline-accent">
+      <span class="material-symbols-outlined" style="font-size:18px;">arrow_outward</span>
+    </a>
+  </div>
+
+  <!-- Name -->
+  <h3 class="font-mono text-xl font-bold text-text tracking-tight">{name}</h3>
+
+  <!-- Description -->
+  <p class="font-body text-sm text-muted leading-relaxed flex-grow">{description}</p>
+
+  <!-- Stats -->
+  <div class="flex items-center gap-4 pt-4 font-mono text-xs text-muted-2" style="border-top:1px solid var(--color-hair);">
+    <span class="flex items-center gap-1">
+      <span class="material-symbols-outlined" style="font-size:14px;">star</span>
+      {stars}
+    </span>
+    <span>{lang}</span>
+    <span>{license}</span>
+    <span class="ml-auto">{lastUpdated}</span>
+  </div>
+
+  <!-- Links -->
+  <div class="flex items-center gap-4 mt-1">
+    <a
+      href={githubUrl}
+      target="_blank"
+      rel="noopener"
+      class="font-mono text-xs text-muted transition-colors hover:text-accent focus-visible:outline-accent"
+    >
+      View on GitHub ↗
+    </a>
+    {docsUrl && (
+      <a
+        href={docsUrl}
+        class="font-mono text-xs text-muted transition-colors hover:text-text focus-visible:outline-accent"
+      >
+        Read the docs →
+      </a>
+    )}
+  </div>
+</article>

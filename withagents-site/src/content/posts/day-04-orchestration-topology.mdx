@@ -1,0 +1,88 @@
+---
+title: "Orchestration topology is the product"
+subtitle: "What 1,676 Agent spawns and 4,237 TaskUpdates across 23,479 sessions say about how agents actually coordinate"
+slug: day-04-orchestration-topology
+date: "2026-04-22"
+author: Nick Krzemienski
+kind: essay
+tags:
+  - Orchestration
+  - AgentDesign
+  - Production
+  - WithAgents
+relatedProjectSlugs:
+  - runbooks
+  - operator-ui
+  - agent-contracts
+readTime: 8
+excerpt: "1,676 agent spawns. 4,237 task updates. 1,743 peer messages. The shape of those numbers is the shape of the product."
+---
+
+4,534 of my sessions were started by a human. 18,945 were started by other agents. Once that ratio crossed four-to-one, the product I was actually shipping stopped being "prompts" and started being the thing one level up: the topology those agents coordinate through.
+
+The 360-day mine across 72 projects pins the numbers. `Agent` invocations: 1,676. `TaskUpdate`: 4,237. `TaskCreate`: 1,634. `SendMessage`: 1,743. `Skill`: 1,293. `ExitPlanMode`: 111. Every one of those is an edge in the graph. The agents are nodes. The topology is what you feel when you run the fleet.
+
+I did not design most of it. I ran into it.
+
+## What I mean by topology
+
+Topology is the arrangement: who spawns whom, what each node can see, where state lives, and which edges are allowed. Three shapes showed up enough to name.
+
+**Star.** One lead agent in the middle, N workers around it. The lead plans, dispatches, merges. Workers only talk to the lead. Multi-agent merge orchestrator runs this shape: 12 agents, 35 worktrees, one lead reconciling at the end.
+
+**Wave.** Dependencies grouped by depth. Wave 1 runs in parallel, passes, then Wave 2 runs in parallel against Wave 1's outputs. ValidationForge lives here. DB before API before Web or iOS, never skip an upstream PASS. 4,237 TaskUpdate rows, 1,634 TaskCreate rows, and a consistent 2.6:1 ratio tells me most of those updates are reclassifying status as waves converge.
+
+**Loop.** One agent, N rotations through different hats. Ralph is the canonical case: planner, builder, reviewer, fixer, each in a fresh 40K-token context, talking to the next one through disk, not memory. Non-interactive by design.
+
+Three shapes, one job: make the next agent's decision cheaper than the last one's was.
+
+## Where topology gets chosen for you
+
+I used to pick topology like a dropdown. Feature? Star. Refactor? Loop. Cross-platform? Wave. That was wrong. The topology gets chosen by where state already lives.
+
+If state lives on disk, you can fan out. `ralph-orchestrator`'s 926-file working tree has an append-only event log at `.ralph/events/`. Any hat, at any time, can read that log and resume. 336 MB of session data lives on the filesystem because the context window is not a reliable coordination surface. Loops and waves both work. Stars work. You pick for cost.
+
+If state only lives in one agent's context window, you have a star whether you wanted one or not. The agent holding the context *is* the bottleneck; everyone else is a worker waiting to be told what state they're in. This is the failure mode `claude-mem-architecture` exists to fix. Agents can share files, they cannot share memory. If you build a topology that assumes shared memory, you built a star by accident.
+
+If state is a running process (simulator, dev server, database), you either need an Operator UI that lets humans inspect mid-run, or a hook that freezes the process and dumps state to disk. ILS-iOS logs 3,596 files of exactly this pattern — 153 agent spawns, all of them reading simulator state from disk because the simulator itself won't fit in anybody's context.
+
+State location is the first design variable. Topology is the second.
+
+## The 9.6:1 ratio is not incidental
+
+Across the 360-day mine: `Read` = 88,560, `Write` = 10,140. Agents are readers that occasionally write. A fleet of 1,676 spawns did 88,560 reads against 10,140 writes, which means most agent work is *inspection*, not production.
+
+Inspection is where topology pays off or breaks. A star with a slow lead and fast workers has the workers waiting for the lead to finish reading. A wave with a bad upstream PASS means every downstream inspection is inspecting drift, not the real system. A loop with accumulated context means each rotation is inspecting more noise than signal.
+
+The way I think about it now: topology is a cache hierarchy. Each edge is either a cheap read (filesystem, disk event, JSON payload) or an expensive read (full context handoff, agent-to-agent negotiation). 1,743 `SendMessage` calls across the mine versus 4,237 `TaskUpdate` calls tells me the coordination is already biased toward disk. The agents figured out that talking is expensive and writing is cheap before I did.
+
+## The operator sits on a graph, not a chat
+
+The shift I did not predict: the moment you cross five agents, the interface stops being a conversation. It starts being a graph you walk. What's running, what's blocked, which wave is stalled, which hat is about to time out. An Operator UI is not a nice-to-have once the topology gets past a certain cardinality. It is the only way to stay honest about what the fleet is doing.
+
+111 `ExitPlanMode` calls across the mine tell me planning is a distinct phase, not a mode I flip into. It is a node in the graph with its own entry and exit edges. The 1,293 `Skill` invocations say the same thing. Skills are typed edges: structured contracts that load standardized protocols instead of whatever prompt each agent improvised.
+
+The Runbooks product is this realization compiled down into a shape you can operate: opinionated topologies with typed edges, disk-first state, and a UI that shows you the graph when it's running and the trace when it's done. The product is not "run agents." The product is "inspect the topology, then run agents."
+
+## What I do not know yet
+
+I do not know the right policy for when a wave should collapse into a loop. I have seen tasks where waves are the wrong shape: every downstream validator turned out to depend on state the upstream validator did not stabilize until after it reported PASS, and the whole run had to restart as a loop with tighter gates. I have also seen tasks where a loop should have been a wave and ran for forty iterations over something three parallel workers would have finished in ten. The failure modes are symmetrical and I do not have a rule yet. I suspect the rule is about state stability (does the upstream output change on re-read?) but I have not measured it.
+
+What I do know is the default advice ("just parallelize" or "just sequence it") misses the real question: where does state live, and what is the cheapest read for the next agent?
+
+## The artifact
+
+The `trace-timeline` open-source repo is the first working version of this graph-as-operator-surface. You feed it a session log, it draws the topology you actually ran: nodes per agent, edges per message and task update, color per hat. Running it against the 45-day push data produces a shape I was not expecting: a wave outer layer, a star inner layer, and three loops nested inside two of the wave's nodes. Three shapes, composed. That is the real topology of agentic work. It looks like an operating system kernel, not a chat.
+
+The topology is the product. Everything else is plumbing.
+
+{/*
+voice-self-check:
+  em_dash_count: 1 (after post-draft trim)
+  em_dash_per_1k: 0.88 (1 / 1,141 words)
+  banlist_hits: 0 (no "think about that for a second", no "sound familiar", no "here's the thing", no "fundamentally different", no "that's wild", no single-fragment "big difference" closer, no "it's not X, it's Y")
+  opener_formula: pass (specific number "4,534 human / 18,945 agent" → short follow-up paragraph → failure-before-success "I did not design most of it, I ran into it")
+  warmth_beat: tied to artifact — "trace-timeline repo produces a shape I was not expecting" (artifact: the rendered topology graph)
+  aphorism_count: 1 ("The topology is the product. Everything else is plumbing.")
+  self_deprecating_admission: "I used to pick topology like a dropdown. That was wrong." + "I do not have a rule yet."
+*/}

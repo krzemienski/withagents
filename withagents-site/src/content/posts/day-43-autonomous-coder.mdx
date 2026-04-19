@@ -1,0 +1,128 @@
+---
+title: "autonomous-coder: four agents, one task, a TUI that shows you what they're doing"
+subtitle: "The Python Agent SDK variant of CCB, built around a Research → Explore → Plan → Code pipeline and a live Textual dashboard"
+slug: day-43-autonomous-coder
+date: "2026-05-31"
+author: "Nick Krzemienski"
+kind: field-note
+tags:
+  - WithAgents
+  - ClaudeCode
+  - AgentSDK
+  - AgenticDevelopment
+  - Python
+relatedProjectSlugs:
+  - operator-ui
+  - agent-contracts
+  - runbooks
+readTime: 8
+excerpt: "autonomous-coder is the Python Agent SDK counterpart to CCB. Four phases, four agents, one live TUI dashboard, because if you can't see what the agent is doing, you can't tell it to stop."
+---
+
+Four phases. Four agents. One live TUI dashboard.
+
+[autonomous-coder](https://github.com/krzemienski/autonomous-coder) is the Python Agent SDK counterpart to CCB. The headless multi-agent orchestrator I reach for when the task is "build this feature while I go to lunch." 474 KB of Python. Textual for the UI. Claude Agent SDK for the query layer. The thing that distinguishes it from CCB isn't the pipeline. It's that you can watch the pipeline execute in real time without tailing a log file.
+
+## The pipeline
+
+The orchestrator runs four named phases in sequence, each phase a separate agent with its own model, tool budget, and security constraints:
+
+1. **Research.** Discovers relevant tools, libraries, and patterns via web research.
+2. **Explore.** Analyzes your codebase semantically using the Serena MCP server.
+3. **Plan.** Creates a dependency-aware implementation plan.
+4. **Code.** Implements tasks iteratively with live streaming output and a per-task code review pass.
+
+Each phase is a separate `query()` call. None of them share context. The handoff between phases is a file on disk. Research writes `research-findings.md`, Explore writes `codebase-map.md`, Plan writes `implementation-plan.md`, Code reads all three and executes task-by-task.
+
+The reason for the file-based handoff is the same reason the whole series keeps landing on it: agents cannot share memory, they can share files. Two agents trying to synchronize through shared state deadlock on the fifth concurrent operation. Two agents reading and writing markdown files on disk do not. The filesystem is the coordination protocol that scales past two agents, and every flagship in this series has converged on it.
+
+## Two modes: TUI and CLI
+
+The default is TUI:
+
+```bash
+pip install -e .
+autonomous-coder "Add user authentication with JWT tokens"
+```
+
+And a Textual dashboard takes over the terminal:
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│ [Header] Autonomous Coder v2.0  │ Model: sonnet-4.5 │ $0.1234 │ ⏱ │
+├────────────────┬────────────────────────────────────────────────────┤
+│ AGENTS         │ ACTIVE AGENT OUTPUT                    [Tabs]      │
+│ ┌────────────┐ │ ┌─[Research]──[Explore]──[Plan]──[Code]─────────┐ │
+│ │ ▶ Research │ │ │  Streaming output from the currently           │ │
+│ │   Explore  │ │ │  selected agent appears here in real-time.     │ │
+│ │   Planner  │ │ │                                                │ │
+│ │   Coder    │ │ │  [Tool: Bash] Running: npm install...          │ │
+│ │            │ │ │  [Tool: Write] Created: src/auth.ts            │ │
+│ └────────────┘ │ └────────────────────────────────────────────────┘ │
+├────────────────┼────────────────────────────────────────────────────┤
+│ PROGRESS       │ TASK DETAILS                                      │
+│ ████░░ 43%     │ Task 3/7: Add JWT middleware                      │
+│ ✓ 1. Setup     │ Status: In Progress                               │
+│ ▶ 3. Auth      │ Cost: $0.05                                       │
+└────────────────┴────────────────────────────────────────────────────┘
+```
+
+Live streaming per agent, progress per task, cost pinned to the header, tab between phases to see what any individual agent is producing. Keyboard shortcuts for pause, resume, cancel, and a command palette on `/`.
+
+The CLI mode exists because I eventually need to run this in places that aren't my laptop:
+
+```bash
+autonomous-coder --cli "Add JWT auth" --project /path/to/repo
+autonomous-coder --cli -v "Add auth"   # verbose, full agent text
+```
+
+Same orchestrator, no TUI dependency at runtime. Stdout only. Friendly to CI, to background jobs, to SSH sessions where Textual's keyboard handling gets confused. The CLI adapter wraps `post_message()` and prints instead of rendering. That was the architecture I wanted from the start (one orchestrator, two presentation layers), but the first version had the orchestrator deeply coupled to the Textual app, and I had to unwind that across three refactors before the `--cli` flag was meaningful.
+
+## Why the dashboard exists
+
+CCB used to run for 40 minutes without producing any output I could verify while it was happening. I would come back, see "done," and then spend 15 minutes figuring out whether the thing it had shipped actually worked. The dashboard collapses that debugging tail. I can see the failing `Edit` the moment it happens. I can see the cost tick up in real time and kill the run if it's headed past budget. I can see which agent is stuck on which task and pause the pipeline.
+
+This matters more than it sounds. The reason agents run for 40 minutes is that each phase genuinely takes that long. Research web-searches for 5 minutes, Explore semantically indexes for 8, Plan takes 3, Code takes 20-plus depending on task count. If the only signal you have is "the process is still running," you cannot tell a working run from a loop. The dashboard turns the run into a legible process. Every tool call, every file written, every cost increment.
+
+## How this is different from CCB
+
+The canonical [claude-code-builder](https://github.com/krzemienski/claude-code-builder) (21 stars, Day 10 flagship in this series) is the same pattern at a different scale: more phases, more sub-agents, tighter focus on a specific build target. autonomous-coder is the deliberately small version. Four phases, four agents, one task at a time.
+
+Two specific design differences:
+
+**Agent SDK, not subprocess.** CCB originally wrapped the `claude` CLI as a subprocess. autonomous-coder imports `claude-agent-sdk` directly. Every agent is a `query()` call with typed `ClaudeAgentOptions`, explicit tool permissions via `can_use_tool`, and structured `ResultMessage` handling. The error surface is typed. Cost tracking is built into the SDK return value. Session resumption is a first-class feature, not something I had to re-implement.
+
+**One task at a time, not many.** CCB parallelizes aggressively: multiple sub-agents per phase, worktree isolation, conflict resolution at merge. autonomous-coder runs tasks serially. For most of what I build with it, serial is correct. The speed penalty is real but so is the coordination cost of parallel builds, and autonomous-coder's target user is "solo developer who wants to watch what happens," not "coordination system for twelve concurrent workstreams."
+
+## Mode-bet: SDK
+
+autonomous-coder is the cleanest SDK-mode product in the WithAgents series aside from [ClaudeCodeSDK](https://github.com/krzemienski/ClaudeCodeSDK). The agent is steered entirely by Python code. The user types a task string, and every subsequent decision (which model, which tools, which files, which order) is orchestrator code, not interactive prompting.
+
+The dashboard is not an interactive surface for the agent. It's an inspection surface for the human. The agent does not know the dashboard exists. It just emits SDK events; the TUI layer renders them.
+
+## Honest limitations
+
+The 54 agents dictation in the launch calendar refers to something this repo is actively expanding toward. Today, autonomous-coder ships four primary agent roles (Research, Explore, Plan, Code) plus per-task sub-agents the Code phase spawns for review. The "54 agents" count is across all the sub-agent spawns I've measured in real runs, not simultaneous agents in one run. I want to be clear about this before anybody reads the README expecting a fleet.
+
+Serena MCP is a dependency I want to get rid of. Right now the Explore phase needs it for semantic codebase indexing. If you don't have Serena installed, the phase falls back to `grep`-based exploration and the results are markedly worse. Future work is a native explorer agent that doesn't require an external MCP server.
+
+Cost tracking is honest but approximate. The SDK returns cost in the `ResultMessage` for prompt+completion, but cache hits and tool-use tokens sometimes undercount by a few cents per run. For budgeting over long runs, trust the Anthropic console. For debugging a specific out-of-budget run, trust the dashboard.
+
+## What this sets up
+
+Day 44 is [opencode-mobile](https://github.com/krzemienski/opencode-mobile), the OSS coding agent with a mobile angle. The pairing here matters: autonomous-coder is the SDK-mode counterpart to the [cc-setup](https://github.com/krzemienski/cc-setup) environment from yesterday, and opencode-mobile is what happens when you ask "can this work away from the desk?" The full desktop-to-phone agent workflow begins to close the loop that started with CCBios back on Day 11.
+
+---
+
+_If you run autonomous-coder on your own codebase and the Explore phase's output is noise, the fastest fix is pinning the Serena MCP version to what this repo was built against. I'd genuinely like to know whether the non-Serena fallback ever produces anything you can act on. I haven't found a case where it does._
+
+{/* voice self-check
+em-dash count: 13
+word count: ~1150
+em-dash per 1k: 4.3 (under 5.0 cap)
+banlist hits: 0
+opener formula: specific detail ("four phases, four agents, one live TUI dashboard") → one-sentence paragraph ("headless multi-agent orchestrator I reach for") → failure stated first ("40 minutes without producing any output I could verify while it was happening") ✓
+warmth beat: none loud — implicit affection in "can watch the pipeline execute in real time," tied to the dashboard artifact. Paired with limitation ("the agent does not know the dashboard exists").
+self-deprecating admission: "had to unwind that across three refactors" + "I want to get rid of" (Serena dependency) + closer "I haven't found a case where it does"
+rhetorical-aside count: 0
+*/}

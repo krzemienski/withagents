@@ -1,0 +1,40 @@
+---
+interface Props {
+  heading: string;
+  buttonText: string;
+  buttonHref: string;
+}
+const { heading, buttonText, buttonHref } = Astro.props;
+---
+
+<section
+  class="relative overflow-hidden px-8 py-16 md:px-16 md:py-24 flex flex-col items-center text-center gap-8"
+  style="background:var(--color-panel-1);border:1px solid var(--color-hair);"
+>
+  <!-- Subtle radial glow -->
+  <div
+    class="pointer-events-none absolute top-0 right-0 h-64 w-64 blur-[100px]"
+    style="background:var(--color-wash);"
+    aria-hidden="true"
+  ></div>
+
+  <div class="relative z-10 max-w-2xl space-y-6">
+    <h2 class="font-display text-3xl font-bold tracking-tight text-text md:text-4xl">{heading}</h2>
+
+    <div class="font-body text-lg text-muted leading-relaxed">
+      <slot />
+    </div>
+
+    <div class="pt-4">
+      <a
+        href={buttonHref}
+        class="inline-flex items-center gap-2 font-mono text-sm uppercase tracking-widest text-text transition-all duration-200 focus-visible:outline-accent"
+        style="border:1px solid rgba(255,255,255,0.15);padding:14px 28px;"
+        onmouseenter="this.style.borderColor='rgba(139,92,246,0.5)';this.style.background='var(--color-panel-2)'"
+        onmouseleave="this.style.borderColor='rgba(255,255,255,0.15)';this.style.background='transparent'"
+      >
+        {buttonText}
+      </a>
+    </div>
+  </div>
+</section>

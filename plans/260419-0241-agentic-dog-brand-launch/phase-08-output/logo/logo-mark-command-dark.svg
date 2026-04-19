@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="WithAgents Command mark">
+  <title>WithAgents — Command logomark (dark surface)</title>
+  <desc>Squarer panel with monospace w/ centered, Ultraviolet terminal rule beneath. For CLI README banners.</desc>
+  <rect x="1" y="1" width="254" height="254" rx="16" fill="#0A0A0D" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+  <!-- monospace-style w/ drawn as paths for font-independence -->
+  <!-- w -->
+  <path d="M 64 92 L 82 168 L 100 120 L 118 168 L 136 92"
+        fill="none"
+        stroke="#F5F5F7"
+        stroke-width="16"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+  <!-- / -->
+  <line x1="152" y1="80" x2="192" y2="176"
+        stroke="#F5F5F7"
+        stroke-width="16"
+        stroke-linecap="round"/>
+  <!-- terminal rule (ultraviolet) -->
+  <rect x="64" y="200" width="128" height="6" rx="3" fill="#8B5CF6"/>
+</svg>

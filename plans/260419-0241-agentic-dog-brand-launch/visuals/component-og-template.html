@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>og-template — agentic.dog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { background: #050505; }
+  body {
+    width: 1200px;
+    height: 630px;
+    background: #0a0a0a;
+    color: #e5e7eb;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    overflow: hidden;
+    position: relative;
+    background-image:
+      repeating-linear-gradient(
+        180deg,
+        rgba(255,255,255,0.015) 0px,
+        rgba(255,255,255,0.015) 1px,
+        transparent 1px,
+        transparent 3px
+      ),
+      radial-gradient(ellipse at 80% 20%, rgba(255, 0, 110, 0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 20% 80%, rgba(57, 255, 20, 0.05) 0%, transparent 50%);
+  }
+
+  .og-window {
+    margin: 32px;
+    width: calc(1200px - 64px);
+    height: calc(630px - 64px);
+    background: #111827;
+    border: 1px solid #1f2937;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .chrome {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 22px;
+    background: #0c1220;
+    border-bottom: 1px solid #1f2937;
+    font-size: 14px;
+    color: #6b7280;
+  }
+  .dot { width: 14px; height: 14px; border-radius: 50%; }
+  .dot-r { background: #ff5f56; }
+  .dot-y { background: #ffbd2e; }
+  .dot-g { background: #27c93f; }
+  .path {
+    margin-left: 14px;
+    font-family: 'JetBrains Mono', monospace;
+    color: #9ca3af;
+    font-size: 14px;
+  }
+  .brand {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 16px;
+    color: #39ff14;
+    letter-spacing: 0.02em;
+  }
+  .brand::before { content: '▌ '; color: #39ff14; }
+
+  .body {
+    flex: 1;
+    padding: 48px 56px 44px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .prompt-pre {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 18px;
+    color: #39ff14;
+    margin-bottom: 28px;
+    letter-spacing: 0.02em;
+  }
+  .prompt-pre .cmd { color: #9ca3af; }
+
+  h1.title {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    font-size: 56px;
+    line-height: 1.08;
+    color: #e5e7eb;
+    letter-spacing: -0.02em;
+    margin-bottom: 28px;
+    max-width: 960px;
+  }
+  h1.title .accent {
+    color: #ff006e;
+    text-shadow: 0 0 20px rgba(255, 0, 110, 0.55);
+  }
+
+  .subtitle {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 22px;
+    color: #39ff14;
+    font-weight: 500;
+    margin-bottom: 40px;
+    letter-spacing: 0.01em;
+  }
+
+  .ascii-line {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    color: #374151;
+    margin-bottom: 28px;
+    letter-spacing: -1px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+  }
+  .byline { color: #9ca3af; }
+  .byline .name { color: #e5e7eb; font-weight: 600; }
+  .meta-tag {
+    color: #faff00;
+    background: rgba(250, 255, 0, 0.08);
+    border: 1px solid rgba(250, 255, 0, 0.3);
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+</style>
+</head>
+<body>
+  <div class="og-window">
+    <div class="chrome">
+      <span class="dot dot-r"></span>
+      <span class="dot dot-y"></span>
+      <span class="dot dot-g"></span>
+      <span class="path">~/agentic.dog/series/lesson-03</span>
+      <span class="brand">agentic.dog</span>
+    </div>
+
+    <div class="body">
+      <div class="prompt-pre">❯ <span class="cmd">cat lesson-03/title.md</span></div>
+
+      <h1 class="title">The Day I Banned Unit Tests and Shipped <span class="accent">257 Sessions</span> of Real Validation</h1>
+
+      <div class="subtitle">$ validationforge --no-mock — ship what actually runs</div>
+
+      <div class="ascii-line">────────────────────────────────────────────────────────────────────────────────</div>
+
+      <div class="footer">
+        <div class="byline">by <span class="name">Nick Krzemienski</span> · 18-lesson series</div>
+        <div class="meta-tag">lesson 03/18</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

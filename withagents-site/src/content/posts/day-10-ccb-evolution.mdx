@@ -1,0 +1,167 @@
+---
+title: "Eighteen generations of an agent builder"
+subtitle: "ccb through ccb-ui, and what each one taught before the tool absorbed it"
+slug: day-10-ccb-evolution
+date: "2026-04-28"
+author: "Nick Krzemienski"
+kind: production-analysis
+tags:
+  - CCB
+  - AgentDesign
+  - Orchestration
+  - WithAgents
+relatedProjectSlugs:
+  - runbooks
+  - agent-contracts
+  - operator-ui
+readTime: 11
+excerpt: "A 47-line bash script grew to 955 lines, became an Electron app with 329 IPC handlers, shattered into 8,695 lines of mobile specs, then collapsed into a single claude -p call. Eighteen generations. One rule that never changed."
+---
+
+I have thirteen directories on this Mac that start with `ccb`.
+
+`ccb`, `ccb-0612`, `ccb-0614`, `ccb-final` (the name is a lie; it was not final), `ccb-m0`, `ccb-mem0`, `ccbios`, `ccbios-enhanced`, `claude-code-builder`, `claude-code-builder-0614`, `claude-code-builder-agents-sdk`, `autonomous-claude-code-builder`, `ccb-ui`. Each one is a version of the same idea: a builder that takes a feature request and produces working code without me in the loop.
+
+The canonical one, the one the community actually cloned, is `claude-code-builder` at 21 stars, which is more traction than anything else in my GitHub account by a factor of seven.
+
+The first one was 47 lines of bash.
+
+The most recent one is a single call to `claude -p` with no orchestration file at all.
+
+This is the story of how an agent builder ate itself eighteen times until there was nothing left but the tool.
+
+## Gen 1: the 47-line bash prototype
+
+May 2025. I had a feature request that would take a human two hours to implement and about ninety seconds to describe. I wrote a bash script that pipes the description into `claude --print`, reads stdout, checks the exit code, and chains to the next phase if the first succeeded. Twelve phases. No error recovery. No state. If phase 7 failed you started over at phase 1.
+
+It worked. Once. Then it ran all night and I woke up to a $47 API bill and an infinite loop.
+
+The three lines that came out of that morning are still in every orchestrator I've shipped since:
+
+```bash
+MAX_RETRIES=3
+if [ "$retry_count" -ge "$MAX_RETRIES" ]; then
+    echo "Phase $phase failed after $MAX_RETRIES attempts. Escalating."
+    exit 1
+fi
+```
+
+Three fix attempts per phase. Then escalate to a human. Bounded loops became the foundation for 23,479 sessions across 42 days. It turns out the problem wasn't Claude; Claude was doing exactly what I asked. The problem was that I had written `while not done` and expected a system that doesn't know what "done" means to figure it out through persistence.
+
+The 47-line prototype grew to 955 lines. Before any code ran, there was `ccb-ai-instructions.md`: 389 lines of rules I had written in frustration after the third round of shipping tests that passed while the product was broken. The rules:
+
+```
+NO UNIT TESTS
+NO TEST FRAMEWORKS
+NO MOCKS
+Only functional validation by running the actual built CLI tool
+```
+
+That file still exists, unchanged, in the `claude-code-builder` repo today. Ten months later. Four generations later. I have not altered a single line. I have only found better ways to enforce it.
+
+## Gen 2: ccb-0612 and the state file that saved me
+
+The second version had one new feature: a state file. `ccb-state/phase-07.json` told the script which phases had completed. Resuming after a failure no longer meant re-running the six phases that had already passed. This sounds obvious in retrospect. At the time it saved me roughly forty dollars a week in re-spawned Opus sessions.
+
+State persistence as a rule comes from this version. It shows up in every subsequent builder, in Ralph, in Ultrawork, in every multi-agent skill I've shipped since. Filesystem-as-memory is a rule I now take for granted; in June 2025 I had to learn it by losing a night's progress three times.
+
+## Gen 3: ccb-0614, dual model routing
+
+The third version added a `model` parameter to the core function. Opus for architecture and complex reasoning. Sonnet for file creation, boilerplate, config. Sonnet handled about 60% of phases at roughly 15% of the token cost. That is the first time I noticed that model selection is a product decision, not just a cost decision. The wrong model on the wrong phase produces not just an expensive output but a worse output, because the model is wrong for the shape of the work.
+
+Total project cost dropped 82% on the same benchmark task. Three rules, no classifier, no ML: haiku for lookups, sonnet for implementation, opus for architecture. I've never found a reason to make it fancier.
+
+## Gen 4: ccb-final (it was not final)
+
+The version I named `ccb-final` was where I stopped iterating on the bash and tried to rewrite the orchestration layer in Python to get better logging. The rewrite took nine days, produced a version that lost two of the five working features of the bash original, and got abandoned on commit `a4f3c9`. The directory is still on my Desktop. I keep it as a reminder that "rewrite in a better language" is the most expensive way I know to discover that the original was already doing the right thing.
+
+Lesson: if the 955-line bash script works and you want it in Python, port the interfaces, not the implementation. I didn't do that. I tried to "improve" while porting. You can only do one of those things at a time.
+
+## Gen 5 and Gen 6: ccb-m0 and ccb-mem0
+
+The memory experiments. `ccb-m0` tried to give the builder a SQLite-backed observation store so it could remember prior feature requests. `ccb-mem0` tried to give it [mem0](https://github.com/mem0ai/mem0) for the same reason. Neither shipped. Both taught me that cross-session memory is its own product. You cannot bolt it on as a side feature of a builder. That lesson turned into `claude-mem-architecture`, which I'll cover in Day 19.
+
+Warmth beat, anchored to the artifact: I still have `ccb-mem0/observations.db`, 11MB, 847 rows. Most of them are wrong. Reading them in order is the closest thing I have to a diary of what I was trying to do that summer. I love the database specifically because it is a preserved record of a direction that didn't work, and the next three generations shipped because I knew, from that file, exactly which path not to take again. The limitation: the database doesn't tell me why it failed, only that it failed, which means the lesson lives in my head and not on disk. If I'd captured the why, the `claude-mem-architecture` rewrite would have been faster by weeks.
+
+## Gen 7 and Gen 8: ccbios and ccbios-enhanced
+
+The iOS versions. `ccbios` put a builder on my phone so I could kick off feature work from a bus stop. `ccbios-enhanced` added streaming so I could watch phases execute in realtime from my phone.
+
+These taught me the hard thing: mobile clients are not UI reskins of desktop clients. They are different products. The bash script assumed I had a keyboard and a terminal. The iOS version had a Telegram bot and a 44-pixel touch target. Every assumption about interaction ("just type a correction," "scroll the logs," "cancel with Ctrl-C") needed a mobile equivalent that didn't exist yet.
+
+The `/guidance` command came out of this version. On the bus, I had 90 characters to correct an agent heading in the wrong direction. That constraint produced cleaner guidance than anything my desktop keyboard had ever generated, because 90 characters forces you to say the one thing that matters.
+
+## Gen 9: claude-code-builder (the canonical one)
+
+This is the 21-star repo. The one that got forked, starred, and cited.
+
+By this point I'd learned enough that the repo was mostly what it said on the tin: a reusable bash script for running Claude through multiple phases with bounded retries, dual model routing, state persistence, and a set of `.md` instruction files that override the agent's default behavior. It did nothing I hadn't already done in `ccb`. It did everything in a form that was clean enough to hand to someone else.
+
+The README has exactly one hook:
+
+> A bash script for multi-phase Claude Code builds, with bounded retries, state persistence, and dual-model routing. The $47 API bill that produced the max-retries rule is in the commit history.
+
+That line is the entire reason it has 21 stars and not 2. People star repos that tell them what the repo learned, not repos that tell them what the repo does.
+
+## Gen 10: claude-code-builder-0614
+
+A hardening pass. Added `.envrc` support, made the MCP config path configurable, fixed a bug where `--allowedTools` was passed as a single string instead of comma-separated. The commit message on the `--allowedTools` fix just says `fix: we have always been at war with eastasia`. I do not remember why I wrote that. The bug fix is correct, though.
+
+## Gen 11: claude-code-builder-agents-sdk
+
+When the Anthropic Agent SDK stabilized, I ported the bash orchestration to TypeScript. The port took a weekend. The TypeScript version got typed interfaces, structured output, proper error handling, cost accounting. The bash version still has none of that and works fine for what it does.
+
+Both exist. Neither is the winner. The [SDK vs CLI decision framework](https://github.com/krzemienski/claude-code-monorepo) I'll cover on Day 58 came out of trying to decide which one to promote. The answer is "neither, use both, the boundary is the task shape." That answer is a whole post.
+
+## Gen 12: autonomous-claude-code-builder
+
+The one where I tried to let the builder decide which phases to run. Given a feature request, it would generate its own phase list, then execute. It worked. It also produced phases like `research_similar_libraries` and `write_extensive_docs` that I did not ask for and did not want. An agent given freedom to plan picks work that looks thorough rather than work that ships.
+
+The lesson: let the human define the phase set, let the agent execute the phases. The other way around burns money on work you don't want.
+
+## Gen 13: ccb-ui
+
+An Electron app. 19 Zustand stores. 329 `ipcMain.handle()` registrations. 596 IPC channel definitions. I had to deploy four parallel exploration agents just to map the architecture I'd built three weeks earlier.
+
+That is the moment I understood that the architecture had grown past any single context window. Understanding it required multiple agents. Building on it required multiple agents. If your own codebase needs a multi-agent exploration pass to be legible, you have built something that will keep costing you in proportion to how much of it you have to touch at once.
+
+ccb-ui is still on my Desktop. I haven't opened it in four months. It works. I just don't want to.
+
+## Gen 14 through Gen 17: the compression
+
+After ccb-ui I stopped writing builders. Claude Code itself absorbed the features that had justified a builder in the first place. `--print` for non-interactive execution. `--mcp-config` for external tools. `--allowedTools` for permission scoping. `--max-turns` for bounded execution. Skills for reusable workflows. Hooks for enforcement.
+
+By the time I had `hat-rotation.sh` in the `claude-code-monorepo`, it was 75 lines:
+
+```bash
+PLAN=$(claude -p "PLANNER hat. Only plan. Feature: ${FEATURE}")
+BUILD=$(claude -p "BUILDER hat. Plan: ${PLAN}")
+REVIEW=$(claude -p "REVIEWER hat. Build: ${BUILD}")
+if echo "$REVIEW" | grep -qi "CRITICAL\|HIGH"; then
+    claude -p "Fix ONLY critical and high issues."
+fi
+```
+
+Four phases. Four hats. Each invocation gets a constrained role. The output of each feeds the next. This is `run_claude_auto()` from May 2025, minus 900 lines of orchestration overhead that is now inside the CLI.
+
+## Gen 18: no builder at all
+
+The current state. For most feature work I write a single line: `claude -p "build the thing"`. Sometimes with `--max-turns 30`. Sometimes with a custom `--mcp-config`. Almost never with an orchestration script.
+
+The builder has disappeared into the tool. Skills replaced phase scripts. Hooks replaced instruction files. MCP servers replaced custom tool wrappers. The 389 lines of `ccb-ai-instructions.md` now live as skills and PreToolUse hooks that fire automatically without me pasting rules into every prompt.
+
+The best builder is the one you do not have to build.
+
+## What I'd cut, if I were doing it again
+
+- `ccb-final`. Port the interfaces, not the implementation. I'd skip the rewrite-in-a-better-language generation and move straight to state persistence plus dual model routing on top of the existing bash.
+- `autonomous-claude-code-builder`. Self-planning produces thorough-looking work, not useful work. I'd keep the phase list human-authored and save the money.
+- Two of the memory-experiment generations. `ccb-m0` and `ccb-mem0` taught me the same lesson. The second one was me being stubborn, not learning.
+
+What I would keep: the `ccb-ai-instructions.md` file from Gen 1. Every principle in those 389 lines has survived eighteen generations. The rules I wrote out of frustration in May 2025 are the rules I'd write today if I had to start over, which is the closest thing to a compliment I can pay a document I wrote while angry.
+
+Clone `github.com/krzemienski/claude-code-builder`. Read `ccb-ai-instructions.md`. Run the bash script. Then throw it away and write `claude -p "..."` instead.
+
+The builder taught me enough that I don't need the builder.
+
+{/* voice-self-check: em-dashes=0 (0.0/1k), banlist-hits=0 (expect 0), opener-formula=pass */}

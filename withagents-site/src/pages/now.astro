@@ -1,0 +1,101 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+import SectionNumber from '@/components/SectionNumber.astro';
+
+// Authored snapshot of the current week. Update this file (not a CMS entry)
+// whenever the status shifts. Intentionally low-ceremony.
+const updated = '2026-04-19';
+
+const thisWeek = [
+  {
+    tag: 'SHIPPING',
+    title: 'withagents.dev public launch',
+    detail: 'Site live. 45-day publication arc kicks off with ValidationForge GA on Day 01.',
+  },
+  {
+    tag: 'WRITING',
+    title: '18 Lessons from 23k+ Claude Code sessions',
+    detail: 'Series hub going live alongside the Day 01 flagship. Each post cites a real mined session.',
+  },
+  {
+    tag: 'BUILDING',
+    title: 'SessionForge milestone + Code Stories dual-SKU',
+    detail: 'Finale flagship (Day 50) ties together validation, consensus, Ralph, and skills tracks.',
+  },
+];
+
+const currently = [
+  { name: 'ValidationForge', state: 'GA — Day 01 flagship', href: '/products/validationforge' },
+  { name: 'Ralph Orchestrator', state: 'Flagship Day 22', href: '/products/ralph-orchestrator' },
+  { name: 'withagents-skills', state: 'Package launch Day 35', href: '/products/withagents-skills' },
+  { name: 'SessionForge', state: 'Finale Day 50', href: '/products/sessionforge' },
+];
+---
+
+<BaseLayout
+  title="Now — WithAgents"
+  description="What is shipping this week at withagents.dev."
+  kind="about"
+>
+  <Nav current="now" />
+
+  <main class="relative z-10 w-full">
+    <div class="mx-auto max-w-[1200px] px-6 py-16 md:py-24">
+
+      <header class="mb-16 md:mb-24">
+        <SectionNumber number="04" label="Now" />
+        <h1
+          class="font-display font-black text-text tracking-tighter mt-6 mb-6"
+          style="font-size:clamp(48px,8vw,96px);letter-spacing:-0.04em;"
+        >
+          what's shipping
+        </h1>
+        <p class="font-body text-xl text-muted max-w-2xl leading-relaxed md:text-2xl">
+          A snapshot of this week. Updated when the work meaningfully shifts.
+        </p>
+        <p class="font-mono text-xs uppercase tracking-wider text-muted-2 mt-6">
+          Last updated {updated}
+        </p>
+      </header>
+
+      <section class="mb-24">
+        <h2 class="font-mono text-xs uppercase tracking-widest text-muted mb-8 pb-4" style="border-bottom:1px solid var(--color-panel-2);">
+          This week
+        </h2>
+        <div class="space-y-10">
+          {thisWeek.map((item) => (
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-12 md:gap-8">
+              <div class="md:col-span-2">
+                <span class="font-mono text-[11px] uppercase tracking-wider text-accent">{item.tag}</span>
+              </div>
+              <div class="md:col-span-10">
+                <h3 class="font-display text-2xl font-semibold text-text mb-3">{item.title}</h3>
+                <p class="font-body text-muted leading-relaxed max-w-2xl">{item.detail}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="mb-24">
+        <h2 class="font-mono text-xs uppercase tracking-widest text-muted mb-8 pb-4" style="border-bottom:1px solid var(--color-panel-2);">
+          Currently
+        </h2>
+        <ul class="space-y-4">
+          {currently.map((p) => (
+            <li class="flex items-baseline justify-between gap-4">
+              <a href={p.href} class="font-display text-xl font-semibold text-text hover:text-accent transition-colors">
+                {p.name}
+              </a>
+              <span class="font-mono text-[11px] uppercase tracking-wider text-muted">{p.state}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>

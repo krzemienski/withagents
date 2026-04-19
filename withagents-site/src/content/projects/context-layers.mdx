@@ -1,0 +1,49 @@
+---
+name: context-layers
+slug: context-layers
+tagline: Context-window composition primitives for multi-step agent work
+status: stable
+kind: open-source
+techChips:
+  - TypeScript
+  - Python
+  - Claude SDK
+githubUrl: https://github.com/krzemienski/context-layers
+stars: 0
+version: v1.0.0
+lastUpdated: "2026-04-19"
+---
+
+`context-layers` is a library of context-window composition primitives. It solves a specific problem: as a session grows, the context window fills with noise — old tool outputs, completed task acknowledgments, superseded plans. Useful signal drowns.
+
+Context layers let you compose the window deliberately rather than accidentally.
+
+## Core primitives
+
+**Layer** — a named, typed slice of the context window. Each layer has a priority, a max-token budget, and an eviction policy.
+
+**Stack** — an ordered collection of layers that composes into a final context. The stack assembles the window before each agent call.
+
+**Eviction policy** — rules for which content to drop when a layer exceeds its budget. Policies: `oldest-first`, `lowest-priority`, `summarize-then-drop`.
+
+**Summary hook** — a function called before eviction that condenses a layer's content into a shorter form. The condensed form stays in the window; the original evicts.
+
+## Why this matters
+
+The 150,000-token context window is not a luxury. It is a trap. Monolithic sessions that fill the window hit 67% task completion with 34% contradiction rate. Hat-scoped sessions with disciplined context composition hit 94% completion with 2% contradiction rate.
+
+Context layers are the scaffolding for hat-scoped sessions.
+
+## Usage
+
+```typescript
+import { ContextStack, Layer } from 'context-layers';
+
+const stack = new ContextStack([
+  new Layer('system', { priority: 10, maxTokens: 4_000, eviction: 'oldest-first' }),
+  new Layer('task', { priority: 8, maxTokens: 8_000, eviction: 'summarize-then-drop' }),
+  new Layer('history', { priority: 3, maxTokens: 20_000, eviction: 'oldest-first' }),
+]);
+
+const composed = stack.compose(); // returns string ready for the API call
+```

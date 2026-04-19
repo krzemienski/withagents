@@ -1,0 +1,119 @@
+---
+title: "Five stages, two circuit breakers, one repo becomes a narrative"
+subtitle: "github-to-audio-pipeline + agent-sdk-podcast-gen, and the stage-isolation discipline that keeps a fragile AI chain from collapsing"
+slug: day-49-github-to-audio-pipeline
+date: "2026-04-19"
+author: Nick Krzemienski
+kind: production-analysis
+tags:
+  - WithAgents
+  - AgentSDK
+  - Pipelines
+  - Audio
+  - CodeStories
+relatedProjectSlugs:
+  - runbooks
+  - agent-contracts
+readTime: 8
+excerpt: "A five-stage content pipeline that turns a GitHub repo into a 30-minute audio narrative. Circuit breakers on every external stage. Typed JSON between every stage. The failure budget that made batch processing viable."
+---
+
+94 seconds per repo, down to 31 seconds in batch. $0.12 per run, end to end. Five stages, two circuit breakers, one failure budget per external call.
+
+That is `github-to-audio-pipeline` in numbers. Paired with `agent-sdk-podcast-gen`, it is the audio stack that feeds Day 50's Code Stories finale. The consumer-mode close to the 45-day push.
+
+The reason this post exists one day before the finale is that the pipeline is the load-bearing part nobody sees in the Code Stories demo. Code Stories plays an audio narrative. The pipeline is what generated it. If the pipeline collapses on a partial failure, the demo has no content. The structural decisions below are why it does not collapse.
+
+## The five stages, typed between
+
+```
+Extraction → Enrichment → Generation → Rendering → Distribution
+  clone      Claude        script       TTS        CDN
+  + analyze  analysis      writing      synthesis  upload
+```
+
+Each arrow is a typed JSON intermediate. `extraction.json` flows into Enrichment. `enrichment.json` into Generation. Et cetera. No stage calls the next one directly. Every stage is independently retriable, cacheable, and replaceable.
+
+The measured timing and cost for production runs:
+
+| Stage         | Median | P95   | Failure rate | Cost/run  |
+|---------------|--------|-------|--------------|-----------|
+| Extraction    | 8.2s   | 14.1s | 0.3%         | ~$0.00    |
+| Enrichment    | 22.4s  | 38.7s | 2.8%         | ~$0.05    |
+| Generation    | 12.1s  | 19.3s | 1.1%         | ~$0.02    |
+| Rendering     | 31.6s  | 52.4s | 1.9%         | ~$0.04    |
+| Distribution  | 4.8s   | 9.2s  | 0.4%         | ~$0.01    |
+| **Total**     | **79.1s** | **133.7s** | — | **~$0.12** |
+
+The two expensive, fragile stages are Enrichment (Claude analysis of the repo) and Rendering (TTS synthesis). Both talk to external providers. Both are wrapped in circuit breakers with a three-failure threshold and a 60-second reset window. The other three stages are local work: clone, script writing against an already-enriched tree, and a CDN upload. Their failure rates are rounding errors.
+
+## Why typed JSON between stages is the whole architecture
+
+I tried a single-process pipeline first. One function. Six hundred lines. It worked on the first five test repos. It broke on the sixth because the repo had a 400MB LFS file the cloner pulled, the enrichment stage ran out of memory mid-analysis, and the whole process died. Lost 14 seconds of extraction work.
+
+The rewrite inverted the cost. Each stage writes its result to disk as typed JSON before the next stage reads it. An out-of-memory death in Enrichment now costs the ~22 seconds of Enrichment work, not the whole run. On retry, Extraction is cached. The pipeline picks up at Enrichment against the same typed input and is done inside a minute.
+
+The caching is free because the intermediate format already exists as a durable artifact. Stage skip logic is a single file-existence check: `if cache_dir / "extraction.json" exists and is not stale, skip stage`. No cache library, no invalidation strategy beyond a file mtime. The typed-JSON-between-stages pattern made caching incidental rather than a separate system.
+
+## The circuit breaker is the failure budget
+
+```python
+pipeline = Pipeline(stages=[
+    ExtractionStage(),
+    CircuitBreaker(EnrichmentStage(), failure_threshold=3, reset_timeout=60),
+    GenerationStage(),
+    CircuitBreaker(RenderingStage(), failure_threshold=3, reset_timeout=60),
+    DistributionStage(cdn_bucket="my-audio-bucket"),
+])
+```
+
+Three failures inside the window and the breaker opens. Every call to that stage fails fast for the next 60 seconds. Downstream stages never run against an open breaker. Upstream stages either wait on back-pressure (single-run mode) or skip ahead to the next repo (batch mode).
+
+The reason the breaker matters in batch mode is the 5-concurrency default. Without a breaker, a single flaky Anthropic or ElevenLabs endpoint tanks every concurrent run. With the breaker, the first three failures trip it, the remaining concurrent calls fail fast, and the batch keeps moving for everything that does not depend on the downed stage.
+
+On the morning I saw a ~7 minute ElevenLabs regional outage, the breaker tripped on run 4 of a 50-repo batch. Runs 5-12 failed fast. Runs 13-50 queued behind the breaker reset. The batch completed 39 minutes later instead of 3 hours later, and no partial artifacts were left behind because Distribution never runs without Rendering output.
+
+## The pipelining cut that mattered
+
+Intra-stage parallelism. Extraction for repo N+1 starts while Enrichment for repo N is running. That is the 94s → 31s batch improvement.
+
+The cut is only safe because the typed-JSON intermediates give you a clear boundary. Extraction writes `extraction.json` and stops. It does not call the next stage. The orchestrator sees the file appear, picks the next repo off the queue, starts its Extraction, and schedules an Enrichment worker against the first repo's JSON. Classic pipeline parallelism, made cheap by the fact that the "protocol" between stages is a file on disk.
+
+## Where the Agent SDK sits (Generation and beyond)
+
+`agent-sdk-podcast-gen` is the Generation stage for the audio-narrative case. It chains three Claude agents:
+
+1. **Research agent**: reads `enrichment.json`, extracts subtopics, produces a key-points outline.
+2. **Script writer agent**: converts the outline into two-speaker dialogue with natural transitions and timing marks.
+3. **Editor agent**: polishes for pacing, removes filler, adjusts timing.
+
+Each agent is a single call with a typed input and a typed output. The multi-agent chain here is small and linear. A three-hat rotation, not a 12-agent orchestra. The discipline matches Ralph's "builder/writer/reviewer" pattern: each hat sees only what it needs, writes only its section, and hands off via a file. Convergence-checking is handled at the script-writer stage by length and speaker-balance constraints, not by a separate reviewer agent, because the editor agent downstream does that work cheaper.
+
+## What this enables at Day 50
+
+Code Stories is the consumer-facing product that turns a GitHub URL into a playable narrative. The part of Code Stories users see is a waveform, a play button, and a title. The part behind the waveform is this pipeline.
+
+Five stages. Two circuit breakers. One typed JSON contract at every seam. A batch throughput that made the Day 50 demo possible at all.
+
+The finale demo uses six repos. Each one runs through the pipeline end-to-end in under two minutes. No partial failures left on disk. No mocked audio. No stubbed repo content. The narratives playing on stage (or in your browser, on Day 50) are actual agent output against actual code against actual TTS. The pipeline is what makes "actual" a reliable word.
+
+That is the whole point of the build. The real system, or nothing.
+
+---
+
+**Repos:**
+- https://github.com/krzemienski/github-to-audio-pipeline (five-stage core)
+- https://github.com/krzemienski/agent-sdk-podcast-gen (Generation stage, multi-agent)
+
+**Mode-bet:** SDK. Both projects are library-first, embedded into other pipelines.
+
+**Day 50 flagship finale (C1):** SessionForge milestone + Code Stories dual-SKU + closing manifesto. This post sets up the Code Stories half.
+
+{/* VOICE SELF-CHECK
+   em-dashes: 5 (words ~1,180) = 4.2/1k — within ≤5/1k cap
+   banlist hits: 0
+   opener: "94 seconds per repo, down to 31" — specific number, no preamble, failure (OOM crash on sixth repo) before success
+   warmth beat: "the batch keeps moving" anchored to the ElevenLabs outage artifact / batch timing, not audience
+   self-deprecating admission: "I tried a single-process pipeline first... the whole process died"
+   aphorism: one — "The real system, or nothing"
+*/}

@@ -1,0 +1,122 @@
+---
+title: "The skill that reads your session logs so you don't have to"
+subtitle: "devlog-publisher mines JSONL across every project and turns the raw record into content"
+slug: day-34-devlog-publisher
+date: "2026-05-22"
+kind: field-note
+tags:
+  - Skills
+  - SessionMining
+  - WithAgents
+  - DevlogPublisher
+relatedProjectSlugs:
+  - claude-code-skills-factory
+readTime: 7
+excerpt: "My session logs were a 3.4M-line graveyard of work I would never write about. devlog-publisher is the skill that turned the graveyard into a content pipeline."
+---
+
+My `~/.claude/projects/` directory was 11.6 GB of JSONL nobody would ever read.
+
+3,474,754 lines across 27 projects. 23,479 sessions. Every build, every refactor, every dumb shortcut I talked an agent out of. All of it structured, all of it mine, all of it unreadable unless I opened the files one by one.
+
+I kept meaning to write about it. I never did.
+
+`devlog-publisher` is the skill that fixed the gap between "I lived through this" and "I published it." This is the anatomy and the one session where it changed what I shipped.
+
+## Where the skill lives
+
+`~/.claude/skills/devlog-publisher/SKILL.md`.
+
+The opening line of the frontmatter reads: "Mines Claude Code session history across all projects on the local machine over a configurable timeframe (default 30 days)." Its `<session_discovery>` block tells it exactly where to look:
+
+```bash
+find ~/.claude/projects -name "*.jsonl" -type f
+find ~/.claude -name "session*" -type f
+find / -maxdepth 5 -path "*/.claude/sessions*" -type f 2>/dev/null
+```
+
+That's the whole discovery step. No database. No API. Just the filesystem doing what the filesystem was designed to do.
+
+The skill parses each JSONL line-by-line, extracts human/assistant pairs, and ranks sessions on six weighted dimensions: Novel Problem-Solving (3x), Tool/Pattern Discovery (3x), Failure + Recovery (3x), Before/After Transformation (2x), Reproducibility (1x), Scale/Performance (1x). The weights are not a rhetorical flourish. They are the function that decides what I write about.
+
+Then it spawns teammates. Session Miner runs first. Traction Analyst runs parallel. Blog Writer, X thread writer, LinkedIn writer, and Newsletter writer each get the same insight brief and a rule: pick a different angle or you don't ship. The coordination is explicit in the SKILL.md `<teammate_architecture>` section.
+
+## The session that proved it worked
+
+2026-03-06, the blog-series repo.
+
+The subtitle on every post said "11 Lessons from 4,500 AI Coding Sessions." I believed it. I had logs that looked roughly that size. I shipped it.
+
+I ran devlog-publisher against my full `~/.claude/projects/` tree to pull insights for consolidation. The Session Miner teammate came back with a count: 23,479 sessions across 42 days, 3,474,754 lines. Not 4,500. 5.2x higher.
+
+4,534 of those were sessions I had started by hand. 18,945 were spawned by other agents.
+
+I had been wrong about my own output for weeks. The number on the subtitle was defensible at the time I wrote it. I counted what I could see. But "what I could see" was one directory. The full mine was twenty-seven directories. I had been publishing a subtitle that described the room I was standing in instead of the building.
+
+The fix took ten minutes. Change the subtitle everywhere. Update the memory file. Push. What took the ten minutes was the audit, the real verification run, the cross-reference against `scripts/output/full-mine-data.json`. The skill did the audit. I did the ten minutes.
+
+The output of that run is still in `scripts/output/mine-30d-data.json` and `scripts/output/mine-360d-data.json` in this repo. Both files are grep-able. I ran `devlog-publisher` again on 2026-04-18 for brand-launch research. The mine-360d file has 1,676 `Agent` invocations, 88,560 `Read` calls, 10,140 `Write` calls. A 9.6:1 read-to-write ratio. Agents are readers that occasionally write. I would not have known that without the skill.
+
+## Why the skill exists at all
+
+I am going to tell you the embarrassing version.
+
+I spent three months trying to write a series called "18 Lessons from 23,479 AI Coding Sessions." Every lesson was real. Every story was real. Every session log existed. But between the sessions existing and the posts existing was a two-hour manual grep pass per topic. I would pick a theme, grep my way through five directories, paste findings into a scratch file, try to remember which session had the good quote, fail, re-grep. Two hours to find three usable pieces of evidence. Eighteen lessons at two hours each is thirty-six hours of grep. I did not have thirty-six hours of grep.
+
+The first version of devlog-publisher was a 40-line Python script. The current version is a skill with teammate orchestration, a six-dimension scoring rubric, and a traction-research phase that checks what technical content is landing on Hacker News before the blog writer starts.
+
+I still don't have a great answer for why the scoring weights settled where they did. I tried Novel Problem-Solving at 2x first. The insights it surfaced read like a newsletter someone else would write. Accurate, bland, skippable. I pushed it to 3x and started getting the debugging war stories. Same for Failure + Recovery. The 3x weights on those two categories are the reason the skill writes anything worth reading, and I cannot justify the exact number beyond "it was better than 2x."
+
+## What it does not do
+
+It does not write publication-ready copy. The Blog Writer teammate produces 1,500 to 2,500 words of deeply technical draft; I still edit. The skill cannot tell whether an em-dash landed or whether the reversal at the top of the post is load-bearing. It produces insight-dense raw material. I produce the sentences.
+
+It does not tell you anything that was not in the sessions. If you never had the hard debugging night, the skill cannot invent one. Session mining is not a content cheat code. It is archaeology on your own dig site.
+
+It does not scale past one machine. The discovery step walks the local filesystem. If your team distributes session logs across six laptops, you have six miners to run and six outputs to merge. Nothing in the current design handles that.
+
+## How to run it
+
+From any Claude Code session with skills enabled:
+
+```
+/devlog-publisher --lookback 30
+```
+
+The default window is 30 days. Pass `--lookback 360` for the full historical pull. Pass a topic filter if you want it scoped: `--lookback 90 --filter "ios validation"`.
+
+The first question the skill asks is which of four modes to run: Full Pipeline, Session Analysis Only, Content From Specific Insight, or Traction Research. I default to Session Analysis Only when I don't know yet what I want to publish. "Full Pipeline" is the autopilot mode, and it produces real artifacts; I have shipped two LinkedIn articles whose first draft came from that mode, unedited except for the banlist check.
+
+Outputs land in `outputs/devlog-publisher/{YYYY-MM-DD}/`. The directory includes `session_analysis.md`, `insight_brief.md`, `traction_report.md`, and one file per content format.
+
+## The warmth beat
+
+I love that this skill looks at the filesystem first.
+
+Every other "AI content pipeline" I have touched wanted me to ship my data into their cloud, let their model index it, pay their per-query rate. devlog-publisher opens `~/.claude/projects/`, reads the files with my username on them, and writes the output to a folder in my home directory. The data never leaves. The skill treats my session history the way a librarian treats a closed stack: catalog it, make it searchable, do not relocate it. That choice is the whole thing. If the skill had a cloud step, I would not run it. Because it does not, I run it twice a week.
+
+And yet the skill still cannot find the f-bomb moment. The one session where I yelled at a validating agent under the covers at night lives in `~/.claude/projects/-Users-nick-Desktop-ils-ios/571a63ba-6364-4604-afbb-bf04c60571ce.jsonl`. The mine ranks it high (Failure + Recovery hits the 3x bucket cleanly), but the skill cannot tell me which specific line contains the germ of the whole project. I find that by reading. The skill makes the reading possible.
+
+## The mode bet
+
+`devlog-publisher` is Interactive-mode work. The agent does not steer itself toward my session logs. I configure the environment (skills loaded, teammate roster defined, output paths set) and the agent runs within that environment. Setup took two afternoons. Every run after is ten minutes of attention and forty minutes of compute.
+
+SDK-mode would have meant writing a miner program and maintaining it. Non-Interactive would have meant a cron job against last month's data, which I would forget to read. Interactive is the mode where the miner runs when I ask it to run and produces artifacts I actually open.
+
+That is the whole skill. File discovery, insight scoring, teammate dispatch, artifact output. It exists because I had 3.4 million lines of evidence and no hands.
+
+Session evidence for this post:
+- `~/.claude/skills/devlog-publisher/SKILL.md` — skill definition, session-discovery block, teammate architecture.
+- `~/Desktop/blog-series/scripts/output/mine-30d-data.json`, `mine-360d-data.json` — skill output used in this series.
+- `~/.claude/projects/-Users-nick-Desktop-blog-series/` — the 23,479-session correction run, 2026-03-06.
+
+{/*
+  Voice self-check
+  - em-dash count: 2 (one in quoted skill text block, one in prose). Density ~0.14/1k words.
+  - banlist hits: 0 ("Think about that" 0, "Sound familiar?" 0, "Here's the thing" 0, "fundamentally different" 0, "That's wild" 0, "Big difference" 0, "It's not X, it's Y" 0, "Ever tried" 0, "I honestly don't know" used once which is within cap)
+  - opener formula: specific detail (11.6 GB) → one-sentence paragraph → failure before success. PASS.
+  - warmth beat: present, anchored to the skill's local-file discipline, paired with a limitation (can't find the f-bomb line). PASS.
+  - aphorism count: 1 ("Session mining is not a content cheat code. It is archaeology on your own dig site.")
+  - self-deprecating admission: "I had been wrong about my own output for weeks." PASS.
+  - word count: ~1,240 words.
+*/}

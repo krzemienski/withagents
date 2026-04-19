@@ -5,11 +5,11 @@ status: pending
 blockedBy: [phase-02-synthesis, phase-03-visual-system-proposal]
 ---
 
-# Phase 04 — agentic.dog CMS Site Architecture
+# Phase 04 — withagents.dev CMS Site Architecture
 
 ## Purpose
 
-Propose the concrete stack + content model + IA + OG pipeline for agentic.dog. User signs off on one stack in Phase 07.
+Propose the concrete stack + content model + IA + OG pipeline for withagents.dev. User signs off on one stack in Phase 07.
 
 ## Stack Recommendation (default; alternatives below)
 
@@ -18,7 +18,7 @@ Propose the concrete stack + content model + IA + OG pipeline for agentic.dog. U
 Why:
 - Content-heavy, SEO-critical, mostly static → Astro's islands architecture wins over Next.js RSC cost
 - Keystatic is git-native (no DB, no ops), writes MDX directly into repo — matches Nick's git-everywhere workflow
-- Existing `blog-series/site/` is Next.js 15 — this plan introduces a NEW repo at `~/Desktop/agentic-dog/`, so no migration tax
+- Existing `blog-series/site/` is Next.js 15 — this plan introduces a NEW repo at `~/Desktop/withagents/`, so no migration tax
 - Satori handles OG images; same theme tokens from Phase 03
 
 **Alternatives (decision deferred to user sign-off):**
@@ -73,13 +73,13 @@ Diagram {
 - Per-template `<title>`, description, canonical, og:image (auto)
 - JSON-LD for Article, BreadcrumbList, Organization
 - Satori template in `src/lib/og.tsx` using Phase 03 theme tokens
-- Hero pulls from post frontmatter; fallback to series art; fallback to agentic.dog default
+- Hero pulls from post frontmatter; fallback to series art; fallback to withagents.dev default
 
 ## Deploy
 
 - Vercel (existing account, blog-series already deployed there)
 - Preview environments per branch
-- `main` → agentic.dog (prod)
+- `main` → withagents.dev (prod)
 
 ## Acceptance Criteria
 

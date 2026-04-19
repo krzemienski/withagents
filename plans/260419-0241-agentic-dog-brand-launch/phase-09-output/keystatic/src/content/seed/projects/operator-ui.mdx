@@ -1,0 +1,35 @@
+---
+name: Operator UI
+slug: operator-ui
+tagline: Clean interfaces for inspecting runs, stepping in, and keeping systems legible
+status: experimental
+kind: product
+techChips:
+  - TypeScript
+  - React
+  - Astro
+version: v0.2.0
+lastUpdated: "2026-04-19"
+---
+
+Operator UI is a set of interface patterns for human-in-the-loop agent review. It is not a dashboard. It is a set of decision surfaces — places where a human can read what an agent did, approve or override the next step, and keep the overall system legible.
+
+## Why this exists
+
+The most common failure mode in production agent systems is not the agent making a wrong decision. It is the human being unable to tell whether a decision was made at all, and why.
+
+Operator UI addresses that failure mode by making agent state inspectable. Every run has a timeline. Every decision has a rationale field. Every pending action is shown before it executes.
+
+## Interface patterns
+
+**Run timeline** — chronological list of agent steps with tool calls collapsed by default. Expand to inspect any step.
+
+**Decision card** — structured view of a single agent decision: inputs, reasoning, output, confidence. Includes an override field.
+
+**Pending action queue** — list of agent-proposed actions awaiting approval. Each action shows its runbook context and estimated impact.
+
+**Abort surface** — one-click abort available at every stage, with a required reason field that feeds back into the next session's context.
+
+## Design constraint
+
+Every Operator UI component renders in under 100ms on a cold load. Agent systems run in the critical path of real work — the UI cannot add latency to the human's review cycle.

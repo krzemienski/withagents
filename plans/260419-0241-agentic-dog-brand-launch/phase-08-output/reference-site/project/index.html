@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Withagents — a workshop for building with agents</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Inter+Tight:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ---------- TWEAKABLE DEFAULTS ---------- */
+  /* EDITMODE: accent + theme + display font */
+</style>
+<script>
+  const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+    "theme": "hyper",
+    "accent": "crimson",
+    "display": "intertight"
+  }/*EDITMODE-END*/;
+</script>
+
+<style>
+  :root {
+    /* hyper theme (default) — flat black terminal, hot pink + purple + orange */
+    --bg:        #000000;
+    --bg-2:      #0a0a0a;
+    --ink:       #f5f0ff;
+    --ink-2:     #c8bdd8;
+    --muted:     #8a7ea0;
+    --rule:      #ff2d9522;
+    --rule-2:    #ff2d9544;
+    --card:      #0f0a14;
+    --accent:    #ff2d95;        /* hot pink */
+    --accent-2:  #b24bff;        /* purple */
+    --accent-3:  #ff8a1f;        /* orange */
+    --accent-ink:#0a0014;
+    --noise-op:  0.10;
+    --glow:      0 0 24px #ff2d9555, 0 0 48px #b24bff33;
+  }
+
+  [data-theme="synthwave"] {
+    /* flat black, magenta + cyan */
+    --bg:        #000000;
+    --bg-2:      #060010;
+    --ink:       #fff0ff;
+    --ink-2:     #e0baff;
+    --muted:     #9a7ebd;
+    --rule:      #ff00aa22;
+    --rule-2:    #ff00aa44;
+    --card:      #08000f;
+    --accent:    #ff00aa;
+    --accent-2:  #00eaff;
+    --accent-3:  #ffcc00;
+    --accent-ink:#000000;
+    --noise-op:  0.10;
+  }
+
+  [data-theme="midnight"] {
+    /* flat black, violet + electric */
+    --bg:        #000000;
+    --bg-2:      #08000f;
+    --ink:       #ffeaff;
+    --ink-2:     #d0b0e8;
+    --muted:     #7a6090;
+    --rule:      #9d4bff22;
+    --rule-2:    #9d4bff44;
+    --card:      #0a0014;
+    --accent:    #9d4bff;
+    --accent-2:  #ff2d95;
+    --accent-3:  #ffea00;
+    --accent-ink:#000000;
+    --noise-op:  0.10;
+  }
+
+  [data-theme="voltage"] {
+    /* flat black, electric blue + lemon */
+    --bg:        #000000;
+    --bg-2:      #000308;
+    --ink:       #eaf4ff;
+    --ink-2:     #a8c2e0;
+    --muted:     #6a7e96;
+    --rule:      #0ea5ff22;
+    --rule-2:    #0ea5ff44;
+    --card:      #030712;
+    --accent:    #0ea5ff;
+    --accent-2:  #f0ff00;
+    --accent-3:  #ff2d95;
+    --accent-ink:#001028;
+    --noise-op:  0.10;
+  }
+
+  [data-theme="toxic"] {
+    /* flat black, acid green + magenta */
+    --bg:        #000000;
+    --bg-2:      #030a04;
+    --ink:       #eaffea;
+    --ink-2:     #a8d8b0;
+    --muted:     #6a8872;
+    --rule:      #3dff8822;
+    --rule-2:    #3dff8844;
+    --card:      #040a06;
+    --accent:    #3dff88;
+    --accent-2:  #ff00aa;
+    --accent-3:  #ffea00;
+    --accent-ink:#001408;
+    --noise-op:  0.10;
+  }
+
+  [data-theme="sunset"] {
+    /* flat black, orange + magenta + gold */
+    --bg:        #000000;
+    --bg-2:      #0a0604;
+    --ink:       #fff2ea;
+    --ink-2:     #e8c6b0;
+    --muted:     #a08070;
+    --rule:      #ff6a1f22;
+    --rule-2:    #ff6a1f44;
+    --card:      #0c0604;
+    --accent:    #ff6a1f;
+    --accent-2:  #ff2d95;
+    --accent-3:  #ffdd00;
+    --accent-ink:#180800;
+    --noise-op:  0.10;
+  }
+
+  [data-theme="blood"] {
+    /* flat black, crimson + amber */
+    --bg:        #000000;
+    --bg-2:      #0a0204;
+    --ink:       #ffeaea;
+    --ink-2:     #e0b0b0;
+    --muted:     #906060;
+    --rule:      #ff1a4422;
+    --rule-2:    #ff1a4444;
+    --card:      #0a0206;
+    --accent:    #ff1a44;
+    --accent-2:  #ffaa00;
+    --accent-3:  #ff2d95;
+    --accent-ink:#1a0008;
+    --noise-op:  0.10;
+  }
+
+  [data-accent="hotpink"] { --accent: #ff2d95; --accent-2: #b24bff; --accent-3: #ff8a1f; --accent-ink: #0a0014; }
+  [data-accent="purple"]  { --accent: #b24bff; --accent-2: #ff2d95; --accent-3: #ff8a1f; --accent-ink: #0a0014; }
+  [data-accent="orange"]  { --accent: #ff8a1f; --accent-2: #ff2d95; --accent-3: #b24bff; --accent-ink: #1a0800; }
+  [data-accent="cyan"]    { --accent: #3df0ff; --accent-2: #b24bff; --accent-3: #ff2d95; --accent-ink: #001820; }
+  [data-accent="acid"]    { --accent: #c6ff2d; --accent-2: #ff2d95; --accent-3: #b24bff; --accent-ink: #0a1400; }
+  [data-accent="magenta"] { --accent: #ff00aa; --accent-2: #00eaff; --accent-3: #ffcc00; --accent-ink: #000000; }
+  [data-accent="lemon"]   { --accent: #f0ff00; --accent-2: #ff2d95; --accent-3: #0ea5ff; --accent-ink: #101800; }
+  [data-accent="mint"]    { --accent: #3dff88; --accent-2: #ff00aa; --accent-3: #ffea00; --accent-ink: #001408; }
+  [data-accent="crimson"] { --accent: #ff1a44; --accent-2: #ffaa00; --accent-3: #ff2d95; --accent-ink: #1a0008; }
+
+  [data-display="fraunces"]        { --f-display: "Fraunces", "Times New Roman", serif; --display-weight: 400; }
+  [data-display="instrument"]      { --f-display: "Instrument Serif", "Times New Roman", serif; --display-weight: 400; }
+  [data-display="intertight"]      { --f-display: "Inter Tight", system-ui, sans-serif; --display-weight: 600; }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: "Inter Tight", system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01", "cv11";
+    overflow-x: hidden;
+  }
+
+  /* subtle paper grain overlay */
+  body::before {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 100;
+    opacity: var(--noise-op);
+    mix-blend-mode: screen;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.3  0 0 0 0 0.1  0 0 0 0 0.4  0 0 0 0.5 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  }
+  /* CRT scanlines */
+  body::after {
+    content: "";
+    position: fixed; inset: 0;
+    pointer-events: none;
+    z-index: 99;
+    background: repeating-linear-gradient(
+      to bottom,
+      transparent 0px,
+      transparent 2px,
+      rgba(255, 45, 149, 0.025) 2px,
+      rgba(255, 45, 149, 0.025) 3px
+    );
+  }
+
+  .f-display { font-family: var(--f-display); font-weight: var(--display-weight, 400); letter-spacing: -0.02em; }
+  .f-mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+  .f-italic { font-family: "Instrument Serif", serif; font-style: italic; font-weight: 400; }
+
+  /* ---------- layout ---------- */
+  .wrap { max-width: 1440px; margin: 0 auto; padding: 0 40px; }
+
+  /* ---------- nav ---------- */
+  nav.top {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in oklab, var(--bg) 85%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--rule);
+  }
+  nav.top .row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 16px 0;
+    gap: 24px;
+  }
+  .brandmark {
+    display: flex; align-items: baseline; gap: 6px;
+    font-family: var(--f-display);
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+  }
+  .brandmark .amp { color: var(--accent); font-style: italic; font-family: "Instrument Serif", serif; font-size: 26px; line-height: 0; position: relative; top: 2px; text-shadow: 0 0 12px var(--accent); }
+  .brandmark .dot { display: inline-block; width: 7px; height: 7px; background: var(--accent); border-radius: 50%; margin-left: 4px; box-shadow: 0 0 8px var(--accent); animation: blink 1.2s steps(2) infinite; }
+  @keyframes blink { 50% { opacity: 0.2; } }
+
+  .nav-links {
+    display: flex; gap: 28px; justify-content: center;
+    font-size: 13px; letter-spacing: 0.02em;
+  }
+  .nav-links a {
+    color: var(--ink-2); text-decoration: none;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 0;
+    border-bottom: 1px solid transparent;
+    transition: border-color .15s, color .15s;
+  }
+  .nav-links a:hover { color: var(--ink); border-bottom-color: var(--accent); }
+  .nav-links a .num { font-family: "JetBrains Mono", monospace; font-size: 10px; color: var(--muted); }
+
+  .nav-cta {
+    display: flex; gap: 12px; justify-content: flex-end; align-items: center;
+    font-size: 13px;
+  }
+  .nav-cta a.ghost { color: var(--ink-2); text-decoration: none; }
+  .nav-cta a.ghost:hover { color: var(--ink); }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 9px 16px;
+    background: var(--ink); color: var(--bg);
+    border: 1px solid var(--ink);
+    border-radius: 2px;
+    text-decoration: none;
+    font-size: 12px; font-weight: 500;
+    letter-spacing: 0.04em;
+    transition: transform .15s, background .15s, box-shadow .15s;
+    cursor: pointer;
+    font-family: "JetBrains Mono", monospace;
+    text-transform: uppercase;
+  }
+  .btn:hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--accent-2); }
+  .btn.accent { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); box-shadow: 0 0 20px var(--accent)55; }
+  .btn.accent:hover { box-shadow: 3px 3px 0 var(--accent-2), 0 0 28px var(--accent)88; }
+  .btn.ghost { background: transparent; color: var(--ink); border-color: var(--rule-2); }
+  .btn .arrow { transition: transform .15s; }
+  .btn:hover .arrow { transform: translateX(3px); }
+
+  /* ---------- announcement bar ---------- */
+  .announce {
+    background: linear-gradient(90deg, var(--accent) 0%, var(--accent-2) 50%, var(--accent-3) 100%);
+    color: #0a0014;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 8px 40px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    font-weight: 600;
+  }
+  .announce .left { display: flex; align-items: center; gap: 12px; }
+  .announce .tag {
+    display: inline-block; padding: 2px 8px;
+    background: #0a0014; color: var(--accent);
+    border-radius: 2px;
+  }
+  .announce a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+  .announce .marquee { opacity: 0.6; font-size: 10px; }
+
+  /* ---------- hero ---------- */
+  section.hero {
+    padding: 56px 0 40px;
+    position: relative;
+  }
+  .hero-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 24px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--rule);
+    margin-bottom: 48px;
+  }
+  .hero-meta .slot strong { color: var(--ink); font-weight: 500; display: block; margin-top: 2px; letter-spacing: 0.05em; }
+  .hero-meta .slot.right { text-align: right; }
+  .hero-meta .slot.center { text-align: center; }
+
+  .hero-headline {
+    font-family: var(--f-display);
+    font-weight: var(--display-weight, 400);
+    font-size: clamp(64px, 11vw, 176px);
+    line-height: 0.88;
+    letter-spacing: -0.035em;
+    margin: 0;
+    font-variation-settings: "opsz" 144, "SOFT" 0;
+  }
+  .hero-headline .line { display: block; }
+  .hero-headline .slant { font-family: "Instrument Serif", serif; font-style: italic; font-weight: 400; letter-spacing: -0.02em; color: var(--accent); text-shadow: 0 0 40px var(--accent)66, 0 0 80px var(--accent-2)33; }
+  .hero-headline .underline-word { position: relative; display: inline-block; background: linear-gradient(90deg, var(--accent), var(--accent-2), var(--accent-3)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero-headline .underline-word::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: 0.12em;
+    height: 0.04em;
+    background: linear-gradient(90deg, var(--accent), var(--accent-3));
+    box-shadow: 0 0 12px var(--accent);
+  }
+  .hero-headline .bullet { display: inline-block; width: 0.45em; height: 0.45em; background: var(--accent-3); border-radius: 50%; vertical-align: 0.18em; margin: 0 0.1em; box-shadow: 0 0 16px var(--accent-3); animation: blink 1.2s steps(2) infinite; }
+
+  .hero-sub {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+  }
+  .hero-sub p {
+    font-size: 19px;
+    line-height: 1.45;
+    color: var(--ink-2);
+    margin: 0;
+    text-wrap: pretty;
+    max-width: 52ch;
+  }
+  .hero-sub p em { font-family: "Instrument Serif", serif; font-style: italic; font-weight: 400; color: var(--accent-3); font-size: 22px; }
+  .hero-sub .cta-block {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 16px;
+  }
+  .hero-sub .cta-row { display: flex; gap: 12px; }
+  .hero-sub .cta-foot {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* spinning seal */
+  .seal {
+    position: absolute;
+    top: 80px; right: 40px;
+    width: 140px; height: 140px;
+    animation: spin 40s linear infinite;
+    pointer-events: none;
+  }
+  .seal svg { width: 100%; height: 100%; display: block; }
+  .seal text { font-family: "JetBrains Mono", monospace; font-size: 10px; letter-spacing: 0.25em; fill: var(--accent); text-transform: uppercase; }
+  .seal .center-glyph { font-family: var(--f-display); font-size: 40px; fill: var(--accent); filter: drop-shadow(0 0 6px var(--accent)); }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---------- section heading ---------- */
+  .section-head {
+    display: grid;
+    grid-template-columns: 120px 1fr auto;
+    align-items: baseline;
+    gap: 32px;
+    padding: 24px 0;
+    border-top: 1px solid var(--accent);
+    margin-top: 96px;
+    margin-bottom: 48px;
+    box-shadow: 0 -1px 0 var(--accent), 0 -6px 24px var(--accent)22;
+  }
+  .section-head .num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+  }
+  .section-head .num strong { color: var(--accent); font-weight: 500; }
+  .section-head .title {
+    font-family: var(--f-display);
+    font-weight: var(--display-weight, 400);
+    font-size: clamp(32px, 4.2vw, 56px);
+    line-height: 1;
+    letter-spacing: -0.025em;
+    margin: 0;
+  }
+  .section-head .title em { font-family: "Instrument Serif", serif; color: var(--accent); font-weight: 400; text-shadow: 0 0 20px var(--accent)66; }
+  .section-head .kicker {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    max-width: 200px;
+    text-align: right;
+    line-height: 1.5;
+  }
+
+  /* ---------- agents roster ---------- */
+  .roster {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 24px;
+  }
+  .agent-card {
+    grid-column: span 4;
+    background: var(--card);
+    border: 1px solid var(--rule-2);
+    padding: 24px;
+    position: relative;
+    display: flex; flex-direction: column;
+    min-height: 340px;
+    transition: transform .2s, border-color .2s, box-shadow .2s;
+    cursor: pointer;
+  }
+  .agent-card::before {
+    content: "";
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.4;
+  }
+  .agent-card:hover { transform: translate(-2px, -2px); border-color: var(--accent); box-shadow: 4px 4px 0 var(--accent-2), 0 0 32px var(--accent)33; }
+  .agent-card:hover .agent-action { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); box-shadow: 0 0 16px var(--accent)88; }
+
+  .agent-card.feature { grid-column: span 6; min-height: 380px; }
+  .agent-card.tall { grid-column: span 4; grid-row: span 2; min-height: 720px; }
+  .agent-card.wide { grid-column: span 8; }
+
+  .agent-head {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-bottom: 16px;
+    border-bottom: 1px dashed var(--rule-2);
+    margin-bottom: 20px;
+  }
+  .agent-head .status::before {
+    content: "●";
+    color: #3df0ff;
+    margin-right: 6px;
+    text-shadow: 0 0 6px #3df0ff;
+  }
+  .agent-head .status.idle::before { color: var(--accent-3); text-shadow: 0 0 6px var(--accent-3); }
+  .agent-head .status.work::before { color: var(--accent); text-shadow: 0 0 6px var(--accent); animation: pulse 1.5s ease-in-out infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  .agent-name {
+    font-family: var(--f-display);
+    font-weight: var(--display-weight, 400);
+    font-size: 38px;
+    line-height: 1;
+    letter-spacing: -0.025em;
+    margin: 0 0 6px;
+  }
+  .agent-card.feature .agent-name { font-size: 52px; }
+  .agent-card.tall .agent-name { font-size: 44px; }
+
+  .agent-handle {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 12px;
+    color: var(--accent);
+    margin-bottom: 16px;
+    text-shadow: 0 0 8px var(--accent)66;
+  }
+  .agent-desc {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    margin: 0 0 20px;
+    text-wrap: pretty;
+  }
+  .agent-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    padding: 14px 0;
+    border-top: 1px solid var(--rule-2);
+    border-bottom: 1px solid var(--rule-2);
+    margin-bottom: 16px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .agent-stats strong {
+    display: block;
+    font-family: var(--f-display);
+    font-weight: 500;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    text-transform: none;
+    margin-top: 2px;
+  }
+  .agent-foot { margin-top: auto; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .agent-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .agent-tag {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.05em;
+    padding: 3px 8px;
+    background: var(--bg-2);
+    color: var(--ink-2);
+    border-radius: 2px;
+  }
+  .agent-action {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 8px 12px;
+    border: 1px solid var(--rule-2);
+    background: transparent;
+    color: var(--ink);
+    white-space: nowrap;
+    transition: all .15s;
+    cursor: pointer;
+  }
+
+  /* featured card internals */
+  .agent-card.feature .agent-preview {
+    margin-bottom: 20px;
+    padding: 16px;
+    background: var(--bg-2);
+    border: 1px solid var(--rule);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    line-height: 1.6;
+    color: var(--ink-2);
+    min-height: 100px;
+  }
+  .agent-preview .you { color: var(--muted); }
+  .agent-preview .agent-reply { color: var(--ink); }
+  .agent-preview .agent-reply::before { content: "→ "; color: var(--accent); text-shadow: 0 0 6px var(--accent); }
+  .typing-dot { display: inline-block; animation: typing 1.4s infinite; }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typing { 0%, 60%, 100% { opacity: 0.3; } 30% { opacity: 1; } }
+
+  /* tall card gets an ASCII chart */
+  .agent-card.tall .ascii-plot {
+    margin: 16px 0;
+    padding: 12px;
+    background: var(--bg);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    line-height: 1.3;
+    color: var(--accent-2);
+    white-space: pre;
+    overflow: hidden;
+    border-left: 2px solid var(--accent);
+    box-shadow: inset 0 0 20px var(--accent)15;
+  }
+
+  /* ---------- how it works ---------- */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--rule-2);
+    border-bottom: 1px solid var(--rule-2);
+  }
+  .step {
+    padding: 32px 24px 40px;
+    border-right: 1px solid var(--rule-2);
+    position: relative;
+  }
+  .step:last-child { border-right: none; }
+  .step .step-num {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    margin-bottom: 40px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .step .step-num .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--ink);
+  }
+  .step .step-num .dot.accent { background: var(--accent); }
+  .step h3 {
+    font-family: var(--f-display);
+    font-weight: var(--display-weight, 400);
+    font-size: 28px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin: 0 0 12px;
+  }
+  .step h3 em { font-family: "Instrument Serif", serif; color: var(--accent); font-weight: 400; text-shadow: 0 0 14px var(--accent)55; }
+  .step p {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    margin: 0 0 24px;
+    text-wrap: pretty;
+  }
+  .step .step-glyph {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    line-height: 1.4;
+    color: var(--accent-2);
+    white-space: pre;
+    margin-top: auto;
+    opacity: 0.7;
+  }
+
+  /* ---------- pricing ---------- */
+  .pricing {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 40px var(--accent)22;
+  }
+  .plan {
+    padding: 32px 28px;
+    border-right: 1px solid var(--rule-2);
+    display: flex; flex-direction: column;
+    background: var(--card);
+    position: relative;
+  }
+  .plan:last-child { border-right: none; }
+  .plan.feature { background: linear-gradient(180deg, #1a0628 0%, #0a0014 100%); color: var(--ink); position: relative; }
+  .plan.feature::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 50% 0%, var(--accent)33 0%, transparent 60%);
+    pointer-events: none;
+  }
+  .plan.feature > * { position: relative; }
+  .plan.feature .tag-badge { background: var(--accent); color: var(--accent-ink); box-shadow: 0 0 12px var(--accent)88; }
+
+  .plan-head {
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed currentColor;
+    opacity: 1;
+    margin-bottom: 24px;
+  }
+  .plan-head > div:first-child { flex: 1; }
+  .plan-name {
+    font-family: var(--f-display);
+    font-weight: var(--display-weight, 400);
+    font-size: 32px;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .plan-name em { font-family: "Instrument Serif", serif; color: var(--accent); font-weight: 400; text-shadow: 0 0 14px var(--accent)55; }
+  .tag-badge {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    background: var(--bg-2);
+    color: var(--ink-2);
+    border-radius: 2px;
+  }
+  .plan-price {
+    font-family: var(--f-display);
+    font-weight: var(--display-weight, 400);
+    font-size: 64px;
+    line-height: 1;
+    letter-spacing: -0.03em;
+    margin: 8px 0 4px;
+    display: flex; align-items: baseline; gap: 6px;
+  }
+  .plan-price .currency { font-size: 24px; font-weight: 400; opacity: 0.6; }
+  .plan-price .period { font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: 0.05em; color: var(--muted); margin-left: 4px; text-transform: uppercase; }
+  .plan.feature .plan-price .period { color: var(--bg-2); }
+  .plan-desc {
+    font-size: 13px;
+    color: var(--ink-2);
+    line-height: 1.5;
+    margin-bottom: 28px;
+    text-wrap: pretty;
+  }
+  .plan ul {
+    list-style: none;
+    padding: 0; margin: 0 0 28px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .plan li {
+    padding: 10px 0;
+    border-top: 1px solid var(--rule-2);
+    display: flex; align-items: flex-start; gap: 10px;
+    color: var(--ink-2);
+  }
+  .plan li:last-child { border-bottom: 1px solid var(--rule-2); }
+  .plan li::before {
+    content: "→";
+    color: var(--accent);
+    font-family: "JetBrains Mono", monospace;
+    flex-shrink: 0;
+  }
+  .plan .btn { margin-top: auto; justify-content: center; }
+  .plan.feature .btn { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+
+  /* ---------- dispatches (writing/news) ---------- */
+  .dispatches {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--accent);
+  }
+  .dispatch {
+    grid-column: span 4;
+    padding: 28px 24px;
+    border-right: 1px solid var(--rule-2);
+    border-bottom: 1px solid var(--rule-2);
+    display: flex; flex-direction: column;
+    gap: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: background .15s;
+  }
+  .dispatch:hover { background: var(--card); box-shadow: inset 0 0 40px var(--accent)15; }
+  .dispatch:nth-child(3n) { border-right: none; }
+  .dispatch .meta {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex; justify-content: space-between;
+  }
+  .dispatch .meta .cat { color: var(--accent); }
+  .dispatch h4 {
+    font-family: var(--f-display);
+    font-weight: var(--display-weight, 400);
+    font-size: 26px;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 4px 0;
+    text-wrap: balance;
+  }
+  .dispatch h4 em { font-family: "Instrument Serif", serif; color: var(--accent); font-weight: 400; }
+  .dispatch:nth-child(2) h4 em { color: var(--accent-2); }
+  .dispatch:nth-child(3) h4 em { color: var(--accent-3); }
+  .dispatch .excerpt {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--ink-2);
+    flex: 1;
+    margin: 0;
+  }
+  .dispatch .author {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    color: var(--ink-2);
+    border-top: 1px dashed var(--rule-2);
+    padding-top: 12px;
+    margin-top: 8px;
+  }
+
+  /* ---------- quote strip ---------- */
+  .quote-strip {
+    padding: 96px 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+    margin-top: 96px;
+    text-align: center;
+  }
+  .quote-strip blockquote {
+    font-family: var(--f-display);
+    font-weight: var(--display-weight, 400);
+    font-size: clamp(32px, 5vw, 64px);
+    line-height: 1.05;
+    letter-spacing: -0.025em;
+    margin: 0 auto;
+    max-width: 16ch;
+    text-wrap: balance;
+  }
+  .quote-strip blockquote em { font-family: "Instrument Serif", serif; color: var(--accent); font-weight: 400; text-shadow: 0 0 20px var(--accent)55; }
+  .quote-strip blockquote em:nth-of-type(2) { color: var(--accent-3); text-shadow: 0 0 20px var(--accent-3)55; }
+  .quote-strip cite {
+    display: block;
+    margin-top: 32px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-style: normal;
+  }
+  .quote-strip cite strong { color: var(--ink); font-weight: 500; }
+
+  /* ---------- runner (marquee) ---------- */
+  .runner {
+    border-top: 1px solid var(--accent);
+    border-bottom: 1px solid var(--accent);
+    padding: 20px 0;
+    overflow: hidden;
+    white-space: nowrap;
+    margin-top: 0;
+    background: linear-gradient(90deg, transparent, var(--accent)08, transparent);
+  }
+  .runner-track {
+    display: inline-flex;
+    gap: 48px;
+    animation: slide 40s linear infinite;
+    font-family: var(--f-display);
+    font-weight: var(--display-weight, 400);
+    font-size: 48px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .runner-track span em { font-family: "Instrument Serif", serif; color: var(--accent); font-weight: 400; text-shadow: 0 0 12px var(--accent)88; }
+  .runner-track span.dot { color: var(--accent-2); text-shadow: 0 0 8px var(--accent-2); }
+  .runner-track span:nth-child(6n+2).dot { color: var(--accent); }
+  .runner-track span:nth-child(6n+4).dot { color: var(--accent-3); }
+  @keyframes slide {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ---------- footer ---------- */
+  footer.bottom {
+    background: linear-gradient(180deg, var(--bg) 0%, #0a0014 100%);
+    color: var(--ink);
+    padding: 64px 0 24px;
+    margin-top: 96px;
+    border-top: 1px solid var(--accent);
+    position: relative;
+  }
+  footer.bottom::before {
+    content: "";
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), var(--accent-2), var(--accent-3), transparent);
+  }
+  footer .bottom-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    gap: 40px;
+    padding-bottom: 64px;
+    border-bottom: 1px solid #ffffff22;
+  }
+  footer .bigmark {
+    font-family: var(--f-display);
+    font-weight: var(--display-weight, 400);
+    font-size: 72px;
+    line-height: 0.9;
+    letter-spacing: -0.035em;
+  }
+  footer .bigmark em { font-family: "Instrument Serif", serif; color: var(--accent); font-weight: 400; text-shadow: 0 0 20px var(--accent)55; }
+  footer .bigmark + p {
+    font-size: 13px; color: var(--muted); margin-top: 16px; max-width: 28ch;
+  }
+  footer h5 {
+    font-family: "JetBrains Mono", monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin: 0 0 16px;
+    font-weight: 500;
+  }
+  footer ul { list-style: none; padding: 0; margin: 0; }
+  footer li { margin-bottom: 8px; }
+  footer a { color: var(--ink-2); text-decoration: none; font-size: 13px; }
+  footer a:hover { color: var(--accent); }
+  footer .foot-bottom {
+    display: flex; justify-content: space-between;
+    padding-top: 24px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+  }
+  .bottom-grid { border-bottom-color: var(--rule-2) !important; }
+
+  /* ---------- Tweaks panel ---------- */
+  #tweaks {
+    position: fixed;
+    bottom: 20px; right: 20px;
+    width: 280px;
+    background: var(--card);
+    border: 1px solid var(--accent);
+    padding: 16px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    z-index: 200;
+    display: none;
+    box-shadow: 6px 6px 0 var(--accent-2), 0 0 40px var(--accent)33;
+  }
+  #tweaks.visible { display: block; }
+  #tweaks h6 {
+    margin: 0 0 12px;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  #tweaks h6 strong { color: var(--ink); font-weight: 500; }
+  #tweaks .tweak-group { margin-bottom: 16px; }
+  #tweaks .tweak-group:last-child { margin-bottom: 0; }
+  #tweaks label {
+    display: block;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  #tweaks .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  #tweaks .chip {
+    padding: 5px 10px;
+    background: transparent;
+    border: 1px solid var(--rule-2);
+    color: var(--ink-2);
+    font-family: inherit;
+    font-size: 10px;
+    cursor: pointer;
+    border-radius: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  #tweaks .chip:hover { border-color: var(--ink); }
+  #tweaks .chip.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); box-shadow: 0 0 12px var(--accent)88; }
+  #tweaks .swatch-row { display: flex; gap: 6px; }
+  #tweaks .swatch {
+    width: 28px; height: 28px;
+    border: 1px solid var(--rule-2);
+    cursor: pointer;
+    border-radius: 2px;
+    position: relative;
+  }
+  #tweaks .swatch.active::after {
+    content: "✓";
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: white;
+    font-size: 14px;
+    mix-blend-mode: difference;
+  }
+
+  /* responsive */
+  @media (max-width: 980px) {
+    .wrap { padding: 0 24px; }
+    .hero-meta, .hero-sub { grid-template-columns: 1fr; gap: 16px; }
+    .hero-sub { gap: 32px; }
+    .roster, .steps, .pricing, .dispatches { grid-template-columns: 1fr; }
+    .agent-card, .agent-card.feature, .agent-card.tall, .agent-card.wide { grid-column: span 1; grid-row: auto; min-height: 0; }
+    .step, .plan, .dispatch { border-right: none; border-bottom: 1px solid var(--rule-2); }
+    .dispatch:nth-child(3n) { border-right: none; }
+    .section-head { grid-template-columns: 1fr; gap: 12px; }
+    .section-head .kicker { text-align: left; max-width: none; }
+    footer .bottom-grid { grid-template-columns: 1fr 1fr; }
+    footer .bigmark { font-size: 48px; }
+    .seal { display: none; }
+    nav.top .row { grid-template-columns: auto auto; }
+    .nav-links { display: none; }
+  }
+</style>
+</head>
+<body data-theme="hyper" data-accent="hotpink" data-display="fraunces">
+
+<!-- announcement bar -->
+<div class="announce">
+  <div class="left">
+    <span class="tag">New</span>
+    <span>Dossier 04 — <a href="#">Designing evals for long-running agents</a></span>
+  </div>
+  <div class="marquee">Vol.&nbsp;II / Iss.&nbsp;07 — Spring ’26</div>
+</div>
+
+<!-- nav -->
+<nav class="top">
+  <div class="wrap">
+    <div class="row">
+      <div class="brandmark">
+        with<span class="amp">&</span>agents<span class="dot"></span>
+      </div>
+      <div class="nav-links">
+        <a href="#roster"><span class="num">01</span> Roster</a>
+        <a href="#process"><span class="num">02</span> Process</a>
+        <a href="#pricing"><span class="num">03</span> Terms</a>
+        <a href="#dispatches"><span class="num">04</span> Dispatches</a>
+        <a href="#"><span class="num">05</span> Studio</a>
+      </div>
+      <div class="nav-cta">
+        <a href="#" class="ghost">sign&nbsp;in</a>
+        <a href="#" class="btn accent">./start_session <span class="arrow">→</span></a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- hero -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-meta">
+      <div class="slot">
+        Filed from the studio<br>
+        <strong>37.7749° N / 122.4194° W</strong>
+      </div>
+      <div class="slot center">
+        A working environment<br>
+        <strong>for humans & their agents</strong>
+      </div>
+      <div class="slot right">
+        Currently hosting<br>
+        <strong>14,208 working sessions</strong>
+      </div>
+    </div>
+
+    <h1 class="hero-headline">
+      <span class="line">Do the work,</span>
+      <span class="line"><span class="slant">with</span> <span class="underline-word">agents</span><span class="bullet"></span></span>
+      <span class="line">not&nbsp;alongside&nbsp;them.</span>
+    </h1>
+
+    <div class="seal" aria-hidden="true">
+      <svg viewBox="0 0 140 140">
+        <defs>
+          <path id="circ" d="M 70,70 m -56,0 a 56,56 0 1,1 112,0 a 56,56 0 1,1 -112,0" />
+        </defs>
+        <circle cx="70" cy="70" r="68" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.4"/>
+        <circle cx="70" cy="70" r="56" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.3"/>
+        <text><textPath href="#circ">  EST. 2026  ·  WITHAGENTS STUDIO  ·  A WORKING PRESS  ·  </textPath></text>
+        <text x="70" y="82" text-anchor="middle" class="center-glyph">&amp;</text>
+      </svg>
+    </div>
+
+    <div class="hero-sub">
+      <p>
+        Withagents is a workshop where you and a cast of specialised AI agents sit down at the <em>same table</em>. You direct the work; they draft, research, reconcile, and ship. No orchestration theatre, no prompt-chain gymnastics — just a quiet room and a shared document.
+      </p>
+      <div class="cta-block">
+        <div class="cta-row">
+          <a href="#" class="btn accent">Start a session <span class="arrow">→</span></a>
+          <a href="#" class="btn ghost">Watch a dispatch</a>
+        </div>
+        <div class="cta-foot">
+          Free for 30 days — no card, no seat fees
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- marquee -->
+<div class="runner">
+  <div class="runner-track">
+    <span>Research</span><span class="dot">●</span>
+    <span>Write</span><span class="dot">●</span>
+    <span><em>Reconcile</em></span><span class="dot">●</span>
+    <span>Ship</span><span class="dot">●</span>
+    <span>Review</span><span class="dot">●</span>
+    <span><em>Rehearse</em></span><span class="dot">●</span>
+    <span>Decide</span><span class="dot">●</span>
+    <span>Research</span><span class="dot">●</span>
+    <span>Write</span><span class="dot">●</span>
+    <span><em>Reconcile</em></span><span class="dot">●</span>
+    <span>Ship</span><span class="dot">●</span>
+    <span>Review</span><span class="dot">●</span>
+    <span><em>Rehearse</em></span><span class="dot">●</span>
+    <span>Decide</span><span class="dot">●</span>
+  </div>
+</div>
+
+<!-- ROSTER -->
+<section id="roster">
+  <div class="wrap">
+    <header class="section-head">
+      <div class="num"><strong>§01</strong> &nbsp;/&nbsp; The roster</div>
+      <h2 class="title">Nine agents, <em>on call</em>.</h2>
+      <div class="kicker">Hand-trained. Evaluated weekly. Hired, not generated.</div>
+    </header>
+
+    <div class="roster">
+      <!-- FEATURE CARD -->
+      <article class="agent-card feature">
+        <div class="agent-head">
+          <span>N°&nbsp;01 / Research</span>
+          <span class="status work">Working</span>
+        </div>
+        <h3 class="agent-name">Marlowe</h3>
+        <div class="agent-handle">@marlowe — the researcher</div>
+        <div class="agent-preview">
+          <div class="you">&gt; compare the 2024 and 2025 annual reports for drift in tone</div>
+          <div class="agent-reply">Reading 312 pages. I'll mark shifts in risk language, forward guidance, and executive voice.<span class="typing-dot">.</span><span class="typing-dot">.</span><span class="typing-dot">.</span></div>
+        </div>
+        <p class="agent-desc">Gathers sources, reconciles conflicting accounts, and hands you a one-page dossier with everything cited. Will disagree with you politely, in the margins.</p>
+        <div class="agent-stats">
+          Avg. depth<strong>82 src</strong>
+          Latency<strong>4.2s</strong>
+          Accuracy<strong>94.1%</strong>
+        </div>
+        <div class="agent-foot">
+          <div class="agent-tags">
+            <span class="agent-tag">research</span>
+            <span class="agent-tag">citations</span>
+            <span class="agent-tag">long-context</span>
+          </div>
+          <button class="agent-action">Hire →</button>
+        </div>
+      </article>
+
+      <!-- TALL CARD -->
+      <article class="agent-card tall">
+        <div class="agent-head">
+          <span>N°&nbsp;02 / Writing</span>
+          <span class="status">Available</span>
+        </div>
+        <h3 class="agent-name">Juno</h3>
+        <div class="agent-handle">@juno — the drafter</div>
+        <p class="agent-desc">Drafts in your voice after reading three samples. Cuts 30% of the words, keeps 100% of the meaning. Hates adverbs.</p>
+        <div class="ascii-plot">Words kept ━━━━━━━━━━━━━━━━━━━━ 100%
+Words cut  ━━━━━━           ⟵ 30%
+Voice match ━━━━━━━━━━━━━━━   96%
+Tone drift  ━                  4%
+Adverbs    (removed on sight)
+
+  draft ──▶ critique ──▶ revise
+     ▲            │
+     └── × 3 ─────┘
+</div>
+        <div class="agent-stats">
+          Words/day<strong>48k</strong>
+          Drafts<strong>3.1×</strong>
+          Style<strong>Adaptive</strong>
+        </div>
+        <div class="agent-foot">
+          <div class="agent-tags">
+            <span class="agent-tag">writing</span>
+            <span class="agent-tag">editing</span>
+          </div>
+          <button class="agent-action">Hire →</button>
+        </div>
+      </article>
+
+      <!-- REGULAR CARDS, col 4 -->
+      <article class="agent-card">
+        <div class="agent-head">
+          <span>N°&nbsp;03 / Data</span>
+          <span class="status">Available</span>
+        </div>
+        <h3 class="agent-name">Pascal</h3>
+        <div class="agent-handle">@pascal — the analyst</div>
+        <p class="agent-desc">Runs SQL you didn't have to write. Notices when your chart axis is lying. Will flag outliers before you ask.</p>
+        <div class="agent-foot">
+          <div class="agent-tags">
+            <span class="agent-tag">sql</span>
+            <span class="agent-tag">charts</span>
+          </div>
+          <button class="agent-action">Hire →</button>
+        </div>
+      </article>
+
+      <article class="agent-card">
+        <div class="agent-head">
+          <span>N°&nbsp;04 / Code</span>
+          <span class="status idle">Idle</span>
+        </div>
+        <h3 class="agent-name">Ada</h3>
+        <div class="agent-handle">@ada — the engineer</div>
+        <p class="agent-desc">Reads your whole repo before it writes anything. Opens PRs that pass CI. Commit messages you'd sign your name to.</p>
+        <div class="agent-foot">
+          <div class="agent-tags">
+            <span class="agent-tag">repo</span>
+            <span class="agent-tag">ci</span>
+            <span class="agent-tag">review</span>
+          </div>
+          <button class="agent-action">Hire →</button>
+        </div>
+      </article>
+
+      <!-- wide card -->
+      <article class="agent-card wide">
+        <div class="agent-head">
+          <span>N°&nbsp;05 / Ops</span>
+          <span class="status work">Working</span>
+        </div>
+        <h3 class="agent-name" style="font-size: 48px;">Hestia</h3>
+        <div class="agent-handle">@hestia — the house-keeper</div>
+        <p class="agent-desc" style="max-width: 58ch;">
+          Runs your calendar, triages your inbox, keeps standing orders with the other agents. The one you talk to first in the morning and the one that closes the door at night. Hestia also schedules the others — when Marlowe needs an hour of quiet to read, she books the room.
+        </p>
+        <div class="agent-stats">
+          Tasks today<strong>127</strong>
+          Calls saved<strong>6h 40m</strong>
+          Conflicts resolved<strong>31</strong>
+        </div>
+        <div class="agent-foot">
+          <div class="agent-tags">
+            <span class="agent-tag">calendar</span>
+            <span class="agent-tag">inbox</span>
+            <span class="agent-tag">routing</span>
+            <span class="agent-tag">conductor</span>
+          </div>
+          <button class="agent-action">Hire →</button>
+        </div>
+      </article>
+
+      <!-- regular 06 -->
+      <article class="agent-card">
+        <div class="agent-head">
+          <span>N°&nbsp;06 / Review</span>
+          <span class="status">Available</span>
+        </div>
+        <h3 class="agent-name">Verity</h3>
+        <div class="agent-handle">@verity — the critic</div>
+        <p class="agent-desc">Hostile reader. Looks for the weakest sentence and says so. Used by every other agent before they hand you work.</p>
+        <div class="agent-foot">
+          <div class="agent-tags">
+            <span class="agent-tag">review</span>
+            <span class="agent-tag">evals</span>
+          </div>
+          <button class="agent-action">Hire →</button>
+        </div>
+      </article>
+
+      <!-- regular 07 -->
+      <article class="agent-card">
+        <div class="agent-head">
+          <span>N°&nbsp;07 / Design</span>
+          <span class="status">Available</span>
+        </div>
+        <h3 class="agent-name">Otis</h3>
+        <div class="agent-handle">@otis — the designer</div>
+        <p class="agent-desc">Composes figures, wireframes, and slide decks. Understands type as a material, not a setting.</p>
+        <div class="agent-foot">
+          <div class="agent-tags">
+            <span class="agent-tag">figma</span>
+            <span class="agent-tag">decks</span>
+          </div>
+          <button class="agent-action">Hire →</button>
+        </div>
+      </article>
+
+      <!-- regular 08 -->
+      <article class="agent-card">
+        <div class="agent-head">
+          <span>N°&nbsp;08 / Archive</span>
+          <span class="status idle">Idle</span>
+        </div>
+        <h3 class="agent-name">Mira</h3>
+        <div class="agent-handle">@mira — the librarian</div>
+        <p class="agent-desc">Remembers what you said six months ago. Surfaces the old note, the old decision, the email you forgot to send.</p>
+        <div class="agent-foot">
+          <div class="agent-tags">
+            <span class="agent-tag">memory</span>
+            <span class="agent-tag">search</span>
+          </div>
+          <button class="agent-action">Hire →</button>
+        </div>
+      </article>
+
+      <!-- regular 09 -->
+      <article class="agent-card">
+        <div class="agent-head">
+          <span>N°&nbsp;09 / Custom</span>
+          <span class="status">Open</span>
+        </div>
+        <h3 class="agent-name"><em style="font-family: 'Instrument Serif', serif; color: var(--accent); font-weight: 400;">You name it</em></h3>
+        <div class="agent-handle">@——— — your own</div>
+        <p class="agent-desc">Bring a job description. We'll interview, train, and introduce it to the rest of the studio. Your agent. Your roster.</p>
+        <div class="agent-foot">
+          <div class="agent-tags">
+            <span class="agent-tag">custom</span>
+            <span class="agent-tag">private</span>
+          </div>
+          <button class="agent-action">Commission →</button>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="process">
+  <div class="wrap">
+    <header class="section-head">
+      <div class="num"><strong>§02</strong> &nbsp;/&nbsp; The process</div>
+      <h2 class="title">A day at the <em>studio</em>.</h2>
+      <div class="kicker">Four beats. No dashboards, no plumbing.</div>
+    </header>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num"><span>Beat 01 — Morning</span><span class="dot accent"></span></div>
+        <h3>You <em>arrive</em> with a problem.</h3>
+        <p>Drop a doc, a link, a half-finished thought. The studio reads it before you finish your coffee.</p>
+        <div class="step-glyph">┌─── 08:42 ──────┐
+│ new brief      │
+│ ↳ marlowe      │
+│ ↳ mira         │
+└────────────────┘</div>
+      </div>
+      <div class="step">
+        <div class="step-num"><span>Beat 02 — Mid-morning</span><span class="dot"></span></div>
+        <h3>Agents <em>confer</em> in the margins.</h3>
+        <p>Hestia routes, Marlowe reads, Pascal runs numbers. You watch the thread like a chat, not a graph.</p>
+        <div class="step-glyph">hestia  ▸ routed (3)
+marlowe ▸ reading…
+pascal  ▸ 14 queries
+verity  ▸ standing by</div>
+      </div>
+      <div class="step">
+        <div class="step-num"><span>Beat 03 — Afternoon</span><span class="dot"></span></div>
+        <h3>You <em>steer</em>, not babysit.</h3>
+        <p>Tap an agent on the shoulder. Rewrite a paragraph. Reject a draft. They learn on the spot.</p>
+        <div class="step-glyph">◆ draft v1  → rejected
+◆ draft v2  → noted
+◆ draft v3  → accepted
+   (in your voice, finally)</div>
+      </div>
+      <div class="step">
+        <div class="step-num"><span>Beat 04 — Close</span><span class="dot"></span></div>
+        <h3>Work <em>ships</em> with your name.</h3>
+        <p>Signed, reviewed, accountable. Every artefact carries a chain of custody you can read.</p>
+        <div class="step-glyph">shipped: memo-q2.md
+  by: you
+  w/: marlowe, juno, verity
+  at: 16:31
+  ✓ reviewed</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<div class="quote-strip">
+  <div class="wrap">
+    <blockquote>
+      “I stopped <em>supervising</em> the tools and started working <em>with</em> them.”
+    </blockquote>
+    <cite><strong>Ines Halabi</strong> &nbsp;/&nbsp; Editor-in-chief, The Slow Press</cite>
+  </div>
+</div>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="wrap">
+    <header class="section-head">
+      <div class="num"><strong>§03</strong> &nbsp;/&nbsp; The terms</div>
+      <h2 class="title">Hire by the <em>hour</em>, the seat, or the studio.</h2>
+      <div class="kicker">Priced in sessions, not tokens. No surprise invoices.</div>
+    </header>
+
+    <div class="pricing">
+      <div class="plan">
+        <div class="plan-head">
+          <div>
+            <div class="plan-name">Guest</div>
+            <div class="plan-price"><span class="currency">$</span>0<span class="period">/ month</span></div>
+          </div>
+          <span class="tag-badge">Trial</span>
+        </div>
+        <p class="plan-desc">Borrow the studio for a week. Hire up to two agents, keep your drafts.</p>
+        <ul>
+          <li>2 agents of your choosing</li>
+          <li>50 working sessions / month</li>
+          <li>Dispatches, delivered</li>
+          <li>Community room access</li>
+        </ul>
+        <a href="#" class="btn ghost" style="border:1px solid var(--ink);">Start free <span class="arrow">→</span></a>
+      </div>
+
+      <div class="plan feature">
+        <div class="plan-head">
+          <div>
+            <div class="plan-name">Resident <em>✦</em></div>
+            <div class="plan-price"><span class="currency">$</span>32<span class="period">/ month</span></div>
+          </div>
+          <span class="tag-badge">Most chosen</span>
+        </div>
+        <p class="plan-desc">A seat at the big table. Full roster, shared documents, long memory.</p>
+        <ul>
+          <li>All nine house agents</li>
+          <li>Unlimited working sessions</li>
+          <li>Persistent, portable memory</li>
+          <li>Connect any tool (Drive, GitHub, Notion)</li>
+          <li>Priority latency routing</li>
+        </ul>
+        <a href="#" class="btn">Take a seat <span class="arrow">→</span></a>
+      </div>
+
+      <div class="plan">
+        <div class="plan-head">
+          <div>
+            <div class="plan-name">Studio</div>
+            <div class="plan-price"><span class="currency">$</span>—<span class="period">/ bespoke</span></div>
+          </div>
+          <span class="tag-badge">Teams</span>
+        </div>
+        <p class="plan-desc">Your own studio, your own roster, your own house rules. For teams of 5+.</p>
+        <ul>
+          <li>Custom-trained agents</li>
+          <li>Shared roster & workspaces</li>
+          <li>SSO, audit logs, data residency</li>
+          <li>Named onboarding steward</li>
+          <li>Evals reviewed quarterly</li>
+        </ul>
+        <a href="#" class="btn ghost" style="border:1px solid var(--ink);">Talk to us <span class="arrow">→</span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DISPATCHES -->
+<section id="dispatches">
+  <div class="wrap">
+    <header class="section-head">
+      <div class="num"><strong>§04</strong> &nbsp;/&nbsp; The dispatches</div>
+      <h2 class="title">From the <em>studio press</em>.</h2>
+      <div class="kicker">Essays, field notes, and working papers.</div>
+    </header>
+
+    <div class="dispatches">
+      <a href="#" class="dispatch">
+        <div class="meta"><span class="cat">Field note</span><span>Apr 14 · 7 min</span></div>
+        <h4>Why we priced <em>per session</em>, not per token.</h4>
+        <p class="excerpt">Token pricing makes sense for platforms. It does not make sense for people trying to do a day's work without a spreadsheet.</p>
+        <div class="author">— Sana Okafor, co-founder</div>
+      </a>
+      <a href="#" class="dispatch">
+        <div class="meta"><span class="cat">Dossier 04</span><span>Apr 09 · 22 min</span></div>
+        <h4>Designing evals for the <em>long-running</em> agent.</h4>
+        <p class="excerpt">Snapshot benchmarks miss what matters. We run our agents through a week of actual work, end-to-end, in the open.</p>
+        <div class="author">— Research team</div>
+      </a>
+      <a href="#" class="dispatch">
+        <div class="meta"><span class="cat">Studio diary</span><span>Mar 31 · 4 min</span></div>
+        <h4>A small room beats a <em>large platform</em>.</h4>
+        <p class="excerpt">We chose to build something cramped and specific before something roomy and general. Here's what that decision cost us.</p>
+        <div class="author">— David Mwangi</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bottom">
+  <div class="wrap">
+    <div class="bottom-grid">
+      <div>
+        <div class="bigmark">with<em>&amp;</em><br>agents.</div>
+        <p>A working press for people and their agents. Made in small rooms, on slow afternoons.</p>
+      </div>
+      <div>
+        <h5>Studio</h5>
+        <ul>
+          <li><a href="#">Roster</a></li>
+          <li><a href="#">Process</a></li>
+          <li><a href="#">Terms</a></li>
+          <li><a href="#">Custom agents</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Press</h5>
+        <ul>
+          <li><a href="#">Dispatches</a></li>
+          <li><a href="#">Dossiers</a></li>
+          <li><a href="#">Field notes</a></li>
+          <li><a href="#">Subscribe</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>House</h5>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Principles</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h5>Legal</h5>
+        <ul>
+          <li><a href="#">Terms</a></li>
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Data residency</a></li>
+          <li><a href="#">Evals</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <div>© 2026 Withagents Studio Ltd. &nbsp;/&nbsp; A working press.</div>
+      <div>Vol. II — Iss. 07</div>
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== TWEAKS ===================== -->
+<div id="tweaks">
+  <h6><strong>Tweaks</strong> <span>/ studio settings</span></h6>
+
+  <div class="tweak-group">
+    <label>Theme</label>
+    <div class="chips" data-key="theme">
+      <button class="chip" data-val="hyper">Hyper</button>
+      <button class="chip" data-val="synthwave">Synthwave</button>
+      <button class="chip" data-val="midnight">Midnight</button>
+      <button class="chip" data-val="voltage">Voltage</button>
+      <button class="chip" data-val="toxic">Toxic</button>
+      <button class="chip" data-val="sunset">Sunset</button>
+      <button class="chip" data-val="blood">Blood</button>
+    </div>
+  </div>
+
+  <div class="tweak-group">
+    <label>Accent</label>
+    <div class="swatch-row" data-key="accent">
+      <button class="swatch" data-val="hotpink" style="background:#ff2d95" title="Hot Pink"></button>
+      <button class="swatch" data-val="purple" style="background:#b24bff" title="Purple"></button>
+      <button class="swatch" data-val="orange" style="background:#ff8a1f" title="Orange"></button>
+      <button class="swatch" data-val="cyan" style="background:#3df0ff" title="Cyan"></button>
+      <button class="swatch" data-val="acid" style="background:#c6ff2d" title="Acid"></button>
+      <button class="swatch" data-val="magenta" style="background:#ff00aa" title="Magenta"></button>
+      <button class="swatch" data-val="lemon" style="background:#f0ff00" title="Lemon"></button>
+      <button class="swatch" data-val="mint" style="background:#3dff88" title="Mint"></button>
+      <button class="swatch" data-val="crimson" style="background:#ff1a44" title="Crimson"></button>
+    </div>
+  </div>
+
+  <div class="tweak-group">
+    <label>Display type</label>
+    <div class="chips" data-key="display">
+      <button class="chip" data-val="fraunces">Fraunces</button>
+      <button class="chip" data-val="instrument">Instrument</button>
+      <button class="chip" data-val="intertight">Inter&nbsp;Tight</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const state = { ...TWEAK_DEFAULTS };
+  const body = document.body;
+
+  function apply() {
+    body.setAttribute('data-theme', state.theme);
+    body.setAttribute('data-accent', state.accent);
+    body.setAttribute('data-display', state.display);
+    document.querySelectorAll('#tweaks [data-key]').forEach(grp => {
+      const key = grp.getAttribute('data-key');
+      grp.querySelectorAll('[data-val]').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-val') === state[key]);
+      });
+    });
+  }
+
+  document.querySelectorAll('#tweaks [data-key]').forEach(grp => {
+    const key = grp.getAttribute('data-key');
+    grp.querySelectorAll('[data-val]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state[key] = btn.getAttribute('data-val');
+        apply();
+        try {
+          window.parent.postMessage({ type: '__edit_mode_set_keys', edits: { [key]: state[key] } }, '*');
+        } catch(e){}
+      });
+    });
+  });
+
+  apply();
+
+  // Tweaks host protocol — listener first, then announce
+  window.addEventListener('message', (e) => {
+    const d = e.data || {};
+    if (d.type === '__activate_edit_mode') document.getElementById('tweaks').classList.add('visible');
+    if (d.type === '__deactivate_edit_mode') document.getElementById('tweaks').classList.remove('visible');
+  });
+  try { window.parent.postMessage({ type: '__edit_mode_available' }, '*'); } catch(e){}
+})();
+</script>
+</body>
+</html>

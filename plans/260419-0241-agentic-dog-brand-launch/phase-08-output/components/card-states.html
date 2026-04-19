@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WithAgents — Card States</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-void:        #040404;
+    --panel-1:        #0A0A0D;
+    --panel-2:        #111116;
+    --panel-3:        #15151C;
+    --text-primary:   #F5F5F7;
+    --text-muted:     #A1A1AA;
+    --accent:         #8B5CF6;
+    --accent-alt:     #C084FC;
+    --accent-hot:     #E879F9;
+    --accent-lime:    #A3E635;
+    --border:         rgba(255,255,255,0.10);
+    --accent-wash:    rgba(139,92,246,0.12);
+    --font-display:   'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-body:      'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-mono:      'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    --radius-sm:      4px;
+    --radius-md:      8px;
+    --space-xs:       6px;
+    --space-sm:       12px;
+    --space-md:       20px;
+    --space-lg:       32px;
+    --space-xl:       48px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-void);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.6;
+    padding: var(--space-xl);
+  }
+
+  .states-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: var(--space-lg);
+    max-width: 1200px;
+  }
+
+  .state-cell {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+  }
+
+  .state-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    padding: 4px var(--space-xs);
+    background: var(--panel-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    display: inline-block;
+    align-self: flex-start;
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: var(--space-lg);
+  }
+
+  /* Card base */
+  .card {
+    background: var(--panel-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* STATE: Default */
+  .card--default {}
+
+  /* STATE: Hover */
+  .card--hover {
+    border-color: rgba(139,92,246,0.35);
+    background: var(--panel-2);
+    box-shadow: 0 0 0 1px rgba(139,92,246,0.08), 0 4px 20px rgba(0,0,0,0.4);
+  }
+
+  /* STATE: Focus-visible */
+  .card--focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* STATE: Active */
+  .card--active {
+    background: var(--panel-3);
+    border-color: rgba(139,92,246,0.28);
+    transform: scale(0.99);
+  }
+
+  /* STATE: Featured */
+  .card--featured {
+    border-color: rgba(139,92,246,0.28);
+    background: linear-gradient(135deg, var(--panel-2) 0%, color-mix(in srgb, var(--panel-2) 85%, var(--accent) 15%) 100%);
+  }
+  .card--featured::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.5;
+  }
+
+  /* STATE: Loading */
+  .card--loading {
+    pointer-events: none;
+  }
+
+  @keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position:  200% 0; }
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, var(--panel-2) 25%, var(--panel-3) 50%, var(--panel-2) 75%);
+    background-size: 200% 100%;
+    border-radius: var(--radius-sm);
+    height: 12px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .skeleton { animation: shimmer 1.6s ease-in-out infinite; }
+  }
+
+  .skeleton--title  { height: 18px; width: 80%; }
+  .skeleton--body1  { height: 12px; width: 100%; }
+  .skeleton--body2  { height: 12px; width: 70%; }
+  .skeleton--tag    { height: 20px; width: 64px; border-radius: 100px; }
+  .skeleton--eye    { height: 10px; width: 40px; }
+
+  /* STATE: Empty */
+  .card--empty {
+    border: 1px dashed rgba(255,255,255,0.12);
+    background: transparent;
+    align-items: center;
+    justify-content: center;
+    min-height: 140px;
+  }
+
+  .card__empty-text {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    opacity: 0.6;
+  }
+
+  /* STATE: Disabled */
+  .card--disabled {
+    opacity: 0.38;
+    pointer-events: none;
+  }
+
+  /* Inner elements */
+  .card__eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .card__eyebrow--featured { color: var(--accent-alt); }
+
+  .card__title {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  .card__body {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  .card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: var(--space-xs);
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--border);
+  }
+
+  .card__meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .card__arrow {
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+  }
+
+  .card--hover .card__arrow { color: var(--accent-alt); }
+  .card--featured .card__arrow { color: var(--accent-alt); }
+</style>
+</head>
+<body>
+
+<p class="page-title">withagents.dev — Card · All States</p>
+
+<div class="states-grid">
+
+  <!-- Default -->
+  <div class="state-cell">
+    <span class="state-label">Default</span>
+    <article class="card card--default">
+      <span class="card__eyebrow">Field Notes</span>
+      <h2 class="card__title">Context persistence is a product design problem</h2>
+      <p class="card__body">Not just a retrieval problem. The design decisions made at the operator layer determine whether your agent stack is trustworthy at scale.</p>
+      <div class="card__footer">
+        <span class="card__meta">7 min read · Apr 2026</span>
+        <span class="card__arrow">Read <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6h7m0 0L6.5 3m3 3L6.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+    </article>
+  </div>
+
+  <!-- Hover -->
+  <div class="state-cell">
+    <span class="state-label">Hover</span>
+    <article class="card card--hover">
+      <span class="card__eyebrow">Field Notes</span>
+      <h2 class="card__title">Context persistence is a product design problem</h2>
+      <p class="card__body">Not just a retrieval problem. The design decisions made at the operator layer determine whether your agent stack is trustworthy at scale.</p>
+      <div class="card__footer">
+        <span class="card__meta">7 min read · Apr 2026</span>
+        <span class="card__arrow">Read <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6h7m0 0L6.5 3m3 3L6.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+    </article>
+  </div>
+
+  <!-- Focus-visible -->
+  <div class="state-cell">
+    <span class="state-label">Focus-visible</span>
+    <article class="card card--focus">
+      <span class="card__eyebrow">Field Notes</span>
+      <h2 class="card__title">Context persistence is a product design problem</h2>
+      <p class="card__body">Not just a retrieval problem. The design decisions made at the operator layer determine whether your agent stack is trustworthy at scale.</p>
+      <div class="card__footer">
+        <span class="card__meta">7 min read · Apr 2026</span>
+        <span class="card__arrow">Read <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6h7m0 0L6.5 3m3 3L6.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+    </article>
+  </div>
+
+  <!-- Active -->
+  <div class="state-cell">
+    <span class="state-label">Active (pressed)</span>
+    <article class="card card--active">
+      <span class="card__eyebrow">Field Notes</span>
+      <h2 class="card__title">Context persistence is a product design problem</h2>
+      <p class="card__body">Not just a retrieval problem. The design decisions made at the operator layer determine whether your agent stack is trustworthy at scale.</p>
+      <div class="card__footer">
+        <span class="card__meta">7 min read · Apr 2026</span>
+        <span class="card__arrow">Read <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6h7m0 0L6.5 3m3 3L6.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+    </article>
+  </div>
+
+  <!-- Featured -->
+  <div class="state-cell">
+    <span class="state-label">Featured</span>
+    <article class="card card--featured">
+      <span class="card__eyebrow card__eyebrow--featured">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true" style="display:inline;vertical-align:middle;margin-right:3px"><path d="M5 0.5l1.1 2.2 2.4.35-1.75 1.7.41 2.4L5 6l-2.16 1.15.41-2.4L1.5 3.05l2.4-.35L5 .5z"/></svg>
+        Featured
+      </span>
+      <h2 class="card__title">Context persistence is a product design problem</h2>
+      <p class="card__body">Not just a retrieval problem. The design decisions made at the operator layer determine whether your agent stack is trustworthy at scale.</p>
+      <div class="card__footer">
+        <span class="card__meta">7 min read · Apr 2026</span>
+        <span class="card__arrow" style="color:var(--accent-alt)">Read <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6h7m0 0L6.5 3m3 3L6.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+    </article>
+  </div>
+
+  <!-- Loading -->
+  <div class="state-cell">
+    <span class="state-label">Loading</span>
+    <article class="card card--loading" aria-busy="true" aria-label="Loading content">
+      <div class="skeleton skeleton--eye"></div>
+      <div class="skeleton skeleton--title"></div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div class="skeleton skeleton--body1"></div>
+        <div class="skeleton skeleton--body2"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding-top:var(--space-sm);border-top:1px solid var(--border)">
+        <div class="skeleton skeleton--tag"></div>
+        <div class="skeleton skeleton--eye"></div>
+      </div>
+    </article>
+  </div>
+
+  <!-- Empty -->
+  <div class="state-cell">
+    <span class="state-label">Empty</span>
+    <article class="card card--empty" aria-label="No content available">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true" style="opacity:0.25;margin-bottom:8px"><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.5"/><path d="M7 8h10M7 12h6M7 16h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <p class="card__empty-text">No articles yet</p>
+    </article>
+  </div>
+
+  <!-- Disabled -->
+  <div class="state-cell">
+    <span class="state-label">Disabled</span>
+    <article class="card card--disabled" aria-disabled="true">
+      <span class="card__eyebrow">Field Notes</span>
+      <h2 class="card__title">Context persistence is a product design problem</h2>
+      <p class="card__body">Not just a retrieval problem. The design decisions made at the operator layer determine whether your agent stack is trustworthy at scale.</p>
+      <div class="card__footer">
+        <span class="card__meta">7 min read · Apr 2026</span>
+        <span class="card__arrow">Read <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6h7m0 0L6.5 3m3 3L6.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+    </article>
+  </div>
+
+</div>
+</body>
+</html>

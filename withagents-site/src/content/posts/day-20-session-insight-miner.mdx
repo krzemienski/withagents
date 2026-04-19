@@ -1,0 +1,63 @@
+---
+title: "The miner that reads 11.6 gigabytes of JSONL and returns a sentence you can publish"
+subtitle: "session-insight-miner — how 696 MB of raw transcripts became 18 reusable insights"
+slug: day-20-session-insight-miner
+date: "2026-05-15"
+author: Nick Krzemienski
+kind: field-note
+tags:
+  - WithAgents
+  - SessionMining
+  - AgentDesign
+  - NonInteractive
+relatedProjectSlugs:
+  - session-insight-miner
+  - sessionforge
+  - code-tales
+readTime: 6
+excerpt: "I could not keep saying 23,479 sessions unless I could grep them. session-insight-miner is the small companion script that makes the number survive."
+---
+
+I could not keep saying 23,479 sessions unless I could grep them.
+
+That is the only reason this repo exists. SessionForge is the larger claim: a shipped tool that reads its own JSONL and produces a publishable pipeline. session-insight-miner is the smaller one underneath it: the script I ran on every project directory before I was allowed to write a sentence with a number in it.
+
+## The shape of the problem
+
+The mine directory is a 42-day slice across 27 projects. 3,474,754 lines of interaction data, 11.6 GB on disk. Every session is a line-delimited JSON file sitting under `~/.claude/projects/`. The top-level tools, Read (87,152 invocations), Bash (82,552), Grep (21,821), Edit (19,979), Glob (11,769), are in there, but you cannot see them without reading every file.
+
+A naive grep works once and then you get it wrong the second time. You miscount because one project double-counted agent-spawned sessions. You miscount because a Task invocation generated a fresh JSONL that you treat as a new user session. You miscount because a Bash call piped into jq produced a fake Bash invocation inside the assistant response.
+
+The only fix is a small program you trust more than your own re-reads.
+
+## What `scripts/deep-mine.py` actually does
+
+The canonical script is `scripts/deep-mine.py`. The outputs it writes, `mine-30d-data.json`, `mine-360d-data.json`, `full-mine-data.json`, are the only numbers I cite in the blog series. If a number is not in one of those files, it is not in a post.
+
+The script walks the session tree and builds three views of the corpus:
+
+1. **Tool leaderboard.** Every `tool_use` block in every assistant message, aggregated by tool name. That is where the 87,152 Read count comes from. Every Agent/Task invocation is counted twice: once as a tool use in the parent session, once as a root-level JSONL under a child project.
+
+2. **Agent-spawn graph.** Every Agent invocation is cross-referenced with a child session file. The ratio you get when you finish this pass is the reason the subtitle says 18,945 agent-spawned sessions: 4x the 4,534 human-started count. The series thesis is an artifact of this cross-reference.
+
+3. **Project weight.** Per-project totals: files, lines, size in bytes, first and last session timestamps. This is where product-inventory.md's `arc_days` and `360d_files` columns came from. Every product row you see in the inventory was measured, not remembered.
+
+None of those three are hard to write. The hard part is trusting the third one when your hands want to round.
+
+## The receipt discipline
+
+The reason I keep the mine script in a repo at all, instead of deleting it after each content sprint, is that every claim in every post has to survive the question, *where did this number come from?*
+
+TODO(day-60-metrics): Day 60 retro will cite exact session counts for the 45/60-day push against this same script re-run on the new window. The shape of this sentence is a promise to that future self.
+
+In practice this means the script has three modes: full-mine (everything), window-mine (last N days), and project-mine (one directory). Every blog post cites which mode produced its number. SessionForge is the productized version of the same discipline: a web app that does the mining, instead of a Python file I invoke by hand.
+
+Neither tool lets me publish a number I have not re-derived on the current dataset. That is the whole value proposition.
+
+## What I don't know
+
+I do not know whether the 81% agent-spawned ratio holds across a 60-day push the way it held for 42 days. I also do not know whether the ratio is stable project-to-project or whether one project (likely ils-ios, given its 3,596-file total) is pulling the average up alone. Those are the two questions the Day 21 insight post is going to answer, and the only reason it can answer them at all is that the miner runs on-demand against whatever window I ask for.
+
+How cool is that? A script that takes 11.6 GB of transcripts and hands back a single line you can put under a blog title. That is the receipt layer under every claim WithAgents makes this launch.
+
+session-insight-miner is the small one. SessionForge is the big one. They both start with the same move: read the logs before you write the claim.

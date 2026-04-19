@@ -1,0 +1,22 @@
+---
+// Keystatic admin UI route.
+// Renders the Keystatic CMS at /keystatic (and all sub-paths).
+//
+// Requirements:
+//   pnpm add @keystatic/core @keystatic/astro @astrojs/react
+//
+// In astro.config.mjs add:
+//   import keystatic from '@keystatic/astro';
+//   import react from '@astrojs/react';
+//   integrations: [react(), keystatic()]
+//
+// This route is only active in development (output: 'server' or hybrid).
+// In production builds, /keystatic/** returns 404 unless you explicitly
+// deploy with SSR. See Phase 11 for GitHub storage + production admin setup.
+
+export const prerender = false;
+
+import KeystaticApp from '@keystatic/astro/ui';
+---
+
+<KeystaticApp />

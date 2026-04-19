@@ -1,0 +1,68 @@
+---
+title: "The validator that refuses to report PASS unless a browser actually rendered the page"
+subtitle: "Playwright Validation Pipeline — the companion harness under ValidationForge"
+slug: day-27-playwright-validation-pipeline
+date: "2026-05-22"
+author: Nick Krzemienski
+kind: production-analysis
+tags:
+  - WithAgents
+  - Validation
+  - Playwright
+  - Interactive
+relatedProjectSlugs:
+  - playwright-validation-pipeline
+  - validationforge
+readTime: 6
+excerpt: "An agent that clicks through the browser and captures frames. Every PASS verdict cites a screenshot by file path. Every FAIL cites the frame that failed."
+---
+
+A build that compiles is not a feature that works.
+
+The `block-test-files.js` hook fired 642 times across the series dataset: once per attempt by an agent to write a test file that would rubber-stamp its own implementation. Every fire was a reminder that *unit-testable* and *usable* are two different specs. Playwright Validation Pipeline is what ran on the other side of that hook: the harness that exercised the real UI and decided whether the button clicked, the page rendered, the form submitted, the response landed.
+
+## What the pipeline actually does
+
+It is not a Playwright wrapper. It is a contract.
+
+Every journey gets a directory. Every directory gets an `evidence-inventory.txt`. Every step gets a numbered file: `step-01-navigate-to-login.png`, `step-02-submit-credentials.json`, `step-03-dashboard-loaded.png`, `step-04-console-errors.txt`. The pipeline does not report PASS unless every file in its inventory is non-empty and the console log is readable.
+
+The harness enforces one rule: no synthetic evidence. A screenshot that shows a blank page is not evidence of a rendered page. A 200 response with an empty body is not evidence of a feature. A console log without timestamps is not a log. Each check fires against the actual running system, `npm run dev` on the side, or the deploy URL on the live side, and each verdict cites a path the reviewer can open.
+
+## Why it sits next to ValidationForge, not inside it
+
+ValidationForge is the plugin: hooks, skills, the Iron Rule compiled into the runtime. Playwright Validation Pipeline is the web-specific harness the Iron Rule enforces on. VF says *do not fake the evidence*; this repo is the shape that discipline takes when the thing under test is a web app.
+
+The split matters because VF ships engines for multiple surfaces. VALIDATE beta covers the generic contract. CONSENSUS and FORGE are planned. Playwright Validation Pipeline is the first dedicated engine that hits browsers. iOS got its own harness (ios-validation-runner, under ils-ios). The API harness is a separate script library. Every platform gets a dedicated runner: the surface determines the evidence format, but the Iron Rule stays constant.
+
+## What goes wrong when you skip it
+
+The series has a Post 3 receipt that I keep quoting because it is the clearest case: an agent wrote `deleteUserAccount()` with a TODO body, wrote a mocked test that asserted the function was called, and reported green. Static checks passed. Lint passed. The test suite passed. The button, clicked by a real browser, did nothing.
+
+Four categories of bug a unit-test harness cannot catch when the same model writes both sides:
+
+1. **Visual rendering.** The form exists. The submit button is off-screen.
+2. **Integration boundary.** The endpoint returns 200. The payload schema does not match.
+3. **State on the second interaction.** First click works. Second click throws because state was not reset.
+4. **Platform-specific layout.** Desktop passes. Mobile viewport clips the primary CTA.
+
+All four get caught by a browser playing back the journey. None get caught by a test the author also wrote.
+
+## The evidence shape
+
+Every journey directory in this pipeline writes:
+
+- **Screenshots** at every state transition, not just success states.
+- **DOM snapshots** captured as HTML or structured JSON after each interaction.
+- **Console logs** with timestamps, retained across the run.
+- **Network logs** when an API boundary is under test.
+- **API response bodies + headers**, not just status codes.
+- **CLI output** for any shell-side step in the journey.
+
+The `report.md` at the bottom of the evidence tree is the only thing that tells a reviewer PASS or FAIL. Every line cites a file path. A skeptical reviewer opens the files and checks. There is no other format. Validation theater depends on verdicts you cannot audit: this pipeline is designed so every verdict gets audited by default.
+
+## What I don't know
+
+I do not know whether the evidence-retention policy scales past one laptop. Every run produces a directory; every FAIL run keeps its evidence indefinitely until explicit cleanup. The cleanup log goes to `e2e-evidence/cleanup.log` and a lock file prevents purges during in-progress runs. None of that has been tested against a CI environment with multiple parallel journeys fighting for the same workspace. The harness runs locally well; the CI story is still the next open question.
+
+What I do know: every PASS the pipeline has returned this year is backed by a file I can open. That is what I have to defend, and that is what the repo ships.

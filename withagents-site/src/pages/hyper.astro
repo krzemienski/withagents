@@ -1,0 +1,466 @@
+---
+// /hyper — standalone cyberpunk variant
+// Rendered without BaseLayout (has its own full CSS system)
+// A small "back" link is added top-left so visitors can exit
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>WithAgents · Hyper</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Sora:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+      :root {
+        --hyper-bg:      #020202;
+        --hyper-panel:   #0A0006;
+        --hyper-surface: #12000C;
+        --hyper-pink:    #FF00AA;
+        --hyper-lime:    #A3E635;
+        --hyper-purple:  #C084FC;
+        --hyper-text:    #F5F5F7;
+        --hyper-muted:   #A1A1AA;
+      }
+
+      html, body {
+        background: var(--hyper-bg);
+        color: var(--hyper-text);
+        font-family: 'IBM Plex Mono', ui-monospace, monospace;
+        min-height: 100vh;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      a { color: inherit; text-decoration: none; }
+
+      /* ── Back link ── */
+      .back-link {
+        position: fixed;
+        top: 16px;
+        left: 16px;
+        z-index: 100;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--hyper-muted);
+        background: rgba(2,2,2,0.85);
+        border: 1px solid rgba(255,0,170,0.20);
+        padding: 6px 12px;
+        transition: color 0.2s, border-color 0.2s;
+      }
+      .back-link:hover { color: var(--hyper-pink); border-color: rgba(255,0,170,0.60); }
+
+      /* ── Hyper nav ── */
+      .hyper-nav {
+        background: rgba(2,2,2,0.85);
+        border-bottom: 1px solid rgba(255,0,170,0.15);
+        backdrop-filter: blur(12px);
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        max-width: 1440px;
+        margin: 0 auto;
+      }
+
+      .hyper-wordmark {
+        font-family: 'Sora', sans-serif;
+        font-size: 18px;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        color: var(--hyper-text);
+        text-shadow: 0 0 20px rgba(255,0,170,0.5);
+      }
+
+      .hyper-nav-links {
+        display: flex;
+        gap: 24px;
+        list-style: none;
+      }
+
+      .hyper-nav-links a {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--hyper-muted);
+        transition: color 0.2s;
+      }
+
+      .hyper-nav-links a:hover { color: var(--hyper-pink); }
+
+      /* ── Main ── */
+      main {
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* ── Hero ── */
+      .hero {
+        padding: 120px 0 80px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .hero::before {
+        content: '';
+        position: absolute;
+        top: -200px; right: -200px;
+        width: 600px; height: 600px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(255,0,170,0.12) 0%, transparent 70%);
+        pointer-events: none;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--hyper-muted);
+        margin-bottom: 32px;
+      }
+
+      .pulse-dot {
+        width: 6px; height: 6px;
+        border-radius: 50%;
+        background: var(--hyper-pink);
+        box-shadow: 0 0 8px var(--hyper-pink);
+        animation: pulse-ring 2s ease-in-out infinite;
+      }
+
+      @keyframes pulse-ring {
+        0%, 100% { box-shadow: 0 0 8px var(--hyper-pink); }
+        50% { box-shadow: 0 0 20px var(--hyper-pink), 0 0 40px rgba(255,0,170,0.3); }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .pulse-dot { animation: none; }
+      }
+
+      .hero-h1 {
+        font-family: 'Sora', sans-serif;
+        font-size: clamp(48px, 8vw, 96px);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 0.9;
+        color: var(--hyper-text);
+        margin-bottom: 32px;
+      }
+
+      .hero-h1 .accent { color: var(--hyper-pink); }
+
+      .hero-sub {
+        font-size: 16px;
+        color: var(--hyper-muted);
+        max-width: 560px;
+        line-height: 1.6;
+        margin-bottom: 48px;
+      }
+
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--hyper-pink);
+        color: #020202;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        font-weight: 600;
+        padding: 14px 28px;
+        border: none;
+        cursor: pointer;
+        transition: box-shadow 0.2s;
+        text-decoration: none;
+      }
+
+      .btn-primary:hover {
+        box-shadow: 0 0 30px rgba(255,0,170,0.5);
+      }
+
+      .btn-ghost {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        background: transparent;
+        color: var(--hyper-muted);
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        padding: 14px 28px;
+        border: 1px solid rgba(255,0,170,0.25);
+        cursor: pointer;
+        transition: border-color 0.2s, color 0.2s;
+        text-decoration: none;
+      }
+
+      .btn-ghost:hover { border-color: rgba(255,0,170,0.70); color: var(--hyper-text); }
+
+      .cta-row {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+
+      /* ── Terminal block ── */
+      .terminal {
+        background: var(--hyper-panel);
+        border: 1px solid rgba(255,0,170,0.15);
+        margin: 64px 0;
+        max-width: 680px;
+      }
+
+      .terminal-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        background: var(--hyper-surface);
+        border-bottom: 1px solid rgba(255,0,170,0.12);
+        font-size: 10px;
+        color: var(--hyper-muted);
+      }
+
+      .terminal-dot {
+        width: 10px; height: 10px;
+        border-radius: 50%;
+      }
+
+      .terminal-body {
+        padding: 20px 16px;
+        font-size: 12px;
+        line-height: 1.8;
+        color: #A1A1AA;
+      }
+
+      .line-num { color: #494454; margin-right: 12px; user-select: none; }
+      .kw-pink { color: var(--hyper-pink); }
+      .kw-lime { color: var(--hyper-lime); }
+      .kw-purple { color: var(--hyper-purple); }
+      .kw-muted { color: var(--hyper-muted); }
+
+      /* ── Grid ── */
+      .section-label {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        color: var(--hyper-pink);
+        margin-bottom: 16px;
+      }
+
+      .section-heading {
+        font-family: 'Sora', sans-serif;
+        font-size: clamp(28px, 4vw, 48px);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        color: var(--hyper-text);
+        margin-bottom: 48px;
+      }
+
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1px;
+        background: rgba(255,0,170,0.08);
+        border: 1px solid rgba(255,0,170,0.08);
+        margin-bottom: 96px;
+      }
+
+      .card {
+        background: var(--hyper-panel);
+        padding: 32px;
+        position: relative;
+        overflow: hidden;
+        transition: background 0.2s;
+      }
+
+      .card:hover { background: var(--hyper-surface); }
+
+      .card-chip {
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.16em;
+        background: var(--hyper-surface);
+        padding: 3px 8px;
+        display: inline-block;
+        margin-bottom: 16px;
+      }
+
+      .card-title {
+        font-family: 'Sora', sans-serif;
+        font-size: 20px;
+        font-weight: 700;
+        color: var(--hyper-text);
+        margin-bottom: 12px;
+        letter-spacing: -0.02em;
+      }
+
+      .card-desc {
+        font-size: 12px;
+        color: var(--hyper-muted);
+        line-height: 1.7;
+      }
+
+      .card-link {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--hyper-muted);
+        margin-top: 24px;
+        transition: color 0.2s;
+      }
+
+      .card:hover .card-link { color: var(--hyper-pink); }
+
+      /* ── Footer ── */
+      .hyper-footer {
+        border-top: 1px solid rgba(255,0,170,0.12);
+        padding: 32px 0 64px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+      }
+
+      .hyper-footer .wordmark {
+        font-family: 'Sora', sans-serif;
+        font-size: 16px;
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        color: rgba(255,255,255,0.25);
+      }
+
+      .hyper-footer .links {
+        display: flex;
+        gap: 24px;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: rgba(255,255,255,0.25);
+      }
+
+      .hyper-footer .links a:hover { color: var(--hyper-pink); }
+
+      .hyper-footer .copy {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.10em;
+        color: rgba(255,255,255,0.15);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Back to main site -->
+    <a href="/" class="back-link" aria-label="Back to main site">← Main site</a>
+
+    <!-- Nav -->
+    <div style="position:sticky;top:0;z-index:50;background:rgba(2,2,2,0.85);border-bottom:1px solid rgba(255,0,170,0.15);backdrop-filter:blur(12px);">
+      <nav class="hyper-nav" aria-label="Primary">
+        <span class="hyper-wordmark">withagents/hyper</span>
+        <ul class="hyper-nav-links">
+          <li><a href="/products">Products</a></li>
+          <li><a href="/writing">Writing</a></li>
+          <li><a href="/opensource">Open Source</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+      </nav>
+    </div>
+
+    <main>
+      <!-- Hero -->
+      <section class="hero">
+        <div class="status-pill">
+          <span class="pulse-dot"></span>
+          <span>Hyper Mode Active</span>
+        </div>
+
+        <h1 class="hero-h1">
+          Applied Agent<br/>
+          <span class="accent">Design.</span>
+        </h1>
+
+        <p class="hero-sub">
+          High-signal. Zero ceremony. A home for products, systems-first writing,
+          and field-tested open source work that holds up in production.
+        </p>
+
+        <div class="cta-row">
+          <a href="/products" class="btn-primary">Explore Products →</a>
+          <a href="/writing" class="btn-ghost">Read the Index</a>
+        </div>
+
+        <!-- Terminal mock -->
+        <div class="terminal">
+          <div class="terminal-bar">
+            <span class="terminal-dot" style="background:#EC4899;"></span>
+            <span class="terminal-dot" style="background:#FACC15;"></span>
+            <span class="terminal-dot" style="background:#A3E635;"></span>
+            <span style="margin-left:8px;">withagents_hyper.sh</span>
+          </div>
+          <div class="terminal-body">
+            <div><span class="line-num">1</span><span class="kw-pink">$</span> <span class="kw-lime">withagents</span> init --mode hyper</div>
+            <div><span class="line-num">2</span><span class="kw-muted"># Initializing hyper runtime...</span></div>
+            <div><span class="line-num">3</span><span class="kw-lime">✓</span> Memory layer connected</div>
+            <div><span class="line-num">4</span><span class="kw-lime">✓</span> Runbook engine ready</div>
+            <div><span class="line-num">5</span><span class="kw-lime">✓</span> Operator UI mounted</div>
+            <div><span class="line-num">6</span><span class="kw-purple">→</span> <span style="color:var(--hyper-text);">System Status: Nominal</span> <span class="kw-pink">●</span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Products section -->
+      <section style="padding:0 0 96px;">
+        <p class="section-label">01 / Architecture</p>
+        <h2 class="section-heading">Core Infrastructure.</h2>
+        <div class="card-grid">
+          {[
+            { chip: 'SYS_01', chipColor: 'var(--hyper-pink)', title: 'Runbooks', desc: 'Deterministic execution paths for non-deterministic models. Framework for constraining agent behavior safely.', link: '/products/runbooks', linkLabel: 'View Documentation' },
+            { chip: 'SYS_02', chipColor: 'var(--hyper-purple)', title: 'Memory Layer', desc: 'State management built for persistence. Semantic caching and structured retrieval patterns.', link: '/products/memory-layer', linkLabel: 'View Architecture' },
+            { chip: 'SYS_03', chipColor: 'var(--hyper-lime)', title: 'Operator UI', desc: 'Human-in-the-loop interfaces. High-fidelity dashboards for monitoring fleet health.', link: '/products/operator-ui', linkLabel: 'Explore Components' },
+          ].map(c => (
+            <div class="card">
+              <div class="card-chip" style={`color:${c.chipColor};`}>{c.chip}</div>
+              <h3 class="card-title">{c.title}</h3>
+              <p class="card-desc">{c.desc}</p>
+              <a href={c.link} class="card-link">{c.linkLabel} ↗</a>
+            </div>
+          ))}
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <div style="max-width:1440px;margin:0 auto;padding:0 24px;">
+      <footer class="hyper-footer">
+        <span class="wordmark">withagents</span>
+        <div class="links">
+          <a href="https://github.com">GitHub</a>
+          <a href="/writing">Writing</a>
+          <a href="#">RSS</a>
+        </div>
+        <span class="copy">© 2026 WithAgents</span>
+      </footer>
+    </div>
+  </body>
+</html>

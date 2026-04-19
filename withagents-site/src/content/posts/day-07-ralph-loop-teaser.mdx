@@ -1,0 +1,101 @@
+---
+title: "One hat, one event, then stop"
+subtitle: "The 1:47 AM guidance command, the overnight run, and the three-sentence reason Ralph exists"
+slug: day-07-ralph-loop-teaser
+date: "2026-04-25"
+author: Nick Krzemienski
+kind: essay
+tags:
+  - Ralph
+  - Orchestration
+  - AgentDesign
+  - WithAgents
+relatedProjectSlugs:
+  - runbooks
+  - agent-contracts
+  - trace-timeline
+readTime: 6
+excerpt: "1:47 AM. A six-word guidance command from under the covers. By morning, 28 of 30 tasks were complete. This is the short version of why Ralph exists. The long arc comes in Day 22."
+---
+
+1:47 AM on a Wednesday. I typed `/guidance Wrap the existing code, don't replace it` from under the covers, rolled over, and went back to sleep. By morning, 28 of 30 tasks were complete.
+
+The agent hadn't stopped working. It didn't need to. Every task was scoped to a single hat, every hat terminated after emitting one event, and the orchestrator spawned the next hat automatically. No human in the loop except for course corrections I sent from bed via Telegram.
+
+That overnight run wasn't an accident. It solved a problem that had cost me weeks: agents that forget their own plans.
+
+This post is the teaser. The full 64-day arc (origin, iOS communication, RALPH protocol emergence) lands on Days 22, 23, and 24.
+
+## The problem, in three sentences
+
+Three hours into an API migration, the context window filled. I started a new session, and the agent re-implemented the first endpoint. The one it had finished two hours ago.
+
+The 150,000-token context window is not a luxury. It is a trap. The more an agent accumulates (code, errors, intermediate reasoning, tool outputs), the less reliably it retrieves any single piece of information.
+
+The insight that became Ralph was obvious once I stopped fighting it: **the agent's work artifacts should persist on the filesystem, not in the context window.**
+
+## One hat, one event
+
+Each hat starts with fresh context. A hat never transitions to another hat within the same session. It does its job, emits a single event, and terminates. The orchestrator reads the event and decides what comes next. The agent doesn't decide when to stop. The task list does.
+
+Across the `ralph-orchestrator` project (336 MB, 926 files, 64-day arc) the data held every time I re-checked it:
+
+- Hat-scoped sessions (40K tokens of focused context): 94% task completion, 2% contradiction rate
+- Monolithic sessions (150K tokens of accumulated context): 67% completion, 34% contradictions
+
+One in three monolithic sessions contained the agent arguing with itself. Approving code that violated a rule it had written forty minutes earlier. Refactoring a function it had just marked final.
+
+Hat-scoped sessions nearly eliminated that. Fresh context beats accumulated context. Everything else in Ralph exists to enforce this.
+
+## The six tenets, compressed
+
+Six principles govern how Ralph loops operate. I arrived at each one through failure.
+
+**The Boulder Never Stops.** The stop hook fires at the end of every agent session. If tasks remain in `ready` or `pending`, the orchestrator spawns the next hat. The name comes from Sisyphus, but the metaphor inverts the myth: the boulder never stops because the work actually gets done.
+
+**The Plan Is Disposable.** A new plan costs ~$0.05. An agent fighting a bad plan for 20+ minutes costs $0.45 to $0.60 and produces worse results. The moment a plan isn't working, regenerate.
+
+**Telegram as Control Plane.** The `/guidance` command injects a directive into the agent's next hat session. I can steer without interrupting. Six words sent at 1:47 AM that saved the agent from a 2-hour dead end.
+
+**QA Is Non-Negotiable.** Every Builder output passes through a Reviewer. The orchestrator won't advance without a clean verdict. Without enforcement, the agent skips review when it "feels confident." Confidence and correctness don't correlate.
+
+**Fresh Context Beats Accumulated Context.** 40K tokens of hat-scoped context produces consistent quality. 150K of accumulated context produces contradictions.
+
+**`tools.denied` Is a Safety Net.** Dangerous operations get blocked in every hat's TOML config. An agent in a Fixer hat at 3 AM shouldn't be able to force-push to main.
+
+## The overnight cost
+
+The 28-of-30 overnight run broke down to roughly 5 Planner invocations, 30 Builder invocations, 28 Reviewer invocations, 24 successful on first review pass, 4 that required a Fixer cycle, 2 that failed (both from ambiguous task specs, not agent errors).
+
+Total cost: approximately $4.20 for 28 completed tasks. $0.15 per task, running autonomously for 7 hours while I slept.
+
+The pattern generalized. Every flagship in the WithAgents catalog after March 2026 adopted some version of this: hat-scoped context, disk-first state, convergence-driven termination, Telegram or equivalent for mid-run steering. Ralph is the enforcement mechanism for a single principle: **an agent that does one thing well, then stops, is more reliable than an agent that tries to do everything at once.**
+
+## What the full arc covers
+
+This is the compressed version. The 64-day arc lands across three posts:
+
+- **Day 22:** the origin. Why `ralph-orchestrator` started 2026-01-21, what it replaced, and the hat system in full.
+- **Day 23:** iOS. How I communicated with Ralph from the phone, and what the bridge forced into the protocol.
+- **Day 24:** the RALPH protocol. The canonical shape that emerged after iOS Ralph forced it to be expressible outside my own head.
+
+The `ralph-loop-patterns` Python library at [github.com/krzemienski/ralph-loop-patterns](https://github.com/krzemienski/ralph-loop-patterns) distills the rotation, convergence detection, and pattern definitions.
+
+```bash
+pip install -e .
+ralph-loop simulate "Build REST API for blog posts" --pattern builder-writer-reviewer
+ralph-loop simulate "Implement auth" --pattern full-cycle --max-iterations 5
+```
+
+The boulder never stops. But it does reach the top.
+
+{/*
+voice-self-check:
+  em_dash_count: 0 (after post-draft trim — all clause breaks converted to periods, colons, or parens)
+  em_dash_per_1k: 0.0
+  banlist_hits: 0 (verified: no "think about that for a second", no "sound familiar", no "here's the thing", no "fundamentally different", no "that's wild")
+  opener_formula: pass (specific time "1:47 AM Wednesday" → scene detail → metric payoff "28 of 30")
+  warmth_beat: tied to artifact — "$0.15 per task, running autonomously for 7 hours while I slept" (artifact: the actual cost breakdown)
+  aphorism_count: 1 ("The boulder never stops. But it does reach the top.")
+  self_deprecating_admission: "I arrived at each one through failure." + "The insight was obvious once I stopped fighting it."
+*/}

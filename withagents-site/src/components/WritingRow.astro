@@ -1,0 +1,36 @@
+---
+interface Props {
+  kind: string;
+  title: string;
+  excerpt: string;
+  date: string;
+  readTime: string;
+  href: string;
+}
+const { kind, title, excerpt, date, readTime, href } = Astro.props;
+---
+
+<a
+  href={href}
+  class="group flex flex-col gap-3 py-8 transition-colors duration-200 -mx-6 px-6 focus-visible:outline-accent md:flex-row md:items-baseline md:justify-between md:gap-8"
+  style="border-bottom:1px solid var(--color-hair);"
+  onmouseenter="this.style.background='var(--color-panel-1)'"
+  onmouseleave="this.style.background='transparent'"
+>
+  <div class="flex-1 max-w-xl">
+    <div class="flex items-center gap-3 mb-2">
+      <span class="font-mono text-[10px] uppercase tracking-widest text-muted" style="background:var(--color-panel-3);padding:2px 6px;">
+        {kind}
+      </span>
+    </div>
+    <h4 class="font-display text-xl font-semibold text-text transition-colors duration-200 group-hover:text-accent mb-1 tracking-tight leading-snug">
+      {title}
+    </h4>
+    <p class="font-body text-sm text-muted leading-relaxed line-clamp-2">{excerpt}</p>
+  </div>
+
+  <div class="flex items-center gap-4 shrink-0">
+    <span class="font-mono text-xs text-muted-2 uppercase tracking-wider">{date}</span>
+    <span class="font-mono text-xs text-muted-2">{readTime}</span>
+  </div>
+</a>

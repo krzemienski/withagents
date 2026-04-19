@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="WithAgents logomark">
+  <title>WithAgents — Index logomark (light surface)</title>
+  <desc>w/ monogram inverted for light backgrounds. Ultraviolet slash retained.</desc>
+  <rect x="1" y="1" width="254" height="254" rx="48" fill="#F5F5F7" stroke="rgba(0,0,0,0.08)" stroke-width="1"/>
+  <path d="M 62 102 L 86 174 L 108 132 L 130 174 L 154 102"
+        fill="none"
+        stroke="#0A0A0D"
+        stroke-width="18"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+  <line x1="168" y1="88" x2="200" y2="176"
+        stroke="#8B5CF6"
+        stroke-width="18"
+        stroke-linecap="round"/>
+</svg>

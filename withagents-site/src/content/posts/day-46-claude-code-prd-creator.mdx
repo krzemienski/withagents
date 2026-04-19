@@ -1,0 +1,101 @@
+---
+title: "A PRD is a contract between an intent and an agent"
+subtitle: "Why claude-code-prd-creator sits before the code-access session, and what 200+ generated tasks actually cost"
+slug: day-46-claude-code-prd-creator
+date: "2026-04-19"
+author: Nick Krzemienski
+kind: field-note
+tags:
+  - WithAgents
+  - SpecDriven
+  - PRD
+  - Agents
+relatedProjectSlugs:
+  - runbooks
+  - agent-contracts
+readTime: 6
+excerpt: "An agent handed a sentence produces a sprawl. An agent handed a four-document PRD produces a buildable system. claude-code-prd-creator is the step between those two states."
+---
+
+A one-sentence product idea, handed to a build-agent, produces a sprawl. The agent wanders. It picks a framework. It scaffolds six files that might matter. It asks for clarification forty minutes in, after it has already made three decisions it cannot unmake without a rewrite.
+
+A four-document PRD, handed to the same build-agent, produces a system. Scaffolds the right stack. Builds the right endpoints. Gets to working tests in the same forty minutes.
+
+`claude-code-prd-creator` is the thing that sits between those two states. Not a better prompt. Not a meta-agent. A pre-code-access session that turns a sentence into a structured contract the build-agent can execute against.
+
+## What it generates, and why four documents
+
+One text input. One structured interview. Four documents out:
+
+1. **Main PRD.** Executive summary, target audience, core features with specifications, technical architecture (FastAPI backend default), database schema, API endpoint contracts, third-party integration research, acceptance criteria with measurable outcomes.
+2. **AI Custom Instructions.** MCP server utilization guide, research verification protocols, git workflow, code quality standards, testing approach (production-only), error handling.
+3. **Design System.** Frontend stack (shadcn, Tailwind v4), dark theme palette, typography spec, component library mapping, ASCII wireframes for every screen.
+4. **Task Breakdown.** 200+ granular tasks, dependency mapping, time estimates per task, git branch suggestions, priority ordering.
+
+The four-document split is the load-bearing decision. A single giant PRD has two failure modes: the agent skips sections, and humans stop reading after section two. Four smaller documents each with a specific audience survive both failures. The build-agent reads AI Custom Instructions first. The human reviewing spec reads Main PRD. The designer cross-references the Design System. The planner lives in Task Breakdown. Each document is allowed to be complete without the others.
+
+## Why it ships before the code-access session, not inside it
+
+The temptation was to make this an MCP tool inside a normal Claude Code session. A command you ran when you wanted a PRD. I tried that first. It was worse than the standalone tool for three specific reasons:
+
+- **Context pollution.** Running PRD generation inside a build session filled the context with a 15-question interview before any code existed. The build-agent's first 40K tokens were all spec-gathering, not build state.
+- **Premature file creation.** The agent helpfully wanted to start scaffolding during the interview. It wrote `package.json` before I had answered whether the project even had a frontend.
+- **Interview drift.** With full tool access, the agent kept offering to "just check" something on GitHub or read an example repo. Every check added to the context, none of them added to the spec.
+
+Running PRD generation as its own pre-session fixes all three. No write tools. No code access. One chat transcript that terminates in four markdown files. The build session starts clean, with the PRD loaded as read-only context, and the first tool call is a real file write.
+
+## The interview, in numbers
+
+Default interview generates 5–15 follow-up questions depending on project complexity. The question-generation prompt takes the initial description plus the previous answers and returns a JSON block of question objects, each with an id, context, examples, category (technical/business/ux/integration/security), and a required flag.
+
+Two questions rule the whole interview quality:
+
+**"What is your deployment target?"** is the question that eliminates the most downstream decisions. Docker Compose on a VPS, serverless on Vercel, and a native desktop app produce three entirely different PRDs. The build-agent given a wrong answer here generates scaffolding that is coherent internally and useless to the user.
+
+**"Is there a human in the loop for any step?"** is the question that rewrites the AI Custom Instructions document. If yes, the instructions include explicit human-review checkpoints between phases. If no, they include explicit abort-on-doubt clauses so the agent will stop rather than ship a low-confidence decision.
+
+Every other question is downstream of those two. The interview prompt weights them first.
+
+## What 200+ tasks actually looks like
+
+The Task Breakdown document is the one most people ignore the first time. It should not be ignored. 200+ tasks sounds like over-planning. It is under-planning once you feed it to an agent.
+
+Sample slice from a real run (a job-matching platform described in one sentence):
+
+- `[ ] Create FastAPI project structure with dependency-injection container`
+- `[ ] Set up PostgreSQL connection pool (asyncpg, pool_size=10, max_overflow=20)`
+- `[ ] Implement session-based user table with UUID primary key and last_active index`
+- `[ ] Write /api/projects POST endpoint with request validation via pydantic v2`
+- `[ ] Add rate limiter middleware (100 req/min per session) before route registration`
+- `[ ] Create docker-compose.yaml with web / api / postgres / redis services wired`
+
+Every task names a specific artifact. Every task includes the specific dependency (`asyncpg`, `pydantic v2`, `redis`) that forces the agent to pick the right tool before writing code. When a build-agent claims "done" on a task, the claim is verifiable because the task specified the verification.
+
+The alternative is a task list that says `[ ] Build the backend` and an agent that ships vibes.
+
+## The part I keep getting wrong
+
+I keep shipping PRDs where the acceptance criteria are too generous. "System handles concurrent users without performance degradation" is not an acceptance criterion. It is an aspiration with no failure mode. The PRDs that lead to working builds have criteria like "/api/projects POST returns < 200ms p95 at 50 concurrent sessions on a 2-vCPU Fly machine." That is the level the build-agent can actually verify.
+
+When I hand an agent loose criteria, it writes code that matches the looseness. The quality of the PRD is the ceiling on the quality of the build. I have not automated the tightness check. It is still a human read.
+
+## How this fits the mode-bet
+
+claude-code-prd-creator is an SDK bet that exists so the Interactive bet downstream can work. You write a structured interview. You get structured artifacts. You hand the artifacts to an Interactive-mode build agent (Claude Code, with skills and hooks) and let the rich environment do the build.
+
+The PRD is a contract between a sentence and a session. Agents can keep contracts they can read. They cannot keep contracts that live only in a user's head.
+
+---
+
+**Repo:** https://github.com/krzemienski/claude-code-prd-creator · Python 3.11+ · Claude API + OpenAI fallback.
+
+**Next post (Day 47):** `live-mermaid-editor` — why the diagram is a live-rendered spec, not an afterthought in the PRD flow.
+
+{/* VOICE SELF-CHECK
+   em-dashes: 4 (words ~1,050) = 3.8/1k — within ≤5/1k cap
+   banlist hits: 0
+   opener: "A one-sentence product idea, handed to a build-agent, produces a sprawl" — failure before success: pass
+   warmth beat: none — strict analytical tone for this post
+   self-deprecating admission: "I keep shipping PRDs where the acceptance criteria are too generous... I have not automated the tightness check"
+   aphorism: one — "Agents can keep contracts they can read. They cannot keep contracts that live only in a user's head."
+*/}

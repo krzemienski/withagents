@@ -1,0 +1,357 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+
+interface Product {
+  slug: string;
+  name: string;
+  tagline: string;
+  category: string;
+  version: string;
+  license: string;
+  status: string;
+  githubUrl: string;
+  overview: string[];
+  features: { title: string; desc: string }[];
+  codeExample: string;
+  installSteps: string[];
+}
+
+export function getStaticPaths() {
+  const products: Product[] = [
+  {
+    slug: 'runbooks',
+    name: 'Runbooks',
+    tagline: 'Deterministic execution paths for non-deterministic models.',
+    category: 'WORKFLOW ENGINE',
+    version: 'v1.2.4',
+    license: 'MIT',
+    status: 'STABLE',
+    githubUrl: 'https://github.com/withagents/runbooks',
+    overview: [
+      'Runbooks provides opinionated workflow primitives for triage, analysis, and execution across real internal systems. Define complex sequences of agent actions with deterministic control points, human-approval gates, and structured fallbacks.',
+      'Built for operators who need predictability. Every execution step is logged, every branching decision is traceable, and every blocking gate can be reviewed and overridden by a human in the loop.',
+    ],
+    features: [
+      { title: 'Deterministic Control Points', desc: 'Define explicit checkpoints where execution halts for validation or human approval.' },
+      { title: 'Execution Tracing', desc: 'Full trace log for every run. Every step timestamped and queryable.' },
+      { title: 'Human-in-the-Loop Gates', desc: 'Block and resume workflows with operator-level approval flows built in.' },
+      { title: 'Structured Fallbacks', desc: 'Declare fallback paths declaratively. Never rely on model improvisation for critical paths.' },
+    ],
+    codeExample: `import { Runbook, Gate, Step } from '@withagents/runbooks';
+
+const triage = new Runbook('incident_triage_v2');
+
+triage
+  .step('gather_metrics', async (ctx) => {
+    ctx.metrics = await prometheus.query(ctx.incident_id);
+  })
+  .gate('approve_remediation', { timeout: '5m' })
+  .step('apply_fix', async (ctx) => {
+    await systems.apply(ctx.approved_action);
+  });
+
+await triage.run({ incident_id: 'INC-1042' });`,
+    installSteps: [
+      'npm install @withagents/runbooks',
+      'import { Runbook } from \'@withagents/runbooks\'',
+      'Define your first runbook with steps and gates',
+    ],
+  },
+  {
+    slug: 'memory-layer',
+    name: 'Memory Layer',
+    tagline: 'Practical patterns for preserving context across sessions, tools, and multi-step work.',
+    category: 'CONTEXT ENGINE',
+    version: 'v0.9.1',
+    license: 'MIT',
+    status: 'BETA',
+    githubUrl: 'https://github.com/withagents/memory-layer',
+    overview: [
+      'Memory Layer provides semantic caching and structured retrieval primitives that work across sessions, tools, and multi-step agent workflows. Stop losing context between turns.',
+      'Designed as infrastructure, not magic. Every retrieval is deterministic given the same embedding model. Every cache entry is inspectable. The layer between your agent and its memory should be as readable as the agent itself.',
+    ],
+    features: [
+      { title: 'Semantic Caching', desc: 'Cache context by semantic similarity. Retrieve the right memory without exact-match keys.' },
+      { title: 'Session Persistence', desc: 'Context survives tool switches, model reloads, and multi-day sessions.' },
+      { title: 'Structured Retrieval', desc: 'Query memory by type, recency, relevance, or any combination.' },
+      { title: 'Inspectable Store', desc: 'Every entry readable. No black-box embeddings databases that can\'t be audited.' },
+    ],
+    codeExample: `import { MemoryLayer } from '@withagents/memory-layer';
+
+const memory = new MemoryLayer({ store: 'sqlite', path: './.memory' });
+
+// Store context
+await memory.remember('user_preference', {
+  theme: 'dark', timezone: 'UTC-8',
+}, { ttl: '7d' });
+
+// Semantic retrieval
+const ctx = await memory.recall('user display settings');
+console.log(ctx.theme); // 'dark'`,
+    installSteps: [
+      'npm install @withagents/memory-layer',
+      'Choose a store: sqlite (local), redis (distributed), or pg (production)',
+      'Initialize MemoryLayer and start persisting context',
+    ],
+  },
+  {
+    slug: 'operator-ui',
+    name: 'Operator UI',
+    tagline: 'Clean interfaces for inspecting runs and keeping agent systems legible.',
+    category: 'INTERFACE LAYER',
+    version: 'v0.3.0',
+    license: 'Apache-2.0',
+    status: 'PREVIEW',
+    githubUrl: 'https://github.com/withagents/operator-ui',
+    overview: [
+      'Operator UI provides a composable set of React components for building human-in-the-loop review interfaces. Designed for operators who need to inspect running agents, step in when needed, and keep systems legible under load.',
+      'Not a dashboard generator. Individual inspectable components you compose into exactly the interface your operators need. Every component ships with full keyboard navigation and accessible markup.',
+    ],
+    features: [
+      { title: 'Trace Inspector', desc: 'Step through any agent execution frame by frame. Inspect state at every decision.' },
+      { title: 'Approval Queue', desc: 'Review and act on pending gate requests. Clear, auditable approval flows.' },
+      { title: 'Fleet Overview', desc: 'Monitor running agents across your deployment. Health, progress, and blocking states.' },
+      { title: 'Composable Primitives', desc: 'Use individual components — TraceView, GatePanel, AgentCard — not a locked-in dashboard.' },
+    ],
+    codeExample: `import { TraceInspector, GatePanel } from '@withagents/operator-ui';
+
+function OperatorDashboard({ runId }) {
+  return (
+    <div className="operator-layout">
+      <TraceInspector
+        runId={runId}
+        onStepSelect={(step) => console.log(step)}
+      />
+      <GatePanel
+        runId={runId}
+        onApprove={(gateId) => approveGate(gateId)}
+        onReject={(gateId) => rejectGate(gateId)}
+      />
+    </div>
+  );
+}`,
+    installSteps: [
+      'npm install @withagents/operator-ui',
+      'Wrap your app with <OperatorProvider apiUrl="..." />',
+      'Compose TraceInspector, GatePanel, and AgentCard into your interface',
+    ],
+  },
+  {
+    slug: 'agent-contracts',
+    name: 'agent-contracts',
+    tagline: 'Reusable agent-interface contracts for framework-agnostic integration.',
+    category: 'PROTOCOL',
+    version: 'v0.8.4',
+    license: 'MIT',
+    status: 'STABLE',
+    githubUrl: 'https://github.com/withagents/agent-contracts',
+    overview: [
+      'agent-contracts defines the protocol-level interface contracts that all WithAgents tooling implements. Use these schemas to build integrations that work across Runbooks, Memory Layer, and any third-party agentic framework.',
+      'Schema-first. Every contract is defined in TypeScript and exported as JSON Schema for language-agnostic consumption.',
+    ],
+    features: [
+      { title: 'TypeScript Contracts', desc: 'Strongly typed interfaces for every agent interaction surface.' },
+      { title: 'JSON Schema Export', desc: 'Consume contracts from any language with the bundled JSON Schema output.' },
+      { title: 'Versioned Protocol', desc: 'SemVer-stable contracts. Breaking changes are major versions, period.' },
+      { title: 'Framework Agnostic', desc: 'Works with LangChain, CrewAI, AutoGen, or any custom framework.' },
+    ],
+    codeExample: `import type { AgentContract, ExecutionContext } from '@withagents/contracts';
+
+const contract: AgentContract = {
+  name: 'incident_responder',
+  version: '1.0.0',
+  inputs: { incident_id: 'string', severity: 'low | medium | high' },
+  outputs: { resolved: 'boolean', actions_taken: 'string[]' },
+  gates: [{ id: 'approve_action', timeout: '10m' }],
+};`,
+    installSteps: [
+      'npm install @withagents/contracts',
+      'Import types for your agent interface definitions',
+      'Validate runtime data against the bundled JSON schemas',
+    ],
+  },
+  {
+    slug: 'trace-timeline',
+    name: 'trace-timeline',
+    tagline: 'Chronological execution trace viewer for multi-step agent runs.',
+    category: 'TOOLING',
+    version: 'v1.1.0',
+    license: 'Apache-2.0',
+    status: 'STABLE',
+    githubUrl: 'https://github.com/withagents/trace-timeline',
+    overview: [
+      'trace-timeline renders chronological execution traces for multi-step agent runs. Point it at any structured trace log and get a navigable, inspectable timeline.',
+      'Works standalone as a CLI tool, as an embedded React component, or as a server-rendered view. Designed for postmortems and live debugging equally.',
+    ],
+    features: [
+      { title: 'Timeline Rendering', desc: 'Chronological view of every agent step, branch, and gate in a run.' },
+      { title: 'Diff View', desc: 'Compare two trace runs side by side. Spot regressions immediately.' },
+      { title: 'CLI Mode', desc: 'trace-timeline view run_id.json — works from the terminal with full color output.' },
+      { title: 'Embeddable Component', desc: 'Drop <Timeline traceFile="..." /> into any React app.' },
+    ],
+    codeExample: `# CLI usage
+npx trace-timeline view ./traces/run_2026_04_19.json
+
+# Diff two runs
+npx trace-timeline diff run_a.json run_b.json
+
+# Start local viewer
+npx trace-timeline serve ./traces/ --port 4000`,
+    installSteps: [
+      'npm install -g trace-timeline  (CLI) or  npm install @withagents/trace-timeline  (library)',
+      'Point at a structured trace JSON: trace-timeline view run.json',
+      'Embed in React: import { Timeline } from \'@withagents/trace-timeline\'',
+    ],
+  },
+  {
+    slug: 'context-layers',
+    name: 'context-layers',
+    tagline: 'Context-window composition primitives for multi-step agent work.',
+    category: 'REFERENCE',
+    version: 'v2.0.1',
+    license: 'MIT',
+    status: 'STABLE',
+    githubUrl: 'https://github.com/withagents/context-layers',
+    overview: [
+      'context-layers provides reference implementations for the context composition patterns documented across the WithAgents writing archive. Practical primitives, not theory.',
+      'Includes layered context assembly, priority-based truncation, tool-result compression, and sliding-window strategies. Each pattern ships with a benchmark showing token efficiency vs. retrieval quality.',
+    ],
+    features: [
+      { title: 'Layered Assembly', desc: 'Compose context from system, tool, memory, and user layers with explicit priority.' },
+      { title: 'Priority Truncation', desc: 'When the window fills, lower-priority layers compress first. Predictable behavior.' },
+      { title: 'Tool Result Compression', desc: 'Summarize large tool outputs without losing signal. Configurable compression strategies.' },
+      { title: 'Benchmarks Included', desc: 'Every pattern ships with a reproducible benchmark. Know the tradeoffs.' },
+    ],
+    codeExample: `import { ContextComposer, SystemLayer, MemoryLayer, ToolLayer } from '@withagents/context-layers';
+
+const ctx = new ContextComposer({ maxTokens: 16000 });
+
+ctx.addLayer(new SystemLayer({ content: systemPrompt, priority: 'fixed' }));
+ctx.addLayer(new MemoryLayer({ store: memory, topK: 5, priority: 'high' }));
+ctx.addLayer(new ToolLayer({ results: toolOutputs, priority: 'medium' }));
+
+const composed = await ctx.compose(); // fits in window, truncates by priority`,
+    installSteps: [
+      'npm install @withagents/context-layers',
+      'Import ContextComposer and the layer types you need',
+      'Configure maxTokens and compose your context window',
+    ],
+  },
+];
+  return products.map(p => ({ params: { slug: p.slug }, props: { product: p } }));
+}
+
+const { product } = Astro.props;
+---
+
+<BaseLayout
+  title={`${product.name} — WithAgents`}
+  description={product.tagline}
+>
+  <Nav current="products" />
+
+  <main class="relative z-10 w-full">
+    <div class="mx-auto max-w-[1440px] px-6 py-12 md:py-20 flex flex-col gap-16">
+
+      <!-- Breadcrumb -->
+      <div class="flex items-center gap-2 font-mono text-xs text-muted uppercase tracking-wider">
+        <a href="/" class="hover:text-accent transition-colors focus-visible:outline-accent">Home</a>
+        <span class="material-symbols-outlined" style="font-size:14px;color:var(--color-muted-2);">chevron_right</span>
+        <a href="/products" class="hover:text-accent transition-colors focus-visible:outline-accent">Products</a>
+        <span class="material-symbols-outlined" style="font-size:14px;color:var(--color-muted-2);">chevron_right</span>
+        <span class="text-text">{product.name}</span>
+      </div>
+
+      <!-- Header -->
+      <header class="max-w-3xl flex flex-col gap-6">
+        <!-- Meta row -->
+        <div class="flex flex-wrap items-center gap-3">
+          <span class="font-mono text-[10px] uppercase tracking-widest text-accent" style="background:var(--color-panel-3);padding:3px 8px;">
+            {product.category}
+          </span>
+          <span class="font-mono text-[10px] text-muted" style="background:var(--color-panel-2);padding:3px 8px;">{product.version}</span>
+          <span class="font-mono text-[10px] text-muted" style="background:var(--color-panel-2);padding:3px 8px;">{product.license}</span>
+          <span class="font-mono text-[10px]" style={`background:var(--color-panel-2);padding:3px 8px;color:${product.status === 'STABLE' ? 'var(--color-accent-lime)' : product.status === 'BETA' ? '#FACC15' : 'var(--color-muted)'};`}>
+            {product.status}
+          </span>
+          <a
+            href={product.githubUrl}
+            target="_blank"
+            rel="noopener"
+            class="font-mono text-[10px] text-muted hover:text-accent transition-colors flex items-center gap-1 focus-visible:outline-accent"
+          >
+            GitHub
+            <span class="material-symbols-outlined" style="font-size:12px;">arrow_outward</span>
+          </a>
+        </div>
+
+        <h1 class="font-display text-5xl font-bold text-text tracking-tight md:text-6xl">{product.name}</h1>
+        <p class="font-body text-xl text-muted leading-relaxed">{product.tagline}</p>
+      </header>
+
+      <!-- Overview -->
+      <section class="grid grid-cols-1 gap-8 max-w-3xl">
+        {product.overview.map(p => (
+          <p class="font-body text-lg text-muted leading-relaxed">{p}</p>
+        ))}
+      </section>
+
+      <!-- Features grid 2×2 -->
+      <section class="flex flex-col gap-6">
+        <h2 class="font-mono text-xs uppercase tracking-widest text-muted-2">Features</h2>
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {product.features.map(f => (
+            <div class="flex flex-col gap-2 p-6" style="background:var(--color-panel-1);border:1px solid var(--color-hair);">
+              <h3 class="font-display text-base font-semibold text-text">{f.title}</h3>
+              <p class="font-body text-sm text-muted leading-relaxed">{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <!-- Code example -->
+      <section class="flex flex-col gap-4 max-w-3xl">
+        <h2 class="font-mono text-xs uppercase tracking-widest text-muted-2">Example</h2>
+        <div style="background:var(--color-panel-1);border:1px solid var(--color-hair);">
+          <div class="flex items-center gap-2 px-4 py-2 font-mono text-xs text-muted" style="background:var(--color-panel-2);border-bottom:1px solid var(--color-hair);">
+            <span class="h-2.5 w-2.5 rounded-full" style="background:var(--color-panel-3);"></span>
+            <span class="h-2.5 w-2.5 rounded-full" style="background:var(--color-panel-3);"></span>
+            <span class="h-2.5 w-2.5 rounded-full" style="background:var(--color-panel-3);"></span>
+            <span class="ml-2 text-muted-2">example.ts</span>
+          </div>
+          <pre class="p-6 font-mono text-sm text-muted overflow-x-auto leading-relaxed whitespace-pre-wrap">{product.codeExample}</pre>
+        </div>
+      </section>
+
+      <!-- Installation -->
+      <section class="flex flex-col gap-6 max-w-3xl">
+        <h2 class="font-mono text-xs uppercase tracking-widest text-muted-2">Installation</h2>
+        <ol class="flex flex-col gap-4">
+          {product.installSteps.map((step, i) => (
+            <li class="flex items-start gap-4">
+              <span class="font-mono text-xs text-muted-2 mt-1 shrink-0 w-5">{i + 1}.</span>
+              <div class="font-mono text-sm p-3 flex-1" style="background:var(--color-panel-2);border:1px solid var(--color-hair);">
+                {step}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <!-- Back link -->
+      <div>
+        <a
+          href="/products"
+          class="inline-flex items-center gap-2 font-mono text-xs text-muted hover:text-accent transition-colors focus-visible:outline-accent"
+        >
+          <span class="material-symbols-outlined" style="font-size:14px;">arrow_back</span>
+          All Products
+        </a>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>

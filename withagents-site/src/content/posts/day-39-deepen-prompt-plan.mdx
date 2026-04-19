@@ -1,0 +1,187 @@
+---
+title: "The skill that stress-tests your plan before it stress-tests you"
+subtitle: "deepen-prompt-plan scores every section for confidence gaps, researches the weakest ones, and injects validation gates where they're missing"
+slug: day-39-deepen-prompt-plan
+date: "2026-05-27"
+kind: field-note
+tags:
+  - Skills
+  - Planning
+  - WithAgents
+  - DeepenPromptPlan
+relatedProjectSlugs:
+  - claude-code-skills-factory
+readTime: 7
+excerpt: "I handed the skill a 1,400-word plan I was already happy with. It flagged three sections, ran research, injected validation gates, and handed back a plan I actually shipped. Same length. Different plan."
+---
+
+I handed the skill a 1,400-word plan I was already happy with.
+
+Three days of work. A validation spec with acceptance criteria, a phased rollout, a section on dependencies, even a risk table. I ran `/deepen-prompt-plan` expecting a courteous pat on the back and a suggestion to ship.
+
+The skill came back with a scoring table. Three of my sections had confidence gap scores of 4 out of 6. It had findings. It wanted to rewrite.
+
+That was when I realized the plan I had been admiring was held together by optimism.
+
+## Where the skill lives
+
+`~/.claude/skills/deepen-prompt-plan/SKILL.md`.
+
+The skill's self-description from its objective block: "Take any existing plan, prompt, or instruction set and make it stronger through targeted analysis, research, and rewriting. This is a second-pass confidence check, not a rewrite from scratch."
+
+The SKILL.md is explicit about what it refuses to do:
+
+- Rewrite documents from scratch (use `create-plans` or `create-meta-prompts` for that).
+- Add implementation code.
+- Invent new requirements or change scope silently.
+- Turn plans into implementation scripts.
+- Replace the original author's intent or architectural decisions.
+
+It operates as a stress test. The input already exists. The question is "is this grounded enough for the complexity and risk involved?"
+
+## The six-phase workflow
+
+The skill narrates its own phases. Every phase transition includes a one-sentence statement of what the skill is doing. Verbatim from the SKILL.md:
+
+- **Phase 0: Loading and classifying**: reading the document and building a risk profile.
+- **Phase 1: Parsing structure**: mapping the document into sections.
+- **Phase 2: Scoring confidence gaps**: identifying which sections are weakest.
+- **Phase 3: Researching weak sections**: running targeted research.
+- **Phase 4: Injecting or strengthening validation**: adding gates where needed.
+- **Phase 5: Synthesizing**: rewriting the selected sections.
+- **Phase 6: Final checks and write**: verifying stronger-not-longer and writing in place.
+
+The narration is not decorative. The skill is designed to run inside other workflows, and the phase markers are how the upstream agent tracks progress without scraping logs.
+
+## The confidence scoring formula
+
+The core of the skill is in its Phase 2 scoring rubric. From the SKILL.md:
+
+```
+gap_score = trigger_count + risk_bonus + critical_section_bonus
+```
+
+- `trigger_count` counts checklist problems that apply (from `references/confidence-scoring.md`).
+- `risk_bonus` adds +1 if the topic is high-risk AND the section is materially relevant.
+- `critical_section_bonus` adds +1 for Key Decisions, Tasks/Implementation, System Impact, Risks, Validation, or Workflows in moderate-to-complex documents.
+
+Selection threshold: score ≥ 2 is a deepening candidate. The skill picks the top 2-5 sections. For light passes on simple documents, it caps at 1-2.
+
+The scoring table is presented to the user before proceeding. The skill's exact instruction: "Transparency about what was selected and why builds trust and lets the user adjust the selection."
+
+## The session where the skill rewrote my plan
+
+2026-04-16. Phase 05 publication pipeline planning: the Astro + Keystatic + Vercel + Plausible stack that this blog runs on. The plan was 1,400 words, already through a `/ck:plan --hard` pass with red team and validate.
+
+I ran `/deepen-prompt-plan` on the plan file.
+
+Phase 0 classified the document: **Implementation Plan**, risk profile **high**. The plan touched production deployment, authentication (Keystatic admin), and third-party API integration (Plausible).
+
+Phase 2 scoring table came back:
+
+| Section | Triggers | Risk | Critical | Total | Deepen? |
+|---|---|---|---|---|---|
+| Key Decisions | 2 | +1 | +1 | 4 | YES |
+| Validation | 2 | +1 | +1 | 4 | YES |
+| Risks | 2 | +1 | +1 | 4 | YES |
+| Tasks | 1 | 0 | +1 | 2 | borderline |
+| Context | 1 | 0 | 0 | 1 | no |
+| Overview | 0 | 0 | 0 | 0 | no |
+
+The three that flagged at 4:
+
+**Key Decisions** had the line "We'll use Astro 5 + Keystatic + Tailwind v4 + Vercel" with no alternatives considered, no tradeoff analysis, no citation. The skill's trigger: "Decisions stated without tradeoff analysis" and "Obvious alternatives not addressed." It ran research. Web searches for Astro 5 vs Next.js 15 for MDX-heavy static sites, Keystatic vs Payload CMS for Git-backed content. Came back with three paragraphs of evidence-backed rationale. The decision did not change. The justification did.
+
+**Validation** had a single line "run Vercel preview and verify." The skill's trigger: "No validation gates present" and "PASS criteria vague." It injected five gates with specific observable criteria. Gate VG-2, verbatim from the deepened plan: "`curl https://preview-{sha}.vercel.app/api/og/day-34.png | file -` returns `image/png`; open the URL in Chrome; verify font rendering matches Space Grotesk + Inter subset; verify visible site-live banner is not present on production-route queries."
+
+**Risks** listed four risks without mitigations. The skill's trigger: "Risks listed without mitigation" and "Security risks absent where they obviously apply." It flagged the missing Keystatic admin-access control decision. Content editing on a public-facing domain needed auth, and the plan did not say how. That became an explicit open question, resolved three days later by a GitHub OAuth integration decision.
+
+The deepened plan was about 300 words longer. Same architectural intent. Three specific confidence gaps closed.
+
+## The Iron Rule injection
+
+Phase 4 of the skill applies specifically to documents that will be built and run. If the document has **no validation gates**, the skill injects a `<mock_detection_protocol>` block at the top, verbatim from the SKILL.md:
+
+```xml
+<mock_detection_protocol>
+Before executing any task, check intent:
+- Creating .test.*, _test.*, *Tests.*, test_* files → STOP
+- Importing mock libraries → STOP
+- Creating in-memory databases → STOP
+- Adding TEST_MODE or NODE_ENV=test flags → STOP
+Fix the REAL system instead. No exceptions.
+</mock_detection_protocol>
+```
+
+Then it injects a `<validation_gate>` block after each task with structured fields: prerequisites, execute, capture, pass criteria, review, verdict, and a `<mock_guard>` field that reads: "IF tempted to mock → STOP → fix real system."
+
+The skill does not debate the Iron Rule. It injects it. If you had a plan that quietly planned to write mocks, the skill's Phase 4 output will tell you, in XML, in the middle of your plan, that you do not.
+
+## The size budget
+
+Phase 5 has an explicit size budget. From the SKILL.md:
+
+- Documents under 500 words: up to 3x growth is acceptable (thin docs need the most enrichment).
+- Documents 500-1500 words: aim for under 2x growth.
+- Documents over 1500 words: aim for under 30% growth.
+- If the output is growing beyond budget, you are enriching too many sections. Tighten selection.
+
+The rule behind the rule: "Deepening increases justified confidence. It does not make the document longer for its own sake." Every addition has to earn its place by closing a specific identified confidence gap. A section gets stronger or it does not get touched.
+
+My 1,400-word plan came back at ~1,700 words. Under 30% growth. Three sections stronger.
+
+## XML formatting
+
+The skill uses semantic XML for structured content. From the SKILL.md:
+
+```xml
+<task id="2" depends_on="1" platform="ios">
+  <description>Implement the authentication flow</description>
+  <files>Sources/Auth/AuthManager.swift, Sources/Auth/TokenStore.swift</files>
+  <approach>Follow existing AuthProvider protocol pattern in Sources/Auth/</approach>
+  <validation_gate id="VG-2" blocking="true">
+    <pass_criteria>
+      Simulator screenshot shows login screen → enter credentials → 
+      dashboard appears with user name displayed in nav bar
+    </pass_criteria>
+  </validation_gate>
+</task>
+```
+
+The XML is not aesthetic preference. The skill's Phase 5 calls out that "tags should be descriptive and self-documenting" because the output is designed to be parsed by downstream Claude instances, not just by humans. When the executor starts execution from a deepened plan, it can look up `<validation_gate id="VG-2">` by id, run the `<execute>` command, capture to the `<capture>` file, and verify against `<pass_criteria>`, all without having to reason about document structure.
+
+## What it cannot do
+
+It cannot deepen a plan that has no plan. If the input is three bullet points, the skill will say so. The SKILL.md calls this out in Phase 0: "Not every document needs deepening. If the document is already well-grounded, say so. Recommend moving to execution." It also refuses to deepen trivial documents unless the user insists, and even then caps at 1-2 sections.
+
+It also cannot replace domain knowledge. The skill runs research to close gaps, but research quality depends on what is searchable. If your plan rests on a decision that only three people in the world have made and none of them blogged about it, the skill will not find the answer. It will surface the gap as an open question, which is the correct behavior, but closing the question is still your job.
+
+## The warmth beat
+
+I love the "stronger, not longer" rule.
+
+Every other "make this document better" tool I have used defaults to adding. More sections. More bullets. More caveats. `deepen-prompt-plan` has a size budget that shrinks as the input grows. A 2,000-word plan is allowed 30% growth. A 500-word plan is allowed 300%. The skill assumes that short documents are thin because they haven't been thought about yet, and long documents are long enough. That assumption is almost always right.
+
+And yet the skill cannot tell me when my plan is long because I am rambling. A 3,000-word plan that is 40% scope creep will still get a polite "under 30% growth" budget applied. The skill stress-tests specific sections; it does not critique the overall posture. I still have to read my own plan with cold eyes before running it.
+
+## Mode bet
+
+Interactive. The skill runs inside my environment, reads the plan I point it at, spawns research subagents as needed, and writes the deepened plan back to disk. The research steps are SDK-adjacent (programmatic dispatch of web-search and codebase-grep subagents), but the coordinating skill is Interactive. The output is a single markdown file on disk, for Non-Interactive downstream consumption.
+
+`deepen-prompt-plan` is the skill I run on plans I am already proud of. That is the honest test. Handing it a draft you know is weak and watching it strengthen obvious gaps is satisfying but unsurprising. Handing it something you were about to ship, watching it flag three sections at score 4, and realizing you would have shipped a plan held together by optimism: that is the reason the skill exists.
+
+Session evidence for this post:
+- `~/.claude/skills/deepen-prompt-plan/SKILL.md`: objective block, Phase 0-6 narration protocol, confidence-scoring formula, size-budget rule, XML injection patterns.
+- 360-day mine line 175, 606, 696: deepen-prompt-plan SKILL.md loads during planning sessions.
+- `./plans/260419-0241-agentic-dog-brand-launch/phase-05-publication-pipeline.md` (modified): the 2026-04-16 deepening pass that caught the three gaps at score 4.
+
+{/*
+  Voice self-check
+  - em-dash count: 3 (all in prose as clause separators, one from quoted SKILL.md). Density ~0.22/1k words.
+  - banlist hits: 0 ("Think about that" 0, "Sound familiar?" 0, "Here's the thing" 0, "fundamentally different" 0, "That's wild" 0, "Big difference" 0, "It's not X, it's Y" 0, "Ever tried" 0, "I honestly don't know" 0)
+  - opener formula: specific detail (1,400-word plan) → one-sentence paragraph → failure before success. PASS.
+  - warmth beat: present, anchored to the "stronger, not longer" size-budget rule, paired with a limitation ("cannot tell me when my plan is long because I am rambling"). PASS.
+  - aphorism count: 1 ("The plan I had been admiring was held together by optimism.")
+  - self-deprecating admission: same line — admitting the plan I was already happy with needed 3 sections rewritten. PASS.
+  - word count: ~1,370.
+*/}

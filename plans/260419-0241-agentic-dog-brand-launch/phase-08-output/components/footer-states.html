@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WithAgents — Footer States</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-void:#040404;--panel-1:#0A0A0D;--panel-2:#111116;--panel-3:#15151C;
+    --text-primary:#F5F5F7;--text-muted:#A1A1AA;--accent:#8B5CF6;--accent-alt:#C084FC;
+    --accent-hot:#E879F9;--border:rgba(255,255,255,0.10);--accent-wash:rgba(139,92,246,0.12);
+    --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+    --font-body:'Inter',ui-sans-serif,system-ui,sans-serif;
+    --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+    --radius-sm:4px;--radius-md:8px;--space-xs:6px;--space-sm:12px;--space-md:20px;--space-lg:32px;--space-xl:48px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg-void);color:var(--text-primary);font-family:var(--font-body);padding:var(--space-xl);}
+  .page-title{font-family:var(--font-display);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--space-lg);}
+  .state-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.10em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--space-sm);margin-top:var(--space-xl);display:block;}
+  .state-label:first-of-type{margin-top:0;}
+
+  /* Footer strip */
+  .footer-strip{border-top:1px solid var(--border);background:var(--panel-1);padding:var(--space-md) var(--space-lg);}
+  .bottom-bar{display:flex;align-items:center;justify-content:space-between;gap:var(--space-md);flex-wrap:wrap;}
+  .copyright{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);opacity:.7;}
+  .icons{display:flex;align-items:center;gap:var(--space-sm);}
+  .icon-link{display:flex;align-items:center;justify-content:center;width:32px;height:32px;color:var(--text-muted);text-decoration:none;border-radius:var(--radius-sm);}
+  .icon-link--hover{color:var(--text-primary);background:var(--panel-2);}
+  .icon-link--focus{outline:2px solid var(--accent);outline-offset:2px;color:var(--text-primary);}
+
+  /* Footer link states */
+  .flink{font-size:13px;color:var(--text-muted);text-decoration:none;display:inline-block;margin-right:var(--space-md);}
+  .flink--hover{color:var(--text-primary);}
+  .flink--focus{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--radius-sm);color:var(--text-primary);}
+  .flink--accent{color:var(--accent-alt);}
+  .flink--accent-hover{color:var(--accent-hot);}
+
+  /* Wordmark states */
+  .wm{font-family:var(--font-display);font-size:15px;font-weight:600;letter-spacing:-.03em;color:var(--text-primary);text-decoration:none;display:inline-flex;align-items:center;gap:6px;}
+  .wm-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;}
+  .wm--focus{outline:2px solid var(--accent);outline-offset:3px;border-radius:var(--radius-sm);}
+
+  table{border-collapse:collapse;width:100%;max-width:700px;margin-bottom:var(--space-xl);}
+  th{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);text-align:left;padding:var(--space-sm) var(--space-md) var(--space-sm) 0;border-bottom:1px solid var(--border);}
+  td{padding:var(--space-sm) var(--space-md) var(--space-sm) 0;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:middle;}
+  td:first-child{font-family:var(--font-mono);font-size:11px;color:var(--text-muted);white-space:nowrap;}
+</style>
+</head>
+<body>
+<p class="page-title">withagents.dev — Footer · All States</p>
+
+<!-- Wordmark states -->
+<span class="state-label">Wordmark states</span>
+<table>
+  <thead><tr><th>State</th><th>Element</th></tr></thead>
+  <tbody>
+    <tr><td>Default</td><td><a class="wm" href="#"><span class="wm-dot" aria-hidden="true"></span>withagents</a></td></tr>
+    <tr><td>Focus-visible</td><td><a class="wm wm--focus" href="#"><span class="wm-dot" aria-hidden="true"></span>withagents</a></td></tr>
+  </tbody>
+</table>
+
+<!-- Footer link states -->
+<span class="state-label">Footer link states</span>
+<table>
+  <thead><tr><th>State</th><th>Default link</th><th>Accent CTA link</th></tr></thead>
+  <tbody>
+    <tr><td>Default</td><td><a class="flink" href="#">Runbooks</a></td><td><a class="flink flink--accent" href="#">Start a conversation</a></td></tr>
+    <tr><td>Hover</td><td><a class="flink flink--hover" href="#">Runbooks</a></td><td><a class="flink flink--accent-hover" href="#">Start a conversation</a></td></tr>
+    <tr><td>Focus-visible</td><td><a class="flink flink--focus" href="#">Runbooks</a></td><td><a class="flink flink--accent flink--focus" href="#">Start a conversation</a></td></tr>
+  </tbody>
+</table>
+
+<!-- Icon link states -->
+<span class="state-label">Icon link states (RSS, GitHub)</span>
+<table>
+  <thead><tr><th>State</th><th>RSS</th><th>GitHub</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Default</td>
+      <td>
+        <a class="icon-link" href="#" aria-label="RSS feed">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="3.5" cy="12.5" r="1.5" fill="currentColor"/><path d="M3.5 8.5A4 4 0 0 1 7.5 12.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M3.5 4.5A8 8 0 0 1 11.5 12.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </a>
+      </td>
+      <td>
+        <a class="icon-link" href="#" aria-label="GitHub">
+          <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.5 1a7.5 7.5 0 0 0-2.37 14.62c.375.07.51-.163.51-.36 0-.178-.007-.77-.01-1.4-2.085.453-2.525-.9-2.525-.9-.34-.866-.83-1.097-.83-1.097-.68-.464.051-.455.051-.455.75.053 1.145.77 1.145.77.667 1.143 1.75.813 2.177.621.067-.483.26-.813.474-.999-1.664-.19-3.413-.832-3.413-3.702 0-.818.292-1.486.77-2.01-.077-.19-.334-.952.073-1.984 0 0 .628-.201 2.057.768A7.15 7.15 0 0 1 8.5 5.36c.636.003 1.276.086 1.874.252 1.427-.969 2.055-.768 2.055-.768.408 1.032.15 1.794.074 1.984.48.524.77 1.192.77 2.01 0 2.878-1.752 3.51-3.42 3.695.268.232.508.688.508 1.387 0 1.002-.009 1.81-.009 2.056 0 .2.133.433.513.36A7.5 7.5 0 0 0 8.5 1Z" fill="currentColor"/></svg>
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td>Hover</td>
+      <td>
+        <a class="icon-link icon-link--hover" href="#" aria-label="RSS feed">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="3.5" cy="12.5" r="1.5" fill="currentColor"/><path d="M3.5 8.5A4 4 0 0 1 7.5 12.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M3.5 4.5A8 8 0 0 1 11.5 12.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </a>
+      </td>
+      <td>
+        <a class="icon-link icon-link--hover" href="#" aria-label="GitHub">
+          <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.5 1a7.5 7.5 0 0 0-2.37 14.62c.375.07.51-.163.51-.36 0-.178-.007-.77-.01-1.4-2.085.453-2.525-.9-2.525-.9-.34-.866-.83-1.097-.83-1.097-.68-.464.051-.455.051-.455.75.053 1.145.77 1.145.77.667 1.143 1.75.813 2.177.621.067-.483.26-.813.474-.999-1.664-.19-3.413-.832-3.413-3.702 0-.818.292-1.486.77-2.01-.077-.19-.334-.952.073-1.984 0 0 .628-.201 2.057.768A7.15 7.15 0 0 1 8.5 5.36c.636.003 1.276.086 1.874.252 1.427-.969 2.055-.768 2.055-.768.408 1.032.15 1.794.074 1.984.48.524.77 1.192.77 2.01 0 2.878-1.752 3.51-3.42 3.695.268.232.508.688.508 1.387 0 1.002-.009 1.81-.009 2.056 0 .2.133.433.513.36A7.5 7.5 0 0 0 8.5 1Z" fill="currentColor"/></svg>
+        </a>
+      </td>
+    </tr>
+    <tr>
+      <td>Focus-visible</td>
+      <td>
+        <a class="icon-link icon-link--focus" href="#" aria-label="RSS feed">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="3.5" cy="12.5" r="1.5" fill="currentColor"/><path d="M3.5 8.5A4 4 0 0 1 7.5 12.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M3.5 4.5A8 8 0 0 1 11.5 12.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        </a>
+      </td>
+      <td>
+        <a class="icon-link icon-link--focus" href="#" aria-label="GitHub">
+          <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.5 1a7.5 7.5 0 0 0-2.37 14.62c.375.07.51-.163.51-.36 0-.178-.007-.77-.01-1.4-2.085.453-2.525-.9-2.525-.9-.34-.866-.83-1.097-.83-1.097-.68-.464.051-.455.051-.455.75.053 1.145.77 1.145.77.667 1.143 1.75.813 2.177.621.067-.483.26-.813.474-.999-1.664-.19-3.413-.832-3.413-3.702 0-.818.292-1.486.77-2.01-.077-.19-.334-.952.073-1.984 0 0 .628-.201 2.057.768A7.15 7.15 0 0 1 8.5 5.36c.636.003 1.276.086 1.874.252 1.427-.969 2.055-.768 2.055-.768.408 1.032.15 1.794.074 1.984.48.524.77 1.192.77 2.01 0 2.878-1.752 3.51-3.42 3.695.268.232.508.688.508 1.387 0 1.002-.009 1.81-.009 2.056 0 .2.133.433.513.36A7.5 7.5 0 0 0 8.5 1Z" fill="currentColor"/></svg>
+        </a>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Full footer strip -->
+<span class="state-label">Full bottom bar — default</span>
+<div class="footer-strip">
+  <div class="bottom-bar">
+    <p class="copyright">© 2026 withagents.dev</p>
+    <div class="icons">
+      <a class="icon-link" href="#" aria-label="RSS feed"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="3.5" cy="12.5" r="1.5" fill="currentColor"/><path d="M3.5 8.5A4 4 0 0 1 7.5 12.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M3.5 4.5A8 8 0 0 1 11.5 12.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg></a>
+      <a class="icon-link" href="#" aria-label="GitHub"><svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.5 1a7.5 7.5 0 0 0-2.37 14.62c.375.07.51-.163.51-.36 0-.178-.007-.77-.01-1.4-2.085.453-2.525-.9-2.525-.9-.34-.866-.83-1.097-.83-1.097-.68-.464.051-.455.051-.455.75.053 1.145.77 1.145.77.667 1.143 1.75.813 2.177.621.067-.483.26-.813.474-.999-1.664-.19-3.413-.832-3.413-3.702 0-.818.292-1.486.77-2.01-.077-.19-.334-.952.073-1.984 0 0 .628-.201 2.057.768A7.15 7.15 0 0 1 8.5 5.36c.636.003 1.276.086 1.874.252 1.427-.969 2.055-.768 2.055-.768.408 1.032.15 1.794.074 1.984.48.524.77 1.192.77 2.01 0 2.878-1.752 3.51-3.42 3.695.268.232.508.688.508 1.387 0 1.002-.009 1.81-.009 2.056 0 .2.133.433.513.36A7.5 7.5 0 0 0 8.5 1Z" fill="currentColor"/></svg></a>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

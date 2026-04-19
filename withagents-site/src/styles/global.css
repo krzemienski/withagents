@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+@theme {
+  /* ── Surfaces (permanent hyper-black palette) ── */
+  --color-void:    #040404;
+  --color-panel-1: #0A0A0D;
+  --color-panel-2: #111116;
+  --color-panel-3: #15151C;
+
+  /* ── Text ── */
+  --color-text:    #F5F5F7;
+  --color-muted:   #A1A1AA;
+  --color-muted-2: #71717A;
+
+  /* ── Accent: Ultraviolet (default) ── */
+  --color-accent:      #8B5CF6;
+  --color-accent-alt:  #C084FC;
+  --color-accent-hot:  #E879F9;
+  --color-accent-lime: #A3E635;
+
+  /* ── Border ── */
+  --color-border: rgba(255,255,255,0.10);
+  --color-hair:   rgba(255,255,255,0.06);
+  --color-wash:   rgba(139,92,246,0.12);
+
+  /* ── Typography ── */
+  --font-display: 'Space Grotesk', 'Sora', system-ui, sans-serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+  --font-mono:    'IBM Plex Mono', ui-monospace, Menlo, monospace;
+
+  /* ── Radius scale (sharp-first per design spec) ── */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+}
+
+/* ── Accent theme overrides (data-accent attribute on <html>) ── */
+[data-accent="ultraviolet"] {
+  --color-accent:      #8B5CF6;
+  --color-accent-alt:  #C084FC;
+  --color-accent-hot:  #E879F9;
+  --color-accent-lime: #A3E635;
+  --color-border:      rgba(255,255,255,0.10);
+  --color-wash:        rgba(139,92,246,0.12);
+}
+[data-accent="magenta"] {
+  --color-accent:      #A855F7;
+  --color-accent-alt:  #F472B6;
+  --color-accent-hot:  #FB7185;
+  --color-accent-lime: #A3E635;
+  --color-border:      rgba(244,114,182,0.14);
+  --color-wash:        rgba(168,85,247,0.16);
+}
+[data-accent="lime"] {
+  --color-accent:      #7C3AED;
+  --color-accent-alt:  #A3E635;
+  --color-accent-hot:  #D946EF;
+  --color-accent-lime: #A3E635;
+  --color-border:      rgba(163,230,53,0.14);
+  --color-wash:        rgba(124,58,237,0.12);
+}
+[data-accent="orchid"] {
+  --color-accent:      #9333EA;
+  --color-accent-alt:  #DDD6FE;
+  --color-accent-hot:  #E879F9;
+  --color-accent-lime: #84CC16;
+  --color-border:      rgba(255,255,255,0.08);
+  --color-wash:        rgba(147,51,234,0.10);
+}
+[data-accent="plasma"] {
+  --color-accent:      #9333EA;
+  --color-accent-alt:  #EC4899;
+  --color-accent-hot:  #F472B6;
+  --color-accent-lime: #A3E635;
+  --color-border:      rgba(236,72,153,0.12);
+  --color-wash:        rgba(147,51,234,0.13);
+}
+[data-accent="mono"] {
+  --color-accent:      #7C3AED;
+  --color-accent-alt:  #D4D4D8;
+  --color-accent-hot:  #C084FC;
+  --color-accent-lime: #84CC16;
+  --color-border:      rgba(255,255,255,0.08);
+  --color-wash:        rgba(124,58,237,0.09);
+}
+
+/* ── Typography theme overrides (data-type attribute on <html>) ── */
+[data-type="inter"]   { --font-display: 'Inter', system-ui, sans-serif;          --font-body: 'Inter', system-ui, sans-serif; }
+[data-type="sora"]    { --font-display: 'Sora', system-ui, sans-serif;           --font-body: 'Sora', system-ui, sans-serif; }
+[data-type="space"]   { --font-display: 'Space Grotesk', system-ui, sans-serif;  --font-body: 'Space Grotesk', system-ui, sans-serif; }
+[data-type="manrope"] { --font-display: 'Manrope', system-ui, sans-serif;        --font-body: 'Manrope', system-ui, sans-serif; }
+[data-type="plex"]    { --font-display: 'IBM Plex Sans', system-ui, sans-serif;  --font-body: 'IBM Plex Sans', system-ui, sans-serif; --font-mono: 'IBM Plex Mono', ui-monospace, monospace; }
+
+/* ── Branding mode overrides (data-brand attribute on <html>) ── */
+[data-brand="nexus"]   { --track-wordmark: -0.02em; --wordmark-transform: none;      --wordmark-weight: 560; }
+[data-brand="index"]   { --track-wordmark: -0.03em; --wordmark-transform: lowercase; --wordmark-weight: 500; }
+[data-brand="command"] { --track-wordmark:  0.08em; --wordmark-transform: uppercase; --wordmark-weight: 600; }
+[data-brand="glyph"]   { --track-wordmark: -0.02em; --wordmark-transform: none;      --wordmark-weight: 560; }
+[data-brand="frame"]   { --track-wordmark: -0.01em; --wordmark-transform: none;      --wordmark-weight: 500; }
+
+/* ── Base reset ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-void);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-feature-settings: "ss01","cv11","ss03";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+::selection { background: var(--color-accent); color: #fff; }
+
+/* ── Ambient background wash ── */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(1200px 600px at 50% -10%, var(--color-wash), transparent 60%),
+    radial-gradient(800px 400px at 100% 100%, rgba(255,255,255,0.02), transparent 60%);
+}
+
+/* ── Focus ring ── */
+:focus-visible {
+  outline: 1px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 3px;
+}
+
+/* ── Wordmark ── */
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: var(--wordmark-weight, 500);
+  letter-spacing: var(--track-wordmark, -0.03em);
+  text-transform: var(--wordmark-transform, lowercase);
+}

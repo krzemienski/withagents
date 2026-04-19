@@ -1,0 +1,14 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import BrandLab from '@/components/BrandLab.tsx';
+---
+
+<BaseLayout
+  title="WithAgents · Interactive Brand Lab"
+  description="Explore the WithAgents design system — 6 accent themes, 5 branding modes, 5 typography options. Live switching in a hyper-black canvas."
+  accent="ultraviolet"
+  brand="index"
+  type="space"
+>
+  <BrandLab client:load />
+</BaseLayout>

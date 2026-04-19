@@ -1,0 +1,38 @@
+---
+name: Memory Layer
+slug: memory-layer
+tagline: Practical patterns for preserving context across sessions and tools
+status: beta
+kind: product
+techChips:
+  - Python
+  - SQLite
+  - Claude SDK
+githubUrl: https://github.com/krzemienski/claude-mem-architecture
+version: v0.4.0
+lastUpdated: "2026-04-19"
+---
+
+Memory Layer is a set of practical patterns for preserving context across sessions, tools, and multi-step agent work. It is not a retrieval system. It is a coordination primitive.
+
+The distinction matters. Retrieval systems answer "what did I know?" Memory Layer answers "what do the agents currently working on this task need to share?"
+
+## The problem it solves
+
+In a single-agent session, context lives in the window. The moment a second agent joins — or the session ends and a new one begins — that context is gone. The file system is the only coordination protocol that scales past two agents.
+
+Memory Layer formalizes that observation. It provides typed schemas for observations, decisions, and pending work. Each schema maps directly to a SQLite table. Agents read and write through a small Python interface rather than raw file access.
+
+## Core schema
+
+```
+observations  — what an agent saw (timestamped, source-tagged)
+decisions     — what was decided and why (with rationale field)
+pending       — work items not yet claimed by any agent
+```
+
+## Key insight
+
+Cross-session memory is a product design problem, not just a retrieval problem. The hard part is not storing facts — it is deciding which facts are worth storing, in what granularity, and how long to keep them.
+
+Memory Layer does not make that decision for you. It gives you the scaffolding to make it explicitly.

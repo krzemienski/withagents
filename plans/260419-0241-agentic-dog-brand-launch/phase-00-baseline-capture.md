@@ -10,7 +10,7 @@ injected_from: strengthening-package 2026-04-19
 
 ## Purpose
 
-Snapshot every metric that matters **before** any agentic.dog work begins. Without a baseline, every future "the push worked" claim is unfalsifiable.
+Snapshot every metric that matters **before** any withagents.dev work begins. Without a baseline, every future "the push worked" claim is unfalsifiable.
 
 ## Deliverable
 

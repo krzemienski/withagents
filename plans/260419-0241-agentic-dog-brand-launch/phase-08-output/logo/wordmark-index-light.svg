@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 120" width="512" height="120" role="img" aria-label="withagents">
+  <title>WithAgents — Index wordmark (light surface)</title>
+  <desc>Lowercase editorial wordmark inverted for light backgrounds. Accent on i in Ultraviolet.</desc>
+  <rect width="512" height="120" fill="#F5F5F7"/>
+  <text x="40" y="82" font-family="'Space Grotesk', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif" font-weight="500" font-size="64" letter-spacing="-2.4" fill="#0A0A0D" xml:space="preserve">w<tspan fill="#8B5CF6">i</tspan>thagents</text>
+</svg>

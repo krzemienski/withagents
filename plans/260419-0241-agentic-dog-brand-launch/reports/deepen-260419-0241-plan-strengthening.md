@@ -1,4 +1,4 @@
-# Plan Strengthening Package — agentic.dog Brand Launch
+# Plan Strengthening Package — withagents.dev Brand Launch
 
 **Produced by:** deepen-prompt-plan skill
 **Date:** 2026-04-19 03:40
@@ -109,7 +109,7 @@ Inject these into plan.md as Decision 8 (new). Floors, not ceilings. Failure to 
 | LinkedIn follower delta | +15% (or +N whichever larger) | +30% |
 | X follower delta | +10% | +25% |
 | Flagship repo stars (total across 3: validationforge, code-tales family, manifesto companion) | +100 | +300 |
-| agentic.dog unique visitors (Plausible count) | 1,000 | 5,000 |
+| withagents.dev unique visitors (Plausible count) | 1,000 | 5,000 |
 | Blog post avg time-on-page | ≥3 min | ≥5 min |
 | Non-flagship product repo stars delta | +25 across portfolio | +75 |
 
@@ -155,7 +155,7 @@ Red-team show-stopper #4 demands effort estimates exist BEFORE approval. Here th
 | Phase | Deliverable | Hours | Calendar days | Justification |
 |---|---|---|---|---|
 | 08 | Visual system production (final exports, tokens, components) | 16-24h | 3-4 | Theme already spec'd in Phase 03; production exports are mostly rendering + token extraction. |
-| 09 | CMS site build (Astro+Keystatic, templates, OG, DNS, Vercel) — agentic.dog | 40-56h | 7-10 | From-zero repo stand-up (8h), Keystatic schemas (6h), templates incl. series/projects/now/work (12h), OG Satori wiring (4h), DNS+Vercel+analytics (4h), content seeding (6h), QA (4h). |
+| 09 | CMS site build (Astro+Keystatic, templates, OG, DNS, Vercel) — withagents.dev | 40-56h | 7-10 | From-zero repo stand-up (8h), Keystatic schemas (6h), templates incl. series/projects/now/work (12h), OG Satori wiring (4h), DNS+Vercel+analytics (4h), content seeding (6h), QA (4h). |
 | 09b | hack.ski variant (if kept as separate site) | +16-24h | +3-4 | Shared stack; work is content-model divergence, nav, copy overrides, second DNS/Vercel. **Zero if hack.ski collapses to redirect landing.** |
 | 10 | Content pre-draft backlog + publish-rhythm setup | 60-90h | 10-14 | 3 flagships × 6-8h = 24h. 8-10 product posts × 3-4h = 32h. 6-8 insights × 1-2h = 12h. Voice review pass +20% = 14h overhead. See rhythm below — **not all of this pre-push; ~60% pre-push, 40% during**. |
 | 11 | Automation infra (syndication runner, credentials, cron/hooks) | 60-80h | 10-14 | LinkedIn OAuth2 + X API v2 wiring (16h), Keystatic-publish webhook → runner (8h), platform adapters (24h: LinkedIn-short, X-thread, repo README patch), error handling + retry (8h), Supabase logging (4h), manual-LinkedIn-article prep tooling (6h), credential vault (4h). **Red-team "2-3 weeks" is right.** |
@@ -234,15 +234,15 @@ Red-team show-stopper #3. Current "clone with copy differences" is worst-of-thre
 <hack_ski_decision required_before="phase_01_spawn">
   <option_a name="Differentiate visually">
     <visual_delta>Different accent palette (swap neon green → cyan #00d4ff, neon yellow → magenta #ff00aa). Different motif: retro-vaporwave instead of terminal scanlines.</visual_delta>
-    <content_overlap>0-25% shared posts (manifesto yes; product posts = agentic.dog only).</content_overlap>
+    <content_overlap>0-25% shared posts (manifesto yes; product posts = withagents.dev only).</content_overlap>
     <effort>+16-24h visual system variant (phase-03), +16-24h build variant (phase-09b). ~4-6 days.</effort>
-    <narrative>hack.ski = personal exploration; agentic.dog = professional consulting.</narrative>
+    <narrative>hack.ski = personal exploration; withagents.dev = professional consulting.</narrative>
   </option_a>
   <option_b name="Redirect landing">
     <visual_delta>Single-page hack.ski with bio + 4 link buttons. No CMS, no blog.</visual_delta>
     <content_overlap>0% shared posts.</content_overlap>
     <effort>2-4h. Just a static HTML page + DNS wire.</effort>
-    <narrative>hack.ski = personal front door; agentic.dog = where the work lives.</narrative>
+    <narrative>hack.ski = personal front door; withagents.dev = where the work lives.</narrative>
   </option_b>
   <option_c name="Drop from this cycle">
     <visual_delta>N/A. Parked domain.</visual_delta>
@@ -274,7 +274,7 @@ Red-team show-stopper #5. Current plan 260305-2119-devlog-publisher-website/ has
   <option_a name="Complete first, then start">
     <action>Finish in-flight 260305-2119 plan — push all pending posts, deploy, close the plan. THEN start Phase 01 of this plan.</action>
     <time_impact>+1-2 weeks before Phase 01.</time_impact>
-    <risk>Lose momentum on agentic.dog launch; blog-series posts may not match new voice spec.</risk>
+    <risk>Lose momentum on withagents.dev launch; blog-series posts may not match new voice spec.</risk>
   </option_a>
   <option_b name="Absorb into Phase 09" recommended="true">
     <action>Retire 260305-2119 as a separate plan. This plan's Phase 09 CMS build imports the 18 posts and refactors into new content model. Commit in-flight edits that are still wanted; revert the rest.</action>
@@ -425,7 +425,7 @@ Deepened exactly 8 sections (measurement, risks/kill-switch, effort estimates, h
 </check>
 
 <check name="originality_preserved">
-Author intent preserved: 30-day multi-channel push, agentic.dog umbrella, hyper-terminal theme, flagship-anchored calendar, real-session-mined content, consultant positioning. Nothing scoped out.
+Author intent preserved: 30-day multi-channel push, withagents.dev umbrella, hyper-terminal theme, flagship-anchored calendar, real-session-mined content, consultant positioning. Nothing scoped out.
 </check>
 
 <check name="validation_gates_present">

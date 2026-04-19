@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WithAgents Brand Identity &amp; Theme System</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Sora:wght@400;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-fixed-variant": "#5516be",
+                        "tertiary": "#c6c6ca",
+                        "primary-fixed": "#e9ddff",
+                        "on-tertiary-fixed-variant": "#45474a",
+                        "on-tertiary": "#2f3034",
+                        "surface": "#131313",
+                        "on-error-container": "#ffdad6",
+                        "error": "#ffb4ab",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-tint": "#d0bcff",
+                        "on-background": "#e5e2e1",
+                        "background": "#131313",
+                        "tertiary-fixed": "#e2e2e6",
+                        "inverse-on-surface": "#313030",
+                        "surface-container": "#201f1f",
+                        "outline-variant": "#494454",
+                        "on-primary-fixed": "#23005c",
+                        "on-primary-container": "#340080",
+                        "on-secondary-container": "#304b00",
+                        "surface-variant": "#353534",
+                        "on-surface": "#e5e2e1",
+                        "error-container": "#93000a",
+                        "surface-container-low": "#1c1b1b",
+                        "secondary": "#9ddf2e",
+                        "inverse-primary": "#6d3bd7",
+                        "inverse-surface": "#e5e2e1",
+                        "primary-fixed-dim": "#d0bcff",
+                        "on-tertiary-fixed": "#1a1c1f",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-secondary-fixed": "#121f00",
+                        "on-secondary-fixed-variant": "#334f00",
+                        "tertiary-fixed-dim": "#c6c6ca",
+                        "secondary-fixed": "#b2f746",
+                        "secondary-fixed-dim": "#98da27",
+                        "on-secondary": "#213600",
+                        "on-primary": "#3c0091",
+                        "surface-bright": "#3a3939",
+                        "surface-container-highest": "#353534",
+                        "tertiary-container": "#909094",
+                        "outline": "#958ea0",
+                        "on-error": "#690005",
+                        "primary": "#d0bcff",
+                        "surface-dim": "#131313",
+                        "on-tertiary-container": "#282a2d",
+                        "secondary-container": "#83c300",
+                        "on-surface-variant": "#cbc3d7",
+                        "primary-container": "#a078ff",
+                        // Brand Specific Overrides for this demo
+                        "hyper-black": "#040404",
+                        "panel-main": "#0A0A0D",
+                        "panel-sec": "#111116",
+                        "panel-ter": "#15151C",
+                        "ultraviolet": "#8B5CF6",
+                        "lime-signal": "#A3E635",
+                        "plasma": "#EC4899",
+                        "mono-hyper": "#D4D4D8",
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    fontFamily: {
+                        "sora": ["Sora", "sans-serif"],
+                        "inter": ["Inter", "sans-serif"],
+                        "mono": ["IBM Plex Mono", "monospace"],
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Space Grotesk"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #040404; color: #e5e2e1; }
+        .glass-panel { background: rgba(10, 10, 13, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .ghost-border { border: 1px solid rgba(73, 68, 84, 0.15); }
+        .glow-hover:hover { box-shadow: 0 0 15px rgba(139, 92, 246, 0.3); }
+        .ambient-shadow { box-shadow: 0 10px 40px -10px rgba(0,0,0,0.8); }
+    </style>
+</head>
+<body class="font-inter antialiased min-h-screen flex flex-col md:flex-row overflow-x-hidden selection:bg-ultraviolet selection:text-white">
+<!-- JSON: SideNavBar Implementation for Desktop Context -->
+<aside class="hidden md:flex flex-col h-screen w-64 rounded-none bg-[#0A0A0D] border-r border-white/5 tonal contrast against #040404 canvas sticky top-0 shrink-0">
+<div class="p-6">
+<h1 class="font-sora font-black text-[#8B5CF6] text-xl tracking-tighter">WithAgents</h1>
+<p class="font-mono text-[10px] text-zinc-500 mt-2 uppercase tracking-widest">v2.4.0-alpha</p>
+</div>
+<nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+<a class="flex items-center gap-3 px-4 py-3 bg-[#15151C] text-[#A3E635] shadow-[inset_4px_0_0_0_#A3E635] font-mono text-[11px] uppercase tracking-wider" href="#">
+<span class="material-symbols-outlined text-[18px]">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 hover:bg-[#111116] hover:text-white transition-all ease-out duration-200 font-mono text-[11px] uppercase tracking-wider" href="#">
+<span class="material-symbols-outlined text-[18px]">memory</span>
+                Agent Fleet
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 hover:bg-[#111116] hover:text-white transition-all ease-out duration-200 font-mono text-[11px] uppercase tracking-wider" href="#">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+                Neural Logs
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 hover:bg-[#111116] hover:text-white transition-all ease-out duration-200 font-mono text-[11px] uppercase tracking-wider" href="#">
+<span class="material-symbols-outlined text-[18px]">inventory_2</span>
+                Registry
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-zinc-500 hover:bg-[#111116] hover:text-white transition-all ease-out duration-200 font-mono text-[11px] uppercase tracking-wider" href="#">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="p-4 space-y-4">
+<button class="w-full bg-ultraviolet text-white rounded-[2px] py-3 text-sm font-medium hover:bg-opacity-90 transition-all glow-hover">
+                Deploy New Agent
+            </button>
+<div class="flex flex-col gap-2 pt-4 border-t border-white/5">
+<a class="flex items-center gap-2 text-zinc-500 hover:text-white text-[11px] font-mono uppercase transition-colors" href="#">
+<span class="material-symbols-outlined text-[16px]">help_outline</span> Support
+                </a>
+<a class="flex items-center gap-2 text-zinc-500 hover:text-white text-[11px] font-mono uppercase transition-colors" href="#">
+<span class="material-symbols-outlined text-[16px]">sensors</span> API Status
+                </a>
+</div>
+</div>
+</aside>
+<main class="flex-1 min-h-screen bg-hyper-black relative">
+<!-- Top Nav for Mobile Fallback Context (JSON translation) -->
+<header class="md:hidden flex justify-between items-center w-full px-6 py-4 bg-[#040404]/80 backdrop-blur-md sticky top-0 z-50 bg-[#0A0A0D] tonal shift, no borders">
+<div class="font-sora text-xl font-bold tracking-tighter text-white">WithAgents</div>
+<button class="text-white"><span class="material-symbols-outlined">menu</span></button>
+</header>
+<div class="max-w-[1440px] mx-auto px-6 py-12 md:py-20 lg:px-12 xl:px-24 space-y-24">
+<!-- Intro -->
+<section class="max-w-3xl space-y-6">
+<h2 class="font-sora text-4xl md:text-5xl font-bold tracking-tight text-white">Brand Identity &amp; Theme System</h2>
+<p class="text-zinc-400 text-lg leading-relaxed">The Technical Curator philosophy manifested. High-End Editorial meets Technical Brutalism. Premium restraint across typography, surface logic, and accent signaling.</p>
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-panel-ter text-mono-hyper font-mono text-[10px] uppercase tracking-widest rounded-none">
+<span class="w-1.5 h-1.5 rounded-full bg-lime-signal"></span> System Status: Active
+                </div>
+</section>
+<!-- 1. Branding Modes Grid -->
+<section class="space-y-8">
+<div class="flex items-baseline gap-4 mb-4">
+<span class="font-mono text-ultraviolet text-sm">01</span>
+<h3 class="font-sora text-2xl font-semibold text-white tracking-tight">Branding Modes</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Nexus -->
+<div class="bg-panel-sec aspect-video flex flex-col justify-center items-center relative group overflow-hidden ghost-border">
+<div class="absolute top-4 left-4 font-mono text-[10px] text-zinc-500 uppercase tracking-widest">Nexus Mode</div>
+<h4 class="font-sora text-3xl font-bold text-white tracking-tighter transition-transform group-hover:scale-105 duration-500">WithAgents</h4>
+</div>
+<!-- Index -->
+<div class="bg-panel-sec aspect-video flex flex-col justify-center items-center relative group overflow-hidden ghost-border">
+<div class="absolute top-4 left-4 font-mono text-[10px] text-zinc-500 uppercase tracking-widest">Index Mode</div>
+<h4 class="font-mono text-2xl font-medium text-mono-hyper tracking-tight transition-transform group-hover:scale-105 duration-500">withagents</h4>
+</div>
+<!-- Command -->
+<div class="bg-panel-sec aspect-video flex flex-col justify-center items-center relative group overflow-hidden ghost-border">
+<div class="absolute top-4 left-4 font-mono text-[10px] text-zinc-500 uppercase tracking-widest">Command Mode</div>
+<h4 class="font-inter font-black text-4xl text-transparent bg-clip-text bg-gradient-to-r from-ultraviolet to-plasma tracking-tighter uppercase transition-transform group-hover:scale-105 duration-500">WITHAGENTS</h4>
+</div>
+<!-- Glyph -->
+<div class="bg-panel-sec aspect-square md:aspect-auto md:h-48 flex justify-center items-center relative ghost-border">
+<div class="absolute top-4 left-4 font-mono text-[10px] text-zinc-500 uppercase tracking-widest">Glyph</div>
+<div class="w-12 h-12 border-2 border-ultraviolet rotate-45 flex items-center justify-center">
+<div class="w-4 h-4 bg-white -rotate-45"></div>
+</div>
+</div>
+<!-- Frame -->
+<div class="bg-panel-sec aspect-square md:aspect-auto md:h-48 flex justify-center items-center relative ghost-border md:col-span-2">
+<div class="absolute top-4 left-4 font-mono text-[10px] text-zinc-500 uppercase tracking-widest">Frame Integration</div>
+<div class="flex items-center gap-6 px-8 py-4 border border-zinc-800 bg-panel-ter">
+<div class="w-6 h-6 border-2 border-ultraviolet rotate-45"></div>
+<span class="font-sora font-semibold text-lg text-white tracking-tight">WithAgents</span>
+<span class="text-zinc-600 font-mono text-sm pl-4 border-l border-zinc-800">Workspace</span>
+</div>
+</div>
+</div>
+</section>
+<!-- 2. Accent Theme Matrix -->
+<section class="space-y-8">
+<div class="flex items-baseline gap-4 mb-4">
+<span class="font-mono text-ultraviolet text-sm">02</span>
+<h3 class="font-sora text-2xl font-semibold text-white tracking-tight">Signal Matrix</h3>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<!-- Ultraviolet -->
+<div class="bg-panel-sec p-6 space-y-6 ghost-border">
+<div class="w-full h-24 bg-ultraviolet rounded-[2px]"></div>
+<div>
+<div class="font-mono text-[11px] text-zinc-400 uppercase tracking-wider mb-1">Primary</div>
+<div class="font-sora text-lg text-white">Ultraviolet</div>
+<div class="font-mono text-[10px] text-zinc-500 mt-1">#8B5CF6</div>
+</div>
+<button class="w-full py-2 bg-ultraviolet text-white text-sm font-medium rounded-[2px] glow-hover transition-all">Action</button>
+</div>
+<!-- Lime Signal -->
+<div class="bg-panel-sec p-6 space-y-6 ghost-border">
+<div class="w-full h-24 bg-lime-signal rounded-[2px]"></div>
+<div>
+<div class="font-mono text-[11px] text-zinc-400 uppercase tracking-wider mb-1">Status / Active</div>
+<div class="font-sora text-lg text-white">Lime Signal</div>
+<div class="font-mono text-[10px] text-zinc-500 mt-1">#A3E635</div>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-lime-signal animate-pulse"></span>
+<span class="font-mono text-[11px] text-lime-signal uppercase tracking-wider">System Online</span>
+</div>
+</div>
+<!-- Plasma -->
+<div class="bg-panel-sec p-6 space-y-6 ghost-border">
+<div class="w-full h-24 bg-plasma rounded-[2px]"></div>
+<div>
+<div class="font-mono text-[11px] text-zinc-400 uppercase tracking-wider mb-1">Critical</div>
+<div class="font-sora text-lg text-white">Plasma</div>
+<div class="font-mono text-[10px] text-zinc-500 mt-1">#EC4899</div>
+</div>
+<div class="px-3 py-2 bg-plasma/10 border-l-2 border-plasma text-plasma text-sm font-mono">
+                            ERR_TIMEOUT
+                        </div>
+</div>
+<!-- Mono Hyper -->
+<div class="bg-panel-sec p-6 space-y-6 ghost-border">
+<div class="w-full h-24 bg-mono-hyper rounded-[2px]"></div>
+<div>
+<div class="font-mono text-[11px] text-zinc-400 uppercase tracking-wider mb-1">Metadata</div>
+<div class="font-sora text-lg text-white">Mono Hyper</div>
+<div class="font-mono text-[10px] text-zinc-500 mt-1">#D4D4D8</div>
+</div>
+<button class="w-full py-2 border border-zinc-700 text-mono-hyper text-sm font-medium rounded-[2px] hover:border-zinc-500 transition-colors">Secondary</button>
+</div>
+</div>
+</section>
+<!-- 3. Typography Showcase -->
+<section class="space-y-8">
+<div class="flex items-baseline gap-4 mb-4">
+<span class="font-mono text-ultraviolet text-sm">03</span>
+<h3 class="font-sora text-2xl font-semibold text-white tracking-tight">Typographic Hierarchy</h3>
+</div>
+<div class="bg-panel-sec ghost-border overflow-hidden">
+<div class="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-white/5">
+<!-- Sora -->
+<div class="p-8 space-y-6">
+<div class="font-mono text-[11px] text-zinc-500 uppercase tracking-widest border-b border-white/5 pb-2">Display / Sora</div>
+<div class="space-y-4">
+<div class="text-6xl font-sora font-bold tracking-tighter text-white">Aa</div>
+<p class="font-sora text-2xl font-semibold tracking-tight text-white leading-tight">The Technical Curator.</p>
+<p class="text-zinc-500 text-sm">Used for large, expressive titles. Geometric but warm, providing a modern feel with tight letter spacing.</p>
+</div>
+</div>
+<!-- Inter -->
+<div class="p-8 space-y-6">
+<div class="font-mono text-[11px] text-zinc-500 uppercase tracking-widest border-b border-white/5 pb-2">Body / Inter</div>
+<div class="space-y-4">
+<div class="text-6xl font-inter font-medium tracking-tight text-white">Aa</div>
+<p class="font-inter text-lg text-zinc-300 leading-relaxed">The workhorse typeface. Utilized for all functional UI components and long-form reading contexts.</p>
+<p class="text-zinc-500 text-sm">Provides neutral clarity and optimal legibility across varying pixel densities.</p>
+</div>
+</div>
+<!-- IBM Plex Mono -->
+<div class="p-8 space-y-6 bg-panel-ter/50">
+<div class="font-mono text-[11px] text-ultraviolet uppercase tracking-widest border-b border-white/5 pb-2">Editorial Signal / Plex Mono</div>
+<div class="space-y-4">
+<div class="text-6xl font-mono text-white">Aa</div>
+<p class="font-mono text-sm text-mono-hyper uppercase tracking-wider leading-relaxed">System architecture initialized. Payload 0xFA4. Awaiting instructions.</p>
+<p class="text-zinc-500 text-sm">Used for metadata, labels, code snippets, grounding the system in a technical reality.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 4. Permanent Base Surface System -->
+<section class="space-y-8">
+<div class="flex items-baseline gap-4 mb-4">
+<span class="font-mono text-ultraviolet text-sm">04</span>
+<h3 class="font-sora text-2xl font-semibold text-white tracking-tight">Tonal Architecture</h3>
+</div>
+<div class="relative h-[400px] w-full max-w-4xl flex items-center justify-center p-12">
+<!-- Base Canvas -->
+<div class="absolute inset-0 bg-hyper-black border border-white/5 flex items-end p-4">
+<span class="font-mono text-[10px] text-zinc-600 uppercase tracking-widest">Level 0: Canvas (#040404)</span>
+</div>
+<!-- Panel Main -->
+<div class="relative w-[90%] h-[80%] bg-panel-main shadow-2xl flex items-end justify-end p-4">
+<span class="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">Level 1: Main Container (#0A0A0D)</span>
+<!-- Panel Sec -->
+<div class="absolute top-12 left-12 right-24 bottom-12 bg-panel-sec flex flex-col justify-between p-6">
+<span class="font-mono text-[10px] text-zinc-400 uppercase tracking-widest">Level 2: Surface (#111116)</span>
+<div class="space-y-4 w-full max-w-xs">
+<!-- Panel Ter -->
+<div class="w-full p-4 bg-panel-ter border-l-2 border-ultraviolet">
+<span class="font-mono text-[10px] text-zinc-300 uppercase tracking-widest">Level 3: Utility/Hover (#15151C)</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 5. Interactive Logic Mock -->
+<section class="space-y-8 pb-24">
+<div class="flex items-baseline gap-4 mb-4">
+<span class="font-mono text-ultraviolet text-sm">05</span>
+<h3 class="font-sora text-2xl font-semibold text-white tracking-tight">Interface Configuration</h3>
+</div>
+<div class="bg-panel-main p-8 md:p-12 ghost-border">
+<div class="flex flex-col md:flex-row gap-12 items-start">
+<!-- Controls -->
+<div class="w-full md:w-1/3 space-y-8">
+<div>
+<h4 class="font-mono text-[11px] text-zinc-500 uppercase tracking-widest mb-4">Select Identity Mode</h4>
+<div class="space-y-2">
+<label class="flex items-center gap-3 p-3 bg-panel-sec border border-ultraviolet cursor-pointer transition-colors">
+<input checked="" class="form-radio text-ultraviolet bg-transparent border-zinc-600 focus:ring-0 focus:ring-offset-0" name="mode" type="radio"/>
+<span class="font-sora text-sm text-white">Nexus (Default)</span>
+</label>
+<label class="flex items-center gap-3 p-3 bg-panel-ter/50 border border-transparent hover:border-zinc-700 cursor-pointer transition-colors">
+<input class="form-radio text-ultraviolet bg-transparent border-zinc-600 focus:ring-0 focus:ring-offset-0" name="mode" type="radio"/>
+<span class="font-mono text-sm text-zinc-400">Index</span>
+</label>
+</div>
+</div>
+<div>
+<h4 class="font-mono text-[11px] text-zinc-500 uppercase tracking-widest mb-4">Signal Color</h4>
+<div class="flex gap-3">
+<button class="w-8 h-8 rounded-full bg-ultraviolet ring-2 ring-white ring-offset-2 ring-offset-panel-main"></button>
+<button class="w-8 h-8 rounded-full bg-lime-signal opacity-50 hover:opacity-100 transition-opacity"></button>
+<button class="w-8 h-8 rounded-full bg-plasma opacity-50 hover:opacity-100 transition-opacity"></button>
+</div>
+</div>
+</div>
+<!-- Preview Canvas -->
+<div class="flex-1 w-full bg-hyper-black border border-white/5 p-8 relative overflow-hidden">
+<!-- Glass Overlay Decor -->
+<div class="absolute top-0 right-0 w-64 h-64 bg-ultraviolet/10 rounded-full blur-[80px] pointer-events-none"></div>
+<div class="relative z-10 space-y-6">
+<div class="flex justify-between items-center border-b border-white/10 pb-4">
+<span class="font-sora font-bold text-xl text-white">WithAgents</span>
+<div class="flex gap-4">
+<span class="font-mono text-xs text-zinc-500">v2.4.0</span>
+<span class="w-2 h-2 rounded-full bg-lime-signal mt-1"></span>
+</div>
+</div>
+<div class="space-y-4">
+<h5 class="font-inter font-medium text-white text-lg">System Status</h5>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-panel-sec p-4 ghost-border flex flex-col gap-2">
+<span class="material-symbols-outlined text-ultraviolet">memory</span>
+<span class="font-mono text-xs text-zinc-400">Core Load</span>
+<span class="font-sora text-2xl text-white">24%</span>
+</div>
+<div class="bg-panel-sec p-4 ghost-border flex flex-col gap-2">
+<span class="material-symbols-outlined text-zinc-500">terminal</span>
+<span class="font-mono text-xs text-zinc-400">Active Tasks</span>
+<span class="font-sora text-2xl text-white">1,042</span>
+</div>
+</div>
+</div>
+<div class="pt-4 flex gap-4">
+<button class="px-6 py-2 bg-ultraviolet text-white text-sm font-medium rounded-[2px] hover:bg-opacity-90 transition-all glow-hover">Execute</button>
+<button class="px-6 py-2 border border-zinc-700 text-zinc-300 text-sm font-medium rounded-[2px] hover:border-zinc-500 transition-colors">Cancel</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+</body></html>

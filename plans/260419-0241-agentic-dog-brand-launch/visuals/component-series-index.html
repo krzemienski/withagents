@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>series-index — agentic.dog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg-void: #0a0a0a;
+    --bg-alt: #111827;
+    --bg-elev: #161e2e;
+    --border-faint: #1f2937;
+    --border-glow: #374151;
+    --accent-pink: #ff006e;
+    --accent-green: #39ff14;
+    --accent-yellow: #faff00;
+    --text-cool: #e5e7eb;
+    --text-muted: #9ca3af;
+    --text-faint: #6b7280;
+    --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    --font-sans: 'Inter', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg-void);
+    color: var(--text-cool);
+    font-family: var(--font-sans);
+    background-image: repeating-linear-gradient(
+      180deg,
+      rgba(255,255,255,0.012) 0,
+      rgba(255,255,255,0.012) 1px,
+      transparent 1px, transparent 3px
+    );
+  }
+
+  .page {
+    max-width: 1060px;
+    margin: 0 auto;
+    padding: 64px 32px 96px;
+  }
+
+  .pre-head {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--accent-green);
+    margin-bottom: 16px;
+    letter-spacing: 0.02em;
+  }
+  .pre-head .cmd { color: var(--text-muted); }
+
+  h1 {
+    font-family: var(--font-mono);
+    font-weight: 800;
+    font-size: 46px;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin: 0 0 12px;
+    color: var(--text-cool);
+  }
+  h1 .accent {
+    color: var(--accent-pink);
+    text-shadow: 0 0 18px rgba(255, 0, 110, 0.4);
+  }
+  h1 .cursor {
+    display: inline-block;
+    width: 10px;
+    height: 42px;
+    background: var(--accent-green);
+    vertical-align: -6px;
+    margin-left: 4px;
+    animation: blink 1.1s steps(2, start) infinite;
+    box-shadow: 0 0 8px var(--accent-green);
+  }
+  @keyframes blink { to { visibility: hidden; } }
+
+  .deck {
+    font-family: var(--font-sans);
+    font-size: 18px;
+    color: var(--text-muted);
+    max-width: 720px;
+    line-height: 1.55;
+    margin: 0 0 40px;
+  }
+
+  .stat-strip {
+    display: flex;
+    gap: 40px;
+    padding: 20px 0;
+    border-top: 1px dashed var(--border-faint);
+    border-bottom: 1px dashed var(--border-faint);
+    margin-bottom: 42px;
+    font-family: var(--font-mono);
+  }
+  .stat .k {
+    color: var(--text-faint);
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .stat .v {
+    color: var(--accent-yellow);
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .stat .v.pink { color: var(--accent-pink); }
+  .stat .v.green { color: var(--accent-green); }
+
+  .ascii-section {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--border-glow);
+    letter-spacing: -0.5px;
+    margin-bottom: 22px;
+    user-select: none;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 780px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 520px) { .grid { grid-template-columns: 1fr; } }
+
+  .post {
+    background: var(--bg-alt);
+    border: 1px solid var(--border-faint);
+    border-radius: 6px;
+    padding: 16px 16px 14px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    transition: border-color .15s, transform .15s, box-shadow .15s;
+  }
+  .post:hover {
+    border-color: var(--accent-pink);
+    transform: translateY(-2px);
+    box-shadow: 0 0 14px rgba(255, 0, 110, 0.2);
+  }
+
+  .post-num {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent-green);
+    letter-spacing: 0.06em;
+  }
+  .post-num .pad { color: var(--text-faint); }
+
+  .post-title {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.35;
+    color: var(--text-cool);
+  }
+  .post:hover .post-title { color: var(--accent-pink); }
+
+  .post-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-top: auto;
+  }
+  .post-tag.flagship { color: var(--accent-pink); }
+  .post-tag.foundation { color: var(--accent-yellow); }
+  .post-tag.companion { color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="pre-head">❯ <span class="cmd">ls ./series/agentic-development/</span></div>
+
+  <h1>18 Lessons from <span class="accent">23,479 Sessions</span><span class="cursor"></span></h1>
+
+  <p class="deck">Notes from 42 days in the trenches — 4,534 human sessions, 18,945 agent-spawned. Mined from 11.6GB of raw JSONL. What broke, what survived, what I'd never do again.</p>
+
+  <div class="stat-strip">
+    <div class="stat"><span class="k">sessions</span><span class="v pink">23,479</span></div>
+    <div class="stat"><span class="k">agent spawns</span><span class="v green">18,945</span></div>
+    <div class="stat"><span class="k">projects</span><span class="v">27</span></div>
+    <div class="stat"><span class="k">lessons</span><span class="v">18</span></div>
+  </div>
+
+  <div class="ascii-section">── index ──────────────────────────────────────────────────────────────────────</div>
+
+  <div class="grid">
+    <a class="post" href="#"><span class="post-num">lesson <span class="pad">0</span>1</span><span class="post-title">Series Launch — 23,479 sessions, 18 lessons</span><span class="post-tag flagship">flagship</span></a>
+    <a class="post" href="#"><span class="post-num">lesson <span class="pad">0</span>2</span><span class="post-title">Multi-Agent Consensus: the P2 bug one reviewer missed</span><span class="post-tag flagship">flagship</span></a>
+    <a class="post" href="#"><span class="post-num">lesson <span class="pad">0</span>3</span><span class="post-title">Functional Validation: validationforge & no-mock discipline</span><span class="post-tag flagship">flagship</span></a>
+    <a class="post" href="#"><span class="post-num">lesson <span class="pad">0</span>4</span><span class="post-title">iOS Streaming Bridge: 5-layer SSE end-to-end</span><span class="post-tag foundation">foundation</span></a>
+    <a class="post" href="#"><span class="post-num">lesson <span class="pad">0</span>5</span><span class="post-title">ils-ios Patterns: Claude Code from your pocket</span><span class="post-tag foundation">foundation</span></a>
+    <a class="post" href="#"><span class="post-num">lesson <span class="pad">0</span>6</span><span class="post-title">Parallel Worktrees: 194 branches, zero conflicts</span><span class="post-tag foundation">foundation</span></a>
+    <a class="post" href="#"><span class="post-num">lesson <span class="pad">0</span>7</span><span class="post-title">Prompt Engineering Stack: 7-layer defense-in-depth</span><span class="post-tag companion">companion</span></a>
+    <a class="post" href="#"><span class="post-num">lesson <span class="pad">0</span>8</span><span class="post-title">Ralph Loop: hat-based orchestration at 1:47 AM</span><span class="post-tag flagship">flagship</span></a>
+    <a class="post" href="#"><span class="post-num">lesson <span class="pad">0</span>9</span><span class="post-title">sessionforge: mining 11.6GB of your own transcripts</span><span class="post-tag flagship">flagship</span></a>
+    <a class="post" href="#"><span class="post-num">lesson 10</span><span class="post-title">Stitch Design-to-Code: 21 screens, 107 validation actions</span><span class="post-tag companion">companion</span></a>
+    <a class="post" href="#"><span class="post-num">lesson 11</span><span class="post-title">Spec-Driven Development with reponexus</span><span class="post-tag companion">companion</span></a>
+    <a class="post" href="#"><span class="post-num">lesson 12</span><span class="post-title">claude-mem: teaching agents to remember across sessions</span><span class="post-tag companion">companion</span></a>
+    <a class="post" href="#"><span class="post-num">lesson 13</span><span class="post-title">Sequential Thinking: the 84-step root cause narrative</span><span class="post-tag companion">companion</span></a>
+    <a class="post" href="#"><span class="post-num">lesson 14</span><span class="post-title">Multi-Agent Merge: 35 worktrees, zero conflicts</span><span class="post-tag companion">companion</span></a>
+    <a class="post" href="#"><span class="post-num">lesson 15</span><span class="post-title">Skills Anatomy: SKILL.md as agent contract</span><span class="post-tag companion">companion</span></a>
+    <a class="post" href="#"><span class="post-num">lesson 16</span><span class="post-title">Claude Code Plugins: hooks + MCP + enforcement</span><span class="post-tag companion">companion</span></a>
+    <a class="post" href="#"><span class="post-num">lesson 17</span><span class="post-title">CCB Evolution: bash script to autonomous builder</span><span class="post-tag companion">companion</span></a>
+    <a class="post" href="#"><span class="post-num">lesson 18</span><span class="post-title">SDK vs CLI: the decision framework</span><span class="post-tag flagship">finale</span></a>
+  </div>
+</div>
+</body>
+</html>

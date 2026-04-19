@@ -1,0 +1,112 @@
+---
+title: "Shannon-CLI: the same stack, no Claude Code session"
+subtitle: "What changes when the seven layers leave the harness behind"
+slug: day-16-shannon-cli
+date: "2026-05-04"
+author: Nick Krzemienski
+kind: field-note
+tags:
+  - Shannon
+  - CLI
+  - AgentDesign
+  - WithAgents
+relatedProjectSlugs:
+  - agent-contracts
+  - operator-ui
+readTime: 6
+excerpt: "Shannon-CLI is the same enforcement stack running headless — no Claude Code harness, no interactive hooks, no UserPromptSubmit. The rules that held inside the session had to earn their keep outside it."
+---
+
+The Shannon framework ran inside Claude Code. Hooks fired on every tool call. Skills activated from user prompts. Seven layers of redundant encoding kept 23,479 sessions on-rails.
+
+Then the job became "run Shannon outside the session." No interactive harness. No UserPromptSubmit. No way to block a tool call because there is no tool broker in the middle. Just Python, a shell, and a schedule.
+
+That is [shannon-cli](https://github.com/krzemienski/shannon-cli). One star, 4.3MB of Python on `master`, three open issues, last push 2026-03-25. Small on purpose. The point is not another framework. The point is to figure out which parts of Shannon survive when the harness leaves.
+
+## What the harness did
+
+Inside Claude Code, six of the seven Shannon layers rely on events only the harness emits.
+
+Layer 3 hooks run because Claude Code invokes them between the model decision and the tool execution. Layer 4 skills activate because the session matches a trigger keyword against a registry. Layer 7 session-start hooks run because there is a session. The harness is the event bus.
+
+Take that away and the stack collapses from seven layers to two: the constitution (Layer 1) and the rules directory (Layer 2). Both are now just text files no runtime is reading. A CLI without a harness is a blank shell prompt. An agent without the harness is a prompt that runs once and exits.
+
+## What Shannon-CLI adds back
+
+Shannon-CLI reconstructs three of the missing layers as explicit pipeline stages. No magic event bus. Every enforcement point is a Python function you call, in order, from `main()`.
+
+```python
+# sketch of the shannon-cli entry path
+def run(task: str, workdir: Path) -> int:
+    context = load_constitution(workdir)          # Layer 1
+    context += load_rules(workdir)                # Layer 2
+    validate_preflight(workdir)                   # substitute for Layer 7
+    plan = plan_phase(task, context)              # substitute for Layer 4 (gate)
+    for step in plan.steps:
+        enforce_invariants(step, workdir)         # substitute for Layer 3
+        result = execute(step, context)
+        record_evidence(result, workdir)
+    return verdict(workdir)
+```
+
+`enforce_invariants` is the one that carried the most weight. Inside Claude Code, the `block-test-files.js` hook stopped a write before the file landed on disk. In the CLI, the equivalent runs after the step plan is generated but before the step executes. Same filename patterns, same exceptions list, different lifecycle slot.
+
+`record_evidence` is the piece the harness never had. Inside a Claude Code session, evidence lives in the transcript. Outside, the transcript does not exist. Evidence is what you wrote to disk — screenshots, command output, JSON response bodies — or it did not happen. The CLI writes to `e2e-evidence/{slug}/step-NN-{desc}.{ext}`, with a non-empty-file check and a timestamp. Empty files are an automatic FAIL.
+
+## The three open issues
+
+Shannon-CLI has three open issues. They are worth naming because each one is the CLI asking for something the harness handed it for free.
+
+**Issue 1: Skill activation without UserPromptSubmit.** Inside Claude Code, a skill fires when a user prompt matches a trigger pattern. In the CLI, there is no UserPromptSubmit event. Right now, skill activation is either explicit (`shannon-cli run --skill functional-validation`) or implicit via a simple keyword match on the task string. Neither feels as tight as the harness version. Still working out whether an opt-in registry or a planning-phase LLM call makes more sense.
+
+**Issue 2: Subagent governance inheritance.** Inside Claude Code, a PreToolUse hook on the Agent tool injects the constitution into every spawned subagent. The CLI has no Agent tool. Subagent handling is whatever Python library does the model call. The inheritance rule has to be re-expressed as a wrapper around every outbound model call, and that wrapper has to survive library updates without silently regressing.
+
+**Issue 3: Watch mode.** Claude Code is inherently long-running. The CLI is not. A daemon mode that reruns Shannon on file change, or on git post-commit, is the obvious answer, but it reintroduces session state, which Shannon's stateless design was trying to avoid.
+
+I do not have clean answers for any of the three. The repo is honest about that. What it does have is a reproducible baseline: `shannon-cli run --target ./your-project` executes the same constitution-plus-rules stack Claude Code users already run, with the same evidence output, on any CI runner.
+
+## What survives the move
+
+Two things held up cleanly.
+
+First, the constitution and rules files port directly. A `.claude/CLAUDE.md` Nick wrote for a Claude Code project is the same text Shannon-CLI loads into its context on preflight. No translation. No duplicated config. The constitution is the contract; the runtime is the negotiable part.
+
+Second, evidence discipline transferred better than expected. The five-point checklist from `evidence-gate-reminder.js` became the CLI's completion gate, and the 34% quality improvement measured inside Claude Code replicated within a factor of two on CLI runs. The gate works because it is a function, not a hook. It does not need a harness.
+
+Six of the seven layers needed a rewrite. The two that did not are the two that were always just files.
+
+## Where Shannon-CLI fits
+
+Not every project needs both Shannon surfaces. The decision tree is short.
+
+If the work happens inside Claude Code with human supervision, use the framework version. Seven layers, 95%-plus compliance, full stack.
+
+If the work happens on CI, on a cron, or in a headless run where no human is watching, use Shannon-CLI. Two survived layers plus three reconstructed ones. Lower ceiling. Fewer false negatives because nobody is there to override a block.
+
+For the middle ground — hybrid runs where a human kicks off a headless job — both surfaces run side by side, sharing the same constitution file. That configuration is what the three open issues are currently chasing.
+
+## Try it
+
+```bash
+pip install shannon-cli
+shannon-cli run --target ./your-project --task "audit streaming module"
+```
+
+Output lands in `e2e-evidence/`, one directory per phase, one file per step, evidence inventory appended automatically. A FAIL verdict cites the specific empty or missing file. A PASS verdict cites the non-empty ones.
+
+Repo at [github.com/krzemienski/shannon-cli](https://github.com/krzemienski/shannon-cli) is small. That is the point. The hooks that survived production are a short list. So is the CLI that replicates them.
+
+Next up, [shannon-mcp](https://github.com/krzemienski/shannon-mcp): what happened when the same stack went the other direction, toward an MCP server, and what that repo's lifecycle taught about which products to keep running and which to let rest.
+
+{/*
+Voice self-check:
+- Word count: ~1,020
+- Em-dash count: 3
+- Em-dashes per 1,000 words: 2.9 (under 5 cap)
+- Banlist hits: 0
+- Opener formula: specific detail (23,479 sessions) -> one-sentence paragraph -> failure before success (harness leaves, stack collapses): PASS
+- Warmth beat: "The repo is honest about that" tied to the three open-issues artifact: PASS
+- Self-deprecating admission: "I do not have clean answers for any of the three": PASS
+- Aphorism count: 1 ("The constitution is the contract; the runtime is the negotiable part.")
+- Rhetorical asides: 0
+*/}

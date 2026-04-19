@@ -1,0 +1,32 @@
+# withagents.dev syndication runner — crontab fragment
+#
+# Install:
+#   crontab -e
+#   Paste this block (adjust REPO_ROOT to your actual checkout path).
+#
+# How it works:
+#   - Fires at 08:00 local time every day.
+#   - Reads the 45-day calendar, determines today's day number from .launch-date,
+#     dispatches all pending channels for that day.
+#   - Re-entrant: already-completed channels are skipped automatically.
+#   - Logs to ~/Library/Logs/syndication-runner.log (macOS) or /tmp/syndication-runner.log.
+#
+# Prerequisites:
+#   1. `gh` CLI installed and authenticated: gh auth login
+#   2. `.launch-date` file in repo root: echo "2026-MM-DD" > /path/to/repo/.launch-date
+#   3. Env vars set in ~/.syndication.env (sourced below):
+#        SUPABASE_URL=https://xxxx.supabase.co
+#        SUPABASE_SERVICE_KEY=service_role_key
+#        X_API_KEY=...
+#        X_API_SECRET=...
+#        GH_OWNER=krzemienski
+#
+# ---- Edit REPO_ROOT before installing -----
+REPO_ROOT=/Users/nick/Desktop/blog-series
+LOG_FILE=/Users/nick/Library/Logs/syndication-runner.log
+
+# Syndication runner — fires at 08:00 every day
+0 8 * * * . $HOME/.syndication.env && cd $REPO_ROOT && npx --yes tsx scripts/syndication/scheduler/runner.ts --today >> $LOG_FILE 2>&1
+
+# Optional: dry-run preview at 07:50 (prints what today's dispatch will do, no side effects)
+# 50 7 * * * . $HOME/.syndication.env && cd $REPO_ROOT && npx --yes tsx scripts/syndication/scheduler/runner.ts --today --dry-run >> $LOG_FILE 2>&1

@@ -1,0 +1,95 @@
+---
+title: "Shannon-CC: the repo that is not there yet"
+subtitle: "Cross-compiled, cross-Claude-Code, and why the fourth Shannon surface still exists only as a question"
+slug: day-18-shannon-cc
+date: "2026-05-06"
+author: Nick Krzemienski
+kind: essay
+tags:
+  - Shannon
+  - AgentDesign
+  - Portfolio
+  - WithAgents
+relatedProjectSlugs:
+  - agent-contracts
+  - operator-ui
+readTime: 7
+excerpt: "The Shannon ecosystem is supposed to be four surfaces. The fourth is shannon-cc: cross-compiled, cross-Claude-Code integration. The GitHub org returns 404. That absence is the honest subject of this post."
+---
+
+The Shannon ecosystem was supposed to be four surfaces.
+
+The first three are real. [shannon-framework](https://github.com/krzemienski/shannon-framework) at version 5.6.0, 2⭐, pushed 2026-03-10. [shannon-cli](https://github.com/krzemienski/shannon-cli) on `master`, 1⭐, pushed 2026-03-25. [shannon-mcp](https://github.com/krzemienski/shannon-mcp) on `main`, 2⭐, last push 2025-11-14. That last one is the Tier-2 reference from yesterday's post.
+
+The fourth surface is supposed to be shannon-cc. Cross-compiled. Cross-Claude-Code integration. Today, `gh repo view krzemienski/shannon-cc` returns:
+
+```
+GraphQL: Could not resolve to a Repository with the name 'krzemienski/shannon-cc'.
+```
+
+Four-oh-four. The repo does not exist.
+
+This post is about the absence. Not an announcement. Not a teaser. Just an honest inventory of the gap, what the gap means, and what the next move looks like.
+
+## What shannon-cc was supposed to be
+
+The term "cross-compiled" came out of a Nick voice note, not a spec. The intent was concrete enough to describe: a Shannon surface that runs the same enforcement stack across multiple Claude Code installations simultaneously. Plural machines. Plural `.claude/` directories. Plural sessions that share a constitution but not a session state.
+
+The use case was a team deployment. One central Shannon configuration that rolls out to every engineer's Claude Code install, with drift detection and enforcement audit trails across the fleet. Think: `shannon-framework` as the local runtime, `shannon-cli` as the headless runtime, `shannon-mcp` as the protocol-boundary runtime, and shannon-cc as the fleet runtime.
+
+In my head, that is a square. Four corners, each one owning a distinct deployment shape. The Shannon surface map in the Day 17 post showed three tiers because there are three real repos. The square has a missing fourth corner, and the way to stay honest about a portfolio is to label the missing corner missing.
+
+## Why it does not exist yet
+
+Three reasons, none of them good.
+
+**Reason 1: the forcing event has not happened.** Every Shannon repo that shipped did so because a real session pressed against a problem. The framework shipped because 14 rules were decorative. The CLI shipped because a CI pipeline needed the same enforcement outside the harness. Shannon-MCP shipped five months of work and then stalled because no user showed up. Shannon-CC has no forcing event because no team has asked for fleet-grade Shannon. The demand signal is zero. Building without demand is how shannon-mcp ended up Tier 2.
+
+**Reason 2: the architecture question is unresolved.** A fleet runtime has to pick between two fundamentally incompatible designs: push configuration from a central server to each install, or pull from a central config on session start. Push is simpler operationally but requires every install to run a daemon. Pull is cleaner but tangles with the shannon-cli pattern that explicitly avoids session state. Neither choice is obviously right. I have not done the design work that would decide it, and the other three repos are doing useful work, so the design work has not happened.
+
+**Reason 3: the name is borrowed.** The "cross-compiled" label came from a voice note where I was free-associating about how the stack would generalize. It is not the right name. "cross-compiled" in every other software context means something specific about build targets, and that is not what this would do. The right name would be something closer to "shannon-fleet" or "shannon-team" or "shannon-broadcast." I do not love any of those either. The name being wrong is a sign that the concept is not crisp enough to ship.
+
+## What the absence teaches
+
+Shipping a portfolio honestly means labeling the holes.
+
+If shannon-cc existed today, the post would have demo output, a repo URL, and working tests. Because it does not, the post has this instead: an acknowledgement that the Shannon surface map has a gap, and an explanation of why the gap has stayed open.
+
+That is a more useful post than a vaporware announcement. Readers who were expecting shannon-cc can stop expecting it. Readers who might have a forcing event can describe it in an issue on [shannon-framework](https://github.com/krzemienski/shannon-framework) with the label `shannon-cc-fleet`. I will take that issue as the forcing event and start the design work. Readers who are fine with three surfaces have explicit permission to move on.
+
+The alternative (publishing a nominal shannon-cc repo with a README and no code) would do three kinds of damage at once. It would break the "real system or nothing" thesis on the product surface the thesis is supposed to protect. It would dilute the Shannon GitHub org with a placeholder. And it would pre-commit to the wrong name.
+
+## What happens next
+
+Three-month check-in on this post. If by August 2026 no forcing event has landed, shannon-cc gets explicitly retired from the roadmap, and the Shannon surface map drops to three tiers permanently. The public page at withagents.dev/products updates to reflect that.
+
+If a forcing event does land, one team with a real need, the first commit goes on whichever of the two architecture branches the forcing use case actually needs. Push vs pull gets decided by the first user, not by an upfront design doc.
+
+The honesty bet is that the three-month window is more valuable than the speculative build. The Shannon stack is a system that exists to make "the real system or nothing" mechanically enforceable. It would be an awkward contradiction if the fourth Shannon surface shipped as a mock of itself.
+
+## The three-surface map, unchanged
+
+Until then:
+
+- [shannon-framework](https://github.com/krzemienski/shannon-framework), Tier 1, inside Claude Code sessions
+- [shannon-cli](https://github.com/krzemienski/shannon-cli), Tier 1, headless and CI
+- [shannon-mcp](https://github.com/krzemienski/shannon-mcp), Tier 2, reference on disk
+- shannon-cc, not applicable, pending a forcing event
+
+Open an issue if you have one. The repo will exist when the need does.
+
+Next up in the series: claude-mem architecture. The memory question that shows up once you have four Shannon surfaces disagreeing with each other across sessions, and what to do about it before you have four.
+
+{/*
+Voice self-check (post-trim pass 2):
+- Word count: ~1,040
+- Em-dash count: 0 (all converted to commas/parens/periods after em-dash audit 2026-04-19 09:12)
+- Em-dashes per 1,000 words: 0.0 (well under 5 cap)
+- Banlist hits: 0
+- Opener formula: specific detail (four surfaces, three real repos with exact pushed_at) -> one-sentence paragraph -> failure before success (fourth returns 404): PASS
+- Warmth beat: "The repo will exist when the need does." tied to the open-issues forcing-event mechanism: PASS
+- Self-deprecating admission: "I do not love any of those either. The name being wrong is a sign that the concept is not crisp enough to ship.": PASS
+- Aphorism count: 1 ("Shipping a portfolio honestly means labeling the holes.")
+- Rhetorical asides: 0
+- Frame: "repo that isn't there yet" / honest gap inventory per brief instruction when shannon-cc doesn't exist
+*/}

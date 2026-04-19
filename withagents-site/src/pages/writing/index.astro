@@ -1,0 +1,234 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+
+interface ListArticle {
+  href: string;
+  kind: string;
+  title: string;
+  excerpt: string;
+  date: string;
+  dateISO: string;
+  readTime: string;
+}
+
+// ─── Seed articles ────────────────────────────────────────────────────────────
+
+const SEEDS: ListArticle[] = [
+  {
+    href: '/writing/agent-workflows-operating-systems',
+    kind: 'Essay',
+    title: 'Agent workflows should read like operating systems, not demos',
+    excerpt: 'Why borrowing paradigms from POSIX and kernel design leads to more resilient agentic behaviors than prompting alone.',
+    date: 'Apr 12, 2026',
+    dateISO: '2026-04-12',
+    readTime: '8 min read',
+  },
+  {
+    href: '/writing/layer-between-chat-and-automation',
+    kind: 'Essay',
+    title: 'The layer between chat and automation is where the real product work lives',
+    excerpt: 'Moving beyond conversational interfaces requires a fundamental rethink of state management, user intent parsing, and deterministic execution.',
+    date: 'Mar 28, 2026',
+    dateISO: '2026-03-28',
+    readTime: '12 min read',
+  },
+  {
+    href: '/writing/context-persistence-product-design',
+    kind: 'Field Note',
+    title: 'Why context persistence is a product design problem, not just a retrieval problem',
+    excerpt: "Memory in LLMs isn't just an engineering hurdle; how and when an agent recalls information dictates the trust model with the user.",
+    date: 'Mar 15, 2026',
+    dateISO: '2026-03-15',
+    readTime: '6 min read',
+  },
+  {
+    href: '/writing/trusting-agent-stack-production',
+    kind: 'Production Analysis',
+    title: 'What to look for before trusting an agent stack in production',
+    excerpt: 'A framework for evaluating reliability, fallback mechanisms, and determinism in emerging agentic frameworks.',
+    date: 'Feb 20, 2026',
+    dateISO: '2026-02-20',
+    readTime: '10 min read',
+  },
+  {
+    href: '/writing/agent-interfaces-inspectable',
+    kind: 'Essay',
+    title: 'How to design agent interfaces that remain inspectable under load',
+    excerpt: 'The operators who survive agentic system failures are the ones who can read a trace. Design for that moment.',
+    date: 'Feb 3, 2026',
+    dateISO: '2026-02-03',
+    readTime: '7 min read',
+  },
+];
+
+// ─── Union: collection entries override seeds on slug collision ───────────────
+
+const map = new Map<string, ListArticle>();
+
+for (const seed of SEEDS) {
+  // Derive slug from href ("/writing/foo" -> "foo")
+  const slug = seed.href.replace('/writing/', '');
+  map.set(slug, seed);
+}
+
+const entries = await getCollection('posts');
+
+for (const entry of entries) {
+  const data = entry.data;
+  const kindLabel =
+    data.kind === 'field-note'
+      ? 'Field Note'
+      : data.kind === 'production-analysis'
+      ? 'Production Analysis'
+      : data.kind.charAt(0).toUpperCase() + data.kind.slice(1);
+
+  const dateISO = data.date;
+  const dateDisplay = new Date(dateISO).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC',
+  });
+
+  map.set(data.slug, {
+    href: `/writing/${data.slug}`,
+    kind: kindLabel,
+    title: data.title,
+    excerpt: data.excerpt ?? data.subtitle ?? '',
+    date: dateDisplay,
+    dateISO,
+    readTime: data.readTime ? `${data.readTime} min read` : '5 min read',
+  });
+}
+
+// Sort descending by date
+const articles = Array.from(map.values()).sort(
+  (a, b) => new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime()
+);
+---
+
+<BaseLayout
+  title="Writing — WithAgents"
+  description="Essays and technical notes on building reliable, agentic systems in production environments."
+>
+  <Nav current="writing" />
+
+  <main class="relative z-10 w-full">
+    <div class="mx-auto max-w-[1200px] px-6 py-16 md:py-24">
+
+      <!-- Header -->
+      <header class="mb-24 md:mb-32">
+        <h1
+          class="font-display font-black text-text tracking-tighter mb-6"
+          style="font-size:clamp(48px,8vw,96px);letter-spacing:-0.04em;"
+        >
+          the index
+        </h1>
+        <p class="font-body text-xl text-muted max-w-2xl leading-relaxed md:text-2xl">
+          Essays and technical notes on building reliable, agentic systems in production environments.
+        </p>
+      </header>
+
+      <!-- Featured article (newest) -->
+      <article class="mb-32 group cursor-pointer">
+        <a href={articles[0].href} class="block focus-visible:outline-accent">
+          <div class="grid grid-cols-1 gap-8 items-start lg:grid-cols-12 lg:gap-16">
+            <div class="order-2 lg:order-1 lg:col-span-8">
+              <div class="flex items-center gap-4 mb-6">
+                <span class="font-mono text-[11px] uppercase tracking-wider text-muted" style="background:var(--color-panel-3);padding:3px 8px;">
+                  {articles[0].kind}
+                </span>
+                <span class="font-mono text-[11px] text-muted-2">{articles[0].date}</span>
+              </div>
+              <h2 class="font-display text-4xl font-bold tracking-tight text-text mb-6 leading-tight transition-colors duration-300 group-hover:text-accent md:text-6xl">
+                {articles[0].title}
+              </h2>
+              <p class="font-body text-lg text-muted leading-relaxed mb-8 max-w-3xl">
+                {articles[0].excerpt}
+              </p>
+              <div class="flex items-center gap-2 font-mono text-xs uppercase tracking-wider text-accent transition-transform duration-300 group-hover:translate-x-2">
+                Read Essay
+                <span class="material-symbols-outlined" style="font-size:16px;">arrow_forward</span>
+              </div>
+            </div>
+            <!-- Hero image placeholder -->
+            <div
+              class="order-1 lg:order-2 lg:col-span-4 h-64 lg:h-full min-h-[240px] relative overflow-hidden"
+              style="background:linear-gradient(135deg,var(--color-panel-2),var(--color-panel-1));"
+            >
+              <div class="absolute inset-0 flex items-center justify-center opacity-20">
+                <span class="material-symbols-outlined text-text" style="font-size:80px;">layers</span>
+              </div>
+            </div>
+          </div>
+        </a>
+      </article>
+
+      <!-- Article feed -->
+      <section class="mb-32">
+        <div
+          class="flex justify-between items-end mb-12 pb-4"
+          style="border-bottom:1px solid var(--color-panel-2);"
+        >
+          <h3 class="font-mono text-xs uppercase tracking-widest text-muted">Recent Dispatch</h3>
+        </div>
+
+        <div class="space-y-12">
+          {articles.slice(1).map((a) => (
+            <a href={a.href} class="group grid grid-cols-1 gap-4 items-baseline cursor-pointer focus-visible:outline-accent md:grid-cols-12 md:gap-8">
+              <div class="font-mono text-xs text-muted-2 md:col-span-2">{a.date}</div>
+              <div class="md:col-span-8">
+                <h4 class="font-display text-2xl font-semibold text-text mb-3 transition-colors duration-300 group-hover:text-accent">
+                  {a.title}
+                </h4>
+                <p class="font-body text-muted leading-relaxed max-w-2xl">{a.excerpt}</p>
+              </div>
+              <div class="hidden text-right md:block md:col-span-2">
+                <span class="font-mono text-[10px] uppercase tracking-wider text-muted" style="background:var(--color-panel-3);padding:2px 8px;">
+                  {a.kind}
+                </span>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+
+      <!-- Field Notes subscription -->
+      <section
+        class="relative overflow-hidden p-8 md:p-16"
+        style="background:var(--color-panel-1);border-top:1px solid var(--color-hair);border-left:1px solid var(--color-hair);"
+      >
+        <div
+          class="pointer-events-none absolute top-0 right-0 h-64 w-64 blur-[100px] rounded-full"
+          style="background:var(--color-wash);"
+          aria-hidden="true"
+        ></div>
+        <div class="relative z-10 max-w-2xl">
+          <h3 class="font-display text-2xl font-bold text-text mb-4">Field Notes</h3>
+          <p class="font-body text-muted mb-8 leading-relaxed">
+            Occasional dispatches on agentic engineering, sent directly to your inbox. No noise.
+          </p>
+          <form class="flex flex-col gap-4 sm:flex-row" onsubmit="event.preventDefault()">
+            <input
+              type="email"
+              name="email"
+              placeholder="email@address.com"
+              class="bg-transparent border-0 text-text placeholder-muted-2 font-mono text-sm focus:ring-0 w-full sm:w-72 transition-colors"
+              style="border-bottom:1px solid rgba(255,255,255,0.20);padding:12px 0;"
+            />
+            <button
+              type="submit"
+              class="font-mono text-[11px] uppercase tracking-widest text-muted border transition-all duration-200 hover:text-text"
+              style="border-color:rgba(255,255,255,0.15);padding:12px 24px;border-radius:2px;"
+            >Subscribe</button>
+          </form>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>

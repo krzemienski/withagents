@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WithAgents — Diagram Frame (Mermaid)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+
+  <style>
+    /* ── WithAgents hyper-black tokens ── */
+    :root {
+      --bg-void:        #040404;
+      --panel-1:        #0A0A0D;
+      --panel-2:        #111116;
+      --panel-3:        #15151C;
+      --text-primary:   #F5F5F7;
+      --text-muted:     #A1A1AA;
+      --accent:         #8B5CF6;
+      --accent-alt:     #C084FC;
+      --accent-hot:     #E879F9;
+      --accent-lime:    #A3E635;
+      --border:         rgba(255,255,255,0.10);
+      --accent-wash:    rgba(139,92,246,0.12);
+
+      /* spacing scale */
+      --space-xs:  8px;
+      --space-sm:  16px;
+      --space-md:  24px;
+      --space-lg:  32px;
+      --space-xl:  48px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-void);
+      color: var(--text-primary);
+      font-family: 'Inter', ui-sans-serif, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: var(--space-lg);
+    }
+
+    /* ── Diagram frame wrapper ── */
+    .diagram-frame {
+      background: var(--panel-1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* ── Frame header (kind-tag + optional title) ── */
+    .diagram-frame__header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-lg);
+      border-bottom: 1px solid var(--border);
+      background: var(--panel-2);
+    }
+
+    .diagram-frame__kind-tag {
+      font-family: 'IBM Plex Mono', ui-monospace, monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-wash);
+      border: 1px solid rgba(139,92,246,0.25);
+      border-radius: 4px;
+      padding: 2px 8px;
+      flex-shrink: 0;
+    }
+
+    .diagram-frame__title {
+      font-family: 'Space Grotesk', Inter, ui-sans-serif, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── Diagram body ── */
+    .diagram-frame__body {
+      padding: var(--space-lg);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    /* Mermaid SVG baseline overrides — ensure hyper-black colours hold */
+    .diagram-frame__body .mermaid svg {
+      background: transparent !important;
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* ── Caption row ── */
+    .diagram-frame__caption {
+      padding: var(--space-sm) var(--space-lg);
+      border-top: 1px solid var(--border);
+      background: var(--panel-2);
+      font-size: 13px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* ── Page demo layout ── */
+    .demo-stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xl);
+    }
+
+    .demo-label {
+      font-family: 'Space Grotesk', Inter, ui-sans-serif, sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: var(--space-sm);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      body { padding: var(--space-sm); }
+      .diagram-frame__body { padding: var(--space-md) var(--space-sm); }
+      .diagram-frame__header { padding: var(--space-sm); }
+      .diagram-frame__caption { padding: var(--space-sm); }
+    }
+
+    /* ── Reduced motion ── */
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    /* ── Focus rings (a11y) ── */
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="demo-stack">
+
+  <!-- Example 1: Flowchart / Architecture -->
+  <div>
+    <p class="demo-label">Architecture diagram</p>
+    <div class="diagram-frame" role="figure" aria-labelledby="fig1-caption">
+      <div class="diagram-frame__header">
+        <span class="diagram-frame__kind-tag">Architecture</span>
+        <span class="diagram-frame__title">Runbook Triage Flow</span>
+      </div>
+      <div class="diagram-frame__body">
+        <div class="mermaid">
+%%{init: {"theme": "base", "themeVariables": {"background":"#040404","mainBkg":"#0A0A0D","secondBkg":"#111116","primaryColor":"#0A0A0D","primaryTextColor":"#F5F5F7","primaryBorderColor":"rgba(255,255,255,0.10)","lineColor":"#8B5CF6","secondaryColor":"#111116","tertiaryColor":"#15151C","textColor":"#F5F5F7","fontFamily":"\"Space Grotesk\", Inter, ui-sans-serif, sans-serif","fontSize":"14px","clusterBkg":"#111116","clusterBorder":"rgba(139,92,246,0.25)","edgeLabelBackground":"#111116"}}}%%
+flowchart TD
+    A([Alert]) --> B{Classify}
+    B -->|P1 — critical| C[Enrich: pull trace + context]
+    B -->|P2 — degraded| D[Enrich: pull logs only]
+    B -->|P3 — noise| E[Suppress + log]
+    C --> F{Route}
+    D --> F
+    F -->|Agent-resolvable| G[Execute: runbook agent]
+    F -->|Human-required| H[Page on-call]
+    G --> I{Verify}
+    H --> I
+    I -->|Pass| J([Resolved ✓])
+    I -->|Fail| K[Escalate + capture span]
+    K --> H
+
+    style A fill:#0A0A0D,stroke:#8B5CF6,color:#F5F5F7
+    style J fill:#0A0A0D,stroke:#A3E635,color:#F5F5F7
+    style E fill:#111116,stroke:#1e1e27,color:#A1A1AA
+    style K fill:#111116,stroke:#E879F9,color:#F5F5F7
+    style B fill:#111116,stroke:#1e1e27,color:#F5F5F7
+    style F fill:#111116,stroke:#1e1e27,color:#F5F5F7
+    style I fill:#111116,stroke:#1e1e27,color:#F5F5F7
+    style C fill:#0A0A0D,stroke:#1e1e27,color:#F5F5F7
+    style D fill:#0A0A0D,stroke:#1e1e27,color:#F5F5F7
+    style G fill:#0A0A0D,stroke:#8B5CF6,color:#F5F5F7
+    style H fill:#15151C,stroke:#E879F9,color:#F5F5F7
+        </div>
+      </div>
+      <div class="diagram-frame__caption" id="fig1-caption">
+        Runbooks triage an alert through classify → enrich → route → execute → verify.
+        Unresolved failures escalate and re-page the on-call responder.
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 2: Sequence diagram -->
+  <div>
+    <p class="demo-label">Sequence diagram</p>
+    <div class="diagram-frame" role="figure" aria-labelledby="fig2-caption">
+      <div class="diagram-frame__header">
+        <span class="diagram-frame__kind-tag">Sequence</span>
+        <span class="diagram-frame__title">Operator stepping into a run</span>
+      </div>
+      <div class="diagram-frame__body">
+        <div class="mermaid">
+%%{init: {"theme": "base", "themeVariables": {"background":"#040404","mainBkg":"#0A0A0D","secondBkg":"#111116","primaryColor":"#0A0A0D","primaryTextColor":"#F5F5F7","primaryBorderColor":"rgba(255,255,255,0.10)","lineColor":"#8B5CF6","secondaryColor":"#111116","tertiaryColor":"#15151C","textColor":"#F5F5F7","fontFamily":"\"Space Grotesk\", Inter, ui-sans-serif, sans-serif","fontSize":"14px","actorBkg":"#0A0A0D","actorBorder":"rgba(139,92,246,0.40)","actorLineColor":"rgba(255,255,255,0.10)","signalColor":"#8B5CF6","signalTextColor":"#F5F5F7","labelBoxBkgColor":"#111116","labelBoxBorderColor":"rgba(255,255,255,0.10)","activationBkgColor":"rgba(139,92,246,0.12)","activationBorderColor":"#8B5CF6","noteBkgColor":"#15151C","noteBorderColor":"rgba(255,255,255,0.10)","noteTextColor":"#A1A1AA","edgeLabelBackground":"#111116"}}}%%
+sequenceDiagram
+    participant Ag as Agent
+    participant Op as Operator UI
+    participant Hu as Human
+
+    Ag->>Op: emit span — tool_call(read_file)
+    Op->>Hu: surface run state + pending action
+    Hu-->>Op: approve
+    Op->>Ag: resume signal
+    Ag->>Op: emit span — reasoning checkpoint
+    Op->>Hu: display reasoning excerpt
+    Hu-->>Op: step-over
+    Ag->>Op: emit span — run_complete
+    Op->>Hu: show diff + resolution summary
+        </div>
+      </div>
+      <div class="diagram-frame__caption" id="fig2-caption">
+        Agent emits spans to Operator UI; human approves or steps over at each checkpoint.
+      </div>
+    </div>
+  </div>
+
+</div><!-- /demo-stack -->
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'base',
+    securityLevel: 'loose',
+    fontFamily: '"Space Grotesk", Inter, ui-sans-serif, sans-serif',
+    themeVariables: {
+      background:           '#040404',
+      mainBkg:              '#0A0A0D',
+      secondBkg:            '#111116',
+      primaryColor:         '#0A0A0D',
+      primaryTextColor:     '#F5F5F7',
+      primaryBorderColor:   'rgba(255,255,255,0.10)',
+      lineColor:            '#8B5CF6',
+      secondaryColor:       '#111116',
+      tertiaryColor:        '#15151C',
+      textColor:            '#F5F5F7',
+      fontFamily:           '"Space Grotesk", Inter, ui-sans-serif, sans-serif',
+      fontSize:             '14px',
+      edgeLabelBackground:  '#111116'
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "twitter-api-v2": ["../../../site/node_modules/twitter-api-v2/dist/esm/index.d.ts"]
+    }
+  },
+  "include": ["*.ts"],
+  "exclude": ["node_modules", "dist"]
+}

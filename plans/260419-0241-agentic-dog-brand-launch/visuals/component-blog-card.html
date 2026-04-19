@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>blog-card — agentic.dog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap">
+<style>
+  :root {
+    --bg-void: #0a0a0a;
+    --bg-alt: #111827;
+    --border-faint: #1f2937;
+    --border-glow: #374151;
+    --accent-pink: #ff006e;
+    --accent-green: #39ff14;
+    --accent-yellow: #faff00;
+    --text-cool: #e5e7eb;
+    --text-muted: #9ca3af;
+    --text-faint: #6b7280;
+    --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    --font-sans: 'Inter', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg-void);
+    color: var(--text-cool);
+    font-family: var(--font-sans);
+    background-image: repeating-linear-gradient(
+      180deg,
+      rgba(255,255,255,0.012) 0px,
+      rgba(255,255,255,0.012) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  }
+  .stage {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+  }
+
+  .blog-card {
+    width: 540px;
+    background: var(--bg-alt);
+    border: 1px solid var(--border-faint);
+    border-left: 3px solid var(--accent-pink);
+    border-radius: 6px;
+    padding: 24px 26px 22px;
+    transition: border-color .2s, transform .2s, box-shadow .2s;
+    cursor: pointer;
+  }
+  .blog-card:hover {
+    border-color: var(--border-glow);
+    border-left-color: var(--accent-pink);
+    transform: translateY(-2px);
+    box-shadow: 0 0 20px rgba(255, 0, 110, 0.18);
+  }
+
+  .pre-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-faint);
+    margin-bottom: 14px;
+    letter-spacing: 0.03em;
+  }
+  .series-tag {
+    color: var(--accent-green);
+    font-weight: 500;
+  }
+  .dot-sep { color: var(--border-glow); }
+  .post-num { color: var(--accent-yellow); }
+
+  h2.title {
+    font-family: var(--font-mono);
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-cool);
+    letter-spacing: -0.01em;
+    line-height: 1.25;
+    margin: 0 0 10px;
+  }
+  .blog-card:hover h2.title {
+    color: var(--accent-pink);
+    text-shadow: 0 0 8px rgba(255, 0, 110, 0.35);
+  }
+
+  .subtitle {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.55;
+    margin: 0 0 20px;
+  }
+  .subtitle .highlight {
+    color: var(--accent-yellow);
+    font-family: var(--font-mono);
+    background: rgba(250, 255, 0, 0.06);
+    padding: 0 4px;
+    border-radius: 2px;
+  }
+
+  .footer-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    border-top: 1px dashed var(--border-faint);
+    padding-top: 14px;
+  }
+  .reading { display: inline-flex; align-items: center; gap: 6px; }
+  .reading::before { content: '~'; color: var(--accent-green); }
+  .read-cta {
+    color: var(--text-muted);
+    transition: color .15s;
+  }
+  .blog-card:hover .read-cta { color: var(--accent-pink); }
+  .arrow { margin-left: 4px; }
+</style>
+</head>
+<body>
+<div class="stage">
+  <article class="blog-card">
+    <div class="pre-header">
+      <span class="series-tag">❯ /series/agentic-development</span>
+      <span class="dot-sep">·</span>
+      <span class="post-num">lesson 09/18</span>
+    </div>
+
+    <h2 class="title">Mining 23,479 Sessions: When the Count Triples Your Own Estimate</h2>
+
+    <p class="subtitle">I claimed <span class="highlight">4,500 sessions</span>. The JSONL logs said <span class="highlight">23,479</span>. Here's the pipeline that mined 11.6GB of raw agent transcripts — and the moment I realized most of my "work" wasn't me.</p>
+
+    <div class="footer-row">
+      <span class="reading">14 min read</span>
+      <span class="read-cta">read lesson <span class="arrow">→</span></span>
+    </div>
+  </article>
+</div>
+</body>
+</html>

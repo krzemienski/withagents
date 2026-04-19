@@ -1,0 +1,19 @@
+---
+interface Props {
+  variant?: 'default' | 'accent' | 'lime';
+}
+const { variant = 'default' } = Astro.props;
+
+const colors: Record<string, string> = {
+  default: 'color:var(--color-muted);background:var(--color-panel-3);',
+  accent:  'color:var(--color-accent);background:var(--color-panel-3);',
+  lime:    'color:var(--color-accent-lime);background:var(--color-panel-3);',
+};
+---
+
+<span
+  class="font-mono text-[10px] uppercase tracking-widest inline-block"
+  style={`${colors[variant] ?? colors.default}padding:3px 8px;`}
+>
+  <slot />
+</span>

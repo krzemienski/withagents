@@ -1,0 +1,146 @@
+---
+title: "withagents-skills: ten skills that survived 1,293 invocations"
+subtitle: "What a skill actually is, how to design one that holds up at scale, and the ten in the package that earned their slot"
+slug: day-35-withagents-skills-package
+date: "2026-05-23"
+author: "Nick Krzemienski"
+kind: production-analysis
+tags:
+  - Skills
+  - WithAgents
+  - AgentDesign
+  - Plugins
+relatedProjectSlugs:
+  - runbooks
+  - agent-contracts
+  - operator-ui
+readTime: 10
+excerpt: "Across the training set, agents invoked `Skill` 1,293 times. They almost never wrote new prompts. They loaded standardized protocols. This package is the ten protocols that survived the cull."
+---
+
+1,293.
+
+That is how many times agents called `Skill` across the 360-day session mine. Read: 88,560. Write: 10,140. Bash: 75,658. Grep: 22,463. Glob: 11,773. In that ranking, `Skill` is a smaller number than the heavy tools. But every Skill call is an agent choosing not to write a new prompt. An agent choosing to load a protocol I already wrote.
+
+Every skill call is a contract. The agent is saying: I don't need to re-reason from first principles right now. I'll load the protocol.
+
+Today I'm shipping ten of those protocols as a single package: `withagents-skills`.
+
+It is not every skill in my `.claude/skills/` directory. I have 217 of those. It is the ten that earned their slot across the last 90 days of shipping real products. The ones that fired enough times, got me out of enough holes, and proved stable enough across projects that I would paste them into a stranger's workflow without apology.
+
+## What a skill actually is
+
+Before the package, the contract. A skill, the way I use the term, is four things:
+
+- **A name** an agent can invoke without ambiguity.
+- **A trigger description** that tells the agent *when* to load it.
+- **A protocol body** in markdown that tells the agent *exactly what to do* once loaded.
+- **A set of guardrails** (file paths, banned operations, evidence requirements) that limit what "done" can mean.
+
+A skill is not a prompt. A prompt is a one-shot instruction. A skill is a contract the agent re-loads whenever the trigger fires. The distinction matters because prompts mutate session-to-session as the human refines them. A skill, once in `.claude/skills/`, is a durable reference that every session loads from the same file on disk. The agent cannot "remember it slightly wrong" because it is loading the literal file every time.
+
+That is the whole reason skills scale and prompts don't. Prompts drift. Files don't.
+
+## The ten in the package
+
+Here is the curated list. Every one of these has a session-JSONL history I can point at.
+
+**1. `functional-validation`.** The Iron Rule compiled as a skill. Enforces "real system or nothing." Blocks mock creation. Requires evidence before DONE. This is the skill `validationforge` is built around. It has been loaded in approximately every serious session I've run in the last 90 days.
+
+**2. `create-validation-plan`.** Generates a journey-scoped validation plan with PASS criteria, evidence requirements, and an explicit abort path. Pairs with `functional-validation`. The difference between a two-paragraph "we'll test it" intention and a structured plan the next agent can actually execute.
+
+**3. `preflight`.** Runs the environment checks that catch 80% of failures before they happen. Build verifies. Runtime dependencies present. Required tools installed. This skill exists because I wasted three afternoons debugging agent failures that turned out to be missing environment variables.
+
+**4. `verdict-writer`.** Reads every evidence file in a directory and emits a PASS/FAIL verdict with specific citations. Refuses PASS on empty evidence. This is the skill that caught 14 would-be passing sessions during the ValidationForge benchmarks.
+
+**5. `devlog-publisher`.** Mines session JSONL across all your projects, groups by date/topic/metrics, and produces publishable devlog drafts. The self-referential one. This is the skill that helped write the series you're reading.
+
+**6. `ck-plan`.** Structured planning skill. Decomposes a feature into phases with context links, related files, implementation steps, success criteria, risks. The template came from 111 `ExitPlanMode` calls in the session mine; agents that used structured planning converged faster and produced fewer contradictions than agents that worked from free-form prose.
+
+**7. `visual-explainer`.** Generates a visual HTML explanation (ASCII + Mermaid + diagrams) for a topic, plan review, or diff. I use this constantly when I need to show a reviewer *what changed* without making them read a diff.
+
+**8. `deepen-prompt-plan`.** Stress-tests a plan before execution. Takes a draft plan, probes for missing dependencies, ambiguous acceptance criteria, unhandled failure modes, and returns the hardened version. This is the skill I run before hitting "go" on any multi-hour autonomous run.
+
+**9. `ai-dev-operating-system`.** The OS-level skill. Coordinates which other skills are active, which hooks are registered, which MCP servers are attached. Thin but load-bearing: it is the skill that keeps other skills from contradicting each other when loaded together.
+
+**10. `skill-creator`.** The meta-skill. Creates new skills with correct YAML, trigger descriptions, and protocol structure. Because writing a skill from scratch without the template is the same failure mode as writing a commit message from scratch: technically possible, practically inconsistent.
+
+## What earned a slot (and what got cut)
+
+The cull was harsher than I wanted it to be. I started with 40 candidates. I cut thirty.
+
+Selection criteria, in order:
+
+1. **Fires > 30 times in the last 90 days.** If a skill isn't triggering, it isn't earning its slot. Novelty doesn't count.
+2. **Non-trivial body.** A skill that is a three-line reminder isn't a skill, it's a comment. If I could replace it with a CLAUDE.md bullet, I did.
+3. **Crosses multiple projects.** Product-specific skills went into the product repos. The ten in the package all fire across at least three distinct project directories.
+4. **No overlap.** If two skills do similar work, only the more mature one ships. `create-validation-plan` and `preflight` look adjacent but their responsibilities don't overlap.
+5. **Documented failure modes.** Every skill in the package has a section that says "this skill does not do X, Y, Z." Skills without a written limitation section got kicked back for revision, not inclusion.
+
+Things I cut:
+
+- Three early drafts of a "code-reviewer" skill that kept rubber-stamping its own builder's work. They failed criterion 4. The Reviewer hat in Ralph already does this better.
+- A "git-helper" skill that was just aliases for common git commands. Failed criterion 2. That belongs in `.zshrc`, not `.claude/skills/`.
+- A "mcp-debugger" skill that was genuinely useful but only fired in one project. Failed criterion 3. It lives in that project's repo.
+
+## Mode-bet: Interactive
+
+Skills are the canonical Interactive-mode product. They work by reshaping the agent's environment, not by running headless or by writing steering code. You invest upfront in the protocol. The agent loads the protocol every session thereafter and behaves differently than an agent without it.
+
+The trade-off I accept on this package: an agent that doesn't respect the environment can ignore a skill. A determined agent can route around the trigger and never load the protocol in the first place. In practice, across the 1,293 `Skill` invocations in the mine, I've seen this happen exactly three times, all of them cases where the agent was doing lookups for which the skill was not relevant. Zero cases of an agent actively avoiding a skill whose trigger matched.
+
+Design rules I keep repeating to myself when writing a new skill:
+
+- **Trigger description owns the outcome.** If the agent doesn't load the skill when the situation calls for it, the skill is useless. Spend half your authoring time on the trigger description.
+- **The body should be short enough to load, long enough to close the loop.** My skills average ~80 lines. Anything longer tends to be a protocol that should have been two skills.
+- **Document what the skill does not do.** Limitation sections catch misuse at the trigger level, not the execution level.
+- **Version your skill file.** A skill whose behavior silently changed yesterday will produce regressions you cannot debug later.
+
+## How to install
+
+```bash
+claude plugin install withagents-skills
+```
+
+This adds `.claude/skills/withagents/` with the ten protocols above, plus the YAML frontmatter each one needs to register. The plugin does not overwrite skills you have already authored with matching names; it namespaces under `withagents/` to avoid collision.
+
+After install, verify:
+
+```bash
+ls ~/.claude/skills/withagents/
+# functional-validation/  create-validation-plan/  preflight/  verdict-writer/
+# devlog-publisher/        ck-plan/                 visual-explainer/
+# deepen-prompt-plan/      ai-dev-operating-system/ skill-creator/
+```
+
+Then trigger a skill explicitly once to confirm load:
+
+```
+/withagents:functional-validation
+```
+
+If the skill loads and prints its protocol body, you're wired.
+
+## The warmth beat
+
+Of the ten, the one I find myself using most, and smiling at when I do, is `devlog-publisher`. It is the skill that mined its own history to produce the devlog post that inspired the skill. That kind of loop is why I started this work. A tool that can ingest the record of its own use and produce something publishable from it feels like the right kind of weird.
+
+The limitation: `devlog-publisher` only works on projects where the session JSONL has been preserved. It cannot mine sessions you never recorded. If your agent runs are ephemeral (containerized, torn down on completion) you lose the substrate the skill operates on. The skill is downstream of a discipline: keep the logs.
+
+## What I'd change in six months
+
+- **More than ten skills.** The package is curated for signal, not coverage. A `v2` with 15-20 skills is likely once I can prove another five survive the cull.
+- **Skill dependencies.** Right now skills are flat. `verdict-writer` depends on `create-validation-plan` producing a specific evidence layout. That dependency is implicit. It should be declared in the skill YAML so a missing upstream skill fails fast.
+- **Per-skill metrics in the package itself.** I can see skill fire counts in the session mine, but the package doesn't expose them to the user. A `/withagents:stats` command would let someone see which of the ten are actually earning their slot in *their* work, not mine.
+
+## Where this goes
+
+Days 36-40 are the skill-of-the-week posts: one per skill-track skill, in order, published weekly. Day 36 is `functional-validation`. Day 37 is `ck-plan`. Day 38 is `visual-explainer`. Day 39 is `deepen-prompt-plan`. Day 40 is `ai-dev-operating-system`. Each post is the surgical single-skill deep-dive the package launch can't accommodate.
+
+Install: `claude plugin install withagents-skills`
+
+Repo: `github.com/krzemienski/withagents-skills`
+
+Read the protocol files. Trigger a few. Write your own and follow the same criteria to decide whether it earns a slot in your own package. The point of skills is that you get to curate what your agents load. I'm shipping mine as a reference implementation, not as a mandate.
+
+{/* voice-self-check: em-dashes=0 (0.0/1k), banlist-hits=0 (expect 0), opener-formula=pass */}

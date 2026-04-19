@@ -1,0 +1,100 @@
+---
+title: "The tunnel config is the whole product"
+subtitle: "opencode on a phone, cloudflared on a laptop, and the four lines of JSON that bridged them"
+slug: day-44-opencode-mobile
+date: "2026-04-19"
+author: Nick Krzemienski
+kind: field-note
+tags:
+  - WithAgents
+  - Mobile
+  - OpenSource
+  - Tunneling
+relatedProjectSlugs:
+  - operator-ui
+  - agent-contracts
+readTime: 6
+excerpt: "A four-line tunnel config running over cloudflared free tier. That was the whole mobile patch to an OSS coding agent — and it taught me where the SDK mode-bet actually ends."
+---
+
+Four lines of JSON in `~/.config/opencode-mobile/tunnel-config.json`:
+
+```json
+{
+  "provider": "cloudflare",
+  "mode": "free",
+  "cloudflaredPath": "/opt/homebrew/bin/cloudflared"
+}
+```
+
+That was the whole mobile patch. Not an iOS app. Not a rewrite. A tunnel contract between my phone and the laptop running `opencode`, sitting in a dotfile most people will never see.
+
+I spent three sessions trying to do more than that. Each one failed the same way.
+
+## What opencode is, and what it is not
+
+opencode is an open-source coding agent. It is not my code. The upstream project lives under `opencode-ai` on npm and ships a CLI that talks to whatever model you route it at. I have been running it against Claude for about a month, mostly as a second opinion when my primary stack got stuck.
+
+"opencode-mobile" is not a fork. There is no separate repo. It is a pattern, a config directory under `~/.config/opencode-mobile/` and a cloudflared tunnel, that lets the desktop instance answer prompts I type from my phone.
+
+The reason it matters for this series is the mode-bet. opencode is the canonical SDK bet: you write code (and in this case, config) to steer the agent. Everything interesting about the mobile story is what happens when an SDK-mode product meets a consumer-mode surface.
+
+## The three failed attempts
+
+**Attempt one: native iOS client.** I sketched a SwiftUI app that would embed the opencode runtime via a bridge. I got as far as the keystore before I admitted I was rebuilding `claude-mobile-expo`, which already exists and is the Day 45 story. Delete.
+
+**Attempt two: reverse-tunnel via ngrok.** Worked. Cost $8/month. I was paying for the privilege of exposing a process that already runs locally. The pricing sheet was the feedback: if the economics don't match the product, the architecture is wrong.
+
+**Attempt three: Tailscale.** Also worked. Required every device in my life to join a mesh, and my phone carrier doesn't love that profile. Two out of three connections dropped during actual use, which in mobile-agent work means the whole interaction aborts mid-thought.
+
+Cloudflared free tier, with one line pointing at the homebrew binary, survived all three scenarios I had used to kill the others. I stopped engineering.
+
+## What the four lines actually bought
+
+The tunnel config is the entire API surface. Everything else is standard:
+
+- `opencode` runs on the laptop with its normal config. No mobile-specific fork.
+- `cloudflared` opens a named tunnel, pointed at the local HTTP port opencode already exposes.
+- The phone hits the tunnel URL through Safari (or a bare shortcut). No custom client.
+- Auth is cloudflared's access policy plus the local opencode's token check. Two layers, neither of them mine to maintain.
+
+The lesson the three failed attempts taught me is that in SDK-mode products, the "mobile version" is almost always the wrong framing. The product is already on the laptop. What you need is a legible boundary, not a second implementation.
+
+## Where the mode-bet ends
+
+opencode is the clearest SDK-mode bet I run. You configure it in code, you invoke it from a shell, you pipe it around like any other CLI. That discipline is what makes it good. It is also what makes "iOS-native opencode" nonsense.
+
+The mobile story for an SDK product is a tunnel and an auth policy. The mobile story for an Interactive product (skills, hooks, a rich environment) is a different thing, and that is where `claude-mobile-expo` actually earns a separate binary. The mobile story for a Non-Interactive product (headless loops) is different again, and that is where Ralph-on-iOS lives.
+
+Three products, three mobile stories, one rule: build the surface the runtime actually needs, not the surface the App Store expects.
+
+## The thing I still do not have
+
+I do not have secure multi-device sync. If I move from the phone to a tablet mid-session, opencode has no idea the caller changed. The tunnel sees one origin. The laptop sees one client. The session is the same, but there is no identity continuity.
+
+I have been pretending that is a feature ("the laptop is the identity, not the device"), and some of the time it is. Some of the time it is exactly the gap that makes me open a terminal instead of the phone, which defeats the point of the tunnel.
+
+If you have solved this without a full identity provider in the loop, I would like to know how. I do not have a great answer yet.
+
+## What ships, what doesn't
+
+What ships on Day 44 of this push: the tunnel config pattern, documented. Four lines of JSON, one tunnel, one cloudflared binary path. That is the whole footprint.
+
+What does not ship: a native client, a custom auth layer, a sync protocol. Those are each their own post, and only one of them (`claude-mobile-expo`) earns its binary.
+
+The full mobile surface is going to take more than a tunnel. But on the laptop where the SDK bet lives, the tunnel config is the whole product.
+
+---
+
+**Companion repo:** opencode (upstream OSS) + local `~/.config/opencode-mobile/tunnel-config.json` pattern. No fork maintained.
+
+**Next post (Day 45):** `claude-mobile-expo`: the Interactive-mode answer to the same question, and the one case where a second binary actually earned its weight.
+
+{/* VOICE SELF-CHECK
+   em-dashes: 4 (words ~1,050) = 3.8/1k: within ≤5/1k cap
+   banlist hits: 0
+   opener: "Four lines of JSON": specific detail, one-sentence paragraph, failure-before-success: pass
+   warmth beat: "I stopped engineering" anchored to the cloudflared config (artifact, not audience)
+   self-deprecating admission: "I do not have a great answer yet" (voice-spec structural preference)
+   aphorism: one: "build the surface the runtime actually needs, not the surface the App Store expects"
+*/}

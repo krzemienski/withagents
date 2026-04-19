@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WithAgents — Diagram Frame (SVG)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── WithAgents hyper-black tokens ── */
+    :root {
+      --bg-void:        #040404;
+      --panel-1:        #0A0A0D;
+      --panel-2:        #111116;
+      --panel-3:        #15151C;
+      --text-primary:   #F5F5F7;
+      --text-muted:     #A1A1AA;
+      --accent:         #8B5CF6;
+      --accent-alt:     #C084FC;
+      --accent-hot:     #E879F9;
+      --accent-lime:    #A3E635;
+      --border:         rgba(255,255,255,0.10);
+      --accent-wash:    rgba(139,92,246,0.12);
+
+      --space-xs:  8px;
+      --space-sm:  16px;
+      --space-md:  24px;
+      --space-lg:  32px;
+      --space-xl:  48px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg-void);
+      color: var(--text-primary);
+      font-family: 'Inter', ui-sans-serif, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: var(--space-lg);
+    }
+
+    /* ── Diagram frame wrapper ── */
+    .diagram-frame {
+      background: var(--panel-1);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* ── Frame header ── */
+    .diagram-frame__header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-lg);
+      border-bottom: 1px solid var(--border);
+      background: var(--panel-2);
+    }
+
+    .diagram-frame__kind-tag {
+      font-family: 'IBM Plex Mono', ui-monospace, monospace;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      background: var(--accent-wash);
+      border: 1px solid rgba(139,92,246,0.25);
+      border-radius: 4px;
+      padding: 2px 8px;
+      flex-shrink: 0;
+    }
+
+    .diagram-frame__title {
+      font-family: 'Space Grotesk', Inter, ui-sans-serif, sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── SVG body — scrollable, centred ── */
+    .diagram-frame__body {
+      padding: var(--space-lg);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    /* SVG embed rules */
+    .diagram-frame__body svg,
+    .diagram-frame__body img.svg-embed {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Inline SVG colour passthrough — ensure theme tokens apply */
+    .diagram-frame__body svg text { fill: var(--text-primary); }
+    .diagram-frame__body svg line,
+    .diagram-frame__body svg path:not([fill]) { stroke: var(--accent); }
+
+    /* Placeholder when no real SVG is loaded */
+    .svg-placeholder {
+      width: 100%;
+      min-height: 200px;
+      background: var(--panel-2);
+      border: 1px dashed rgba(255,255,255,0.10);
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+    }
+
+    .svg-placeholder__label {
+      font-family: 'IBM Plex Mono', ui-monospace, monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+    }
+
+    .svg-placeholder__hint {
+      font-size: 13px;
+      color: rgba(161,161,170,0.6);
+      text-align: center;
+      max-width: 320px;
+    }
+
+    /* ── Caption ── */
+    .diagram-frame__caption {
+      padding: var(--space-sm) var(--space-lg);
+      border-top: 1px solid var(--border);
+      background: var(--panel-2);
+      font-size: 13px;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* ── Demo variant showcase ── */
+    .demo-stack { display: flex; flex-direction: column; gap: var(--space-xl); }
+    .demo-label {
+      font-family: 'Space Grotesk', Inter, ui-sans-serif, sans-serif;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: var(--space-sm);
+    }
+
+    /* ── Inline demo SVG — agent lifecycle sketch ── */
+    .demo-svg-canvas {
+      background: var(--panel-1);
+      width: 100%;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      body { padding: var(--space-sm); }
+      .diagram-frame__body { padding: var(--space-md) var(--space-sm); }
+      .diagram-frame__header { padding: var(--space-sm); }
+      .diagram-frame__caption { padding: var(--space-sm); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="demo-stack">
+
+  <!-- Example 1: Inline SVG (e.g. Excalidraw export) -->
+  <div>
+    <p class="demo-label">Inline SVG — Excalidraw export</p>
+    <div class="diagram-frame" role="figure" aria-labelledby="fig1-caption">
+      <div class="diagram-frame__header">
+        <span class="diagram-frame__kind-tag">Schema</span>
+        <span class="diagram-frame__title">trace-timeline — context-layers relationship</span>
+      </div>
+      <div class="diagram-frame__body">
+        <!--
+          USAGE: Replace the SVG block below with your Excalidraw export.
+          Export from Excalidraw: File → Export image → SVG → embed fonts.
+          The frame handles sizing and dark background automatically.
+        -->
+        <svg
+          class="demo-svg-canvas"
+          viewBox="0 0 760 260"
+          xmlns="http://www.w3.org/2000/svg"
+          role="img"
+          aria-label="Diagram showing trace-timeline and context-layers as connected boxes on a hyper-black background"
+        >
+          <defs>
+            <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+              <polygon points="0 0, 8 3, 0 6" fill="#8B5CF6" />
+            </marker>
+          </defs>
+
+          <!-- trace-timeline box -->
+          <rect x="40" y="80" width="200" height="100" rx="8"
+                fill="#0A0A0D" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+          <text x="140" y="122" text-anchor="middle"
+                font-family="Space Grotesk, Inter, sans-serif" font-size="14" fill="#F5F5F7" font-weight="500">
+            trace-timeline
+          </text>
+          <text x="140" y="144" text-anchor="middle"
+                font-family="IBM Plex Mono, monospace" font-size="11" fill="#A1A1AA">
+            chronological viewer
+          </text>
+
+          <!-- Arrow left to right -->
+          <line x1="240" y1="130" x2="370" y2="130"
+                stroke="#8B5CF6" stroke-width="1.5" marker-end="url(#arrowhead)"/>
+          <text x="305" y="120" text-anchor="middle"
+                font-family="IBM Plex Mono, monospace" font-size="11" fill="#A1A1AA">
+            reads
+          </text>
+
+          <!-- context-layers box -->
+          <rect x="370" y="80" width="200" height="100" rx="8"
+                fill="#111116" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+          <text x="470" y="122" text-anchor="middle"
+                font-family="Space Grotesk, Inter, sans-serif" font-size="14" fill="#F5F5F7" font-weight="500">
+            context-layers
+          </text>
+          <text x="470" y="144" text-anchor="middle"
+                font-family="IBM Plex Mono, monospace" font-size="11" fill="#A1A1AA">
+            composition primitives
+          </text>
+
+          <!-- Arrow right pointing to agent-contracts -->
+          <line x1="570" y1="130" x2="700" y2="130"
+                stroke="rgba(255,255,255,0.30)" stroke-width="1" marker-end="url(#arrowhead)"/>
+          <text x="635" y="120" text-anchor="middle"
+                font-family="IBM Plex Mono, monospace" font-size="11" fill="#A1A1AA">
+            uses
+          </text>
+
+          <!-- agent-contracts box -->
+          <rect x="570" y="80" width="150" height="100" rx="8"
+                fill="#15151C" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+          <text x="645" y="118" text-anchor="middle"
+                font-family="Space Grotesk, Inter, sans-serif" font-size="13" fill="#F5F5F7" font-weight="500">
+            agent-contracts
+          </text>
+          <text x="645" y="138" text-anchor="middle"
+                font-family="IBM Plex Mono, monospace" font-size="10" fill="#A1A1AA">
+            interface contracts
+          </text>
+
+          <!-- title -->
+          <text x="380" y="36" text-anchor="middle"
+                font-family="Space Grotesk, Inter, sans-serif" font-size="13" fill="#A1A1AA" letter-spacing="0.08em">
+            OPEN SOURCE — withagents.dev
+          </text>
+        </svg>
+      </div>
+      <div class="diagram-frame__caption" id="fig1-caption">
+        trace-timeline reads from context-layers, which uses agent-contracts as its interface layer.
+        All three are open-source building blocks.
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 2: Placeholder (how to drop in an external SVG file) -->
+  <div>
+    <p class="demo-label">External SVG file embed</p>
+    <div class="diagram-frame" role="figure" aria-labelledby="fig2-caption">
+      <div class="diagram-frame__header">
+        <span class="diagram-frame__kind-tag">Flow</span>
+        <span class="diagram-frame__title">Drop in your SVG here</span>
+      </div>
+      <div class="diagram-frame__body">
+        <!--
+          USAGE for external SVG files:
+          <img class="svg-embed" src="./your-diagram.svg" alt="Describe the diagram here" />
+          OR use <object> for interactive SVG:
+          <object type="image/svg+xml" data="./your-diagram.svg" class="svg-embed">
+            Your browser does not support SVG.
+          </object>
+        -->
+        <div class="svg-placeholder" role="img" aria-label="Placeholder showing where to embed an SVG diagram">
+          <span class="svg-placeholder__label">SVG goes here</span>
+          <span class="svg-placeholder__hint">
+            Replace this block with an &lt;img src="diagram.svg"&gt;
+            or an inline &lt;svg&gt; exported from Excalidraw.
+          </span>
+        </div>
+      </div>
+      <div class="diagram-frame__caption" id="fig2-caption">
+        Caption text appears here — describe what the diagram shows in plain language.
+      </div>
+    </div>
+  </div>
+
+</div><!-- /demo-stack -->
+
+</body>
+</html>

@@ -1,0 +1,46 @@
+---
+name: agent-contracts
+slug: agent-contracts
+tagline: Reusable typed interface contracts for agent-to-agent communication
+status: stable
+kind: open-source
+techChips:
+  - TypeScript
+  - Zod
+  - JSON Schema
+githubUrl: https://github.com/krzemienski/agent-contracts
+stars: 0
+version: v1.0.0
+lastUpdated: "2026-04-19"
+---
+
+`agent-contracts` is a library of typed interface contracts for agent-to-agent communication. It answers a narrow question: when two agents need to hand off work, what does the handoff look like?
+
+The answer is a contract — a typed schema for the message that crosses the boundary. Not a protocol. Not a transport. Just a schema.
+
+## Why contracts matter
+
+128 TeamCreate invocations and 4,237 TaskUpdate operations across 23,479 sessions all coordinate through disk artifacts, not shared state. The file system is the coordination primitive. But untyped files create silent mismatches: Agent A writes a JSON structure that Agent B parses incorrectly, and the error surfaces 20 steps later as a corrupted decision.
+
+Contracts make the mismatches visible at definition time.
+
+## What the library includes
+
+**Task handoff contract** — schema for passing a task from one agent to another, including context, constraints, and acceptance criteria.
+
+**Evidence contract** — schema for the evidence package an agent produces when completing a validation step. Required fields: `files`, `byteCounts`, `verdict`, `timestamp`.
+
+**Decision contract** — schema for recording a choice: the alternatives considered, the rationale, and the confidence level.
+
+**Abort contract** — schema for a clean abort: the stopping condition, the preserved state, and the re-entry point.
+
+## Usage
+
+```typescript
+import { TaskHandoff, Evidence, Decision } from 'agent-contracts';
+
+// Validates at runtime; throws on schema violation
+const handoff = TaskHandoff.parse(rawPayload);
+```
+
+All contracts are Zod schemas. Parse once at the boundary. Trust everywhere inside.

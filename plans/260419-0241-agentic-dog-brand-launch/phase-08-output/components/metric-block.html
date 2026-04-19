@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WithAgents — Metric Block</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-void:        #040404;
+    --panel-1:        #0A0A0D;
+    --panel-2:        #111116;
+    --panel-3:        #15151C;
+    --text-primary:   #F5F5F7;
+    --text-muted:     #A1A1AA;
+    --accent:         #8B5CF6;
+    --accent-alt:     #C084FC;
+    --accent-hot:     #E879F9;
+    --accent-lime:    #A3E635;
+    --border:         rgba(255,255,255,0.10);
+    --accent-wash:    rgba(139,92,246,0.12);
+    --font-display:   'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-body:      'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-mono:      'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    --radius-sm:      4px;
+    --radius-md:      8px;
+    --space-xs:       6px;
+    --space-sm:       12px;
+    --space-md:       20px;
+    --space-lg:       32px;
+    --space-xl:       48px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg-void);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    padding: var(--space-xl);
+    max-width: 1000px;
+  }
+
+  .page-title { font-family: var(--font-display); font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: var(--space-lg); }
+  .variant-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: .10em; text-transform: uppercase; color: var(--text-muted); margin-bottom: var(--space-sm); margin-top: var(--space-xl); display: block; }
+  .variant-label:first-of-type { margin-top: 0; }
+
+  /* ── Single metric ── */
+  .metric {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .metric__number {
+    font-family: var(--font-display);
+    font-size: 52px;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: -0.04em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .metric__number--accent {
+    color: var(--accent-alt);
+  }
+
+  .metric__number--lime {
+    color: var(--accent-lime);
+  }
+
+  .metric__label {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary);
+    letter-spacing: -0.01em;
+  }
+
+  .metric__caption {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* ── Triple row ── */
+  .metric-row {
+    display: flex;
+    gap: var(--space-xl);
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding: var(--space-lg) 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .metric-row .metric { flex: 1; min-width: 160px; }
+
+  .metric-row .metric + .metric {
+    padding-left: var(--space-xl);
+    border-left: 1px solid var(--border);
+  }
+
+  /* ── Grid layout ── */
+  .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .metric-grid__cell {
+    background: var(--panel-1);
+    padding: var(--space-lg) var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .metric-grid .metric__number {
+    font-size: 40px;
+  }
+
+  /* ── Card metric ── */
+  .metric-card {
+    background: var(--panel-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .metric-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.3;
+  }
+
+  .metric-card__number {
+    font-family: var(--font-display);
+    font-size: 44px;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+  }
+
+  .metric-card__label {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-top: 4px;
+  }
+
+  .metric-card__caption {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-top: 2px;
+  }
+
+  .metric-card__delta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent-lime);
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: var(--space-xs);
+  }
+
+  .metric-card__delta--down {
+    color: #F87171;
+  }
+
+  /* ── Hero number (homepage) ── */
+  .metric-hero {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    max-width: 600px;
+  }
+
+  .metric-hero__number {
+    font-family: var(--font-display);
+    font-size: 80px;
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .metric-hero__label {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: -0.01em;
+  }
+
+  .metric-hero__caption {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 480px;
+  }
+
+  /* Cards grid */
+  .metric-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: var(--space-md);
+  }
+</style>
+</head>
+<body>
+
+<p class="page-title">withagents.dev — Metric Block</p>
+
+<!-- ── Single metric ── -->
+<span class="variant-label">Single metric</span>
+<div class="metric" aria-label="23,479 sessions analyzed">
+  <span class="metric__number">23,479</span>
+  <span class="metric__label">Sessions analyzed</span>
+  <span class="metric__caption">Jan 24 – Mar 6, 2026 · 27 projects · 42 days</span>
+</div>
+
+<!-- ── Triple row ── -->
+<span class="variant-label">Triple row — horizontal</span>
+<div class="metric-row" role="group" aria-label="Key metrics">
+  <div class="metric" aria-label="23,479 sessions">
+    <span class="metric__number">23,479</span>
+    <span class="metric__label">Sessions</span>
+    <span class="metric__caption">4,534 human · 18,945 agent-spawned</span>
+  </div>
+  <div class="metric" aria-label="3.5 million lines">
+    <span class="metric__number metric__number--accent">3.5M</span>
+    <span class="metric__label">Log lines</span>
+    <span class="metric__caption">11.6 GB across 27 projects</span>
+  </div>
+  <div class="metric" aria-label="18 lessons">
+    <span class="metric__number metric__number--lime">18</span>
+    <span class="metric__label">Lessons</span>
+    <span class="metric__caption">Distilled from 42 days of production sessions</span>
+  </div>
+</div>
+
+<!-- ── Grid layout ── -->
+<span class="variant-label">Grid — 4-up</span>
+<div class="metric-grid" role="group" aria-label="Production metrics">
+  <div class="metric-grid__cell">
+    <span class="metric__number" style="font-size:36px">87,152</span>
+    <span class="metric__label" style="font-size:13px">Read calls</span>
+    <span class="metric__caption">Top tool by invocation</span>
+  </div>
+  <div class="metric-grid__cell">
+    <span class="metric__number" style="font-size:36px;color:var(--accent-alt)">82,552</span>
+    <span class="metric__label" style="font-size:13px">Bash calls</span>
+    <span class="metric__caption">Second highest tool</span>
+  </div>
+  <div class="metric-grid__cell">
+    <span class="metric__number" style="font-size:36px;color:var(--accent-lime)">19,979</span>
+    <span class="metric__label" style="font-size:13px">Edit calls</span>
+    <span class="metric__caption">Direct file mutations</span>
+  </div>
+  <div class="metric-grid__cell">
+    <span class="metric__number" style="font-size:36px;color:var(--accent-hot)">11,769</span>
+    <span class="metric__label" style="font-size:13px">Glob calls</span>
+    <span class="metric__caption">File pattern searches</span>
+  </div>
+</div>
+
+<!-- ── Card metrics with delta ── -->
+<span class="variant-label">Cards — with delta indicator</span>
+<div class="metric-cards">
+  <div class="metric-card">
+    <span class="metric-card__number">23,479</span>
+    <span class="metric-card__label">Sessions</span>
+    <span class="metric-card__caption">Human + agent-spawned across 27 projects</span>
+    <span class="metric-card__delta">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 8V2M2 5l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      +18,945 agent sessions
+    </span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-card__number" style="color:var(--accent-alt)">142</span>
+    <span class="metric-card__label">agent-contracts stars</span>
+    <span class="metric-card__caption">GitHub · TypeScript</span>
+    <span class="metric-card__delta">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 8V2M2 5l3-3 3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      +12 this week
+    </span>
+  </div>
+  <div class="metric-card">
+    <span class="metric-card__number" style="color:var(--accent-lime)">0.94</span>
+    <span class="metric-card__label">Confidence score</span>
+    <span class="metric-card__caption">Triage runbook · latest production run</span>
+    <span class="metric-card__delta metric-card__delta--down">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 2v6M2 5l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      -0.02 vs previous
+    </span>
+  </div>
+</div>
+
+<!-- ── Hero number ── -->
+<span class="variant-label">Hero — homepage display number</span>
+<div class="metric-hero" aria-label="23,479 sessions — primary hero metric">
+  <span class="metric-hero__number">23,479</span>
+  <span class="metric-hero__label">sessions analyzed</span>
+  <p class="metric-hero__caption">
+    Four months of production agent work. 27 projects, 42 days, 11.6 GB of session data — distilled into 18 practical lessons.
+  </p>
+</div>
+
+</body>
+</html>

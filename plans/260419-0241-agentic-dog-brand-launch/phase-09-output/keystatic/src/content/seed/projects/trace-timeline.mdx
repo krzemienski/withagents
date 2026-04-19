@@ -1,0 +1,46 @@
+---
+name: trace-timeline
+slug: trace-timeline
+tagline: Chronological execution trace viewer for multi-agent runs
+status: stable
+kind: open-source
+techChips:
+  - TypeScript
+  - React
+  - JSONL
+githubUrl: https://github.com/krzemienski/trace-timeline
+stars: 0
+version: v1.1.0
+lastUpdated: "2026-04-19"
+---
+
+`trace-timeline` is a chronological execution trace viewer for multi-agent runs. It reads JSONL event streams and renders them as an inspectable timeline — tool calls, task boundaries, agent handoffs, and abort events all in order.
+
+## The problem
+
+When 12 agents run in parallel across 35 worktrees and something goes wrong, the question is not "which agent failed?" The question is "what sequence of decisions led to the failure?" A stack trace answers the first question. A trace timeline answers the second.
+
+## What it renders
+
+Each event in the stream becomes a timeline entry:
+
+- **Tool call** — tool name, inputs, duration, output status
+- **Task boundary** — task start/end with owning agent label
+- **Handoff** — which agent passed work to which, and what the handoff contract contained
+- **Decision** — rationale shown inline, alternatives collapsed
+- **Abort** — stopping condition, preserved state, re-entry pointer
+
+## Integration
+
+```typescript
+import { TraceTimeline } from 'trace-timeline';
+
+// Feed it a JSONL event stream path or an array of parsed events
+<TraceTimeline source="/path/to/run.jsonl" theme="hyper-black-default" />
+```
+
+The viewer is stateless. Pass it events; it renders them. No server required.
+
+## Design constraint
+
+Timeline entries lazy-render outside the viewport. A 35-agent, 1,000-event trace opens in under 200ms.

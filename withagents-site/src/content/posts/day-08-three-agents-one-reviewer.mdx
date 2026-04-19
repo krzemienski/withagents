@@ -1,0 +1,88 @@
+---
+title: "Three agents caught a P2 bug a single reviewer approved"
+subtitle: "Consensus gates cost $0.15 per run and save multi-hour regressions. The math was settled by one streaming-operator bug."
+slug: day-08-three-agents-one-reviewer
+date: "2026-04-26"
+author: "Nick Krzemienski"
+kind: field-note
+tags:
+  - Consensus
+  - AgentDesign
+  - WithAgents
+  - Review
+relatedProjectSlugs:
+  - agent-contracts
+  - runbooks
+  - operator-ui
+readTime: 4
+excerpt: "A += operator typo survived three days of single-reviewer approvals and shipped to production. Three independent reviewer agents caught it in one gate run. Fifteen cents versus three days of on-call."
+---
+
+A `+=` operator.
+
+That is what shipped to iOS production past a single reviewer agent, past my own manual review, past a green CI run. Three days on-call. One streaming endpoint accumulating state across requests it should have reset. Every fifth user in a session saw someone else's draft.
+
+The fix was one character. Finding it cost three days. The gate that should have caught it cost fifteen cents.
+
+## The setup
+
+The code merged looked correct under casual review:
+
+```swift
+func appendChunk(_ chunk: String) {
+    buffer += chunk
+}
+```
+
+A junior reviewer would approve it. A senior reviewer reading only the diff would approve it. A single reviewer agent reading it in isolation approved it. The bug only surfaces when you ask three questions at once: is `buffer` reset between requests, is `appendChunk` ever called concurrently, and does the operator match the type contract upstream.
+
+One reviewer, one lens. Three reviewers, three lenses.
+
+## The consensus gate
+
+After the on-call, I built the gate documented in [multi-agent-consensus](https://github.com/krzemienski/multi-agent-consensus). Three agents score the same diff against three different lenses, and a fourth aggregates with a unanimous-PASS rule:
+
+- **Alpha** — reads for operator and type consistency. Flags `+=` against a reset contract, flags mutation where immutability was declared.
+- **Bravo** — reads for state lifecycle. Flags accumulation across request boundaries, flags shared state that should be scoped per-session.
+- **Lead** — reads for docstring/spec alignment. Flags any code change that contradicts the comment block or the declared contract.
+
+On the streaming bug, Alpha surfaced the operator-inconsistency. Bravo surfaced the state hazard. Lead surfaced a docstring that said "resets per-request" against code that no longer reset. Three reviewers, three independent flags. Any one of them would have blocked the merge.
+
+The earlier single-reviewer pass caught none of them.
+
+## The numbers
+
+Across the series data I logged:
+
+| Metric | Count |
+|--------|-------|
+| TeamCreate invocations | 128 |
+| TaskCreate per 10-gate iOS audit run | 75 |
+| Cost per consensus gate | ~$0.15 |
+| Single-reviewer approvals of bugs later caught | 7 across 90 days |
+
+Fifteen cents is the floor for a three-agent gate using Haiku for Alpha and Bravo and Sonnet for the Lead aggregation. Even routing Alpha and Bravo to Sonnet brings the gate under a dollar. The most expensive P2 regression I shipped ate roughly fourteen hours of direct work, plus a support backlog, plus a trust cost I cannot price.
+
+Fifteen cents versus fourteen hours is not a close call.
+
+## Why one reviewer is not enough
+
+The lens a reviewer brings is the lens they were told to bring. A prompt that says "check correctness" produces a reviewer that checks whatever its training pulls up for "correctness." A prompt that says "check state hazards across request boundaries" produces a reviewer that catches the state bug and misses the operator bug.
+
+Consensus gates solve this by forcing the lens to be declared per agent. Alpha's prompt does not overlap with Bravo's. Each agent is scored only on what it was asked to see. When the Lead aggregates, a single FAIL blocks the merge. Unanimous PASS is the only gate that ships.
+
+This is not safety theater. The bug rate differential is the receipt. Across the ninety days after I moved iOS reviews onto the consensus gate, zero `+=`-style operator bugs shipped past merge. The ones that tried got logged in `plans/reports/consensus-*-review.md` with the specific reviewer that caught each.
+
+## The shape that generalizes
+
+You do not need a formal framework to get this behavior. The minimum viable consensus gate is three prompts, three CLI invocations, and a shell script that exits non-zero unless all three return PASS. I built the typed version because I ran enough gates that the prompt drift across runs became its own problem. A contract file fixed that.
+
+But the underlying move is older than the tool. A design review with one architect and no dissenters is not a review. It is a rubber stamp with better hourly billing. The moment a second voice can disagree without political cost, the quality of the first voice's review climbs measurably.
+
+Agent consensus gates give you that second voice for fifteen cents and fifteen seconds. The `+=` bug is the reason they exist.
+
+## Evidence pointer
+
+[multi-agent-consensus](https://github.com/krzemienski/multi-agent-consensus) ships the full gate runner, per-lens prompt templates, and the aggregation rule. `plans/reports/consensus-*-review.md` captures the specific reviewer that caught each production-blocker across the 90-day window. Run the demo against any diff and watch three lenses land three independent objections on code you thought was fine.
+
+Fifteen cents. Three lenses. One merge, blocked.

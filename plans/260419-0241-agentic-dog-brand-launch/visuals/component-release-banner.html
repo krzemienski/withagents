@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>release-banner — agentic.dog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg-void: #0a0a0a;
+    --bg-alt: #111827;
+    --border-faint: #1f2937;
+    --accent-pink: #ff006e;
+    --accent-green: #39ff14;
+    --accent-yellow: #faff00;
+    --text-cool: #e5e7eb;
+    --text-muted: #9ca3af;
+    --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    --font-sans: 'Inter', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg-void);
+    color: var(--text-cool);
+    font-family: var(--font-sans);
+    background-image: repeating-linear-gradient(
+      180deg,
+      rgba(255,255,255,0.012) 0,
+      rgba(255,255,255,0.012) 1px,
+      transparent 1px, transparent 3px
+    );
+    min-height: 100vh;
+  }
+
+  .stage {
+    padding: 48px 24px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .banner {
+    width: 100%;
+    max-width: 1120px;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding: 14px 22px;
+    background: var(--bg-alt);
+    border: 1px solid var(--border-faint);
+    border-left: 3px solid var(--accent-pink);
+    border-radius: 6px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    position: relative;
+    overflow: hidden;
+  }
+  .banner::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 200px;
+    height: 100%;
+    background: radial-gradient(ellipse at right center, rgba(255, 0, 110, 0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .tag {
+    flex: none;
+    background: var(--accent-pink);
+    color: #0a0a0a;
+    padding: 4px 9px;
+    border-radius: 3px;
+    font-weight: 700;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    box-shadow: 0 0 14px rgba(255, 0, 110, 0.55);
+  }
+
+  .blink-cursor {
+    flex: none;
+    color: var(--accent-green);
+    font-weight: 700;
+    animation: blink 1.2s steps(2, start) infinite;
+  }
+  @keyframes blink { to { visibility: hidden; } }
+
+  .msg {
+    flex: 1;
+    color: var(--text-cool);
+    letter-spacing: 0.005em;
+  }
+  .msg strong {
+    color: var(--accent-yellow);
+    font-weight: 700;
+  }
+  .msg .version {
+    color: var(--accent-green);
+    font-weight: 500;
+  }
+  .msg .tagline {
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .cta-link {
+    flex: none;
+    color: var(--accent-pink);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 6px 12px;
+    border: 1px solid rgba(255, 0, 110, 0.3);
+    border-radius: 3px;
+    transition: background .15s, box-shadow .15s;
+    font-size: 12px;
+  }
+  .cta-link:hover {
+    background: rgba(255, 0, 110, 0.08);
+    box-shadow: 0 0 12px rgba(255, 0, 110, 0.3);
+    text-shadow: 0 0 6px rgba(255, 0, 110, 0.4);
+  }
+
+  .close {
+    flex: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px 8px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    background: none;
+    border: none;
+  }
+  .close:hover { color: var(--accent-pink); }
+
+  @media (max-width: 760px) {
+    .banner { flex-wrap: wrap; }
+    .msg { flex-basis: 100%; order: 3; margin-top: 4px; }
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="banner" role="alert">
+    <span class="tag">FLAGSHIP LAUNCH</span>
+    <span class="blink-cursor">▌</span>
+    <span class="msg">
+      <strong>validationforge</strong> <span class="version">v1.0</span>
+      &nbsp;—&nbsp;
+      <span class="tagline">no-mock functional validation for Claude Code. Stop shipping "build passed" lies.</span>
+    </span>
+    <a class="cta-link" href="#">read lesson-03 →</a>
+    <button class="close" aria-label="dismiss">×</button>
+  </div>
+</div>
+</body>
+</html>

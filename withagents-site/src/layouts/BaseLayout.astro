@@ -1,0 +1,73 @@
+---
+import '@/styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  kind?: 'home' | 'product' | 'writing' | 'opensource' | 'about';
+  accent?: 'ultraviolet' | 'magenta' | 'lime' | 'orchid' | 'plasma' | 'mono';
+  brand?: 'nexus' | 'index' | 'command' | 'glyph' | 'frame';
+  type?: 'space' | 'inter' | 'sora' | 'manrope' | 'plex';
+}
+
+const {
+  title = 'WithAgents',
+  description = 'A home for applied agent design: products, open-source work, and writing about what holds up in production.',
+  kind = 'home',
+  accent = 'ultraviolet',
+  brand = 'index',
+  type = 'space',
+} = Astro.props;
+
+const siteBase = Astro.site ?? new URL('https://withagents.dev');
+const ogParams = new URLSearchParams({ title, kind });
+const ogImageUrl = new URL(`/api/og.png?${ogParams.toString()}`, siteBase).toString();
+---
+
+<!doctype html>
+<html
+  lang="en"
+  class="bg-void text-text antialiased"
+  data-accent={accent}
+  data-brand={brand}
+  data-type={type}
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+
+    <!-- Fonts: Space Grotesk + Inter + IBM Plex Mono + Sora + Material Symbols -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Inter:wght@300..700&family=IBM+Plex+Mono:wght@400;500&family=Sora:wght@300..700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+      rel="stylesheet"
+    />
+
+    <!-- favicon placeholder -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- OpenGraph + Twitter Card -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={Astro.url.href} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+  </head>
+  <body>
+    <slot />
+
+    <!-- Plausible Analytics: swap to withagents.dev domain when A5 lands -->
+    {import.meta.env.PROD && <script is:inline defer data-domain="withagents.dev" src="https://plausible.io/js/script.js"></script>}
+  </body>
+</html>

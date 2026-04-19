@@ -1,0 +1,60 @@
+WithAgents OG Image — Edge Function Bundle Size Estimate
+=========================================================
+
+File                              Bytes       KB
+--------------------------------------------------
+SpaceGrotesk-Bold-subset.ttf     32,476      31.7
+Inter-Regular-subset.ttf         32,460      31.7
+Inter-Medium-subset.ttf          32,880      32.1
+IBMPlexMono-Regular-subset.ttf   12,192      11.9
+og-template.tsx                   7,915       7.7
+--------------------------------------------------
+Font + template subtotal         117,923     115.2
+Satori runtime overhead (est)     51,200      50.0
+--------------------------------------------------
+TOTAL ESTIMATE                   169,123     165.2 KB
+
+Ceiling:                       1,048,576   1,024.0 KB
+Safety margin used:              165.2 KB  /  1,024 KB  (16.1%)
+Remaining budget:                858.8 KB
+
+STATUS: PASS — 859 KB under the 1MB ceiling. All 4 font weights included.
+
+──────────────────────────────────────────────────────────────────────────────
+Notes
+──────────────────────────────────────────────────────────────────────────────
+
+1. Satori runtime overhead (~50 KB) is a conservative estimate based on the
+   published @vercel/og bundle. Actual overhead varies 40–60 KB depending on
+   the Vercel Edge runtime version.
+
+2. Fonts were subset to ASCII printable (U+0020–007E) plus:
+     U+2013  EN DASH
+     U+2014  EM DASH
+     U+2018  LEFT SINGLE QUOTATION MARK
+     U+2019  RIGHT SINGLE QUOTATION MARK
+     U+201C  LEFT DOUBLE QUOTATION MARK
+     U+201D  RIGHT DOUBLE QUOTATION MARK
+     U+2026  HORIZONTAL ELLIPSIS
+     U+00A0  NON-BREAKING SPACE
+     U+00B7  MIDDLE DOT
+   Subsetting performed with pyftsubset (fontTools 4.55.0), flags:
+     --no-hinting --desubroutinize
+
+3. SpaceGrotesk source is a variable font (SpaceGrotesk[wght].ttf). After
+   subsetting, pyftsubset preserves the variable axis so Satori can access
+   any weight. The template uses fontWeight: 700 (Bold).
+
+4. If bundle grows beyond 900 KB (leaving 100 KB safety margin), drop fonts
+   in this priority order:
+     a. IBMPlexMono-Regular-subset.ttf  (saves 12 KB) — fall back to
+        "Courier New", monospace in tag chip
+     b. Inter-Medium-subset.ttf         (saves 32 KB) — fall back to
+        Inter-Regular with fontWeight: 600 approximation
+     c. Inter-Regular-subset.ttf        (saves 32 KB) — fall back to
+        -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif
+
+5. Verification command (run from og-template/ directory):
+     du -sh font-subsets/*.ttf og-template.tsx
+   Or for a total:
+     find font-subsets -name "*.ttf" -exec wc -c {} + && wc -c og-template.tsx

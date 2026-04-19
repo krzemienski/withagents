@@ -1,0 +1,42 @@
+---
+interface Props {
+  name: string;
+  slug: string;
+  tagline: string;
+  description: string;
+  sysNum: string;
+  icon: string;
+}
+const { name, slug, tagline, description, sysNum, icon } = Astro.props;
+---
+
+<a
+  href={`/products/${slug}`}
+  class="group flex flex-col relative overflow-hidden transition-colors duration-300 h-[400px] focus-visible:outline-accent"
+  style="background:var(--color-panel-1);border:1px solid var(--color-hair);"
+  onmouseenter="this.style.background='var(--color-panel-2)'"
+  onmouseleave="this.style.background='var(--color-panel-1)'"
+>
+  <!-- Ghost icon top-right -->
+  <div class="absolute top-0 right-0 p-6 pointer-events-none select-none" style="opacity:0.08;" aria-hidden="true">
+    <span class="material-symbols-outlined text-text" style="font-size:64px;">{icon}</span>
+  </div>
+
+  <div class="flex flex-col flex-grow p-8 md:p-10">
+    <!-- Sys chip -->
+    <div class="mb-4">
+      <span class="font-mono text-[10px] text-muted uppercase tracking-widest" style="background:var(--color-panel-3);padding:3px 8px;">
+        {sysNum}
+      </span>
+    </div>
+
+    <h4 class="font-display text-2xl font-bold text-text mb-3 tracking-tight">{name}</h4>
+    <p class="font-body text-sm text-muted leading-relaxed">{description}</p>
+  </div>
+
+  <!-- Bottom link -->
+  <div class="px-8 md:px-10 pb-8 flex items-center gap-2 font-mono text-xs text-muted transition-colors duration-200 group-hover:text-accent">
+    <span>{tagline}</span>
+    <span class="material-symbols-outlined" style="font-size:14px;">arrow_outward</span>
+  </div>
+</a>

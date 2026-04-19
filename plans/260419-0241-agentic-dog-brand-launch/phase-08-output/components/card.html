@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WithAgents — Card Component</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  /* ── WithAgents Design Tokens (Ultraviolet / Hyper-black) ── */
+  :root {
+    --bg-void:        #040404;
+    --panel-1:        #0A0A0D;
+    --panel-2:        #111116;
+    --panel-3:        #15151C;
+    --text-primary:   #F5F5F7;
+    --text-muted:     #A1A1AA;
+    --accent:         #8B5CF6;
+    --accent-alt:     #C084FC;
+    --accent-hot:     #E879F9;
+    --accent-lime:    #A3E635;
+    --border:         rgba(255,255,255,0.10);
+    --accent-wash:    rgba(139,92,246,0.12);
+    --font-display:   'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-body:      'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-mono:      'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    --radius-sm:      4px;
+    --radius-md:      8px;
+    --space-xs:       6px;
+    --space-sm:       12px;
+    --space-md:       20px;
+    --space-lg:       32px;
+    --space-xl:       48px;
+    --transition:     150ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-void);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.6;
+    padding: var(--space-xl);
+    min-height: 100vh;
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: var(--space-lg);
+  }
+
+  .variant-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: var(--space-sm);
+    margin-top: var(--space-lg);
+  }
+  .variant-label:first-of-type { margin-top: 0; }
+
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-md);
+    max-width: 1100px;
+  }
+
+  /* ── Base Card ── */
+  .card {
+    background: var(--panel-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    text-decoration: none;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .card {
+      transition:
+        border-color var(--transition),
+        background var(--transition),
+        box-shadow var(--transition);
+    }
+  }
+
+  /* Hover */
+  .card--hover,
+  .card:hover {
+    border-color: rgba(139,92,246,0.35);
+    background: var(--panel-2);
+    box-shadow: 0 0 0 1px rgba(139,92,246,0.08), 0 4px 20px rgba(0,0,0,0.4);
+  }
+
+  /* Focus-visible */
+  .card--focus,
+  .card:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Featured */
+  .card--featured {
+    border-color: rgba(139,92,246,0.28);
+    background: linear-gradient(135deg, var(--panel-2) 0%, color-mix(in srgb, var(--panel-2) 85%, var(--accent) 15%) 100%);
+  }
+  .card--featured::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.5;
+  }
+
+  /* ── Card inner elements ── */
+  .card__eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .card__eyebrow--featured {
+    color: var(--accent-alt);
+  }
+
+  .card__title {
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+  }
+
+  .card__body {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.65;
+    flex: 1;
+  }
+
+  .card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: var(--space-xs);
+    padding-top: var(--space-sm);
+    border-top: 1px solid var(--border);
+  }
+
+  .card__meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .card__tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    background: var(--accent-wash);
+    border: 1px solid rgba(139,92,246,0.2);
+    border-radius: var(--radius-sm);
+    padding: 2px var(--space-xs);
+  }
+
+  .card__tag--featured {
+    color: var(--accent-alt);
+    background: rgba(192,132,252,0.10);
+    border-color: rgba(192,132,252,0.20);
+  }
+
+  .card__arrow {
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+  }
+
+  .card--hover .card__arrow,
+  .card:hover .card__arrow {
+    color: var(--accent-alt);
+  }
+
+  .card--featured .card__arrow {
+    color: var(--accent-alt);
+  }
+
+  /* ── Product card variant ── */
+  .card--product .card__title {
+    font-size: 19px;
+    font-weight: 700;
+  }
+
+  .card__status {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    padding: 2px 8px;
+    border-radius: 100px;
+    background: rgba(163,230,53,0.10);
+    border: 1px solid rgba(163,230,53,0.22);
+    color: var(--accent-lime);
+    text-transform: uppercase;
+  }
+
+  /* ── Open-source card ── */
+  .card__repo-name {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--accent-alt);
+    letter-spacing: -0.01em;
+  }
+
+  .card__stat {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .card__stat svg {
+    opacity: 0.6;
+  }
+
+  /* ── Writing card ── */
+  .card--writing {
+    border-left: 2px solid var(--accent);
+    padding-left: calc(var(--space-md) - 2px);
+  }
+
+  .card--writing.card--featured {
+    border-left-color: var(--accent-alt);
+  }
+
+  .card__reading-time {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* Featured shine bar */
+  .card--featured .card__footer {
+    border-top-color: rgba(139,92,246,0.20);
+  }
+</style>
+</head>
+<body>
+
+<p class="page-title">withagents.dev — Card Component Library</p>
+
+<!-- ── Default State ── -->
+<p class="variant-label">Default — Writing Index Card</p>
+<div class="card-grid">
+  <article class="card card--writing">
+    <span class="card__eyebrow">Field Notes</span>
+    <h2 class="card__title">Agent workflows should read like operating systems, not demos</h2>
+    <p class="card__body">The production gap between a slick agent demo and a system that holds up under real load is a product design problem. Here's what the seams look like up close.</p>
+    <div class="card__footer">
+      <span class="card__reading-time">8 min read · Apr 2026</span>
+      <span class="card__arrow">
+        Read
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6h7m0 0L6.5 3m3 3L6.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </div>
+  </article>
+
+  <article class="card card--writing">
+    <span class="card__eyebrow">Production Analysis</span>
+    <h2 class="card__title">The layer between chat and automation is where the real product work lives</h2>
+    <p class="card__body">Most teams treat the operator UI as an afterthought. It isn't — it's the entire reason a system can be trusted at scale.</p>
+    <div class="card__footer">
+      <span class="card__reading-time">6 min read · Mar 2026</span>
+      <span class="card__arrow">
+        Read
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6h7m0 0L6.5 3m3 3L6.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </div>
+  </article>
+</div>
+
+<!-- ── Products Card ── -->
+<p class="variant-label">Default — Products Index Card</p>
+<div class="card-grid">
+  <article class="card card--product">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <span class="card__eyebrow">Product</span>
+      <span class="card__status">Beta</span>
+    </div>
+    <h2 class="card__title">Runbooks</h2>
+    <p class="card__body">Opinionated workflows for triage, analysis, and execution across real internal systems. Built for teams that need structured agent operations they can actually inspect.</p>
+    <div class="card__footer">
+      <div style="display:flex;gap:var(--space-xs);">
+        <span class="card__tag">orchestration</span>
+        <span class="card__tag">memory</span>
+      </div>
+      <span class="card__arrow">
+        View
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6h7m0 0L6.5 3m3 3L6.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </div>
+  </article>
+
+  <article class="card card--product">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <span class="card__eyebrow">Product</span>
+      <span class="card__status">Stable</span>
+    </div>
+    <h2 class="card__title">Memory Layer</h2>
+    <p class="card__body">Practical patterns for preserving context across sessions, tools, and multi-step work. Persistent, composable, inspection-friendly.</p>
+    <div class="card__footer">
+      <div style="display:flex;gap:var(--space-xs);">
+        <span class="card__tag">context</span>
+        <span class="card__tag">persistence</span>
+      </div>
+      <span class="card__arrow">
+        View
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6h7m0 0L6.5 3m3 3L6.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </div>
+  </article>
+</div>
+
+<!-- ── Open Source Card ── -->
+<p class="variant-label">Default — Open Source Index Card</p>
+<div class="card-grid">
+  <article class="card">
+    <span class="card__eyebrow">Open Source</span>
+    <span class="card__repo-name">agent-contracts</span>
+    <p class="card__body">Reusable agent-interface contracts. Define what agents can call, what they return, and what they promise — in a form both humans and orchestration layers can verify.</p>
+    <div class="card__footer">
+      <div style="display:flex;gap:var(--space-md);">
+        <span class="card__stat">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1l1.3 2.6L10 4l-2 2 .5 2.8L6 7.5 3.5 8.8 4 6 2 4l2.7-.4L6 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          142
+        </span>
+        <span class="card__stat">TypeScript</span>
+      </div>
+      <span class="card__arrow">
+        GitHub
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 9L9 3M9 3H5M9 3v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </div>
+  </article>
+
+  <article class="card">
+    <span class="card__eyebrow">Open Source</span>
+    <span class="card__repo-name">trace-timeline</span>
+    <p class="card__body">Chronological execution trace viewer. See exactly what your agent stack did, in what order, with what inputs and outputs — without sifting through raw logs.</p>
+    <div class="card__footer">
+      <div style="display:flex;gap:var(--space-md);">
+        <span class="card__stat">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M6 1l1.3 2.6L10 4l-2 2 .5 2.8L6 7.5 3.5 8.8 4 6 2 4l2.7-.4L6 1z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          89
+        </span>
+        <span class="card__stat">Python</span>
+      </div>
+      <span class="card__arrow">
+        GitHub
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M3 9L9 3M9 3H5M9 3v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </div>
+  </article>
+</div>
+
+<!-- ── Featured State ── -->
+<p class="variant-label">Featured — Emphasis Variant</p>
+<div class="card-grid">
+  <article class="card card--writing card--featured">
+    <span class="card__eyebrow card__eyebrow--featured">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M5 0.5l1.1 2.2 2.4.35-1.75 1.7.41 2.4L5 6l-2.16 1.15.41-2.4L1.5 3.05l2.4-.35L5 .5z"/></svg>
+      Featured
+    </span>
+    <h2 class="card__title">What to look for before trusting an agent stack in production</h2>
+    <p class="card__body">23,479 sessions later, the signals for "this won't hold" are recognizable early. This is what I look for before calling anything production-ready.</p>
+    <div class="card__footer">
+      <span class="card__reading-time">12 min read · Apr 2026</span>
+      <span class="card__arrow">
+        Read
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6h7m0 0L6.5 3m3 3L6.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </div>
+  </article>
+
+  <article class="card card--product card--featured">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <span class="card__eyebrow card__eyebrow--featured">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor" aria-hidden="true"><path d="M5 0.5l1.1 2.2 2.4.35-1.75 1.7.41 2.4L5 6l-2.16 1.15.41-2.4L1.5 3.05l2.4-.35L5 .5z"/></svg>
+        Featured Product
+      </span>
+      <span class="card__status">Beta</span>
+    </div>
+    <h2 class="card__title">Operator UI</h2>
+    <p class="card__body">Clean interfaces for inspecting runs, stepping in when needed, and keeping systems legible to the humans responsible for them.</p>
+    <div class="card__footer">
+      <div style="display:flex;gap:var(--space-xs);">
+        <span class="card__tag card__tag--featured">inspection</span>
+        <span class="card__tag card__tag--featured">operator</span>
+      </div>
+      <span class="card__arrow">
+        View
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true"><path d="M2.5 6h7m0 0L6.5 3m3 3L6.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+    </div>
+  </article>
+</div>
+
+</body>
+</html>

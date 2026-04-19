@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>consulting-cta — agentic.dog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg-void: #0a0a0a;
+    --bg-alt: #111827;
+    --bg-elev: #161e2e;
+    --border-faint: #1f2937;
+    --border-glow: #374151;
+    --accent-pink: #ff006e;
+    --accent-green: #39ff14;
+    --accent-yellow: #faff00;
+    --text-cool: #e5e7eb;
+    --text-muted: #9ca3af;
+    --text-faint: #6b7280;
+    --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+    --font-sans: 'Inter', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg-void);
+    color: var(--text-cool);
+    font-family: var(--font-sans);
+    background-image: repeating-linear-gradient(
+      180deg,
+      rgba(255,255,255,0.012) 0,
+      rgba(255,255,255,0.012) 1px,
+      transparent 1px, transparent 3px
+    );
+  }
+  .stage {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+  }
+
+  .cta {
+    width: 640px;
+    background: var(--bg-alt);
+    border: 1px solid var(--border-faint);
+    border-radius: 8px;
+    padding: 32px 34px 28px;
+    position: relative;
+  }
+  .cta::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent-pink) 0%, var(--accent-green) 100%);
+    border-radius: 8px 8px 0 0;
+  }
+
+  .pre-header {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent-green);
+    margin-bottom: 14px;
+    letter-spacing: 0.02em;
+  }
+  .pre-header .cmd { color: var(--text-muted); }
+
+  h3 {
+    font-family: var(--font-mono);
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 10px;
+    color: var(--text-cool);
+    letter-spacing: -0.01em;
+  }
+  h3 .accent {
+    color: var(--accent-pink);
+    text-shadow: 0 0 10px rgba(255, 0, 110, 0.35);
+  }
+
+  p.lead {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--text-muted);
+    margin: 0 0 22px;
+  }
+
+  .bullets {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-cool);
+  }
+  .bullets li {
+    padding: 6px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .bullets li::before {
+    content: '›';
+    color: var(--accent-green);
+    font-weight: 700;
+  }
+
+  .ascii-divider {
+    font-family: var(--font-mono);
+    color: var(--border-glow);
+    font-size: 11px;
+    letter-spacing: -1px;
+    margin: 20px 0;
+    user-select: none;
+  }
+
+  .form-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+  input[type="email"] {
+    flex: 1;
+    background: var(--bg-void);
+    border: 1px solid var(--border-faint);
+    color: var(--text-cool);
+    padding: 12px 14px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    outline: none;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  input[type="email"]::placeholder { color: var(--text-faint); }
+  input[type="email"]:focus {
+    border-color: var(--accent-pink);
+    box-shadow: 0 0 10px rgba(255, 0, 110, 0.25);
+  }
+
+  button.submit {
+    background: var(--accent-pink);
+    color: #0a0a0a;
+    border: none;
+    padding: 12px 20px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: 4px;
+    cursor: pointer;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    transition: box-shadow .15s, transform .15s;
+  }
+  button.submit:hover {
+    box-shadow: 0 0 16px rgba(255, 0, 110, 0.6);
+    transform: translateY(-1px);
+  }
+
+  .calendly-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .calendly-link {
+    color: var(--accent-yellow);
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(250, 255, 0, 0.4);
+    padding-bottom: 1px;
+  }
+  .calendly-link:hover {
+    color: var(--accent-pink);
+    border-bottom-color: var(--accent-pink);
+    text-shadow: 0 0 6px rgba(255, 0, 110, 0.4);
+  }
+  .rate-pill {
+    background: rgba(57, 255, 20, 0.08);
+    color: var(--accent-green);
+    border: 1px solid rgba(57, 255, 20, 0.25);
+    padding: 3px 9px;
+    border-radius: 3px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <section class="cta">
+    <div class="pre-header">❯ <span class="cmd">./work-with-nick --consulting</span></div>
+
+    <h3>Consulting on <span class="accent">AI workflows</span></h3>
+
+    <p class="lead">I work with teams shipping agent systems that actually run in production — architecture reviews, validation pipelines, multi-agent orchestration, and the weird failure modes you hit at session #3,000.</p>
+
+    <ul class="bullets">
+      <li>Validation pipeline audit (VF / Playwright / no-mock patterns)</li>
+      <li>Multi-agent architecture review (consensus, worktree, hat rotation)</li>
+      <li>Custom Claude Code plugin + skill engineering</li>
+    </ul>
+
+    <div class="ascii-divider">─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─</div>
+
+    <form class="form-row" onsubmit="return false;">
+      <input type="email" placeholder="your@email.dev" aria-label="email">
+      <button class="submit" type="submit">Start &nbsp;→</button>
+    </form>
+
+    <div class="calendly-row">
+      <span>or skip the form —</span>
+      <a class="calendly-link" href="https://calendly.com/__placeholder__">book a 20-min intro call ↗</a>
+      <span class="rate-pill">retainer-based</span>
+    </div>
+  </section>
+</div>
+</body>
+</html>

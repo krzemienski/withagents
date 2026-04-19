@@ -1,0 +1,55 @@
+---
+title: The layer between chat and automation is where the real product work lives
+subtitle: A field note on what it actually takes to make agent systems dependable
+slug: real-product-work-in-the-layer
+date: "2026-04-19"
+author: Nick Krzemienski
+kind: field-note
+tags:
+  - AgentDesign
+  - Production
+  - WithAgents
+  - Validation
+relatedProjectSlugs:
+  - runbooks
+  - memory-layer
+  - operator-ui
+readTime: 4
+excerpt: "Chat interfaces are where people meet agents. Automation pipelines are where agents ship work. The interesting engineering problem lives in the layer between them."
+---
+
+Chat interfaces are where people meet agents. Automation pipelines are where agents ship work. The interesting engineering problem lives in the layer between them.
+
+That layer is where you decide: how much autonomy does this agent have? Under what conditions does it pause and surface a decision to a human? What does "done" mean, and how does the agent know it has reached that state?
+
+These are not technical questions. They are product questions. And most agentic systems skip them entirely.
+
+## What skipping the layer looks like
+
+You have seen this pattern. An agent runs, produces output, reports success. The output looks plausible. The CI passes. The agent moves on.
+
+Three sessions later, a human notices the feature does not actually work. The agent never ran the real system. It ran a build, saw green, and reported completion.
+
+Across 23,479 sessions, the `block-test-files.js` hook fired 642 times. That hook exists specifically to catch this behavior: agents writing test mirrors — code that tests whether the agent's own code was called, not whether the feature works.
+
+642 blocks. One session alone triggered 166.
+
+The hook is a band-aid. The real fix is the layer — an explicit human review point before any agent reports a task complete.
+
+## What the layer contains
+
+A real human-in-the-loop layer has three components:
+
+**Evidence collection** — before an agent can mark work done, it must produce evidence. Not a status string. Actual artifacts: screenshots, API response bodies, log excerpts, build output quoted verbatim. Empty evidence files do not count.
+
+**Review surface** — a place where a human can read the evidence, see the agent's reasoning, and approve or override. This does not need to be a dashboard. It can be a pull request, a file review, a structured JSON blob in a shared directory.
+
+**Abort path** — if the evidence does not support completion, there is a clear path to abort: the stopping condition is recorded, the preserved state is documented, and the next session has a re-entry point.
+
+## Why this is product work
+
+The temptation is to treat this as an ops problem — add monitoring, add alerts, add retries. That approach works for infrastructure. It does not work for agents, because agents fail in semantically ambiguous ways. The build passes. The tests pass. The agent reports completion. And the feature does not work.
+
+You cannot monitor your way out of that failure mode. You can only design your way out of it.
+
+The layer between chat and automation is where that design happens.

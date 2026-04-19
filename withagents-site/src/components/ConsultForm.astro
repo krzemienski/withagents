@@ -1,0 +1,313 @@
+---
+// ConsultForm.astro
+// Consultant inquiry form. Submits to POST /api/consult.
+// UTM params are read from the page URL and stored in hidden fields so they
+// survive a form submission even if the user navigated away from the UTM URL.
+//
+// Error state: if /work?error=... is present (server redirect-back), the
+// message is surfaced inline above the submit button.
+
+interface Props {
+  /** Pre-populated UTM values (passed from the parent page). */
+  utmSource?:   string;
+  utmMedium?:   string;
+  utmCampaign?: string;
+  /** Server-side validation error forwarded via query param. */
+  serverError?: string;
+}
+
+const { utmSource = '', utmMedium = '', utmCampaign = '', serverError = '' } = Astro.props;
+---
+
+<form
+  id="consult-form"
+  method="POST"
+  action="/api/consult"
+  novalidate
+  class="space-y-6"
+  aria-label="Consulting inquiry form"
+>
+  <!-- Hidden UTM triple -->
+  <input type="hidden" name="utm_source"   value={utmSource}   id="cf-utm-source" />
+  <input type="hidden" name="utm_medium"   value={utmMedium}   id="cf-utm-medium" />
+  <input type="hidden" name="utm_campaign" value={utmCampaign} id="cf-utm-campaign" />
+
+  <!-- Name -->
+  <div class="space-y-2">
+    <label
+      for="cf-name"
+      class="block font-mono text-xs uppercase tracking-widest text-muted"
+    >
+      Name <span class="text-accent" aria-hidden="true">*</span>
+    </label>
+    <input
+      id="cf-name"
+      type="text"
+      name="name"
+      required
+      maxlength="120"
+      autocomplete="name"
+      placeholder="Your name"
+      class="cf-input w-full bg-transparent font-body text-sm text-text placeholder-muted-2 transition-colors duration-200 focus-visible:outline-accent"
+      style="border:1px solid var(--color-border);padding:12px 14px;border-radius:var(--radius-xs);"
+      aria-required="true"
+    />
+    <p id="cf-name-error" class="cf-field-error hidden font-mono text-xs text-accent-hot" role="alert"></p>
+  </div>
+
+  <!-- Email -->
+  <div class="space-y-2">
+    <label
+      for="cf-email"
+      class="block font-mono text-xs uppercase tracking-widest text-muted"
+    >
+      Email <span class="text-accent" aria-hidden="true">*</span>
+    </label>
+    <input
+      id="cf-email"
+      type="email"
+      name="email"
+      required
+      maxlength="254"
+      autocomplete="email"
+      placeholder="you@company.com"
+      class="cf-input w-full bg-transparent font-body text-sm text-text placeholder-muted-2 transition-colors duration-200 focus-visible:outline-accent"
+      style="border:1px solid var(--color-border);padding:12px 14px;border-radius:var(--radius-xs);"
+      aria-required="true"
+    />
+    <p id="cf-email-error" class="cf-field-error hidden font-mono text-xs text-accent-hot" role="alert"></p>
+  </div>
+
+  <!-- Company (optional) -->
+  <div class="space-y-2">
+    <label
+      for="cf-company"
+      class="block font-mono text-xs uppercase tracking-widest text-muted"
+    >
+      Company <span class="text-muted-2 font-normal normal-case tracking-normal">(optional)</span>
+    </label>
+    <input
+      id="cf-company"
+      type="text"
+      name="company"
+      maxlength="120"
+      autocomplete="organization"
+      placeholder="Acme Corp"
+      class="cf-input w-full bg-transparent font-body text-sm text-text placeholder-muted-2 transition-colors duration-200 focus-visible:outline-accent"
+      style="border:1px solid var(--color-border);padding:12px 14px;border-radius:var(--radius-xs);"
+    />
+  </div>
+
+  <!-- Use case -->
+  <div class="space-y-2">
+    <label
+      for="cf-use-case"
+      class="block font-mono text-xs uppercase tracking-widest text-muted"
+    >
+      What are you working on? <span class="text-accent" aria-hidden="true">*</span>
+    </label>
+    <textarea
+      id="cf-use-case"
+      name="use_case"
+      required
+      minlength="10"
+      maxlength="2000"
+      rows="5"
+      placeholder="Describe the system or workflow you're building, and where you're stuck or want a second opinion."
+      class="cf-input w-full resize-y bg-transparent font-body text-sm text-text placeholder-muted-2 transition-colors duration-200 focus-visible:outline-accent"
+      style="border:1px solid var(--color-border);padding:12px 14px;border-radius:var(--radius-xs);min-height:120px;"
+      aria-required="true"
+      aria-describedby="cf-use-case-hint"
+    ></textarea>
+    <p id="cf-use-case-hint" class="font-mono text-[10px] text-muted-2">Min 10 characters. Max 2,000.</p>
+    <p id="cf-use-case-error" class="cf-field-error hidden font-mono text-xs text-accent-hot" role="alert"></p>
+  </div>
+
+  <!-- Server-side error (redirect-back from /api/consult) -->
+  {serverError && (
+    <div
+      class="flex items-start gap-3 p-4"
+      style="background:rgba(232,121,249,0.06);border:1px solid rgba(232,121,249,0.20);border-radius:var(--radius-xs);"
+      role="alert"
+      aria-live="polite"
+    >
+      <span class="material-symbols-outlined text-accent-hot" style="font-size:16px;flex-shrink:0;margin-top:1px;">error_outline</span>
+      <p class="font-mono text-xs text-accent-hot">{serverError}</p>
+    </div>
+  )}
+
+  <!-- Client-side aggregate error -->
+  <div
+    id="cf-form-error"
+    class="hidden flex items-start gap-3 p-4"
+    style="background:rgba(232,121,249,0.06);border:1px solid rgba(232,121,249,0.20);border-radius:var(--radius-xs);"
+    role="alert"
+    aria-live="polite"
+  >
+    <span class="material-symbols-outlined text-accent-hot" style="font-size:16px;flex-shrink:0;margin-top:1px;">error_outline</span>
+    <p id="cf-form-error-msg" class="font-mono text-xs text-accent-hot"></p>
+  </div>
+
+  <!-- Submit -->
+  <div class="pt-2">
+    <button
+      id="cf-submit"
+      type="submit"
+      class="inline-flex items-center gap-3 font-mono text-sm uppercase tracking-widest text-text transition-all duration-200 focus-visible:outline-accent"
+      style="border:1px solid rgba(255,255,255,0.15);padding:14px 28px;border-radius:var(--radius-xs);"
+    >
+      <span id="cf-submit-label">Send Inquiry</span>
+      <span
+        id="cf-submit-spinner"
+        class="hidden material-symbols-outlined animate-spin"
+        style="font-size:16px;"
+        aria-hidden="true"
+      >progress_activity</span>
+      <span class="material-symbols-outlined" style="font-size:16px;" aria-hidden="true" id="cf-submit-arrow">arrow_forward</span>
+    </button>
+    <p class="mt-4 font-mono text-[10px] text-muted-2 uppercase tracking-widest">
+      No pitch decks. I read every message.
+    </p>
+  </div>
+</form>
+
+<script>
+// ── UTM preservation from URL → hidden fields ─────────────────────────────────
+// Runs on every page load so even a direct /work?utm_source=x visit is captured.
+(function syncUtm() {
+  const params = new URLSearchParams(window.location.search);
+  const map: Record<string, string> = {
+    utm_source:   'cf-utm-source',
+    utm_medium:   'cf-utm-medium',
+    utm_campaign: 'cf-utm-campaign',
+  };
+  for (const [param, id] of Object.entries(map)) {
+    const val = params.get(param);
+    const el  = document.getElementById(id) as HTMLInputElement | null;
+    if (val && el && !el.value) el.value = val;
+  }
+})();
+
+// ── Client-side validation ────────────────────────────────────────────────────
+const form    = document.getElementById('consult-form')    as HTMLFormElement;
+const submit  = document.getElementById('cf-submit')       as HTMLButtonElement;
+const spinner = document.getElementById('cf-submit-spinner') as HTMLElement;
+const arrow   = document.getElementById('cf-submit-arrow')   as HTMLElement;
+const label   = document.getElementById('cf-submit-label')   as HTMLElement;
+
+function showFieldError(id: string, msg: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+function clearFieldError(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = '';
+  el.classList.add('hidden');
+}
+
+function setInputState(input: HTMLElement, invalid: boolean) {
+  if (invalid) {
+    input.style.borderColor = 'rgba(232,121,249,0.50)';
+  } else {
+    input.style.borderColor = 'var(--color-border)';
+  }
+}
+
+function validateForm(): boolean {
+  let valid = true;
+
+  const nameEl      = document.getElementById('cf-name')     as HTMLInputElement;
+  const emailEl     = document.getElementById('cf-email')    as HTMLInputElement;
+  const useCaseEl   = document.getElementById('cf-use-case') as HTMLTextAreaElement;
+
+  // Name
+  clearFieldError('cf-name-error');
+  if (!nameEl.value.trim()) {
+    showFieldError('cf-name-error', 'Name is required.');
+    setInputState(nameEl, true);
+    valid = false;
+  } else {
+    setInputState(nameEl, false);
+  }
+
+  // Email
+  clearFieldError('cf-email-error');
+  const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailEl.value.trim() || !emailRe.test(emailEl.value.trim())) {
+    showFieldError('cf-email-error', 'A valid email address is required.');
+    setInputState(emailEl, true);
+    valid = false;
+  } else {
+    setInputState(emailEl, false);
+  }
+
+  // Use case
+  clearFieldError('cf-use-case-error');
+  if (useCaseEl.value.trim().length < 10) {
+    showFieldError('cf-use-case-error', 'Please describe your use case (10+ characters).');
+    setInputState(useCaseEl, true);
+    valid = false;
+  } else {
+    setInputState(useCaseEl, false);
+  }
+
+  return valid;
+}
+
+// Live validation: clear error once field is corrected
+['cf-name', 'cf-email', 'cf-use-case'].forEach(id => {
+  const el = document.getElementById(id);
+  el?.addEventListener('input', () => {
+    clearFieldError(`${id}-error`);
+    setInputState(el as HTMLElement, false);
+  });
+});
+
+// Hover state for submit button
+submit?.addEventListener('mouseenter', () => {
+  submit.style.borderColor = 'rgba(139,92,246,0.5)';
+  submit.style.background  = 'var(--color-panel-2)';
+});
+submit?.addEventListener('mouseleave', () => {
+  submit.style.borderColor = 'rgba(255,255,255,0.15)';
+  submit.style.background  = 'transparent';
+});
+
+form?.addEventListener('submit', (e: Event) => {
+  if (!validateForm()) {
+    e.preventDefault();
+    // Focus first invalid field
+    const firstInvalid = form.querySelector('[style*="rgba(232,121,249"]') as HTMLElement | null;
+    firstInvalid?.focus();
+    return;
+  }
+
+  // Show loading state
+  submit.disabled  = true;
+  spinner.classList.remove('hidden');
+  arrow.classList.add('hidden');
+  label.textContent = 'Sending…';
+});
+</script>
+
+<style>
+  /* Subtle focus ring on inputs matches global :focus-visible */
+  .cf-input:focus {
+    outline: 1px solid var(--color-accent);
+    outline-offset: 0;
+    border-color: rgba(139,92,246,0.5) !important;
+  }
+  .cf-input::placeholder {
+    color: var(--color-muted-2);
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  .animate-spin {
+    animation: spin 1s linear infinite;
+  }
+</style>

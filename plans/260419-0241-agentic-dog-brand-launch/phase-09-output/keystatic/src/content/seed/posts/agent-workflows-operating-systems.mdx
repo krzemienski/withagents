@@ -1,0 +1,67 @@
+---
+title: Agent workflows should read like operating systems, not demos
+subtitle: What 23,479 sessions taught about the gap between impressive and dependable
+slug: agent-workflows-operating-systems
+date: "2026-04-19"
+author: Nick Krzemienski
+kind: essay
+tags:
+  - AgentDesign
+  - Production
+  - WithAgents
+  - Orchestration
+relatedProjectSlugs:
+  - runbooks
+  - operator-ui
+  - agent-contracts
+readTime: 8
+excerpt: "A demo agent impresses by doing something unexpected. A production agent earns trust by doing exactly what you specified, every time, with legible state at every step."
+---
+
+A demo agent impresses by doing something unexpected. A production agent earns trust by doing exactly what you specified, every time, with legible state at every step.
+
+Those are different design targets. Most of what gets called "agentic development" is optimized for the first one.
+
+## What operating systems got right
+
+An operating system does not surprise you. It processes inputs, manages resources, and surfaces state through defined interfaces. When something fails, you read the error. When a process hangs, you inspect the task manager. The whole system is designed around the assumption that humans will need to understand it under pressure.
+
+Agent workflows need the same design target.
+
+The 23,479 sessions behind this work produced a clear pattern: agents given open-ended instructions wander. Agents given typed workflows — defined entry conditions, scoped analysis phases, explicit execution contracts, documented abort conditions — converge. The convergence rate across hat-scoped sessions was 94% task completion with a 2% contradiction rate. Monolithic open-ended sessions ran at 67% completion with 34% contradiction rate.
+
+That is a 27-point gap driven entirely by workflow structure.
+
+## The legibility principle
+
+Every agent action should be inspectable without reading source code.
+
+This is not a monitoring requirement. It is a design requirement. If the only way to understand what an agent did is to read its system prompt and reconstruct its reasoning, that agent is not production-ready. It is a demo running in production.
+
+Legible agent systems share three properties:
+
+**1. Typed state at every boundary.** When an agent hands work to another agent, the handoff is a schema, not a string. Schema violations surface immediately. String mismatches surface 20 steps later as corrupted decisions.
+
+**2. Decision records with rationale fields.** Every agent decision worth making is worth recording. The record includes the alternatives considered, the evidence used, and the confidence level. This is not logging. It is the agent's reasoning, preserved for the human who will review it.
+
+**3. Abort surfaces that preserve context.** An agent that aborts cleanly is more valuable than an agent that pushes through a bad state. The abort surface captures the stopping condition and the re-entry point. The next session picks up from there.
+
+## The mode-bet question
+
+Every agent product makes a bet on how humans and agents will interact. The bet has three modes:
+
+**SDK** — you write code to steer the agent. Programmatic control, typed interfaces, full auditability. High setup cost, highest reliability ceiling.
+
+**Interactive** — you invest in the environment: hooks, skills, custom configuration. The agent interprets your setup, runs inside it, surfaces state through its own interfaces. Medium setup cost, good reliability for well-specified tasks.
+
+**Non-Interactive** — headless autonomous loops. The agent runs, coordinates through the file system, surfaces results when done. Lowest human involvement during execution, highest requirement for upfront workflow design.
+
+The mistake most teams make is choosing their mode based on the demo, then discovering the production requirements demand a different mode entirely.
+
+## What this means in practice
+
+Design your agent workflows the way you design your API contracts: with typed inputs, typed outputs, documented failure modes, and versioned schemas.
+
+The agent is not the product. The workflow is the product. The agent is the runtime.
+
+When the runtime fails — and it will fail — the workflow is what tells you why, and what to do next.

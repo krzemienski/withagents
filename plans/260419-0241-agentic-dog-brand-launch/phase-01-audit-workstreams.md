@@ -43,28 +43,28 @@ Each workstream = 1 agent, reports to `research/{letter}-{slug}.md`. File owners
 
 ### D. blog-series Audit (`research/D-blog-series-audit.md`)
 - Inputs: `/Users/nick/Desktop/blog-series/posts/`, `site/`, `plans/260305-2119-devlog-publisher-website/`, deployed site-rho-pied.vercel.app status
-- Output: current post count, deployment status, asset inventory, what migrates to agentic.dog, what retires, overlap with Phase 09 scope
-- Decide disposition of in-progress `devlog-publisher-website` plan (merge into agentic.dog build? complete separately first?)
+- Output: current post count, deployment status, asset inventory, what migrates to withagents.dev, what retires, overlap with Phase 09 scope
+- Decide disposition of in-progress `devlog-publisher-website` plan (merge into withagents.dev build? complete separately first?)
 
 ### E. Skills + Marketing Toolkit Inventory (`research/E-skills-marketing-toolkit.md`)
 - Inputs: `~/.claude/skills/` (200+ skills in available list), `.claude/skills/` (project-local), `scripts/`, `.omc/`
 - **Required output format (added 2026-04-19):** matrix — `{Mode 2 need} → {1 primary skill, 1 fallback skill, gap flag}`. No raw skill dumps. Mode 2 needs to cover minimally: content gen, OG image render, syndication (LinkedIn share, X thread), analytics install, CTA capture form, voice-spec generation/review, social card render, series index render.
-- Gap list: what does agentic.dog need that no skill covers? Name explicitly.
+- Gap list: what does withagents.dev need that no skill covers? Name explicitly.
 
 ### F. Draft Content Disposition Audit (`research/F-drafts-disposition.md`)
 - Inputs: `posts/REVIEW-POSTS-*.md`, `posts/INDEX.md`, any Substack/Medium/LinkedIn drafts on disk, content-hub/marketing-dashboard output
-- Output: per-draft triage (publish as-is / edit / merge / retire) aligned to agentic.dog positioning
+- Output: per-draft triage (publish as-is / edit / merge / retire) aligned to withagents.dev positioning
 - Flag anything with legacy "open to full-time" / "Agentic League" language for removal
 
 ### G. Brand Reference Reconnaissance (`research/G-brand-reconnaissance.md`)
 - Inputs: existing mentions across any repo, README, or bio; social-handle availability checks
-- Output: **social-handle availability** (@agenticdog, @hackski, @codestories) + **trademark exposure** + any current public references to these names
+- Output: **social-handle availability** (@withagents, @hackski, @codestories) + **trademark exposure** + any current public references to these names
 - **DNS availability portion dropped (added 2026-04-19):** domains purchased per Decision #1; Workstream G trimmed to handles + trademarks only.
 
 ### H. Blog-Series Content Voice Audit (`research/H-blog-series-voice-audit.md`) — **ADDED 2026-04-19**
 - Inputs: existing 18 blog-series posts at `/Users/nick/Desktop/blog-series/posts/post-*/post.md`, draft `voice-spec.md` from Phase 02 synthesis, MEMORY.md record of 2026-04-18 Sonnet voice-drift restart
 - Output: per-post QA — em-dash count, AI-tell patterns (generic empathy openers, "it's not just X, it's Y", corporate transitions), verdict (publish-as-is / light-edit / rewrite / retire)
-- Flags which posts need voice rework before migration into agentic.dog CMS (Phase 09 content seed)
+- Flags which posts need voice rework before migration into withagents.dev CMS (Phase 09 content seed)
 - Rationale: MEMORY.md records Sonnet-drafted-self-reviewed content passing its own review and failing public launch standard. Adding independent voice QA before migration to prevent repeat.
 
 ## Orchestration Rules

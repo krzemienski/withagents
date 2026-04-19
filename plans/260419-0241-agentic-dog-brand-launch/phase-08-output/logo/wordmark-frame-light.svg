@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 160" width="560" height="160" role="img" aria-label="WithAgents">
+  <title>WithAgents — Frame wordmark (light surface)</title>
+  <desc>Title-case wordmark framed inverted for light backgrounds. Ultraviolet rules retained.</desc>
+  <rect width="560" height="160" fill="#F5F5F7"/>
+  <line x1="56" y1="42" x2="504" y2="42" stroke="#8B5CF6" stroke-width="1"/>
+  <text x="280" y="108" text-anchor="middle" font-family="'Space Grotesk', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif" font-weight="400" font-size="52" letter-spacing="-0.6" fill="#0A0A0D">WithAgents</text>
+  <line x1="56" y1="124" x2="504" y2="124" stroke="#8B5CF6" stroke-width="1"/>
+</svg>

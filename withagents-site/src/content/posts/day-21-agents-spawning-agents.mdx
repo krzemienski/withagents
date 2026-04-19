@@ -1,0 +1,99 @@
+---
+title: "81% of my AI coding sessions were agents spawning other agents"
+subtitle: "4,534 human-started sessions. 18,945 agent-started sessions. I did not design that behavior. It emerged."
+slug: day-21-agents-spawning-agents
+date: "2026-05-09"
+author: "Nick Krzemienski"
+kind: essay
+tags:
+  - AgentDesign
+  - Orchestration
+  - WithAgents
+  - Delegation
+relatedProjectSlugs:
+  - agent-contracts
+  - runbooks
+  - trace-timeline
+readTime: 6
+excerpt: "The headline is 23,479 sessions. The underreported number is that 18,945 of them were spawned by other agents, not by me. The 81% ratio changes what you are actually building."
+---
+
+I started 4,534 Claude Code sessions with my keyboard.
+
+The agents I started spawned 18,945 more without my input.
+
+The published number for this series is 23,479 total sessions over 42 days. That figure is technically accurate and directionally misleading. The real ratio is 4,534 human-initiated against 18,945 agent-initiated, and the latter arrived without me filing a ticket, clicking a button, or typing a prompt. Every one of those sessions was some other session deciding it needed help.
+
+Eighty-one percent of my AI coding work was agents spawning other agents.
+
+I did not design that behavior. It emerged.
+
+## The Agent count
+
+From the same 360-day mine: **1,676 Agent invocations** logged as delegation events. Each one is a parent session invoking the Task or Agent primitive, handing a scoped prompt to a child, and waiting on the child's return. The 1,676 is a conservative cut (only top-level delegations with explicit agent_id fields). The 18,945 agent-initiated sessions includes the recursive spawns those parents triggered.
+
+The shape of a typical chain:
+
+```
+Human session (planner)
+  ├─ Agent: researcher-A (context gathering)
+  │    └─ Agent: grep-scout
+  ├─ Agent: researcher-B (docs lookup)
+  ├─ Agent: executor (implementation)
+  │    ├─ Agent: type-check-runner
+  │    └─ Agent: build-runner
+  └─ Agent: code-reviewer (verification pass)
+       └─ Agent: diff-auditor
+```
+
+The human typed one prompt. Eight agents ran. Four of those eight spawned their own children.
+
+Nothing in that tree was explicit in my initial prompt. The planner decided it needed researchers because the prompt referenced three systems I had not read this week. The researchers decided they needed scouts because the file tree was larger than their context budget. The executor decided it needed type-checking and build sub-agents because the Iron Rule hook would block a DONE claim without evidence.
+
+## Why it emerged
+
+The primitive that drove this is delegation, not instruction. Claude Code ships a `Task` tool that lets an agent hand a scoped prompt to a sub-agent with its own context window. Once an agent learns (via skill, via hook, via explicit CLAUDE.md rule) that delegation is cheaper than over-stuffing its own context, the tree grows on its own.
+
+Four enforcement layers pushed me toward delegation:
+
+1. **Context decay.** At 10+ messages, a session's edit quality drops because it forgets which files it read. Spawning a child with a narrow prompt gets you a fresh 200K window with a crisp goal.
+2. **Read-to-Write ratio.** Day 03's 9.6:1. The Read phase is expensive and parallelizable. Five scouts in parallel beat one session doing breadth-first walks.
+3. **Evidence gates.** My `completion-claim-validator.js` hook rejects DONE without a build run, a test run, or a screenshot. A parent session that does not want to run those itself delegates to children that do.
+4. **Hat-scoped workflows.** Ralph-style loops that assign one task to one agent with one lens produce 94% completion / 2% contradiction vs. 67% / 34% for monolithic. The orchestration layer, once built, spawns children whether or not I told it to.
+
+None of these individually says "spawn an agent." Together they create an environment where not spawning is the mistake.
+
+## What 81% changes
+
+If you are building an agent product and your cost model assumes users drive sessions, you are pricing the 19% and losing money on the 81%. The bigger consequence is architectural: the user is not the primary API caller anymore. Another agent is.
+
+Three design moves fall out of this.
+
+**1. Your agents should expect to be invoked by other agents.** Prompt scaffolding that assumes a human reader ("I'll help you with...") produces friction in agent-to-agent invocations. Typed contracts, declared inputs, declared outputs. The child should know how to exit cleanly with a structured result the parent can parse.
+
+**2. Your observability surface has to show the tree, not the session.** A list of sessions is useless at 81% agent-initiated. You need a trace viewer that collapses the tree into a legible parent-child structure with per-node cost, duration, and verdict. `trace-timeline` on this site exists because the default log view does not work once the tree gets two layers deep.
+
+**3. Your cost attribution has to flow up.** A child session that cost $0.40 was invoked by a parent that cost $0.02. The parent is the thing you charge, budget, and optimize. Eighty-one percent of your spend is on the 19% of sessions the user actually owns.
+
+## The 1,676 Agent invocations as primitive
+
+The Task / Agent primitive is the only piece of Claude Code that makes 23,479 sessions possible. Without it, I would have typed 23,479 prompts and produced 23,479 rounds of rework. With it, I typed 4,534 prompts and reviewed 18,945 results.
+
+That ratio is not a quality-of-life improvement. It is a different job. I stopped being the agent and became the orchestrator. My hour went from "write code" to "read eight agent reports, approve six, reject two, respawn one with tighter constraints." The productivity gain shows up downstream: one of my solo weeks during that run produced what a three-person squad would ship in a sprint, and the commit log reads more like a coordination artifact than a diff.
+
+None of that was planned. I set up hooks to enforce validation. I wrote skills to scope work. I configured model routing to keep costs sane. The 81% ratio was the emergent consequence of those three guardrails. Agents spawn agents because the environment makes spawning cheaper than over-stuffing.
+
+## The product pillar this maps to
+
+Two of the three pillars on this site exist because of the 81%:
+
+- **Runbooks** encode the spawning patterns that worked. Which parent delegates to which child, in which order, with which evidence gate. If you have watched agent trees collapse into noise, a runbook is the template that makes the tree legible in advance.
+- **Operator UI** is the viewer for the tree once it is running. Per-node verdict, per-node cost, per-node time, step-in / step-over on any child. Without this, the tree is data. With this, the tree is inspectable.
+
+The third pillar, **Memory Layer**, exists because the 81% would produce 18,945 sessions of amnesia otherwise. Every spawned child needs a way to inherit what the parent (and the parent's prior runs) already learned. That is covered in depth on Day 19.
+
+## Evidence pointer
+
+Series canon: 4,534 human-started + 18,945 agent-started = 23,479 total across 42 days. The 360-day mine confirms the primitive at corpus scale with 1,676 Agent invocations as top-level delegations. Full data in `scripts/output/mine-360d-data.json` and `MEMORY.md`. Post 01 (series-launch) logs the original framing with the line I keep coming back to: "an entire organizational layer. I didn't design that behavior. It emerged."
+
+If you want to build for 2026 agent workflows, build for the 81%. The user is not the API caller anymore. Another agent is.

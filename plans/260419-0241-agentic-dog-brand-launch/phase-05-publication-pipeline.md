@@ -9,14 +9,14 @@ blockedBy: [phase-02-synthesis, phase-04-cms-site-architecture]
 
 ## Purpose
 
-Design the canonical content flow from agentic.dog CMS → every syndication target. Define cadence for the 30-day push.
+Design the canonical content flow from withagents.dev CMS → every syndication target. Define cadence for the 30-day push.
 
 ## Canonical Flow (updated per decisions 2026-04-19)
 
 ```
-agentic.dog CMS (Keystatic commit)
+withagents.dev CMS (Keystatic commit)
       │
-      ├─► build hook → deploy to agentic.dog
+      ├─► build hook → deploy to withagents.dev
       ├─► hack.ski companion deploy (same template, AI-agnostic copy variants)
       ├─► syndication runner (scripted, Node/TS)
       │     ├─► LinkedIn article (long-form)
@@ -32,7 +32,7 @@ agentic.dog CMS (Keystatic commit)
 
 | Platform | Skill | Notes |
 |---|---|---|
-| LinkedIn long-form | `ck:ckm:write:good` + `copywriting` | 800-1500 words, 3-5 hashtags, canonical to agentic.dog |
+| LinkedIn long-form | `ck:ckm:write:good` + `copywriting` | 800-1500 words, 3-5 hashtags, canonical to withagents.dev |
 | LinkedIn short | `social` + `copywriting` | 200-350 words, ≤3 hashtags, teaser + link |
 | X thread | `social` + devlog-publisher `twitter_thread.md` | 7-12 posts, DIFFERENT angle from blog |
 | Repo README | `docs` + manual | Add "Featured in: {post}" + series link |
@@ -54,7 +54,7 @@ agentic.dog CMS (Keystatic commit)
 
 ## Release-Cycle Cadence (30-day)
 
-- **Flagship launches** (3): validationforge GA + big post, codestories.platform debut + big post, agentic-dog manifesto post
+- **Flagship launches** (3): validationforge GA + big post, codestories.platform debut + big post, withagents manifesto post
 - **Product posts** (8-10): one per flagship product on rotation
 - **Insight-only days** (6-8): short post/thread drawn from insight library, no repo launch
 - **Devlog days** (2-3/week): daily-ish thin updates on the push itself

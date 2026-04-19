@@ -1,0 +1,64 @@
+---
+title: "Five Whys on a failed agent run, and the PDCA loop that followed"
+subtitle: "Kaizen Algorithm Tuning — the methodology repo that turned threshold regrets into repeatable fixes"
+slug: day-28-kaizen-algorithm-tuning
+date: "2026-05-23"
+author: Nick Krzemienski
+kind: field-note
+tags:
+  - WithAgents
+  - Methodology
+  - Kaizen
+  - Interactive
+relatedProjectSlugs:
+  - kaizen-algorithm-tuning
+  - agent-constitution-framework
+  - validationforge
+readTime: 5
+excerpt: "One change, one hypothesis, one measurement. The repo that codified why I stopped tuning three thresholds at once."
+---
+
+The YouTube Shorts detector regressed overnight and I spent two hours theorizing about why.
+
+No prints, no traces, no frame dumps. Just reading `motion_analyzer.py` top to bottom and arguing with myself about which branch produced the wrong boundary. By the time I gave up and added a five-line TRACE_APPEND instrumentation, the fix took ten minutes. The root cause was three functions away from the one I had been staring at.
+
+That session is the reason `kaizen-algorithm-tuning` exists. One change, one hypothesis, one measurement: or the run does not count.
+
+## What the repo actually is
+
+It is four Kaizen primitives installed as Claude Code skills, pointed at the threshold-tuning problem that kept eating my week:
+
+1. **Five Whys.** You name the symptom, then you ask why five times. Each answer is required to be a measurable claim, not a theory. The fifth why is the change you make.
+2. **Fishbone analysis.** Six categories, input data, preprocessing, model, postprocessing, environment, review, each owning a bucket of candidate causes. You cannot touch code before every bucket has at least one populated candidate.
+3. **PDCA (Plan → Do → Check → Act).** Every experiment writes a hypothesis before the change, runs the change, reads the result, and decides whether the change stays or reverts. The `Check` phase is a file, not a vibe.
+4. **A3 one-pager.** Problem statement, target state, root cause, countermeasures, results, follow-up. The A3 is the artifact you hand to the next session when the current one times out.
+
+None of this is new. Kaizen is a manufacturing discipline from 1980s Toyota. The move here is binding it to the way Claude Code agents already want to behave: checklist-driven, file-first, step-numbered. The skills do not teach the discipline: they make it the path of least resistance.
+
+## The one-change rule
+
+The rule that collapsed my debugging time most: *one change at a time, verify, decide next*.
+
+Before the repo existed, a regression would trigger three parallel edits. Lower the threshold here, add a guard there, tighten a filter somewhere else. The regression would go away and I would not know which edit fixed it. The next regression six days later would look identical because two of the three "fixes" were band-aids over each other.
+
+After the repo, the PDCA skill enforces one edit per cycle. You run the regression suite. You write the hypothesis. You make one change. You run the suite again. The `Check` file captures the diff in behavior, and the `Act` decision, keep, revert, escalate, is a field the skill will not let you leave blank. Two failed PDCA cycles on the same hypothesis stops the loop entirely; the skill will not let you retry the same theory a third time.
+
+That is the whole methodology. No machine learning. No classifier. A contract that says *one hypothesis, one change, one measurement.*
+
+## Where it earns its keep
+
+It earns it on the second regression.
+
+The first regression is always solved by whoever was paying attention. The second, three weeks later, is where the A3 artifact matters: someone (usually me) picks up a `failed-approaches.md` file from the first round and reads what did not work before touching the code. The file is the difference between burning two hours again and spending ten minutes confirming that yes, I already tried that.
+
+The skill bundle ships with a pre-populated `failed-approaches.md` template. It has five headings: approach, evidence it failed, why it failed (with a link to the data), what would have made it work, what to try next. The skill refuses to let you add an entry without filling every heading. The constraint is the point.
+
+## Why this sits in the methodology cluster, not the validation cluster
+
+Kaizen is upstream of validation.
+
+Playwright Validation Pipeline tells you *the button does not render*. Agent Constitution Framework tells you *here is the rule the agent must not break*. ValidationForge tells you *the build passed but the feature did not*. Kaizen tells you *here is the discipline for investigating why, and here is the template your successor will read next week*.
+
+The four are the same idea in different registers: make the shortcut physically unavailable. Validation theater survives because an agent can skip the frame inspection and go straight to threshold tuning. The Five Whys skill is the hook that forces frame inspection before theorizing. PDCA is the hook that forces one change at a time. The A3 is the hook that forces the next session to read the last one's evidence.
+
+None of this is glamorous. The repo is nine skills, three templates, one rules file. Every time I ship it into a new project, the first regression gets solved slower and every regression after gets solved faster. That is the trade the discipline is for.

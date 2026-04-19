@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WithAgents — Blockquote States</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-void:#040404;--panel-1:#0A0A0D;--panel-2:#111116;--panel-3:#15151C;
+    --text-primary:#F5F5F7;--text-muted:#A1A1AA;--accent:#8B5CF6;--accent-alt:#C084FC;
+    --accent-lime:#A3E635;--border:rgba(255,255,255,0.10);--accent-wash:rgba(139,92,246,0.12);
+    --font-display:'Space Grotesk',ui-sans-serif,system-ui,sans-serif;
+    --font-body:'Inter',ui-sans-serif,system-ui,sans-serif;
+    --font-mono:'IBM Plex Mono',ui-monospace,'SF Mono',Menlo,monospace;
+    --radius-sm:4px;--radius-md:8px;--space-xs:6px;--space-sm:12px;--space-md:20px;--space-lg:32px;--space-xl:48px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg-void);color:var(--text-primary);font-family:var(--font-body);padding:var(--space-xl);max-width:760px;}
+  .page-title{font-family:var(--font-display);font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--space-lg);}
+  .state-label{font-family:var(--font-mono);font-size:10px;letter-spacing:.10em;text-transform:uppercase;color:var(--text-muted);margin-bottom:var(--space-sm);margin-top:var(--space-lg);display:block;}
+  .state-label:first-of-type{margin-top:0;}
+
+  blockquote.bq{margin:0;padding:var(--space-md) var(--space-lg);background:var(--panel-1);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:0 var(--radius-md) var(--radius-md) 0;}
+  blockquote.bq p{font-size:16px;color:var(--text-primary);line-height:1.65;font-style:italic;letter-spacing:-.01em;}
+  blockquote.bq footer{margin-top:var(--space-sm);font-family:var(--font-mono);font-size:11px;color:var(--text-muted);font-style:normal;display:flex;align-items:center;gap:var(--space-xs);}
+  blockquote.bq footer::before{content:'';display:inline-block;width:14px;height:1px;background:var(--text-muted);opacity:.4;}
+
+  /* States */
+  .bq--default{}
+  .bq--hover{border-left-color:var(--accent-alt);background:var(--panel-2);}
+  .bq--focus{outline:2px solid var(--accent);outline-offset:2px;}
+  .bq--featured{border-left-color:var(--accent-alt);background:linear-gradient(135deg,var(--panel-2) 0%,color-mix(in srgb,var(--panel-2) 88%,var(--accent) 12%) 100%);border-color:rgba(192,132,252,.22);}
+  .bq--muted p{color:var(--text-muted);font-size:15px;}
+
+  /* Callout */
+  .callout{background:var(--accent-wash);border:1px solid rgba(139,92,246,.20);border-radius:var(--radius-md);padding:var(--space-md);display:flex;gap:var(--space-sm);align-items:flex-start;}
+  .callout__icon{color:var(--accent-alt);flex-shrink:0;margin-top:2px;}
+  .callout__body{font-size:14px;color:var(--text-muted);line-height:1.65;}
+  .callout__body strong{color:var(--text-primary);font-weight:600;display:block;margin-bottom:4px;font-family:var(--font-display);font-size:14px;}
+  .callout--warn{background:rgba(251,191,36,.07);border-color:rgba(251,191,36,.18);}
+  .callout--warn .callout__icon{color:#FCD34D;}
+  .callout--err{background:rgba(239,68,68,.07);border-color:rgba(239,68,68,.18);}
+  .callout--err .callout__icon{color:#F87171;}
+  .callout--suc{background:rgba(163,230,53,.07);border-color:rgba(163,230,53,.18);}
+  .callout--suc .callout__icon{color:var(--accent-lime);}
+</style>
+</head>
+<body>
+<p class="page-title">withagents.dev — Blockquote · All States</p>
+
+<span class="state-label">Default</span>
+<blockquote class="bq bq--default">
+  <p>The production gap between a slick agent demo and a system that holds up under real load is a product design problem.</p>
+  <footer><cite>Nick Krzemienski — field notes</cite></footer>
+</blockquote>
+
+<span class="state-label">Hover (simulated)</span>
+<blockquote class="bq bq--hover">
+  <p>The production gap between a slick agent demo and a system that holds up under real load is a product design problem.</p>
+  <footer><cite>Nick Krzemienski — field notes</cite></footer>
+</blockquote>
+
+<span class="state-label">Focus-visible</span>
+<blockquote class="bq bq--focus" tabindex="0">
+  <p>The production gap between a slick agent demo and a system that holds up under real load is a product design problem.</p>
+  <footer><cite>Nick Krzemienski — field notes</cite></footer>
+</blockquote>
+
+<span class="state-label">Featured / highlighted</span>
+<blockquote class="bq bq--featured">
+  <p>The production gap between a slick agent demo and a system that holds up under real load is a product design problem.</p>
+  <footer><cite>Nick Krzemienski — field notes</cite></footer>
+</blockquote>
+
+<span class="state-label">Muted variant (secondary prose)</span>
+<blockquote class="bq bq--muted">
+  <p>The production gap between a slick agent demo and a system that holds up under real load is a product design problem.</p>
+  <footer><cite>Nick Krzemienski — field notes</cite></footer>
+</blockquote>
+
+<span class="state-label">Callout — Info</span>
+<aside class="callout" role="note">
+  <span class="callout__icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v.5M8 7.5v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+  <div class="callout__body"><strong>Note</strong>Validate the <code style="font-family:var(--font-mono);font-size:.88em;color:var(--accent-alt);background:rgba(139,92,246,.10);border:1px solid rgba(139,92,246,.18);border-radius:4px;padding:1px 4px">status</code> field before consuming agent output.</div>
+</aside>
+
+<span class="state-label">Callout — Warning</span>
+<aside class="callout callout--warn" role="note">
+  <span class="callout__icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2L14.5 13.5H1.5L8 2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 6.5v3M8 11v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+  <div class="callout__body"><strong>Production caution</strong>Do not pass raw user input directly to agent tool calls.</div>
+</aside>
+
+<span class="state-label">Callout — Success</span>
+<aside class="callout callout--suc" role="note">
+  <span class="callout__icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 8.5l2.5 2.5 4-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+  <div class="callout__body"><strong>Contract validated</strong>All tool calls are within scope. 7 rounds completed without violations.</div>
+</aside>
+
+<span class="state-label">Callout — Error</span>
+<aside class="callout callout--err" role="alert">
+  <span class="callout__icon" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+  <div class="callout__body"><strong>Contract violation</strong>Tool <code style="font-family:var(--font-mono);font-size:.88em;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);border-radius:4px;padding:1px 4px;color:#F87171">write_file</code> not declared. Execution halted at round 3.</div>
+</aside>
+
+</body>
+</html>

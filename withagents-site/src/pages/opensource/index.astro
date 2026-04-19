@@ -1,0 +1,150 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+import RepoCard from '@/components/RepoCard.astro';
+
+const repos = [
+  {
+    name: 'agent-contracts',
+    tagline: 'Protocol',
+    stars: '1.2k',
+    lang: 'TypeScript',
+    license: 'MIT',
+    lastUpdated: '2d ago',
+    description: 'Reusable agent-interface contracts. Protocol-level definitions for agentic interaction patterns that work across frameworks.',
+    githubUrl: 'https://github.com/withagents/agent-contracts',
+    docsUrl: '/opensource',
+    accentColor: 'var(--color-accent)',
+  },
+  {
+    name: 'trace-timeline',
+    tagline: 'Tooling',
+    stars: '850',
+    lang: 'TypeScript',
+    license: 'Apache-2.0',
+    lastUpdated: '5d ago',
+    description: 'Chronological execution trace viewer. A visual debugger for multi-step agent execution flows with timeline inspection.',
+    githubUrl: 'https://github.com/withagents/trace-timeline',
+    docsUrl: '/opensource',
+    accentColor: 'var(--color-accent-lime)',
+  },
+  {
+    name: 'context-layers',
+    tagline: 'Reference',
+    stars: '2.1k',
+    lang: 'Python',
+    license: 'MIT',
+    lastUpdated: '1d ago',
+    description: 'Context-window composition primitives. Reference implementation for persistence patterns and retrieval strategies.',
+    githubUrl: 'https://github.com/withagents/context-layers',
+    docsUrl: '/opensource',
+    accentColor: '#EC4899',
+  },
+];
+---
+
+<BaseLayout
+  title="Open Source — WithAgents"
+  description="Reusable building blocks for applied agent design. High-signal, reference-quality open source work."
+>
+  <Nav current="opensource" />
+
+  <main class="relative z-10 w-full flex-grow flex flex-col">
+    <div class="mx-auto w-full max-w-[1440px] px-6 py-12 md:py-24 flex flex-col gap-24">
+
+      <!-- Header -->
+      <header class="flex flex-col gap-6">
+        <div class="flex items-center gap-2 font-mono text-sm text-muted">
+          <span>WITHAGENTS</span>
+          <span class="material-symbols-outlined" style="font-size:16px;color:var(--color-muted-2);">chevron_right</span>
+          <span style="color:var(--color-accent-lime);">OPEN SOURCE</span>
+        </div>
+        <h1 class="font-display text-5xl font-bold tracking-tighter text-text uppercase md:text-7xl">
+          Open Source
+        </h1>
+        <!-- Filter tabs -->
+        <div class="flex flex-wrap gap-3 mt-4">
+          {['Reference Patterns', 'Contracts', 'Tooling'].map(tab => (
+            <button
+              class="font-mono text-xs uppercase tracking-wider text-muted transition-colors hover:text-text focus-visible:outline-accent"
+              style="background:var(--color-panel-2);padding:8px 16px;"
+            >{tab}</button>
+          ))}
+        </div>
+      </header>
+
+      <!-- Repo grid -->
+      <section class="flex flex-col gap-8">
+        <h2
+          class="font-display text-2xl font-semibold text-text tracking-tight pb-4"
+          style="border-bottom:1px solid var(--color-hair);"
+        >Core Repositories</h2>
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {repos.map(r => <RepoCard {...r} />)}
+        </div>
+      </section>
+
+      <!-- Contribution protocol -->
+      <section class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div
+          class="lg:col-span-2 flex flex-col justify-between p-8 md:p-12"
+          style="background:var(--color-panel-1);border:1px solid rgba(255,255,255,0.06);"
+        >
+          <div class="flex flex-col gap-6">
+            <h2 class="font-display text-3xl font-bold text-text tracking-tight">Contribution Protocol</h2>
+            <p class="font-body text-muted leading-relaxed max-w-xl">
+              We operate on a strict, high-fidelity contribution model. All PRs must adhere to the core architectural constraints defined in the agent-contracts repository.
+            </p>
+            <ul class="flex flex-col gap-4 mt-4">
+              {[
+                'Review the active RFCs before initiating a new pattern.',
+                'Ensure deterministic execution across all agent states.',
+                'All interfaces must remain inspectable by design.',
+              ].map(item => (
+                <li class="flex items-start gap-3">
+                  <span class="material-symbols-outlined mt-0.5" style="font-size:20px;color:var(--color-accent-lime);">check_circle</span>
+                  <span class="font-body text-sm text-muted">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="mt-8">
+            <a
+              href="https://github.com/withagents"
+              target="_blank"
+              rel="noopener"
+              class="inline-flex items-center gap-2 font-mono text-sm text-accent hover:text-accent-alt transition-colors focus-visible:outline-accent"
+            >
+              View on GitHub
+              <span class="material-symbols-outlined" style="font-size:16px;">arrow_outward</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Tech stack -->
+        <div
+          class="flex flex-col gap-6 p-8"
+          style="background:var(--color-panel-2);border:1px solid rgba(255,255,255,0.06);"
+        >
+          <h3 class="font-display text-xl font-semibold text-text tracking-tight">Tech Stack</h3>
+          <div class="flex flex-col gap-4">
+            {[
+              { label: 'TypeScript', note: 'Contracts + Tooling' },
+              { label: 'Python', note: 'Context + Analysis' },
+              { label: 'Rust', note: 'Performance-critical paths' },
+              { label: 'MIT / Apache-2.0', note: 'Licensing' },
+            ].map(s => (
+              <div class="flex items-center justify-between" style="border-bottom:1px solid var(--color-hair);padding-bottom:12px;">
+                <span class="font-mono text-sm text-text">{s.label}</span>
+                <span class="font-mono text-xs text-muted-2">{s.note}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>

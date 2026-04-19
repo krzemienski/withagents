@@ -1,0 +1,35 @@
+BEFORE-GREP REPORT — agentic.dog → withagents.dev rename sweep
+Generated: 2026-04-19
+Pattern: agentic\.dog|agentic-dog|agentic dog|Agentic Dog|agenticdog|@agenticdog|agenticdevelopment\.com
+
+14  plans/260419-0241-agentic-dog-brand-launch/plan.md
+4   plans/260419-0241-agentic-dog-brand-launch/CHECKPOINT.md
+1   plans/260419-0241-agentic-dog-brand-launch/phase-00-baseline-capture.md
+7   plans/260419-0241-agentic-dog-brand-launch/phase-01-audit-workstreams.md
+5   plans/260419-0241-agentic-dog-brand-launch/phase-04-cms-site-architecture.md
+5   plans/260419-0241-agentic-dog-brand-launch/phase-05-publication-pipeline.md
+2   plans/260419-0241-agentic-dog-brand-launch/phase-07-approval-package.md
+9   plans/260419-0241-agentic-dog-brand-launch/reports/critic-260419-0241-red-team-review.md
+9   plans/260419-0241-agentic-dog-brand-launch/reports/deepen-260419-0241-plan-strengthening.md
+3   plans/260419-0241-agentic-dog-brand-launch/research/A-session-archaeology.md
+4   plans/260419-0241-agentic-dog-brand-launch/research/B-github-catalog.md
+8   plans/260419-0241-agentic-dog-brand-launch/research/C-desktop-product-scan.md
+11  plans/260419-0241-agentic-dog-brand-launch/research/D-blog-series-audit.md
+5   plans/260419-0241-agentic-dog-brand-launch/research/E-skills-marketing-toolkit.md
+18  plans/260419-0241-agentic-dog-brand-launch/research/F-drafts-disposition.md
+17  plans/260419-0241-agentic-dog-brand-launch/research/G-brand-reconnaissance.md
+6   plans/260419-0241-agentic-dog-brand-launch/research/H-blog-series-voice-audit.md
+18  plans/260419-0241-agentic-dog-brand-launch/synthesis/approval-package.md
+2   plans/260419-0241-agentic-dog-brand-launch/synthesis/approval-record.md
+10  plans/260419-0241-agentic-dog-brand-launch/synthesis/calendar-30day.md
+13  plans/260419-0241-agentic-dog-brand-launch/synthesis/calendar-45day.md
+1   plans/260419-0241-agentic-dog-brand-launch/synthesis/insight-library.md
+1   plans/260419-0241-agentic-dog-brand-launch/synthesis/narrative-spine.md
+12  plans/260419-0241-agentic-dog-brand-launch/synthesis/product-inventory.md
+4   plans/260419-0241-agentic-dog-brand-launch/synthesis/voice-spec.md
+
+TOTAL: 189 matches across 25 files
+No matches in: posts/, site/posts/, CLAUDE.md
+BRIEF.md: excluded (already withagents.dev — source of truth)
+phase-08-stale-agentic-dog/: excluded (archived)
+CHECKPOINT.md: included (not inside phase-08-stale-*)

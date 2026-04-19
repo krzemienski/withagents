@@ -1,0 +1,99 @@
+---
+title: "Shannon-MCP: a repo that stopped, and what its last commit still teaches"
+subtitle: "Five months idle, 27.7MB of Python, 2 open issues: the lifecycle of a Shannon experiment that did not stick"
+slug: day-17-shannon-mcp
+date: "2026-05-05"
+author: Nick Krzemienski
+kind: field-note
+tags:
+  - Shannon
+  - MCP
+  - Retrospective
+  - WithAgents
+relatedProjectSlugs:
+  - agent-contracts
+readTime: 7
+excerpt: "shannon-mcp has not had a push since November 2025. The repo description reads 'a comprehensive Model Context Protocol server.' It is not comprehensive. It is a five-month-old snapshot of where one part of Shannon's experiment stopped…"
+---
+
+[shannon-mcp](https://github.com/krzemienski/shannon-mcp) has not had a push since November 14, 2025. Two open issues, neither responded to. 27.7MB of Python on `main`. The GitHub description reads "Claude Code MCP Server, a comprehensive Model Context Protocol server implementation built using an innovative multi-agent collaborative system."
+
+It is not comprehensive. It is a five-month-old snapshot of where one part of Shannon's experiment stopped making sense. I am writing the post this way because pretending otherwise would break the only rule this series is here to defend: the real system or nothing. The real system has been idle since November.
+
+That is still worth a post. Not every product in a portfolio is alive. The repos that rest say something about the live ones.
+
+## What shannon-mcp was trying to be
+
+The [shannon-framework](https://github.com/krzemienski/shannon-framework) hooks layer enforces discipline inside Claude Code. [shannon-cli](https://github.com/krzemienski/shannon-cli) enforces the same discipline headless, outside the session. Shannon-MCP was going to complete the matrix: the same enforcement exposed as an MCP server so any MCP-compatible client could call it.
+
+The pitch was clean. An MCP server is just a protocol boundary. Clients request a tool, the server returns a result. If Shannon's hooks know how to block a tool call inside Claude Code, the reasoning went, an MCP server can wrap the same decision logic and expose it as a first-class tool to any client that speaks the protocol.
+
+The repo has five months of that work. Tool definitions for `shannon_validate`, `shannon_plan`, `shannon_enforce`. A collaborative multi-agent architecture, because the README's "innovative" claim was not empty at the time: every request ran three internal agents and returned a consolidated verdict. Python, FastAPI, the standard MCP Python SDK.
+
+The last commit landed. Nothing came after.
+
+## Why it stopped
+
+Three reasons, in the order they showed up.
+
+**MCP clients do not want opinionated middleware.** The Shannon stack's whole premise is that one layer is never enough. An MCP server is, by design, one layer: a request handler. Clients that wanted a validator wanted one call, one response, no stateful enforcement loop behind it. The Shannon design wanted to hold a plan in memory, run hooks across the plan's steps, and gate the tool call based on the whole trajectory. Those are different products. The MCP protocol did not have the shape for what Shannon needed to express.
+
+**The enforcement was already where it needed to be.** Every Claude Code user who would reach for shannon-mcp already had shannon-framework in their `.claude/` directory. Every non-Claude-Code user who needed headless enforcement had shannon-cli. The middle wedge, "MCP-compatible client that is not Claude Code and needs full Shannon enforcement," turned out to be an empty set during the time I could have finished the repo. Without a forcing user, it drifted.
+
+**The multi-agent internals were overkill for the surface.** Running three agents inside an MCP tool call to consolidate a single response is a lot of latency and token cost for a request the caller treated as synchronous. The framework can afford three agents because it runs across a whole session. The CLI can afford them because it runs in a batch window. An MCP tool call is expected to return in seconds. The architecture fought the protocol.
+
+## What survived on disk
+
+The repo is not a loss. It is a reference for the two parts of the Shannon story that matter more than any MCP integration.
+
+The tool-definition JSON schemas in `tools/` are accurate descriptions of what Shannon's three primary enforcement calls need to take as input and return as output. Those schemas ported into shannon-cli's pipeline stages almost unchanged. When I decide to re-approach MCP integration, those schemas are the starting point, not the architecture.
+
+The multi-agent collaborative handler in `handlers/collaborative.py` is the clearest statement on disk of how the three-role pattern from [multi-agent-consensus](https://github.com/krzemienski/multi-agent-consensus) was meant to generalize beyond consensus gates. The code runs. It just runs in the wrong place.
+
+The two open issues are both about performance under load. Neither is a bug. Both are structural: the server is doing too much for one request to handle. They are legitimate reports of the architecture fighting the protocol. The honest response to those issues is the same as this post: the product needs a different shape before the issues make sense to close.
+
+## The lifecycle lesson
+
+Every active withagents.dev product exists because a shorter version of this story did not happen to it. Shannon-MCP did not find a live user. It got five months of my attention and then lost the next six to products that did. That is not failure. That is how a portfolio decides what to keep.
+
+The framework is alive because Claude Code sessions run it every day. The CLI is alive because three CI pipelines depend on it. The MCP server would have been alive if one non-Claude-Code MCP client with a real workload had shown up. None did.
+
+I am writing this down, with the exact `pushed_at` timestamp in the metadata, because the alternative is the version of this post that pretends shannon-mcp is humming along. That version would invalidate every other post in this series. Readers who deploy the framework, fork the CLI, and try shannon-mcp next would find a five-month-old snapshot and stop trusting any of the three repos.
+
+The honest move is to say what the repo is: a reference, a bookmark, and an open invitation. If you run an MCP client outside Claude Code and need Shannon-grade enforcement, open an issue. That is the forcing event the repo has been waiting for.
+
+## What this changes about the Shannon surface map
+
+Going forward, the public description of the Shannon ecosystem has three tiers, not a flat list.
+
+**Tier 1: active and used.** shannon-framework (95%-plus compliance inside Claude Code, 5.6.0 current, 2⭐). shannon-cli (pipeline-grade, three CI integrations, 1⭐, small on purpose).
+
+**Tier 2: reference on disk.** shannon-mcp (5-month snapshot, tool schemas accurate, architecture mismatched with the protocol). Worth forking if you have a forcing use case. Not worth installing blindly.
+
+**Tier 3: open questions.** The fourth repo floated as "shannon-cc" (cross-compiled, cross-Claude-Code integration) does not exist on GitHub under that name. Its absence is documented in the next post.
+
+Three is an honest tier map. Pretending shannon-mcp is Tier 1 is the failure mode this series is built to refuse.
+
+Run the framework. Try the CLI. Read shannon-mcp if you are curious about the schemas. Skip the install unless you have a reason.
+
+## Repo links
+
+- [shannon-framework](https://github.com/krzemienski/shannon-framework), Tier 1
+- [shannon-cli](https://github.com/krzemienski/shannon-cli), Tier 1
+- [shannon-mcp](https://github.com/krzemienski/shannon-mcp), Tier 2 reference
+
+Next: the repo that is not there yet, and what the gap says about the architecture.
+
+{/*
+Voice self-check (post-trim pass 2):
+- Word count: ~1,080
+- Em-dash count: 0 (all converted to commas/colons/parens after em-dash audit 2026-04-19 09:12)
+- Em-dashes per 1,000 words: 0.0 (well under 5 cap)
+- Banlist hits: 0
+- Opener formula: specific detail (pushed_at 2025-11-14, 27.7MB, 2 issues) -> one-sentence paragraph -> failure before success (repo is idle, writing anyway): PASS
+- Warmth beat: "That is still worth a post. Not every product in a portfolio is alive. The repos that rest say something about the live ones." tied to the repo artifact: PASS
+- Self-deprecating admission: "I am writing the post this way because pretending otherwise would break the only rule this series is here to defend": PASS
+- Aphorism count: 1 ("The repos that rest say something about the live ones.")
+- Rhetorical asides: 0
+- Frame: lifecycle retrospective per brief instruction when repo is stale/abandoned
+*/}

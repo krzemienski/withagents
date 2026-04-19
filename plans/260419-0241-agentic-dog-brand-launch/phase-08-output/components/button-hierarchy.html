@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WithAgents — Button Hierarchy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-void:        #040404;
+    --panel-1:        #0A0A0D;
+    --panel-2:        #111116;
+    --panel-3:        #15151C;
+    --text-primary:   #F5F5F7;
+    --text-muted:     #A1A1AA;
+    --accent:         #8B5CF6;
+    --accent-alt:     #C084FC;
+    --accent-hot:     #E879F9;
+    --accent-lime:    #A3E635;
+    --border:         rgba(255,255,255,0.10);
+    --accent-wash:    rgba(139,92,246,0.12);
+    --font-display:   'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-body:      'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-mono:      'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    --radius-sm:      4px;
+    --radius-md:      8px;
+    --space-xs:       6px;
+    --space-sm:       12px;
+    --space-md:       20px;
+    --space-lg:       32px;
+    --space-xl:       48px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg-void);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.6;
+    padding: var(--space-xl);
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: var(--space-lg);
+  }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.10em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: var(--space-sm);
+    margin-top: var(--space-lg);
+  }
+  .section-label:first-of-type { margin-top: 0; }
+
+  .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+  }
+
+  /* ── Base button ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 1;
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    text-decoration: none;
+    white-space: nowrap;
+    padding: 10px var(--space-md);
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .btn {
+      transition:
+        background 150ms cubic-bezier(0.4, 0, 0.2, 1),
+        border-color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+        box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1),
+        color 150ms cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+  }
+
+  .btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* ── Primary ── */
+  .btn--primary {
+    background: var(--accent);
+    color: #fff;
+    border: 1px solid transparent;
+  }
+  .btn--primary:hover {
+    background: var(--accent-alt);
+    box-shadow: 0 0 18px rgba(139,92,246,0.30);
+  }
+  .btn--primary:active {
+    background: #7C3AED;
+    box-shadow: none;
+  }
+
+  /* ── Secondary ── */
+  .btn--secondary {
+    background: var(--panel-2);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+  .btn--secondary:hover {
+    background: var(--panel-3);
+    border-color: rgba(139,92,246,0.30);
+    color: var(--text-primary);
+  }
+  .btn--secondary:active {
+    background: var(--panel-1);
+  }
+
+  /* ── Tertiary ── */
+  .btn--tertiary {
+    background: var(--accent-wash);
+    color: var(--accent-alt);
+    border: 1px solid rgba(139,92,246,0.20);
+  }
+  .btn--tertiary:hover {
+    background: rgba(139,92,246,0.20);
+    border-color: rgba(139,92,246,0.36);
+  }
+  .btn--tertiary:active {
+    background: rgba(139,92,246,0.10);
+  }
+
+  /* ── Ghost ── */
+  .btn--ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+  }
+  .btn--ghost:hover {
+    background: var(--panel-2);
+    color: var(--text-primary);
+    border-color: var(--border);
+  }
+  .btn--ghost:active {
+    background: var(--panel-3);
+  }
+
+  /* ── Danger ── */
+  .btn--danger {
+    background: rgba(239,68,68,0.12);
+    color: #F87171;
+    border: 1px solid rgba(239,68,68,0.22);
+  }
+  .btn--danger:hover {
+    background: rgba(239,68,68,0.20);
+    border-color: rgba(239,68,68,0.36);
+  }
+  .btn--danger:active {
+    background: rgba(239,68,68,0.08);
+  }
+
+  /* ── Disabled ── */
+  .btn:disabled,
+  .btn[aria-disabled="true"] {
+    opacity: 0.35;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* ── Sizes ── */
+  .btn--sm {
+    font-size: 12px;
+    padding: 7px var(--space-sm);
+    border-radius: var(--radius-sm);
+  }
+  .btn--md {
+    font-size: 14px;
+    padding: 10px var(--space-md);
+  }
+  .btn--lg {
+    font-size: 15px;
+    font-weight: 600;
+    padding: 13px 28px;
+    letter-spacing: -0.01em;
+  }
+
+  /* ── Icon button ── */
+  .btn--icon {
+    padding: 9px;
+    border-radius: var(--radius-md);
+    background: var(--panel-2);
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+  }
+  .btn--icon:hover {
+    color: var(--text-primary);
+    border-color: rgba(139,92,246,0.28);
+    background: var(--panel-3);
+  }
+
+  /* size row label */
+  .size-badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    min-width: 28px;
+    opacity: 0.6;
+  }
+
+  hr.divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: var(--space-md) 0;
+  }
+</style>
+</head>
+<body>
+
+<p class="page-title">withagents.dev — Button Hierarchy</p>
+
+<!-- ── Variants ── -->
+<p class="section-label">Variants — Default State</p>
+<div class="row">
+  <button class="btn btn--primary btn--md">Start a conversation</button>
+  <button class="btn btn--secondary btn--md">View products</button>
+  <button class="btn btn--tertiary btn--md">Browse writing</button>
+  <button class="btn btn--ghost btn--md">Learn more</button>
+  <button class="btn btn--danger btn--md">Remove access</button>
+</div>
+
+<hr class="divider">
+
+<!-- ── Hover State ── -->
+<p class="section-label">Hover (simulated)</p>
+<div class="row">
+  <button class="btn btn--primary btn--md" style="background:var(--accent-alt);box-shadow:0 0 18px rgba(139,92,246,0.30);">Start a conversation</button>
+  <button class="btn btn--secondary btn--md" style="background:var(--panel-3);border-color:rgba(139,92,246,0.30);">View products</button>
+  <button class="btn btn--tertiary btn--md" style="background:rgba(139,92,246,0.20);border-color:rgba(139,92,246,0.36);">Browse writing</button>
+  <button class="btn btn--ghost btn--md" style="background:var(--panel-2);color:var(--text-primary);border-color:var(--border);">Learn more</button>
+  <button class="btn btn--danger btn--md" style="background:rgba(239,68,68,0.20);border-color:rgba(239,68,68,0.36);">Remove access</button>
+</div>
+
+<hr class="divider">
+
+<!-- ── Focus State ── -->
+<p class="section-label">Focus-visible</p>
+<div class="row">
+  <button class="btn btn--primary btn--md" style="outline:2px solid var(--accent);outline-offset:2px;">Start a conversation</button>
+  <button class="btn btn--secondary btn--md" style="outline:2px solid var(--accent);outline-offset:2px;">View products</button>
+  <button class="btn btn--tertiary btn--md" style="outline:2px solid var(--accent);outline-offset:2px;">Browse writing</button>
+  <button class="btn btn--ghost btn--md" style="outline:2px solid var(--accent);outline-offset:2px;">Learn more</button>
+  <button class="btn btn--danger btn--md" style="outline:2px solid var(--accent);outline-offset:2px;">Remove access</button>
+</div>
+
+<hr class="divider">
+
+<!-- ── Active/Pressed ── -->
+<p class="section-label">Active (pressed)</p>
+<div class="row">
+  <button class="btn btn--primary btn--md" style="background:#7C3AED;">Start a conversation</button>
+  <button class="btn btn--secondary btn--md" style="background:var(--panel-1);">View products</button>
+  <button class="btn btn--tertiary btn--md" style="background:rgba(139,92,246,0.10);">Browse writing</button>
+  <button class="btn btn--ghost btn--md" style="background:var(--panel-3);">Learn more</button>
+  <button class="btn btn--danger btn--md" style="background:rgba(239,68,68,0.08);">Remove access</button>
+</div>
+
+<hr class="divider">
+
+<!-- ── Disabled ── -->
+<p class="section-label">Disabled</p>
+<div class="row">
+  <button class="btn btn--primary btn--md" disabled>Start a conversation</button>
+  <button class="btn btn--secondary btn--md" disabled>View products</button>
+  <button class="btn btn--tertiary btn--md" disabled>Browse writing</button>
+  <button class="btn btn--ghost btn--md" disabled>Learn more</button>
+  <button class="btn btn--danger btn--md" disabled>Remove access</button>
+</div>
+
+<hr class="divider">
+
+<!-- ── Sizes ── -->
+<p class="section-label">Sizes — Primary</p>
+<div class="row" style="align-items:flex-end;">
+  <span class="size-badge">sm</span>
+  <button class="btn btn--primary btn--sm">Start a conversation</button>
+  <span class="size-badge">md</span>
+  <button class="btn btn--primary btn--md">Start a conversation</button>
+  <span class="size-badge">lg</span>
+  <button class="btn btn--primary btn--lg">Start a conversation</button>
+</div>
+
+<p class="section-label">Sizes — Secondary</p>
+<div class="row" style="align-items:flex-end;">
+  <span class="size-badge">sm</span>
+  <button class="btn btn--secondary btn--sm">View products</button>
+  <span class="size-badge">md</span>
+  <button class="btn btn--secondary btn--md">View products</button>
+  <span class="size-badge">lg</span>
+  <button class="btn btn--secondary btn--lg">View products</button>
+</div>
+
+<hr class="divider">
+
+<!-- ── With icons ── -->
+<p class="section-label">With icons</p>
+<div class="row">
+  <button class="btn btn--primary btn--md">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    New runbook
+  </button>
+  <button class="btn btn--secondary btn--md">
+    View on GitHub
+    <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true"><path d="M3 10L10 3M10 3H6M10 3v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <button class="btn btn--ghost btn--md">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.4"/><path d="M7 4.5v3l1.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    Recent
+  </button>
+
+  <!-- Icon-only -->
+  <button class="btn btn--icon" aria-label="Search">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+  </button>
+  <button class="btn btn--icon" aria-label="Copy">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M3 11V3a2 2 0 0 1 2-2h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+  </button>
+</div>
+
+</body>
+</html>

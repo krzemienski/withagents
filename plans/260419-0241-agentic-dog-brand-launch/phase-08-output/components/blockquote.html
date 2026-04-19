@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WithAgents — Blockquote</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-void:        #040404;
+    --panel-1:        #0A0A0D;
+    --panel-2:        #111116;
+    --panel-3:        #15151C;
+    --text-primary:   #F5F5F7;
+    --text-muted:     #A1A1AA;
+    --accent:         #8B5CF6;
+    --accent-alt:     #C084FC;
+    --accent-hot:     #E879F9;
+    --accent-lime:    #A3E635;
+    --border:         rgba(255,255,255,0.10);
+    --accent-wash:    rgba(139,92,246,0.12);
+    --font-display:   'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-body:      'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-mono:      'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    --radius-sm:      4px;
+    --radius-md:      8px;
+    --space-xs:       6px;
+    --space-sm:       12px;
+    --space-md:       20px;
+    --space-lg:       32px;
+    --space-xl:       48px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg-void);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    padding: var(--space-xl);
+    max-width: 760px;
+  }
+
+  .page-title { font-family: var(--font-display); font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: var(--space-lg); }
+  .variant-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: .10em; text-transform: uppercase; color: var(--text-muted); margin-bottom: var(--space-sm); margin-top: var(--space-xl); display: block; }
+  .variant-label:first-of-type { margin-top: 0; }
+  .prose { font-size: 16px; color: var(--text-muted); line-height: 1.75; }
+
+  /* ── Base blockquote ── */
+  blockquote.bq {
+    margin: 0;
+    padding: var(--space-md) var(--space-lg);
+    background: var(--panel-1);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  }
+
+  blockquote.bq p {
+    font-size: 17px;
+    color: var(--text-primary);
+    line-height: 1.65;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  blockquote.bq footer {
+    margin-top: var(--space-sm);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: normal;
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  blockquote.bq footer::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 1px;
+    background: var(--text-muted);
+    opacity: 0.4;
+  }
+
+  /* ── Accent bar variant ── */
+  blockquote.bq--accent-bar {
+    border-left: 3px solid var(--accent-alt);
+    background: linear-gradient(135deg, var(--panel-2) 0%, var(--panel-1) 100%);
+    border-color: rgba(192,132,252,0.20);
+    border-left-color: var(--accent-alt);
+  }
+
+  blockquote.bq--accent-bar p {
+    color: var(--text-primary);
+  }
+
+  /* ── Pull quote — large editorial ── */
+  blockquote.bq--pull {
+    background: transparent;
+    border: none;
+    border-left: none;
+    padding: var(--space-md) 0;
+    border-top: 1px solid rgba(139,92,246,0.28);
+    border-bottom: 1px solid rgba(139,92,246,0.28);
+    border-radius: 0;
+  }
+
+  blockquote.bq--pull p {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1.35;
+    font-style: normal;
+  }
+
+  blockquote.bq--pull footer {
+    margin-top: var(--space-sm);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent-alt);
+  }
+
+  blockquote.bq--pull footer::before { display: none; }
+
+  /* ── Callout / info box ── */
+  .callout {
+    background: var(--accent-wash);
+    border: 1px solid rgba(139,92,246,0.20);
+    border-radius: var(--radius-md);
+    padding: var(--space-md);
+    display: flex;
+    gap: var(--space-sm);
+    align-items: flex-start;
+  }
+
+  .callout__icon {
+    color: var(--accent-alt);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .callout__body {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  .callout__body strong {
+    color: var(--text-primary);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+    font-family: var(--font-display);
+    font-size: 14px;
+  }
+
+  /* Callout variants */
+  .callout--warn {
+    background: rgba(251,191,36,0.07);
+    border-color: rgba(251,191,36,0.18);
+  }
+  .callout--warn .callout__icon { color: #FCD34D; }
+
+  .callout--error {
+    background: rgba(239,68,68,0.07);
+    border-color: rgba(239,68,68,0.18);
+  }
+  .callout--error .callout__icon { color: #F87171; }
+
+  .callout--success {
+    background: rgba(163,230,53,0.07);
+    border-color: rgba(163,230,53,0.18);
+  }
+  .callout--success .callout__icon { color: var(--accent-lime); }
+</style>
+</head>
+<body>
+
+<p class="page-title">withagents.dev — Blockquote</p>
+
+<!-- ── Standard blockquote with attribution ── -->
+<span class="variant-label">Standard — accent bar left, attribution</span>
+<blockquote class="bq">
+  <p>The production gap between a slick agent demo and a system that holds up under real load is a product design problem. The seams show at the operator layer.</p>
+  <footer>
+    <cite>Nick Krzemienski — "Agent workflows should read like operating systems, not demos"</cite>
+  </footer>
+</blockquote>
+
+<!-- ── Accent bar variant ── -->
+<span class="variant-label">Accent bar — alt color, panel-2 background</span>
+<blockquote class="bq bq--accent-bar">
+  <p>Context persistence is not a retrieval problem. It's a product design problem. The decisions made at the interface layer — what the operator sees, what they can act on — determine whether a system can be trusted.</p>
+  <footer>
+    <cite>From "Why context persistence is a product design problem"</cite>
+  </footer>
+</blockquote>
+
+<!-- ── Pull quote ── -->
+<span class="variant-label">Pull quote — editorial, large</span>
+<blockquote class="bq--pull">
+  <p>After 23,479 sessions, the signals for "this won't hold" are recognizable early — and they're almost never in the model.</p>
+  <footer>— withagents.dev, field notes</footer>
+</blockquote>
+
+<!-- ── Callout: info ── -->
+<span class="variant-label">Callout — info (note / tip)</span>
+<aside class="callout" role="note">
+  <span class="callout__icon" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/>
+      <path d="M8 5v.5M8 7.5v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </span>
+  <div class="callout__body">
+    <strong>Note</strong>
+    The <code style="font-family:var(--font-mono);font-size:.88em;color:var(--accent-alt);background:rgba(139,92,246,.10);border:1px solid rgba(139,92,246,.18);border-radius:4px;padding:1px 4px">maxRounds</code> parameter caps agent execution but does not guarantee a complete result. Always validate <code style="font-family:var(--font-mono);font-size:.88em;color:var(--accent-alt);background:rgba(139,92,246,.10);border:1px solid rgba(139,92,246,.18);border-radius:4px;padding:1px 4px">status</code> before consuming output.
+  </div>
+</aside>
+
+<!-- ── Callout: warning ── -->
+<span class="variant-label">Callout — warning</span>
+<aside class="callout callout--warn" role="note">
+  <span class="callout__icon" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <path d="M8 2L14.5 13.5H1.5L8 2Z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+      <path d="M8 6.5v3M8 11v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </span>
+  <div class="callout__body">
+    <strong>Production caution</strong>
+    Avoid passing raw user input directly to agent tool calls. Validate and sanitize at the contract boundary before execution reaches the agent loop.
+  </div>
+</aside>
+
+<!-- ── Callout: success ── -->
+<span class="variant-label">Callout — success</span>
+<aside class="callout callout--success" role="note">
+  <span class="callout__icon" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/>
+      <path d="M5 8.5l2.5 2.5 4-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </span>
+  <div class="callout__body">
+    <strong>Contract validated</strong>
+    All tool calls are within contract scope. Execution proceeded for 7 rounds without violations.
+  </div>
+</aside>
+
+<!-- ── Callout: error ── -->
+<span class="variant-label">Callout — error</span>
+<aside class="callout callout--error" role="alert">
+  <span class="callout__icon" aria-hidden="true">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+      <circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.4"/>
+      <path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </span>
+  <div class="callout__body">
+    <strong>Contract violation</strong>
+    Tool <code style="font-family:var(--font-mono);font-size:.88em;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);border-radius:4px;padding:1px 4px;color:#F87171">write_file</code> is not declared in this contract. Execution halted at round 3.
+  </div>
+</aside>
+
+</body>
+</html>

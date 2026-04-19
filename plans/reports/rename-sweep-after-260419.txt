@@ -1,0 +1,34 @@
+AFTER-GREP REPORT — agentic.dog → withagents.dev rename sweep
+Generated: 2026-04-19
+Pattern: agentic\.dog|agentic-dog|agentic dog|Agentic Dog|agenticdog|@agenticdog|agenticdevelopment\.com
+
+0  plans/260419-0241-agentic-dog-brand-launch/plan.md
+0  plans/260419-0241-agentic-dog-brand-launch/CHECKPOINT.md           [2 path refs — protected]
+0  plans/260419-0241-agentic-dog-brand-launch/phase-00-baseline-capture.md
+0  plans/260419-0241-agentic-dog-brand-launch/phase-01-audit-workstreams.md  [1 path ref — protected]
+0  plans/260419-0241-agentic-dog-brand-launch/phase-04-cms-site-architecture.md
+0  plans/260419-0241-agentic-dog-brand-launch/phase-05-publication-pipeline.md
+0  plans/260419-0241-agentic-dog-brand-launch/phase-07-approval-package.md
+0  plans/260419-0241-agentic-dog-brand-launch/reports/critic-260419-0241-red-team-review.md  [2 path refs — protected]
+0  plans/260419-0241-agentic-dog-brand-launch/reports/deepen-260419-0241-plan-strengthening.md  [1 path ref — protected]
+0  plans/260419-0241-agentic-dog-brand-launch/research/A-session-archaeology.md
+0  plans/260419-0241-agentic-dog-brand-launch/research/B-github-catalog.md
+0  plans/260419-0241-agentic-dog-brand-launch/research/C-desktop-product-scan.md
+0  plans/260419-0241-agentic-dog-brand-launch/research/D-blog-series-audit.md
+0  plans/260419-0241-agentic-dog-brand-launch/research/E-skills-marketing-toolkit.md
+0  plans/260419-0241-agentic-dog-brand-launch/research/F-drafts-disposition.md  [1 path ref — protected]
+0  plans/260419-0241-agentic-dog-brand-launch/research/G-brand-reconnaissance.md  [2 path refs — protected]
+0  plans/260419-0241-agentic-dog-brand-launch/research/H-blog-series-voice-audit.md
+0  plans/260419-0241-agentic-dog-brand-launch/synthesis/approval-package.md  [2 path refs — protected]
+0  plans/260419-0241-agentic-dog-brand-launch/synthesis/approval-record.md
+0  plans/260419-0241-agentic-dog-brand-launch/synthesis/calendar-30day.md
+0  plans/260419-0241-agentic-dog-brand-launch/synthesis/calendar-45day.md
+0  plans/260419-0241-agentic-dog-brand-launch/synthesis/insight-library.md
+0  plans/260419-0241-agentic-dog-brand-launch/synthesis/narrative-spine.md
+0  plans/260419-0241-agentic-dog-brand-launch/synthesis/product-inventory.md
+0  plans/260419-0241-agentic-dog-brand-launch/synthesis/voice-spec.md  [2 path refs — protected]
+
+ACTIONABLE BRAND STRING MATCHES REMAINING: 0
+PATH-REF EXCEPTIONS (protected per brief): 11 occurrences across 8 files
+  — all are references to the plan folder name `260419-0241-agentic-dog-brand-launch/`
+  — folder rename explicitly prohibited by task brief (would break absolute paths)

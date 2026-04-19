@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WithAgents - Applied Agent Design</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&amp;family=Inter:wght@400;500;600&amp;family=Sora:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed-variant": "#5516be",
+                        "tertiary": "#c6c6ca",
+                        "primary-fixed": "#e9ddff",
+                        "on-tertiary-fixed-variant": "#45474a",
+                        "on-tertiary": "#2f3034",
+                        "surface": "#131313",
+                        "on-error-container": "#ffdad6",
+                        "error": "#ffb4ab",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-tint": "#d0bcff",
+                        "on-background": "#e5e2e1",
+                        "background": "#131313",
+                        "tertiary-fixed": "#e2e2e6",
+                        "inverse-on-surface": "#313030",
+                        "surface-container": "#201f1f",
+                        "outline-variant": "#494454",
+                        "on-primary-fixed": "#23005c",
+                        "on-primary-container": "#340080",
+                        "on-secondary-container": "#304b00",
+                        "surface-variant": "#353534",
+                        "on-surface": "#e5e2e1",
+                        "error-container": "#93000a",
+                        "surface-container-low": "#1c1b1b",
+                        "secondary": "#9ddf2e",
+                        "inverse-primary": "#6d3bd7",
+                        "inverse-surface": "#e5e2e1",
+                        "primary-fixed-dim": "#d0bcff",
+                        "on-tertiary-fixed": "#1a1c1f",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-secondary-fixed": "#121f00",
+                        "on-secondary-fixed-variant": "#334f00",
+                        "tertiary-fixed-dim": "#c6c6ca",
+                        "secondary-fixed": "#b2f746",
+                        "secondary-fixed-dim": "#98da27",
+                        "on-secondary": "#213600",
+                        "on-primary": "#3c0091",
+                        "surface-bright": "#3a3939",
+                        "surface-container-highest": "#353534",
+                        "tertiary-container": "#909094",
+                        "outline": "#958ea0",
+                        "on-error": "#690005",
+                        "primary": "#d0bcff",
+                        "surface-dim": "#131313",
+                        "on-tertiary-container": "#282a2d",
+                        "secondary-container": "#83c300",
+                        "on-surface-variant": "#cbc3d7",
+                        "primary-container": "#a078ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Sora", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["IBM Plex Mono", "monospace"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #040404;
+            color: #F5F5F7;
+        }
+    </style>
+</head>
+<body class="font-body antialiased min-h-screen flex flex-col selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar (Shared Component JSON logic) -->
+<nav class="bg-[#040404]/80 backdrop-blur-md sticky top-0 z-50 docked full-width rounded-none">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-[1440px] mx-auto">
+<div class="flex items-center gap-8">
+<a class="font-headline text-xl font-bold tracking-tighter text-white" href="#">WithAgents</a>
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-zinc-500 font-label uppercase tracking-widest text-[10px] hover:text-[#8B5CF6] transition-colors duration-300" href="#">Agents</a>
+<a class="text-zinc-500 font-label uppercase tracking-widest text-[10px] hover:text-[#8B5CF6] transition-colors duration-300" href="#">Repository</a>
+<a class="text-zinc-500 font-label uppercase tracking-widest text-[10px] hover:text-[#8B5CF6] transition-colors duration-300" href="#">Articles</a>
+<a class="text-zinc-500 font-label uppercase tracking-widest text-[10px] hover:text-[#8B5CF6] transition-colors duration-300" href="#">Documentation</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center bg-[#0A0A0D] px-3 py-1.5 rounded-none border border-outline-variant/20 focus-within:border-[#8B5CF6]/50 transition-colors">
+<span class="material-symbols-outlined text-zinc-500 text-sm mr-2">search</span>
+<input class="bg-transparent border-none text-sm text-white placeholder-zinc-600 focus:ring-0 w-48 font-body p-0" placeholder="Search..." type="text"/>
+<div class="font-label text-[9px] text-zinc-600 bg-[#15151C] px-1.5 py-0.5 ml-2">⌘K</div>
+</div>
+<a class="text-zinc-400 font-label text-xs hover:text-white transition-colors duration-300" href="#">Sign In</a>
+<a class="bg-[#8B5CF6] text-[#F5F5F7] font-body text-sm px-4 py-2 rounded-sm hover:shadow-[0_0_15px_rgba(139,92,246,0.3)] transition-all active:scale-[0.98] duration-200" href="#">Get Started</a>
+</div>
+</div>
+</nav>
+<main class="flex-grow flex flex-col items-center w-full">
+<!-- Hero Section -->
+<section class="w-full max-w-[1440px] px-6 py-32 md:py-48 flex flex-col items-start relative overflow-hidden">
+<div class="absolute top-0 right-0 w-[800px] h-[800px] bg-[#8B5CF6]/5 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+<div class="max-w-4xl z-10">
+<div class="flex items-center gap-3 mb-8">
+<span class="flex h-2 w-2 rounded-full bg-[#A3E635]"></span>
+<span class="font-label text-xs text-zinc-400 tracking-widest uppercase">System Status: Nominal</span>
+</div>
+<h1 class="font-headline text-6xl md:text-8xl font-bold tracking-tighter text-white mb-8 leading-[0.9] text-balance">
+                    Applied Agent <br/>Design.
+                </h1>
+<p class="font-body text-xl md:text-2xl text-zinc-400 mb-12 max-w-2xl leading-relaxed text-balance">
+                    A home for products, systems-first writing, and field-tested open source work.
+                </p>
+<div class="flex flex-col sm:flex-row gap-6 items-start">
+<a class="group relative inline-flex items-center gap-3 bg-[#8B5CF6] text-[#F5F5F7] font-body font-medium px-8 py-4 rounded-sm hover:shadow-[0_0_20px_rgba(139,92,246,0.4)] transition-all active:scale-[0.98] duration-200" href="#products">
+<span>Explore Products</span>
+<span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+<a class="inline-flex items-center gap-3 px-8 py-4 rounded-sm font-label text-sm text-zinc-300 border border-outline-variant/15 hover:border-outline-variant/40 hover:bg-[#111116] transition-all" href="#writing">
+<span>Read the Index</span>
+</a>
+</div>
+</div>
+</section>
+<!-- Product Pillars Grid -->
+<section class="w-full max-w-[1440px] px-6 py-24 border-t border-white/5" id="products">
+<div class="flex justify-between items-end mb-16">
+<div>
+<h2 class="font-label text-sm text-[#8B5CF6] tracking-widest uppercase mb-4">01. Architecture</h2>
+<h3 class="font-headline text-3xl md:text-4xl font-bold text-white tracking-tight">Core Infrastructure</h3>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Card 1 -->
+<div class="bg-[#0A0A0D] p-8 md:p-10 flex flex-col group hover:bg-[#111116] transition-colors duration-300 relative overflow-hidden h-[400px]">
+<div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-white">book_4</span>
+</div>
+<div class="mb-auto">
+<div class="font-label text-xs text-zinc-500 mb-4 bg-[#15151C] inline-block px-2 py-1">SYS_01</div>
+<h4 class="font-headline text-2xl font-bold text-white mb-3">Runbooks</h4>
+<p class="font-body text-zinc-400 text-sm leading-relaxed">Deterministic execution paths for non-deterministic models. A framework for constraining agent behavior safely.</p>
+</div>
+<div class="mt-8 flex items-center gap-2 text-zinc-500 font-label text-xs group-hover:text-[#8B5CF6] transition-colors">
+<span>View Documentation</span>
+<span class="material-symbols-outlined text-sm">arrow_outward</span>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-[#0A0A0D] p-8 md:p-10 flex flex-col group hover:bg-[#111116] transition-colors duration-300 relative overflow-hidden h-[400px]">
+<div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-white">database</span>
+</div>
+<div class="mb-auto">
+<div class="font-label text-xs text-zinc-500 mb-4 bg-[#15151C] inline-block px-2 py-1">SYS_02</div>
+<h4 class="font-headline text-2xl font-bold text-white mb-3">Memory Layer</h4>
+<p class="font-body text-zinc-400 text-sm leading-relaxed">State management built for persistence. Semantic caching and structured retrieval patterns.</p>
+</div>
+<div class="mt-8 flex items-center gap-2 text-zinc-500 font-label text-xs group-hover:text-[#8B5CF6] transition-colors">
+<span>View Architecture</span>
+<span class="material-symbols-outlined text-sm">arrow_outward</span>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-[#0A0A0D] p-8 md:p-10 flex flex-col group hover:bg-[#111116] transition-colors duration-300 relative overflow-hidden h-[400px]">
+<div class="absolute top-0 right-0 p-6 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-6xl text-white">terminal</span>
+</div>
+<div class="mb-auto">
+<div class="font-label text-xs text-zinc-500 mb-4 bg-[#15151C] inline-block px-2 py-1">SYS_03</div>
+<h4 class="font-headline text-2xl font-bold text-white mb-3">Operator UI</h4>
+<p class="font-body text-zinc-400 text-sm leading-relaxed">Human-in-the-loop interfaces. High-fidelity dashboards for monitoring fleet health and intervening in agent flows.</p>
+</div>
+<div class="mt-8 flex items-center gap-2 text-zinc-500 font-label text-xs group-hover:text-[#8B5CF6] transition-colors">
+<span>Explore Components</span>
+<span class="material-symbols-outlined text-sm">arrow_outward</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Latest from the Index -->
+<section class="w-full max-w-[1440px] px-6 py-24" id="writing">
+<div class="flex flex-col md:flex-row gap-16">
+<div class="md:w-1/3">
+<h2 class="font-label text-sm text-[#8B5CF6] tracking-widest uppercase mb-4">02. The Index</h2>
+<h3 class="font-headline text-3xl font-bold text-white tracking-tight mb-6">Systems-First Writing</h3>
+<p class="font-body text-zinc-400 text-sm leading-relaxed mb-8">Essays and technical notes on building reliable, agentic systems in production environments.</p>
+<a class="inline-flex items-center gap-2 text-zinc-300 font-label text-xs hover:text-[#8B5CF6] transition-colors" href="#">
+<span>View Full Index</span>
+<span class="material-symbols-outlined text-[14px]">arrow_forward</span>
+</a>
+</div>
+<div class="md:w-2/3 flex flex-col gap-0">
+<!-- Essay 1 -->
+<a class="group py-8 border-b border-white/5 flex flex-col md:flex-row md:items-baseline justify-between gap-4 hover:bg-[#0A0A0D] -mx-6 px-6 transition-colors" href="#">
+<div class="max-w-xl">
+<h4 class="font-headline text-xl font-semibold text-white group-hover:text-[#8B5CF6] transition-colors mb-2">Agent workflows should read like operating systems.</h4>
+<p class="font-body text-sm text-zinc-500 line-clamp-2">Moving away from script-kiddie prompting towards robust, interruptible state machines.</p>
+</div>
+<div class="font-label text-xs text-zinc-600 uppercase tracking-wider shrink-0">Oct 12, 2023</div>
+</a>
+<!-- Essay 2 -->
+<a class="group py-8 border-b border-white/5 flex flex-col md:flex-row md:items-baseline justify-between gap-4 hover:bg-[#0A0A0D] -mx-6 px-6 transition-colors" href="#">
+<div class="max-w-xl">
+<h4 class="font-headline text-xl font-semibold text-white group-hover:text-[#8B5CF6] transition-colors mb-2">The fallacy of universal context windows.</h4>
+<p class="font-body text-sm text-zinc-500 line-clamp-2">Why throwing 100k tokens at a problem is an architectural failure, not a solution.</p>
+</div>
+<div class="font-label text-xs text-zinc-600 uppercase tracking-wider shrink-0">Sep 28, 2023</div>
+</a>
+</div>
+</div>
+</section>
+<!-- Open Source Pulse -->
+<section class="w-full max-w-[1440px] px-6 py-12">
+<div class="bg-[#0A0A0D] border border-white/5 p-6 flex flex-col md:flex-row items-center justify-between gap-6">
+<div class="flex items-center gap-4">
+<div class="h-10 w-10 bg-[#15151C] flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-zinc-400">commit</span>
+</div>
+<div>
+<h3 class="font-label text-xs text-zinc-500 uppercase tracking-widest mb-1">Open Source Pulse</h3>
+<div class="font-body text-sm text-white">Active Deployments</div>
+</div>
+</div>
+<div class="flex flex-wrap items-center gap-8">
+<!-- Repo 1 -->
+<div class="flex items-center gap-3">
+<span class="flex h-1.5 w-1.5 rounded-full bg-[#A3E635]"></span>
+<div class="font-label text-xs text-zinc-300">agent-contracts</div>
+<div class="font-label text-[10px] text-zinc-600">v1.2.4</div>
+</div>
+<!-- Repo 2 -->
+<div class="flex items-center gap-3">
+<span class="flex h-1.5 w-1.5 rounded-full bg-[#A3E635]"></span>
+<div class="font-label text-xs text-zinc-300">trace-timeline</div>
+<div class="font-label text-[10px] text-zinc-600">v0.9.1-beta</div>
+</div>
+<!-- Repo 3 -->
+<div class="flex items-center gap-3">
+<span class="flex h-1.5 w-1.5 rounded-full bg-[#EC4899]"></span>
+<div class="font-label text-xs text-zinc-300">eval-suite</div>
+<div class="font-label text-[10px] text-zinc-600">Building...</div>
+</div>
+</div>
+</div>
+</section>
+<!-- The Applied Layer -->
+<section class="w-full bg-[#0A0A0D] mt-24 py-32">
+<div class="max-w-[1440px] px-6 mx-auto flex flex-col md:flex-row justify-between items-start md:items-end gap-12">
+<div class="max-w-2xl">
+<h2 class="font-label text-xs text-[#8B5CF6] tracking-widest uppercase mb-6">03. Advisory</h2>
+<h3 class="font-headline text-4xl md:text-5xl font-bold text-white tracking-tight mb-6 text-balance">Applied Systems.</h3>
+<p class="font-body text-lg text-zinc-400 leading-relaxed text-balance">
+                        Quiet, implementation-first collaboration for organizations introducing agentic workflows into production.
+                    </p>
+</div>
+<a class="inline-flex items-center gap-3 px-8 py-4 bg-[#F5F5F7] text-[#040404] font-body font-medium rounded-sm hover:bg-white transition-colors shrink-0" href="#">
+<span>Start a conversation</span>
+<span class="material-symbols-outlined text-sm">mail</span>
+</a>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full bg-[#040404] border-t border-white/5 py-12">
+<div class="max-w-[1440px] mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="font-headline text-lg font-bold tracking-tighter text-zinc-600">WithAgents</div>
+<div class="flex gap-6 font-label text-xs text-zinc-600 uppercase tracking-widest">
+<a class="hover:text-zinc-300 transition-colors" href="#">GitHub</a>
+<a class="hover:text-zinc-300 transition-colors" href="#">Twitter</a>
+<a class="hover:text-zinc-300 transition-colors" href="#">RSS</a>
+</div>
+<div class="font-label text-xs text-zinc-700 uppercase tracking-widest">
+                © 2024 Null Island
+            </div>
+</div>
+</footer>
+</body></html>

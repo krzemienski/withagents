@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WithAgents — Code Block</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-void:        #040404;
+    --panel-1:        #0A0A0D;
+    --panel-2:        #111116;
+    --panel-3:        #15151C;
+    --text-primary:   #F5F5F7;
+    --text-muted:     #A1A1AA;
+    --accent:         #8B5CF6;
+    --accent-alt:     #C084FC;
+    --accent-hot:     #E879F9;
+    --accent-lime:    #A3E635;
+    --border:         rgba(255,255,255,0.10);
+    --accent-wash:    rgba(139,92,246,0.12);
+    --font-display:   'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-body:      'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-mono:      'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    --radius-sm:      4px;
+    --radius-md:      8px;
+    --space-xs:       6px;
+    --space-sm:       12px;
+    --space-md:       20px;
+    --space-lg:       32px;
+    --space-xl:       48px;
+
+    /* Syntax token colors — class-based, Prism/Shiki compatible */
+    --tok-keyword:    #C084FC;   /* purple */
+    --tok-string:     #86EFAC;   /* green */
+    --tok-comment:    #52525B;   /* zinc */
+    --tok-number:     #FCA5A5;   /* red-ish */
+    --tok-function:   #7DD3FC;   /* sky */
+    --tok-operator:   #A1A1AA;   /* neutral */
+    --tok-type:       #A3E635;   /* lime */
+    --tok-variable:   #F5F5F7;   /* white */
+    --tok-punctuation:#71717A;   /* zinc */
+    --tok-constant:   #FDBA74;   /* orange */
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg-void);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    padding: var(--space-xl);
+    max-width: 860px;
+  }
+
+  .page-title { font-family: var(--font-display); font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: var(--space-lg); }
+  .variant-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: .10em; text-transform: uppercase; color: var(--text-muted); margin-bottom: var(--space-sm); margin-top: var(--space-xl); display: block; }
+  .variant-label:first-of-type { margin-top: 0; }
+  .prose { font-size: 16px; color: var(--text-muted); line-height: 1.75; max-width: 680px; }
+
+  /* ── Inline code ── */
+  code {
+    font-family: var(--font-mono);
+    font-size: 0.88em;
+    color: var(--accent-alt);
+    background: rgba(139,92,246,0.10);
+    border: 1px solid rgba(139,92,246,0.18);
+    border-radius: var(--radius-sm);
+    padding: 1px 5px;
+    font-weight: 400;
+  }
+
+  /* ── Fenced code block ── */
+  .code-block {
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Header bar */
+  .code-block__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--panel-3);
+    border-bottom: 1px solid var(--border);
+    gap: var(--space-sm);
+  }
+
+  .code-block__lang {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: lowercase;
+  }
+
+  .code-block__filename {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-left: var(--space-xs);
+  }
+
+  .code-block__copy {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text-muted);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    padding: 3px 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .code-block__copy { transition: color 150ms cubic-bezier(0.4,0,0.2,1), background 150ms cubic-bezier(0.4,0,0.2,1), border-color 150ms cubic-bezier(0.4,0,0.2,1); }
+  }
+
+  .code-block__copy:hover {
+    color: var(--text-primary);
+    border-color: rgba(139,92,246,0.28);
+    background: var(--panel-2);
+  }
+
+  .code-block__copy:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* Code content */
+  .code-block__pre {
+    margin: 0;
+    padding: var(--space-md);
+    overflow-x: auto;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.65;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .code-block__code {
+    display: block;
+    white-space: pre;
+    color: var(--tok-variable);
+  }
+
+  /* Line numbers (optional variant) */
+  .code-block--lined .code-block__pre {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: var(--space-md);
+    padding-left: var(--space-sm);
+  }
+
+  .code-block__line-num {
+    color: var(--text-muted);
+    opacity: 0.35;
+    user-select: none;
+    text-align: right;
+    font-size: 12px;
+    padding-right: var(--space-sm);
+    border-right: 1px solid var(--border);
+    line-height: 1.65;
+  }
+
+  /* Caption slot */
+  .code-block__caption {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    padding: var(--space-xs) var(--space-sm);
+    border-top: 1px solid var(--border);
+    opacity: 0.7;
+  }
+
+  /* ── Syntax token classes (Prism/Shiki-compatible) ── */
+  .tok-keyword    { color: var(--tok-keyword); }
+  .tok-string     { color: var(--tok-string); }
+  .tok-comment    { color: var(--tok-comment); font-style: italic; }
+  .tok-number     { color: var(--tok-number); }
+  .tok-function   { color: var(--tok-function); }
+  .tok-operator   { color: var(--tok-operator); }
+  .tok-type       { color: var(--tok-type); }
+  .tok-variable   { color: var(--tok-variable); }
+  .tok-punctuation{ color: var(--tok-punctuation); }
+  .tok-constant   { color: var(--tok-constant); }
+  .tok-import     { color: var(--tok-keyword); }
+  .tok-attr       { color: var(--accent-alt); }
+
+  /* Highlighted line */
+  .code-block__line--highlight {
+    background: rgba(139,92,246,0.08);
+    margin: 0 calc(-1 * var(--space-md));
+    padding: 0 var(--space-md);
+    display: block;
+    border-left: 2px solid var(--accent);
+    padding-left: calc(var(--space-md) - 2px);
+  }
+</style>
+</head>
+<body>
+
+<p class="page-title">withagents.dev — Code Block</p>
+
+<!-- ── Inline code in prose ── -->
+<span class="variant-label">Inline code — prose context</span>
+<p class="prose">
+  The <code>agent-contracts</code> library exposes a typed <code>AgentInterface</code>
+  that both the orchestrator and any downstream <code>trace-timeline</code> consumer can import.
+  Run <code>pnpm add @withagents/agent-contracts</code> to get started.
+</p>
+
+<!-- ── Basic fenced block ── -->
+<span class="variant-label">Fenced — TypeScript, copy button</span>
+<div class="code-block">
+  <div class="code-block__header">
+    <span class="code-block__lang">typescript</span>
+    <button class="code-block__copy" aria-label="Copy code to clipboard" onclick="this.textContent='Copied'; setTimeout(()=>this.innerHTML='<svg width=\'11\' height=\'11\' viewBox=\'0 0 11 11\' fill=\'none\'><rect x=\'3\' y=\'3\' width=\'7\' height=\'7\' rx=\'1.5\' stroke=\'currentColor\' stroke-width=\'1.2\'/><path d=\'M1.5 8V1.5a1.5 1.5 0 0 1 1.5-1.5H8\' stroke=\'currentColor\' stroke-width=\'1.2\' stroke-linecap=\'round\'/></svg> Copy', 2000)">
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M1.5 8V1.5a1.5 1.5 0 0 1 1.5-1.5H8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Copy
+    </button>
+  </div>
+  <pre class="code-block__pre"><code class="code-block__code"><span class="tok-import">import</span> <span class="tok-punctuation">{</span> <span class="tok-variable">defineContract</span> <span class="tok-punctuation">}</span> <span class="tok-import">from</span> <span class="tok-string">'@withagents/agent-contracts'</span><span class="tok-punctuation">;</span>
+
+<span class="tok-keyword">const</span> <span class="tok-variable">runbookContract</span> <span class="tok-operator">=</span> <span class="tok-function">defineContract</span><span class="tok-punctuation">({</span>
+  <span class="tok-attr">name</span><span class="tok-punctuation">:</span> <span class="tok-string">'triage-runbook'</span><span class="tok-punctuation">,</span>
+  <span class="tok-attr">version</span><span class="tok-punctuation">:</span> <span class="tok-string">'1.0.0'</span><span class="tok-punctuation">,</span>
+  <span class="tok-attr">tools</span><span class="tok-punctuation">:</span> <span class="tok-punctuation">[</span><span class="tok-string">'read_file'</span><span class="tok-punctuation">,</span> <span class="tok-string">'search_logs'</span><span class="tok-punctuation">,</span> <span class="tok-string">'create_ticket'</span><span class="tok-punctuation">],</span>
+  <span class="tok-attr">maxRounds</span><span class="tok-punctuation">:</span> <span class="tok-number">12</span><span class="tok-punctuation">,</span>
+  <span class="tok-attr">outputSchema</span><span class="tok-punctuation">:</span> <span class="tok-variable">TriageResult</span><span class="tok-punctuation">,</span>
+<span class="tok-punctuation">});</span>
+
+<span class="tok-comment">// Export for orchestrator consumption</span>
+<span class="tok-keyword">export</span> <span class="tok-keyword">default</span> <span class="tok-variable">runbookContract</span><span class="tok-punctuation">;</span></code></pre>
+</div>
+
+<!-- ── With filename ── -->
+<span class="variant-label">Fenced — with filename, Python</span>
+<div class="code-block">
+  <div class="code-block__header">
+    <span class="code-block__lang">python</span>
+    <span class="code-block__filename">memory_layer/store.py</span>
+    <button class="code-block__copy" aria-label="Copy code to clipboard">
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M1.5 8V1.5a1.5 1.5 0 0 1 1.5-1.5H8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Copy
+    </button>
+  </div>
+  <pre class="code-block__pre"><code class="code-block__code"><span class="tok-import">from</span> <span class="tok-variable">dataclasses</span> <span class="tok-import">import</span> <span class="tok-variable">dataclass</span><span class="tok-punctuation">,</span> <span class="tok-variable">field</span>
+<span class="tok-import">from</span> <span class="tok-variable">typing</span> <span class="tok-import">import</span> <span class="tok-type">Any</span><span class="tok-punctuation">,</span> <span class="tok-type">Dict</span><span class="tok-punctuation">,</span> <span class="tok-type">Optional</span>
+
+<span class="tok-keyword">@dataclass</span>
+<span class="tok-keyword">class</span> <span class="tok-type">ContextLayer</span><span class="tok-punctuation">:</span>
+    <span class="tok-attr">session_id</span><span class="tok-punctuation">:</span> <span class="tok-type">str</span>
+    <span class="tok-attr">observations</span><span class="tok-punctuation">:</span> <span class="tok-type">Dict</span><span class="tok-punctuation">[</span><span class="tok-type">str</span><span class="tok-punctuation">,</span> <span class="tok-type">Any</span><span class="tok-punctuation">]</span> <span class="tok-operator">=</span> <span class="tok-function">field</span><span class="tok-punctuation">(</span><span class="tok-attr">default_factory</span><span class="tok-operator">=</span><span class="tok-variable">dict</span><span class="tok-punctuation">)</span>
+    <span class="tok-attr">parent_id</span><span class="tok-punctuation">:</span> <span class="tok-type">Optional</span><span class="tok-punctuation">[</span><span class="tok-type">str</span><span class="tok-punctuation">]</span> <span class="tok-operator">=</span> <span class="tok-constant">None</span>
+
+    <span class="tok-keyword">def</span> <span class="tok-function">observe</span><span class="tok-punctuation">(</span><span class="tok-variable">self</span><span class="tok-punctuation">,</span> <span class="tok-attr">key</span><span class="tok-punctuation">:</span> <span class="tok-type">str</span><span class="tok-punctuation">,</span> <span class="tok-attr">value</span><span class="tok-punctuation">:</span> <span class="tok-type">Any</span><span class="tok-punctuation">)</span> <span class="tok-operator">-&gt;</span> <span class="tok-constant">None</span><span class="tok-punctuation">:</span>
+<span class="code-block__line--highlight">        <span class="tok-variable">self</span><span class="tok-punctuation">.</span><span class="tok-variable">observations</span><span class="tok-punctuation">[</span><span class="tok-variable">key</span><span class="tok-punctuation">]</span> <span class="tok-operator">=</span> <span class="tok-variable">value</span>  <span class="tok-comment"># always mutable</span></span>
+</code></pre>
+  <div class="code-block__caption">Highlighted line: the observation write is intentionally mutable — see memory-layer docs.</div>
+</div>
+
+<!-- ── Shell / terminal ── -->
+<span class="variant-label">Fenced — Shell commands</span>
+<div class="code-block">
+  <div class="code-block__header">
+    <span class="code-block__lang">shell</span>
+    <button class="code-block__copy" aria-label="Copy code to clipboard">
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M1.5 8V1.5a1.5 1.5 0 0 1 1.5-1.5H8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Copy
+    </button>
+  </div>
+  <pre class="code-block__pre"><code class="code-block__code"><span class="tok-comment"># Install withagents-skills</span>
+<span class="tok-function">pnpm</span> <span class="tok-variable">add</span> <span class="tok-string">@withagents/skills</span>
+
+<span class="tok-comment"># Initialize a runbook project</span>
+<span class="tok-function">npx</span> <span class="tok-string">withagents</span> <span class="tok-variable">init</span> <span class="tok-attr">--template</span> <span class="tok-string">runbook</span>
+
+<span class="tok-comment"># Start the operator UI locally</span>
+<span class="tok-function">pnpm</span> <span class="tok-variable">dev</span></code></pre>
+</div>
+
+<!-- ── JSON ── -->
+<span class="variant-label">Fenced — JSON output</span>
+<div class="code-block">
+  <div class="code-block__header">
+    <span class="code-block__lang">json</span>
+    <button class="code-block__copy" aria-label="Copy code to clipboard">
+      <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="7" rx="1.5" stroke="currentColor" stroke-width="1.2"/>
+        <path d="M1.5 8V1.5a1.5 1.5 0 0 1 1.5-1.5H8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+      Copy
+    </button>
+  </div>
+  <pre class="code-block__pre"><code class="code-block__code"><span class="tok-punctuation">{</span>
+  <span class="tok-attr">"contract"</span><span class="tok-punctuation">:</span> <span class="tok-string">"triage-runbook"</span><span class="tok-punctuation">,</span>
+  <span class="tok-attr">"session"</span><span class="tok-punctuation">:</span> <span class="tok-string">"sess_01JT8K..."</span><span class="tok-punctuation">,</span>
+  <span class="tok-attr">"rounds"</span><span class="tok-punctuation">:</span> <span class="tok-number">7</span><span class="tok-punctuation">,</span>
+  <span class="tok-attr">"status"</span><span class="tok-punctuation">:</span> <span class="tok-string">"complete"</span><span class="tok-punctuation">,</span>
+  <span class="tok-attr">"output"</span><span class="tok-punctuation">:</span> <span class="tok-punctuation">{</span>
+    <span class="tok-attr">"severity"</span><span class="tok-punctuation">:</span> <span class="tok-string">"high"</span><span class="tok-punctuation">,</span>
+    <span class="tok-attr">"ticket_id"</span><span class="tok-punctuation">:</span> <span class="tok-string">"OPS-4821"</span><span class="tok-punctuation">,</span>
+    <span class="tok-attr">"confidence"</span><span class="tok-punctuation">:</span> <span class="tok-number">0.94</span>
+  <span class="tok-punctuation">}</span>
+<span class="tok-punctuation">}</span></code></pre>
+  <div class="code-block__caption">Trace output from a production triage run — 7 rounds, severity escalated.</div>
+</div>
+
+</body>
+</html>

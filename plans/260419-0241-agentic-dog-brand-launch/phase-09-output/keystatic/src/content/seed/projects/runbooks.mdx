@@ -1,0 +1,36 @@
+---
+name: Runbooks
+slug: runbooks
+tagline: Opinionated workflows for triage, analysis, and execution
+status: stable
+kind: product
+techChips:
+  - Python
+  - Node.js
+  - Any LLM
+githubUrl: https://github.com/krzemienski/withagents-skills
+version: v1.0.0
+lastUpdated: "2026-04-19"
+---
+
+Runbooks is a collection of opinionated agent workflows built for real internal systems — not demos. Each runbook defines a triage path, an analysis phase, and a concrete execution contract.
+
+The pattern emerged from a recurring observation across 23,479 sessions: agents given open-ended instructions wander. Agents given a runbook — a documented sequence of decisions and checkpoints — converge.
+
+## What a runbook is
+
+A runbook is a typed workflow. It specifies:
+
+- **Entry condition** — when to invoke this runbook
+- **Triage phase** — what information to gather before acting
+- **Analysis phase** — how to reason about gathered state
+- **Execution contract** — what actions are permitted, and in what order
+- **Abort condition** — when to stop and surface to a human
+
+## Where runbooks run
+
+Runbooks ship as a skill set inside the `withagents-skills` package. They wire directly into Claude Code via the skills system — no separate daemon, no custom infrastructure.
+
+## Design principle
+
+The point of a runbook is not to automate a task. The point is to make an agent's behavior *inspectable under load*. When something goes wrong in a runbook-driven workflow, you can read the runbook and understand exactly which decision branch failed.

@@ -1,0 +1,118 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+import SectionNumber from '@/components/SectionNumber.astro';
+import { getCollection } from 'astro:content';
+
+// Aggregate posts by seriesSlug. Phase 10 will populate these.
+const allPosts = await getCollection('posts');
+const seriesEntries = await getCollection('series');
+
+function postsForSeries(slug: string) {
+  return allPosts
+    .filter((p) => p.data.seriesSlug === slug)
+    .sort((a, b) => new Date(a.data.date).getTime() - new Date(b.data.date).getTime());
+}
+
+// If no series entries exist yet, render a placeholder for the flagship arc.
+const flagship = {
+  slug: 'agentic-development-18-lessons',
+  title: 'Agentic Development: 18 Lessons',
+  summary: 'What 23,479 Claude Code sessions taught me about building systems with agents. One lesson at a time, grounded in real session evidence.',
+  totalPlanned: 18,
+};
+const flagshipPosts = postsForSeries(flagship.slug);
+---
+
+<BaseLayout
+  title="Series — WithAgents"
+  description="Long-form series from withagents.dev. Flagship: 18 Lessons from 23,479 Claude Code sessions."
+  kind="writing"
+>
+  <Nav current="series" />
+
+  <main class="relative z-10 w-full">
+    <div class="mx-auto max-w-[1200px] px-6 py-16 md:py-24">
+
+      <header class="mb-16 md:mb-24">
+        <SectionNumber number="05" label="Series" />
+        <h1
+          class="font-display font-black text-text tracking-tighter mt-6 mb-6"
+          style="font-size:clamp(48px,8vw,96px);letter-spacing:-0.04em;"
+        >
+          the arcs
+        </h1>
+        <p class="font-body text-xl text-muted max-w-2xl leading-relaxed md:text-2xl">
+          Multi-post series. Each post earns its place in the arc.
+        </p>
+      </header>
+
+      <!-- Flagship series -->
+      <section class="mb-24">
+        <div class="mb-8 pb-4" style="border-bottom:1px solid var(--color-panel-2);">
+          <div class="flex items-baseline gap-4 mb-2">
+            <span class="font-mono text-[11px] uppercase tracking-wider text-accent">Flagship</span>
+            <span class="font-mono text-[11px] text-muted-2">
+              {flagshipPosts.length} of {flagship.totalPlanned}
+            </span>
+          </div>
+          <h2 class="font-display text-3xl font-bold text-text md:text-4xl">{flagship.title}</h2>
+          <p class="font-body text-muted leading-relaxed max-w-3xl mt-4">{flagship.summary}</p>
+        </div>
+
+        {flagshipPosts.length === 0 ? (
+          <p class="font-mono text-sm text-muted-2 italic">
+            First lesson publishes with the Day 01 launch.
+          </p>
+        ) : (
+          <ol class="space-y-6 counter-reset">
+            {flagshipPosts.map((post, idx) => (
+              <li class="grid grid-cols-1 gap-4 md:grid-cols-12 md:gap-8 items-baseline">
+                <div class="md:col-span-1 font-mono text-sm text-muted-2">
+                  {String(idx + 1).padStart(2, '0')}
+                </div>
+                <div class="md:col-span-9">
+                  <a href={`/writing/${post.data.slug}`} class="group">
+                    <h3 class="font-display text-xl font-semibold text-text group-hover:text-accent transition-colors">
+                      {post.data.title}
+                    </h3>
+                    {post.data.subtitle && (
+                      <p class="font-body text-muted mt-2">{post.data.subtitle}</p>
+                    )}
+                  </a>
+                </div>
+                <div class="md:col-span-2 md:text-right">
+                  <span class="font-mono text-[10px] uppercase tracking-wider text-muted">
+                    {post.data.date}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ol>
+        )}
+      </section>
+
+      <!-- Additional series (populated from Keystatic as Phase 10 lands) -->
+      {seriesEntries.filter((s) => s.data.slug !== flagship.slug).length > 0 && (
+        <section class="mb-24">
+          <h2 class="font-mono text-xs uppercase tracking-widest text-muted mb-8 pb-4" style="border-bottom:1px solid var(--color-panel-2);">
+            Other series
+          </h2>
+          <ul class="space-y-10">
+            {seriesEntries.filter((s) => s.data.slug !== flagship.slug).map((s) => (
+              <li>
+                <h3 class="font-display text-2xl font-semibold text-text mb-2">{s.data.title}</h3>
+                <p class="font-mono text-xs text-muted-2">
+                  {postsForSeries(s.data.slug).length} posts
+                </p>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>

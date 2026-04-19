@@ -1,5 +1,5 @@
 ---
-title: "agentic.dog brand launch — audit, build, 30-day multi-channel push"
+title: "withagents.dev brand launch — audit, build, 30-day multi-channel push"
 created: 2026-04-19
 status: proposed (Mode 1 / pending user approval)
 mode: two-mode (exploratory + functional validation → build + launch)
@@ -7,16 +7,16 @@ blockedBy: []
 blocks: []
 ---
 
-# agentic.dog Brand Launch — Plan
+# withagents.dev Brand Launch — Plan
 
 ## TL;DR
 
-Three net-new domains (**agentic.dog** umbrella, **codestories.platform** product, **hack.ski** personal) fed by a consolidation of real products and a 30-day multi-channel publication push. Current blog-series repo IS the existing static site and the launch-content source. All three domains are unregistered / undeployed today.
+Three net-new domains (**withagents.dev** umbrella, **codestories.platform** product, **hack.ski** personal) fed by a consolidation of real products and a 30-day multi-channel publication push. Current blog-series repo IS the existing static site and the launch-content source. All three domains are unregistered / undeployed today.
 
 ## Mode Structure
 
 - **Mode 1 (this plan)** — Audit all real assets, synthesize narrative spine, propose visual + site + pipeline + calendar. **Halt for user approval.**
-- **Mode 2 (after approval)** — Build visual system, stand up agentic.dog CMS, generate content, wire automation, execute 30-day calendar.
+- **Mode 2 (after approval)** — Build visual system, stand up withagents.dev CMS, generate content, wire automation, execute 30-day calendar.
 
 Do not start Mode 2 before explicit sign-off.
 
@@ -89,11 +89,11 @@ Do not start Mode 2 before explicit sign-off.
 
 ## Brand Architecture (Authoritative)
 
-- **agentic.dog** — umbrella: canonical blog, project index, work-with-me CTA. Where long-form originates.
+- **withagents.dev** — umbrella: canonical blog, project index, work-with-me CTA. Where long-form originates.
 - **codestories.platform** — Code Stories product site (audio narration of repos from `code-tales*` family).
 - **hack.ski** — personal brand surface (distinct from the commercial umbrella).
 
-Consistent positioning everywhere: full-time at agentic.dog, consulting available, collaboration open, **explicitly not job-seeking**.
+Consistent positioning everywhere: full-time at withagents.dev, consulting available, collaboration open, **explicitly not job-seeking**.
 
 ## Acceptance Criteria (Mode 1 Delivery)
 
@@ -111,30 +111,39 @@ Mode 1 is "done" when:
 
 ## Decisions Locked In (user sign-off 2026-04-19)
 
-1. **Domains:** agentic.dog, hack.ski, codestories.platform — **all three already purchased**. Mode 2 skips purchase; does DNS + Vercel domain-attach only.
+1. **Domains:** withagents.dev, hack.ski, codestories.platform — **all three already purchased**. Mode 2 skips purchase; does DNS + Vercel domain-attach only.
 2. **codestories.platform is NOT a website.** It's the repo/application storage location for Code Stories code. Actual Code Stories product domain (codetails.app or similar) TBD — filled in later. **Out of scope for this plan.**
-3. **Stack:** **Astro + Keystatic + Tailwind v4 + Satori OG + Vercel** (agentic.dog AND hack.ski).
-4. **hack.ski = clone of agentic.dog** — same brand, same visual system, same template, same pipeline. **Only copy differs** (agentic.dog AI-focused; hack.ski personal/general). One codebase → two Vercel deploys. Folded into Phase 09 (not a separate Phase 15).
+3. **Stack:** **Astro + Keystatic + Tailwind v4 + Satori OG + Vercel** (withagents.dev AND hack.ski).
+4. **hack.ski = clone of withagents.dev** — same brand, same visual system, same template, same pipeline. **Only copy differs** (withagents.dev AI-focused; hack.ski personal/general). One codebase → two Vercel deploys. Folded into Phase 09 (not a separate Phase 15).
 5. **Voice guidelines** ("Opus 4.7 talking") live inside `/ckm:copywriting` (50 writing styles + extraction) and `/ckm:brand` (voice framework). No separate doc needed. Content pipeline invokes `ck:ckm:write:good` for voice calibration.
-6. **Channels for 30-day push:** agentic.dog blog (canonical) + LinkedIn article + LinkedIn short + X thread + repo READMEs. **Substack and Medium skipped** this cycle.
-7. **61 companion repos:** Re-announce **selectively** — pick 5-10 strongest, reframe under agentic.dog brand into 30-day calendar slots. Not a full re-launch, not a quiet archive.
+6. **Channels for 30-day push:** withagents.dev blog (canonical) + LinkedIn article + LinkedIn short + X thread + repo READMEs. **Substack and Medium skipped** this cycle.
+7. **61 companion repos:** Re-announce **selectively** — pick 5-10 strongest, reframe under withagents.dev brand into 30-day calendar slots. Not a full re-launch, not a quiet archive.
 
-## Pending Blockers (Round 3 Q&A — must resolve before Phase 01 spawn)
+## Round 3 Decisions Locked In (2026-04-19 sign-off)
 
-1. **hack.ski scope** — pick Option A (differentiate visually, +16-24h) / B (redirect landing, 2-4h, **recommended**) / C (drop this cycle)
-2. **`260305-2119-devlog-publisher-website/` disposition** — pick Option A (complete first, +1-2wk) / B (absorb into Phase 09, **recommended**, requires user to describe 42 in-flight files) / C (retire+discard)
-3. **Success metrics** — confirm 30-day floors: inquiries ≥3, LinkedIn +15%, X +10%, flagship stars +100, unique visitors 1000, time-on-page ≥3 min
-4. **Kill-switch sign-off** — day-10 (inquiries=0 AND LinkedIn+5% AND stars+10) and day-20 (inquiries<2 AND flat engagement) tripwires
-5. **Analytics tool** — Plausible / Vercel Analytics / PostHog (Plausible recommended)
-6. **Consultant funnel mechanism** — embedded form / email direct / Calendly link (form → email → Calendly recommended, UTM per channel)
-7. **Voice spec source** — derive from 3 existing Nick posts (which?) + custom banlist
-8. **LinkedIn + X API credential handoff** — who/when/where (vault, env file, 1Password)
-9. **X API paid tier budget** — $100/mo basic tier approved for write access?
+**Phase 00 (baseline capture) → SKIPPED per user decision 2026-04-19.** Explicit opt-out. Consequence: 30-day measurement has no true zero-day reference. Post-push attribution will rely on directional signals and commit-log timestamps instead of snapshot deltas. User aware.
+
+1. **hack.ski → DROP from this cycle.** Phase 09b removed. Park domain; revisit after 30-day push if pull exists.
+2. **`260305-2119-devlog-publisher-website/` → ABSORB into Phase 09.** All 42+ in-flight files committed as-is in commit 928c3b7 (consolidation of 61 post drafts → 18 posts). That plan closes; this plan's Phase 09 owns the work.
+3. **Success metrics (RAISED BAR — aspirations become floors):**
+   - Consulting inquiries ≥8 qualified
+   - LinkedIn followers +30%
+   - X followers +25%
+   - Flagship repo stars +300 total (validationforge + Code Stories + manifesto companions)
+   - withagents.dev unique visitors ≥5,000
+   - Avg time-on-page ≥3 min
+4. **Kill-switch approved as-drafted.** Day-10 tripwire (inquiries=0 AND LinkedIn<+5% AND stars<+10 → 24h pause + review). Day-20 (inquiries<2 AND flat engagement → cut remaining calendar 40%). Any day: 2 consecutive misses → 48h buffer pause.
+5. **Analytics: Plausible** ($9/mo). Install Day -1 of push.
+6. **Consultant funnel: embedded form → email → Calendly**, UTM tagged per channel. Phase 13 builds this BEFORE Phase 12 starts.
+7. **Voice spec source: ALL 18 existing posts as corpus.** Derive banlist + tone patterns from full corpus in Phase 02 → `synthesis/voice-spec.md`.
+8. **Credentials: just-in-time at Phase 11 kickoff.** No early handoff. LinkedIn/X/Supabase/Vercel/Cloudflare — drop into vault or .env.local at start of automation build. `linkedin-tokens.json` renamed to `.env.linkedin-tokens.json` (gitignored via `.env*`).
+9. **X API paid tier: conditional.** Estimate thread volume from Phase 06 calendar first. If <10 threads, go manual (save $100/mo). If ≥10, approve $100/mo basic tier.
 
 ## Non-blocking Open Items
 
-- Code Stories product domain (codetails.app or alternative) — filled in later by user, does not block agentic.dog launch
+- Code Stories product domain (codetails.app or alternative) — filled in later, does not block withagents.dev launch
 - Which specific 5-10 of the 61 companion repos to re-announce — decided in Phase 06 after Phase 02 readiness grades
+- Disposition of 58 untracked nested repo clones (validationforge/, shannon-framework/, etc.) — decided in Phase 09 (add as submodules, .gitignore, or leave as working dirs)
 
 ## Cross-Plan Dependencies
 
@@ -142,7 +151,7 @@ Scanned `plans/` (blog-series):
 - `260305-2119-devlog-publisher-website/` (status: in-progress, `plan.md`, phase-02 + phase-04 modified) — **overlapping scope**: site build + new blog posts. Recommend: absorb into Phase 09 (CMS build) or complete/close before Mode 2. Flagged.
 - `260306-1741-blog-consolidation/` (if present) — mining research reports referenced in MEMORY.md.
 
-No hard `blockedBy` relationships — agentic.dog is new domain, new repo. Soft: Phase 09 should subsume or retire `260305-2119-devlog-publisher-website/` to avoid duplicate work.
+No hard `blockedBy` relationships — withagents.dev is new domain, new repo. Soft: Phase 09 should subsume or retire `260305-2119-devlog-publisher-website/` to avoid duplicate work.
 
 ## Next Action
 

@@ -1,0 +1,74 @@
+---
+interface Props {
+  current?: 'products' | 'writing' | 'opensource' | 'about' | 'work';
+}
+const { current } = Astro.props;
+
+const links = [
+  { href: '/products', label: 'Products', key: 'products' },
+  { href: '/writing', label: 'Writing', key: 'writing' },
+  { href: '/opensource', label: 'Open Source', key: 'opensource' },
+  { href: '/about', label: 'About', key: 'about' },
+  { href: '/work', label: 'Work', key: 'work' },
+];
+---
+
+<nav
+  aria-label="Primary"
+  class="sticky top-0 z-50 w-full"
+  style="background:rgba(4,4,4,0.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--color-hair);"
+>
+  <div class="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-4">
+    <!-- Wordmark -->
+    <div class="flex items-center gap-8">
+      <a href="/" class="wordmark text-xl text-text focus-visible:outline-accent">withagents</a>
+
+      <!-- Desktop nav links -->
+      <div class="hidden items-center gap-6 md:flex">
+        {links.map(link => (
+          <a
+            href={link.href}
+            class={[
+              'font-mono text-[10px] uppercase tracking-widest transition-colors duration-200',
+              current === link.key
+                ? 'text-text border-b border-accent pb-0.5'
+                : 'text-muted hover:text-accent',
+            ].join(' ')}
+          >
+            {link.label}
+          </a>
+        ))}
+      </div>
+    </div>
+
+    <!-- Right side -->
+    <div class="flex items-center gap-4">
+      <!-- Search (decorative) -->
+      <div
+        class="hidden items-center gap-2 md:flex"
+        style="background:var(--color-panel-1);border:1px solid var(--color-hair);padding:6px 12px;"
+        aria-hidden="true"
+      >
+        <span class="material-symbols-outlined text-muted" style="font-size:16px;">search</span>
+        <span class="font-mono text-xs text-muted-2">Search</span>
+        <span
+          class="font-mono text-[9px] text-muted-2"
+          style="background:var(--color-panel-3);padding:2px 5px;"
+        >⌘K</span>
+      </div>
+
+      <a
+        href="/about"
+        class="hidden font-mono text-xs text-muted transition-colors hover:text-text sm:block focus-visible:outline-accent"
+      >Sign In</a>
+
+      <a
+        href="/products"
+        class="font-mono text-sm text-text transition-all duration-200 focus-visible:outline-accent"
+        style="background:var(--color-accent);padding:8px 16px;border-radius:2px;"
+        onmouseenter="this.style.boxShadow='0 0 15px rgba(139,92,246,0.3)'"
+        onmouseleave="this.style.boxShadow='none'"
+      >Get Started</a>
+    </div>
+  </div>
+</nav>

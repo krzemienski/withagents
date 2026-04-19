@@ -1,0 +1,116 @@
+---
+title: "The RALPH protocol"
+subtitle: "What was left after iOS made me stop cheating — the typed, disk-first contract that runs the same whether I'm at my desk or asleep"
+slug: day-24-ralph-protocol
+date: "2026-05-12"
+author: Nick Krzemienski
+kind: essay
+tags:
+  - Ralph
+  - AgentContracts
+  - Orchestration
+  - Protocol
+  - WithAgents
+relatedProjectSlugs:
+  - agent-contracts
+  - runbooks
+  - trace-timeline
+readTime: 7
+excerpt: "Day 22 was the origin. Day 23 was the iOS forcing function. This is the protocol that came out the other side — small, typed, filesystem-first, and identical whether the operator is at their desk, at a restaurant, or asleep."
+---
+
+The first time I wrote "the RALPH protocol" into a session log, it was a six-line README inside `ralph-loop-patterns/PROTOCOL.md`. I wrote it from my phone on the Brooklyn-bound train from Day 23. It was less a specification than a private apology: the things I had been doing implicitly, now written down, because iOS had stopped letting me get away with them.
+
+That's what this post is. Day 22 was the origin. Day 23 was the forcing function. Day 24, this one, is the small, typed, filesystem-first contract that was left over.
+
+## Why a protocol, not a library
+
+I had a library already. `ralph-loop-patterns` has hat enums, convergence detection, and four named rotation patterns. The library is fine. The library also runs identically whether you are treating the agent like a coworker or like a vending machine.
+
+The missing piece was a contract the *operator* honored. Library gives you `Hat.BUILDER`. Contract tells you that once `.ralph/events/` has a `build.complete`, no one (including me, at 11:40 PM, from a phone) is allowed to mutate what the builder produced until a reviewer has emitted a verdict.
+
+Library is a set of types. Protocol is what you are not allowed to do.
+
+## The five invariants
+
+Five rules, small enough to print on an index card. Everything the fleet does either respects them or fails.
+
+**1. Every hat has exactly one exit event.**
+A hat's `emit_event` field is the only way it terminates. If the session exits without the event, the orchestrator treats the session as failed and restarts with the same inputs. A Builder that finishes code but does not write `build.complete` gets rerun. This turns out to be more important than any retry strategy. The protocol punishes silent success identically to silent failure.
+
+**2. Events are append-only. Facts are on disk.**
+`.ralph/events/` is a directory of JSON files, numbered, never deleted. A task lifecycle row lives in `.ralph/tasks/task-NNN.json`. An agent decision lives in `.ralph/agent/decisions.md`. No fact about the run exists only in a context window. Any hat, at any time, in any order, can reconstruct the state of the world from disk alone.
+
+**3. Every transition is gated by an event, not a heuristic.**
+`plan.complete` → Builder. `build.complete` → Reviewer. `review.verdict(issues>0)` → Fixer. `review.verdict(issues==0)` → Converged. No transition exists because an agent "feels ready." Every transition exists because an event was written. The router is deterministic.
+
+**4. The operator speaks in typed directives, not prose.**
+This is the one iOS gave me. The control plane accepts `hat:`, `scope:`, `guidance:` (≤240 chars), `priority:` as structured fields. A prose directive that does not parse is rejected at the bridge and never reaches the fleet. The laptop-side orchestrator accepts the same typed grammar the phone does, because removing the typing on the laptop let me cheat, and cheating was the thing iOS took away.
+
+**5. Convergence terminates the loop. Nothing else does.**
+No iteration cap, no wall clock, no token budget. Reviewer emits zero critical findings for one pass → Converged. That is the only exit. The `max_iterations` parameter on the library is a safety rail against runaway cycles, not a stopping rule. The stopping rule is the same on laptop and phone: has the Reviewer said nothing critical yet?
+
+Five rules. That is the protocol.
+
+## The event shape
+
+Every event in `.ralph/events/` is the same envelope. Variant payloads per hat.
+
+```json
+{
+  "hat": "builder",
+  "event": "build.complete",
+  "status": "success",
+  "files_modified": ["src/auth/oauth.py", "src/auth/tokens.py"],
+  "task_id": "task-019",
+  "iteration": 7,
+  "timestamp": "2026-05-11T22:41:08.412Z"
+}
+```
+
+The envelope carries routing. The payload carries evidence. `trace-timeline` (open-source) reads the event log and renders the topology: nodes per hat, edges per event. If the rendered graph does not match what you thought happened, the protocol caught a lie.
+
+## What changed from the pre-iOS version
+
+Honest comparison. Pre-iOS Ralph had rules. Post-iOS Ralph has a protocol. The difference is everything.
+
+Pre-iOS, when `review.verdict` landed with two issues, I would sometimes intervene and route to Writer instead of Fixer because I had a hunch the issue was documentation, not code. That worked when I was at the desk watching the events come in. It made the behavior non-deterministic for anyone else reading the log, including future-me looking at the same run three weeks later.
+
+Post-iOS, the hunch is illegal. If I want the route to go to Writer, I send `hat:writer scope:docs guidance:<why>` as a typed directive. The directive lands in the event log next to the verdict. Future-me can read exactly why the routing deviated. The cost is I no longer get to cheat. The benefit is the run is legible without me in the room.
+
+Pre-iOS, a Builder could emit `build.complete` with no `files_modified` field and the orchestrator would roll forward. Post-iOS, schema validation at the event-write point rejects the incomplete payload. The Builder gets retried with stricter instructions.
+
+Pre-iOS, `/guidance` was prose. Post-iOS, `guidance:` is a 240-character string field with no special behavior other than "make it readable to the next hat." The 240-character cap forces me to decide what I actually want; the `memo:` extension writes longer rationale to `.ralph/agent/decisions.md` so the directive stays terse.
+
+Every change came from the phone. The laptop adopted them because removing them on the laptop made the laptop worse.
+
+## What the protocol does not try to solve
+
+Three things it deliberately does not handle.
+
+**Consent races.** Last-write-wins on the event log is still the behavior. If the phone emits a guidance directive at the same millisecond the laptop emits a review.verdict, the later write wins. I do not think this is right. The right answer is a lock on the active hat. I have not built it yet. Day 23 flagged this; Day 24 does not fix it.
+
+**Offline reconciliation.** If the phone loses its SSE channel during a fix loop, the phone rehydrates from disk when the channel comes back. Good enough for now. Not good under spotty connectivity for long cycles. This is on the list.
+
+**Cross-project topology.** The protocol is scoped to one `.ralph/` directory, which is one task, which is one rotation. When I run three Ralph loops in three worktrees simultaneously (see `auto-claude-worktrees`), each has its own event log and there is no cross-loop coordination. If that ever needs to change, it is a different protocol, not an extension to this one.
+
+## Why this is a product, not a post
+
+`agent-contracts` (open-source) is the extractable version of the RALPH protocol, generalized to any hat-rotating agent loop. Five invariants, one event envelope, a schema validator at the event-write point, a typed directive grammar, and a convergence predicate.
+
+The product is the constraint: what the operator cannot do. Not the orchestrator, not the library, not the bridge. The protocol is the thing that makes Ralph-on-the-laptop and Ralph-on-the-phone and Ralph-on-someone-else's-laptop behave the same way.
+
+I have been running this version for three weeks. Two operators other than me have used it on their own runs without asking me what anything means. That is the metric I care about.
+
+The boulder never stops. The protocol is what keeps the boulder on the road.
+
+{/*
+voice-self-check:
+  em_dash_count: 0 (after post-draft trim)
+  em_dash_per_1k: 0.0
+  banlist_hits: 0 (no "think about that for a second", no "sound familiar", no "here's the thing", no "fundamentally different", no "that's wild", no single-fragment "big difference" closer, no "it's not X, it's Y")
+  opener_formula: pass (specific scene "first time I wrote RALPH protocol, six-line README, phone on Brooklyn-bound train" → follow-up → failure-before-success "less a specification than a private apology")
+  warmth_beat: tied to artifact — "Two operators other than me have used it on their own runs without asking me what anything means. That is the metric I care about." (artifact: actual runs by others)
+  aphorism_count: 1 ("The boulder never stops. The protocol is what keeps the boulder on the road.")
+  self_deprecating_admission: "less a specification than a private apology" + "I do not think this is right. I have not built it yet" + "Day 23 flagged this; Day 24 does not fix it"
+*/}

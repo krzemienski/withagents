@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="WithAgents Frame mark">
+  <title>WithAgents — Frame logomark (dark surface)</title>
+  <desc>Compact enterprise mark: thin Ultraviolet rules frame a centered w/ monogram. For press kits and About hero.</desc>
+  <rect x="1" y="1" width="254" height="254" rx="8" fill="#0A0A0D" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+  <line x1="52" y1="76" x2="204" y2="76" stroke="#8B5CF6" stroke-width="1"/>
+  <!-- w/ monogram, smaller, centered -->
+  <path d="M 82 112 L 96 164 L 110 128 L 124 164 L 138 112"
+        fill="none"
+        stroke="#F5F5F7"
+        stroke-width="12"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+  <line x1="150" y1="104" x2="174" y2="168"
+        stroke="#F5F5F7"
+        stroke-width="12"
+        stroke-linecap="round"/>
+  <line x1="52" y1="188" x2="204" y2="188" stroke="#8B5CF6" stroke-width="1"/>
+</svg>

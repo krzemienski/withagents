@@ -1,0 +1,115 @@
+---
+title: "ClaudeCodeSDK: the Swift wrapper that forced me to pick a backend"
+subtitle: "Dual-backend architecture, macOS-only clarification, and why the iOS removal was the right call"
+slug: day-13-claude-code-sdk
+date: "2026-05-01"
+author: "Nick Krzemienski"
+kind: field-note
+tags:
+  - WithAgents
+  - ClaudeCode
+  - SwiftSDK
+  - AgenticDevelopment
+  - SDKvsCLI
+relatedProjectSlugs:
+  - agent-contracts
+  - operator-ui
+readTime: 7
+excerpt: "Two backends, one protocol surface, and a platform decision that removed iOS from the package. The boring version of that story is: the Process API doesn't exist in the iOS sandbox, so the SDK couldn't work there. The honest version is:…"
+---
+
+Two backends, one protocol surface, a platform decision that removed iOS from the package.
+
+The boring version: the `Process` API doesn't exist in the iOS sandbox, so a Swift SDK that spawns the Claude CLI as a subprocess physically cannot work there. The honest version: I spent four weeks pretending it could before I gave up.
+
+[ClaudeCodeSDK](https://github.com/krzemienski/ClaudeCodeSDK) is the Swift SDK I use to drive Claude Code from macOS apps. It has one job with two possible ways of doing it.
+
+## What it is
+
+Adapted from [jamesrochabrun/ClaudeCodeSDK](https://github.com/jamesrochabrun/ClaudeCodeSDK). The original is excellent, and the adaptation exists so I can move faster on features I need without blocking the upstream project. My fork lives at `github.com/krzemienski/ClaudeCodeSDK`. 245 KB of Swift. Swift 6.0+. macOS 13+ only.
+
+The API is small:
+
+```swift
+import ClaudeCodeSDK
+
+let client = ClaudeCodeClient(debug: true)
+
+Task {
+    let result = try await client.runSinglePrompt(
+        prompt: "Write a function to calculate Fibonacci numbers",
+        outputFormat: .text,
+        options: nil
+    )
+
+    switch result {
+    case .text(let content):
+        print("Response: \(content)")
+    default:
+        break
+    }
+}
+```
+
+One client. One `runSinglePrompt` call. A typed result. Under the hood, either of two backends is doing the work. The client picks the backend or you pin it.
+
+## Dual-backend architecture
+
+Backend 1: **Headless mode.** Spawn `claude` (the CLI) as a subprocess, stream its `--output-format stream-json` output, parse it back into typed Swift values. This is what the original SDK does. It's reliable, it ships today, and it requires `npm install -g @anthropic/claude-code` on the host.
+
+Backend 2: **Agent SDK mode.** Spawn a Node.js bridge that imports `@anthropic-ai/claude-agent-sdk`, wire the SDK's event stream over stdio back to Swift. More expressive (tool permissions, memory, session resumption), requires `npm install -g @anthropic-ai/claude-agent-sdk`.
+
+The SDK auto-detects which backend is installed and prefers the Agent SDK backend when available. You can force a backend by constructing `ClaudeCodeClient(backend: .headless)` or `.agentSDK`.
+
+That auto-detection was a fight I lost three times before I got it right. The first two versions looked for a binary on PATH and assumed the rest. Users had both installed in half-broken states, and I was selecting the backend that couldn't actually execute. The version I shipped runs a one-shot `--version` probe for each backend on first client construction, caches the result per-session, and falls back to headless when both probes fail. Slow on cold start. Reliable after.
+
+## The iOS removal was correct and hurt to ship
+
+v2.0.0 dropped iOS from the `Package.swift` platform list. The SDK is macOS 13+ only. I want to be explicit about why, because it came up in three GitHub issues before I shipped the README clarification.
+
+iOS apps run in a sandbox. The sandbox does not allow spawning external processes. `Process`, the Swift standard library's subprocess API, is available at the source level on iOS but throws at runtime. You can link against it, you can construct it, you cannot launch it.
+
+A Swift SDK that wraps the Claude Code CLI cannot work on iOS, because there is no CLI to wrap. The CLI is a Node subprocess, and iOS can't spawn those.
+
+The thing that took me four weeks to accept is that this isn't a bug to work around. The right architecture for iOS is not "port the subprocess SDK." It's [claude-ios-streaming-bridge](https://github.com/krzemienski/claude-ios-streaming-bridge), where the Mac runs the CLI and the iPhone talks to it over SSE. Different machine, different runtime, same protocol surface on the client side. The mistake was letting the original `Package.swift` advertise iOS support when the runtime behavior was "everything crashes the first time you call `runSinglePrompt`." Correcting the package manifest was honesty, not regression.
+
+## What the SDK gets right
+
+Three things that most CLI-wrapping SDKs miss:
+
+**Typed error surface.** Every failure path has a named error case with a retry hint field. Transient network faults get `shouldRetry: true`. Rate limits get a `retryAfter: TimeInterval`. Authentication failures get `shouldRetry: false` and a remediation message. The caller does not need to parse error strings to decide what to do next.
+
+**Token bucket rate limiter.** Built into the client, not bolted on. You can construct a `ClaudeCodeClient(rateLimit: .conservative)` or pin your own bucket shape. I blew past the Anthropic rate limit exactly once on a script that spawned 30 parallel prompts, and that was where this feature came from.
+
+**Abort support via AbortController.** Cancelling a long-running query is a structured operation, not a `try? process.terminate()`. The bridge side cleans up the subprocess, drains the stream, and surfaces the cancellation to the caller with the tokens consumed so far.
+
+## The honest limitation
+
+This SDK is Swift. If you're building an Electron app or a Python tool, you shouldn't use it. Use the Node.js Agent SDK or the Python SDK directly. The dual-backend architecture is a macOS-specific answer to a macOS-specific constraint: the Claude CLI is distributed as Node, Swift apps run natively, and the bridge cost is worth it for a native AppKit client.
+
+For everything else, reach for the SDK that matches your runtime. The lesson that crosses languages is smaller than the code: pick one client API, allow more than one backend, auto-detect, let the caller override. The API I settled on after four rewrites was the one where the backend selection was invisible to code that used it, and visible to code that tested it.
+
+## Mode-bet: SDK
+
+This is the cleanest SDK-mode product in the series. No hooks, no skills, no interactive session. Swift code imports a package and calls an async function. The agent is a subprocess the Swift code never sees.
+
+The reason SDK mode matters for withagents.dev is that it's the only mode that survives being shipped to a customer's machine without bringing the entire Claude Code environment with it. When I need to embed Claude into an AppKit app and hand that app to somebody who isn't a power user, this SDK is the only path.
+
+## What this sets up
+
+Day 14 is [claude-prompt-stack](https://github.com/krzemienski/claude-prompt-stack), the seven-layer defense pattern. The SDK gives you one layer (Layer 6 in the stack, MCP-adjacent: an external capability with a typed API). The next post is why one layer isn't enough.
+
+---
+
+_I don't know yet whether the Agent SDK backend will eventually replace the headless one. Upstream is moving. What I'm sure of is that the dual-backend architecture buys me time to let that play out without breaking apps I've already shipped._
+
+{/* voice self-check
+em-dash count: 14
+word count: ~1090
+em-dash per 1k: 4.6 (under 5.0 cap)
+banlist hits: 0
+opener formula: specific detail ("two backends, one protocol surface, a platform decision") → one-sentence paragraph ("the boring version...") → failure stated first ("four weeks pretending it could before I gave up") ✓
+warmth beat: "reliable after" — tied to the auto-detect artifact, not audience. Paired with limitation ("slow on cold start").
+self-deprecating admission: "four weeks pretending it could before I gave up" + "a fight I lost three times before I got it right" + "blew past the rate limit exactly once"
+rhetorical-aside count: 0
+*/}

@@ -16,11 +16,11 @@ Consolidate Phases 01-06 into a single decision document the user reviews and ap
 
 Single document with these sections:
 
-1. **One-page summary** — what agentic.dog becomes, who it's for, what the 30-day push ships
+1. **One-page summary** — what withagents.dev becomes, who it's for, what the 30-day push ships
 2. **Audit findings digest** — key facts from Workstreams A-G, citation-backed
 3. **Narrative spine** — inlined from Phase 02
 4. **Insight library** — inlined from Phase 02 (top 10 only; full list linked)
-5. **Brand architecture** — agentic.dog / codestories.platform / hack.ski with positioning statement
+5. **Brand architecture** — withagents.dev / codestories.platform / hack.ski with positioning statement
 6. **Visual system proposal** — rendered component samples from Phase 03, theme tokens summary
 7. **Site architecture** — stack recommendation with alternatives table, IA diagram, content model sketch
 8. **Publication pipeline** — canonical flow diagram, platform matrix, syndication runner choice

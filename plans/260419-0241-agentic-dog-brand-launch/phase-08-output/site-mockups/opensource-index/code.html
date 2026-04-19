@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WITHAGENTS - Open Source</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=Sora:wght@400;600;700;800&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed-variant": "#5516be",
+                        "tertiary": "#c6c6ca",
+                        "primary-fixed": "#e9ddff",
+                        "on-tertiary-fixed-variant": "#45474a",
+                        "on-tertiary": "#2f3034",
+                        "surface": "#131313",
+                        "on-error-container": "#ffdad6",
+                        "error": "#ffb4ab",
+                        "surface-container-high": "#2a2a2a",
+                        "surface-tint": "#d0bcff",
+                        "on-background": "#e5e2e1",
+                        "background": "#131313",
+                        "tertiary-fixed": "#e2e2e6",
+                        "inverse-on-surface": "#313030",
+                        "surface-container": "#201f1f",
+                        "outline-variant": "#494454",
+                        "on-primary-fixed": "#23005c",
+                        "on-primary-container": "#340080",
+                        "on-secondary-container": "#304b00",
+                        "surface-variant": "#353534",
+                        "on-surface": "#e5e2e1",
+                        "error-container": "#93000a",
+                        "surface-container-low": "#1c1b1b",
+                        "secondary": "#9ddf2e",
+                        "inverse-primary": "#6d3bd7",
+                        "inverse-surface": "#e5e2e1",
+                        "primary-fixed-dim": "#d0bcff",
+                        "on-tertiary-fixed": "#1a1c1f",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-secondary-fixed": "#121f00",
+                        "on-secondary-fixed-variant": "#334f00",
+                        "tertiary-fixed-dim": "#c6c6ca",
+                        "secondary-fixed": "#b2f746",
+                        "secondary-fixed-dim": "#98da27",
+                        "on-secondary": "#213600",
+                        "on-primary": "#3c0091",
+                        "surface-bright": "#3a3939",
+                        "surface-container-highest": "#353534",
+                        "tertiary-container": "#909094",
+                        "outline": "#958ea0",
+                        "on-error": "#690005",
+                        "primary": "#d0bcff",
+                        "surface-dim": "#131313",
+                        "on-tertiary-container": "#282a2d",
+                        "secondary-container": "#83c300",
+                        "on-surface-variant": "#cbc3d7",
+                        "primary-container": "#a078ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": ["Sora", "sans-serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["IBM Plex Mono", "monospace"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .text-hyper-black { color: #040404; }
+        .bg-hyper-black { background-color: #040404; }
+        .bg-panel { background-color: #0A0A0D; }
+        .bg-surface-sec { background-color: #111116; }
+        .bg-surface-tert { background-color: #15151C; }
+        .text-uv { color: #8B5CF6; }
+        .text-lime-signal { color: #A3E635; }
+        .text-mono-hyper { color: #D4D4D8; }
+        .border-ghost { border-color: rgba(73, 68, 84, 0.15); }
+        .hover-border-ghost:hover { border-color: rgba(73, 68, 84, 0.4); }
+    </style>
+</head>
+<body class="bg-hyper-black text-on-surface font-body antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col">
+<!-- TopNavBar -->
+<nav class="bg-[#040404]/80 backdrop-blur-md sticky top-0 z-50 docked full-width rounded-none">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-[1440px] mx-auto">
+<a class="font-headline text-xl font-bold tracking-tighter text-white" href="#">WITHAGENTS</a>
+<div class="hidden md:flex gap-8 items-center">
+<a class="text-zinc-500 font-label uppercase tracking-widest text-[10px] hover:text-[#8B5CF6] transition-colors duration-300" href="#">Agents</a>
+<a class="text-white border-b-2 border-[#8B5CF6] pb-1 font-label uppercase tracking-widest text-[10px] hover:text-[#8B5CF6] transition-colors duration-300" href="#">Repository</a>
+<a class="text-zinc-500 font-label uppercase tracking-widest text-[10px] hover:text-[#8B5CF6] transition-colors duration-300" href="#">Articles</a>
+<a class="text-zinc-500 font-label uppercase tracking-widest text-[10px] hover:text-[#8B5CF6] transition-colors duration-300" href="#">Documentation</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="text-mono-hyper font-label text-sm hover:text-white transition-colors duration-300">Sign In</button>
+<button class="bg-[#8B5CF6] text-white px-4 py-2 rounded-[2px] font-label text-sm hover:bg-[#9333EA] transition-colors duration-300 active:scale-[0.98]">Get Started</button>
+</div>
+</div>
+</nav>
+<!-- Main Content -->
+<main class="flex-grow w-full max-w-[1440px] mx-auto px-6 py-12 md:py-24 flex flex-col gap-24">
+<!-- Header Section -->
+<header class="flex flex-col gap-6">
+<div class="flex items-center gap-2 text-mono-hyper font-label text-sm">
+<span class="text-zinc-500">WITHAGENTS</span>
+<span class="material-symbols-outlined text-[16px] text-zinc-600">chevron_right</span>
+<span class="text-lime-signal">OPEN SOURCE</span>
+</div>
+<h1 class="font-headline text-5xl md:text-7xl font-bold tracking-tighter text-white uppercase">Open Source</h1>
+<!-- Breadcrumb Navigation -->
+<div class="flex flex-wrap gap-4 mt-4">
+<a class="bg-surface-sec px-4 py-2 font-label text-xs uppercase tracking-wider text-mono-hyper hover:bg-surface-tert hover:text-white transition-colors" href="#">Reference Patterns</a>
+<a class="bg-surface-sec px-4 py-2 font-label text-xs uppercase tracking-wider text-mono-hyper hover:bg-surface-tert hover:text-white transition-colors" href="#">Contracts</a>
+<a class="bg-surface-sec px-4 py-2 font-label text-xs uppercase tracking-wider text-mono-hyper hover:bg-surface-tert hover:text-white transition-colors" href="#">Tooling</a>
+</div>
+</header>
+<!-- Repository Grid -->
+<section class="flex flex-col gap-8">
+<h2 class="font-headline text-2xl font-semibold text-white tracking-tight border-b border-white/5 pb-4">Core Repositories</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Repo Card 1 -->
+<article class="bg-surface-sec border border-ghost hover-border-ghost p-6 flex flex-col gap-4 rounded-none transition-all duration-300 group">
+<div class="flex justify-between items-start">
+<div class="bg-surface-tert px-2 py-1 font-label text-[10px] uppercase text-uv tracking-widest">Protocol</div>
+<span class="material-symbols-outlined text-zinc-500 group-hover:text-uv transition-colors">arrow_outward</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-white tracking-tight">agent-contracts</h3>
+<p class="text-zinc-400 text-sm leading-relaxed flex-grow">Protocol-level definitions for agentic interaction.</p>
+<div class="flex items-center gap-4 mt-4 pt-4 border-t border-white/5 font-label text-xs text-zinc-500">
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">star</span> 1.2k</div>
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">commit</span> v0.8.4</div>
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">gavel</span> MIT</div>
+</div>
+</article>
+<!-- Repo Card 2 -->
+<article class="bg-surface-sec border border-ghost hover-border-ghost p-6 flex flex-col gap-4 rounded-none transition-all duration-300 group">
+<div class="flex justify-between items-start">
+<div class="bg-surface-tert px-2 py-1 font-label text-[10px] uppercase text-lime-signal tracking-widest">Tooling</div>
+<span class="material-symbols-outlined text-zinc-500 group-hover:text-lime-signal transition-colors">arrow_outward</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-white tracking-tight">trace-timeline</h3>
+<p class="text-zinc-400 text-sm leading-relaxed flex-grow">A visual debugger for multi-step agent execution.</p>
+<div class="flex items-center gap-4 mt-4 pt-4 border-t border-white/5 font-label text-xs text-zinc-500">
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">star</span> 850</div>
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">commit</span> v1.1.0</div>
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">gavel</span> Apache-2.0</div>
+</div>
+</article>
+<!-- Repo Card 3 -->
+<article class="bg-surface-sec border border-ghost hover-border-ghost p-6 flex flex-col gap-4 rounded-none transition-all duration-300 group">
+<div class="flex justify-between items-start">
+<div class="bg-surface-tert px-2 py-1 font-label text-[10px] uppercase text-[#EC4899] tracking-widest">Reference</div>
+<span class="material-symbols-outlined text-zinc-500 group-hover:text-[#EC4899] transition-colors">arrow_outward</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-white tracking-tight">context-layers</h3>
+<p class="text-zinc-400 text-sm leading-relaxed flex-grow">Reference implementation for persistence patterns.</p>
+<div class="flex items-center gap-4 mt-4 pt-4 border-t border-white/5 font-label text-xs text-zinc-500">
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">star</span> 2.1k</div>
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">commit</span> v2.0.1</div>
+<div class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">gavel</span> MIT</div>
+</div>
+</article>
+</div>
+</section>
+<!-- Contribution & Tech Stack Bento -->
+<section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Contribution Guide -->
+<div class="lg:col-span-2 bg-panel border border-ghost p-8 md:p-12 flex flex-col justify-between">
+<div class="flex flex-col gap-6">
+<h2 class="font-headline text-3xl font-bold text-white tracking-tight">Contribution Protocol</h2>
+<p class="text-zinc-400 text-base leading-relaxed max-w-xl">
+                        We operate on a strict, high-fidelity contribution model. All PRs must adhere to the core architectural constraints defined in the agent-contracts repository.
+                    </p>
+<ul class="flex flex-col gap-4 mt-4">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-lime-signal mt-0.5 text-[20px]">check_circle</span>
+<span class="text-zinc-300 text-sm">Review the active RFCs before initiating a new pattern.</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-lime-signal mt-0.5 text-[20px]">check_circle</span>
+<span class="text-zinc-300 text-sm">Ensure deterministic execution across all agent states.</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-lime-signal mt-0.5 text-[20px]">check_circle</span>
+<span class="text-zinc-300 text-sm">Maintain zero-knowledge proofs where specified.</span>
+</li>
+</ul>
+</div>
+<div class="mt-12">
+<button class="border border-ghost hover-border-ghost text-mono-hyper px-6 py-3 font-label text-sm uppercase tracking-wider transition-all hover:text-white flex items-center gap-2">
+                        View Guidelines
+                        <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Tech Stack -->
+<div class="bg-surface-sec border border-ghost p-8 flex flex-col gap-8">
+<h3 class="font-headline text-xl font-bold text-white tracking-tight">Core Stack</h3>
+<div class="flex flex-col gap-6">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-surface-tert flex items-center justify-center border border-white/5">
+<span class="font-label text-white font-bold text-lg">R</span>
+</div>
+<div>
+<div class="font-label text-sm text-white uppercase">Rust</div>
+<div class="text-zinc-500 text-xs">High-performance runtime</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-surface-tert flex items-center justify-center border border-white/5">
+<span class="font-label text-[#3178C6] font-bold text-lg">TS</span>
+</div>
+<div>
+<div class="font-label text-sm text-white uppercase">TypeScript</div>
+<div class="text-zinc-500 text-xs">Interface &amp; Tooling</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-surface-tert flex items-center justify-center border border-white/5">
+<span class="font-label text-[#FFD43B] font-bold text-lg">Py</span>
+</div>
+<div>
+<div class="font-label text-sm text-white uppercase">Python</div>
+<div class="text-zinc-500 text-xs">Data &amp; ML Pipelines</div>
+</div>
+</div>
+</div>
+<div class="mt-auto pt-8 border-t border-white/5">
+<div class="flex justify-between items-center text-xs font-label text-zinc-500">
+<span>SYSTEM STATUS</span>
+<span class="text-lime-signal flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-lime-signal animate-pulse"></span>
+                            OPERATIONAL
+                        </span>
+</div>
+</div>
+</div>
+</section>
+</main>
+</body></html>

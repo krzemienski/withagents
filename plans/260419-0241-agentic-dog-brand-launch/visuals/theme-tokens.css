@@ -1,0 +1,44 @@
+/* agentic.dog — hyper-terminal theme tokens */
+/* Phase 03 visual system. Import or inline. */
+
+:root {
+  /* Surfaces */
+  --bg-void:        #0a0a0a;   /* terminal black */
+  --bg-alt:         #111827;   /* near-black alt surface */
+  --bg-elev:        #1a1f2e;   /* elevated cards */
+  --border-faint:   #1f2937;   /* divider lines */
+  --border-glow:    #374151;   /* stronger outline */
+
+  /* Accents (use sparingly) */
+  --accent-pink:    #ff006e;   /* primary accent, CTAs, hero metric */
+  --accent-green:   #39ff14;   /* success, confirmations, prompt-ok */
+  --accent-yellow:  #faff00;   /* warnings, inline code tags */
+
+  /* Text */
+  --text-cool:      #e5e7eb;   /* primary text */
+  --text-muted:     #9ca3af;   /* secondary prose */
+  --text-faint:     #6b7280;   /* timestamps, metadata */
+
+  /* Type */
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Scale */
+  --radius-sm:  4px;
+  --radius-md:  8px;
+  --space-xs:   6px;
+  --space-sm:   12px;
+  --space-md:   20px;
+  --space-lg:   32px;
+
+  /* FX */
+  --glow-pink:   0 0 12px rgba(255, 0, 110, 0.55);
+  --glow-green:  0 0 10px rgba(57, 255, 20, 0.45);
+  --scanlines: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.012) 0px,
+    rgba(255, 255, 255, 0.012) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}

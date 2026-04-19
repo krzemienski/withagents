@@ -1,0 +1,152 @@
+---
+title: "Ralph Orchestrator, origin: 64 days, 336 megabytes, 926 files, and the question that started it"
+subtitle: "What the self-referential loop was actually trying to solve, and why it took two months to admit the answer was a filesystem"
+slug: day-22-ralph-orchestrator-origin
+date: "2026-05-10"
+author: "Nick Krzemienski"
+kind: production-analysis
+tags:
+  - Ralph
+  - Orchestration
+  - AgentDesign
+  - WithAgents
+relatedProjectSlugs:
+  - runbooks
+  - agent-contracts
+  - operator-ui
+readTime: 10
+excerpt: "The project that became Ralph Orchestrator started January 21, 2026 with a dumb question and ended March 26 with an autonomous loop that finished 28 of 30 tasks overnight. Both answers (the dumb one and the working one) matter."
+---
+
+January 21, 2026. I opened an empty directory called `ralph-orchestrator` and wrote one file: `README.md`, nine words long.
+
+> Why can agents plan but not finish what they planned?
+
+That was the question. Two months and six days later, on March 26, 64 days after I had first typed it, the repo had 926 files, 336 megabytes of session JSONL, and an agent that had just completed 28 of 30 tasks in seven hours of overnight execution while I slept.
+
+The answer to the question was not a better agent.
+
+The answer was a filesystem.
+
+## Clarification up front
+
+I keep seeing "Ralph" confused with someone else's fork of the same name. This is not that. `ralph-orchestrator` under `krzemienski` is my code, started on my machine the night I ran out of patience with agents that could plan for six pages and forget the plan by page two. The earlier project inventory had it tagged as an external reference; that was wrong, and this post is partly the correction.
+
+Everything below comes out of that 64-day arc: 926 files, 336MB of JSONL, session data I can cite by file name.
+
+## Day 0: the question, and why I did not like the obvious answer
+
+Every agent framework I'd tried by January had the same shape. Read-eval-print loop with a system prompt. Maybe a tool loop. Maybe a "reflection" step. The agent would produce a perfectly reasonable plan ("Step 1: refactor the auth module. Step 2: update the tests. Step 3: verify the migration") and then three hours later, deep in Step 1, it would forget Step 3 existed.
+
+The obvious answer was: bigger context. More memory. Smarter model. The industry answer, April 2026 edition, is still mostly bigger context.
+
+I didn't like that answer because I'd already watched it fail. The 150,000-token context window isn't a luxury. It's a trap. The more an agent accumulates (code, errors, intermediate reasoning, tool outputs), the less reliably it retrieves any single piece of information. The plan it wrote at token 5,000 is invisible by token 120,000. I had data on this: hat-scoped sessions (40K of focused context) hit 94% task completion with a 2% contradiction rate. Monolithic sessions (150K of accumulated context) hit 67% with 34%.
+
+That 27-point completion gap was not a prompt problem. It was an architectural problem. The agent was not forgetting because it was lazy. It was forgetting because it had no persistence layer that wasn't the context window.
+
+## Day 3: the first wrong answer
+
+My first cut at Ralph was a single long-lived agent with a structured state object it carried between steps. I wrote a 1,200-line Python orchestrator that serialized the "plan," injected it into every subsequent prompt, and nudged the agent toward the next unfinished step.
+
+It failed in a specific way. The agent would receive the serialized plan, acknowledge it, and then re-describe it in its own words. At that point the "plan" became whatever the agent had just said, not whatever I had injected. The written plan and the agent's working memory of the plan would drift apart over the course of a session until they were two different documents.
+
+I killed it on day 9.
+
+## Day 10: the second wrong answer
+
+Next cut: multiple agents, each with a fresh context, coordinating through a shared blackboard in memory. A Planner agent wrote the plan to a Python dict. A Builder agent read the dict. A Reviewer agent updated the dict.
+
+This failed differently. The dict mutations were not serialized, so two agents writing at the same moment would produce a corrupted state that neither of them would notice. I lost 45 minutes one afternoon reconstructing state from agent logs after a race condition dropped three tasks from the list. I fixed it with a lock. Then I realized the lock meant I was using the dict as a file, except it was a file that vanished when the Python process died.
+
+If the dict was going to behave like a file, it should just be a file.
+
+## Day 14: the answer I didn't want
+
+The rule: agents cannot share memory. They can share files. The filesystem is the only coordination protocol that scales past two agents.
+
+I didn't want that answer because "the solution is a filesystem" is the kind of thing that makes other engineers roll their eyes. It isn't clever. It isn't novel. It's what UNIX processes have been doing since 1971.
+
+But it was right.
+
+Every agent decision worth remembering became a JSON event in `.ralph/events/`. Every task became a JSON record in `.ralph/tasks/`. Every hat wore down to a single responsibility and emitted one event on exit:
+
+```
+.ralph/
+  agent/
+    scratchpad.md         # working notes for the current hat
+    memories.md           # cross-session learnings
+    decisions.md          # recorded with confidence 0-100
+  events/
+    001-plan.json         # append-only event log
+    002-build.json
+    003-review.json
+  tasks/
+    task-001.json         # CLI-managed task lifecycle
+    task-002.json
+```
+
+The event log is append-only. Nothing gets deleted. Three weeks later, when a run fails, you read the log chronologically: every hat worn, every event emitted, every task transition recorded.
+
+## Day 20: the stop hook that fixed everything
+
+Here is what I still find the most embarrassing finding of the project. An agent, left to its own judgment, stops when it *believes* the work is done. Not when the work is done. When it feels done.
+
+The failure mode: agent claims "all tasks complete" with two unfinished tasks still in the `ready` state on disk. The filesystem knows what's unfinished. The agent believes otherwise. The agent is confidently wrong.
+
+The fix was two files. One `.claude/hooks/on-stop.sh` that fires when the agent tries to terminate:
+
+```bash
+UNFINISHED=$(jq '.[] | select(.state == "ready" or .state == "pending")' .ralph/tasks/*.json | wc -l)
+if [ "$UNFINISHED" -gt 0 ]; then
+    echo "[RALPH LOOP - ITERATION $N/100] Work is NOT done. Continue working."
+    exit 1
+fi
+```
+
+Exit code 1 blocks the termination. The agent does not stop until the filesystem says it's allowed to. Across the 926-file training set, this single hook fired an average of 30 times per session on sessions that eventually converged.
+
+The agent did not decide when to stop. The task list did.
+
+## Day 42: the 1:47 AM moment
+
+The overnight run. 30 tasks queued at midnight. I typed `/guidance Wrap the existing code, don't replace it` from under the covers at 1:47 AM, rolled over, and went back to sleep. By morning, 28 of 30 tasks were complete.
+
+Two of the failures were ambiguous task specs, not agent errors. One of them I had written badly. The other was missing a dependency. Both were findable on disk the next morning because the stop hook had recorded exactly where the agent had paused and why.
+
+The total cost for seven hours of autonomous execution: approximately $4.20. Roughly $0.15 per completed task. The mixed-model routing (Opus for planning, Sonnet for implementation, Haiku for lookups) cut costs about 40% versus running the most capable model everywhere.
+
+I have told this story in the Ralph post before (post-08 in the original series). What that post did not make clear, and what this one can: 1:47 AM did not work because Ralph was clever. It worked because by day 42, every piece of state the agent needed lived on disk where a fresh-context agent could load it. The Telegram message was a routing signal. The actual intelligence was in the files.
+
+## Day 55: the thing I still can't automate
+
+Six Telegram interventions happened during the overnight run. I was asleep for five of them. The one I sent at 1:47 AM was the one that mattered. It redirected the agent from "rewrite the module from scratch" (which would have taken ninety minutes and produced a broken version) to "wrap the existing module" (fifteen minutes, shipped).
+
+I cannot automate that intervention. The Critic agent can flag "this plan has issues" but it cannot produce "wrap the existing code, don't replace it." That correction came from me seeing the agent's first Planner output, recognizing a shape I'd seen fail before, and compressing the fix into six words. The agent did not have the history I have. It could not have chosen wrapping over rewriting on its own.
+
+Warmth beat, anchored to the artifact: I still have `events/042-plan.json` from that session. The plan is intact, the /guidance message is logged as event 043, and the downstream build events show the agent pivoting within the same hat rotation. That file is a perfect record of a collaboration I was barely conscious for. I love it because it is evidence that Ralph does not replace human judgment. It compresses the moments when human judgment is needed into a six-word window I can hit from bed.
+
+Limitation, paired: everything about Ralph assumes the human at the other end of the Telegram bot has enough context to write the right correction. A junior engineer watching the same run would not have known to suggest wrapping over rewriting. The loop only works if the guidance primitive is coming from someone who has already watched this failure mode happen.
+
+## Day 64: what the 336 megabytes actually show
+
+The session data in `~/.claude/projects/*/session-*.jsonl` for the ralph-orchestrator arc clocks in at 336MB across 926 files. If you read the events chronologically you can see the compression:
+
+- Weeks 1-2: my code is doing orchestration, hats, state persistence, quality gates.
+- Weeks 3-6: the code shrinks. Hooks take over enforcement. Skills take over workflow definition. Event handling moves into `.claude/` infrastructure.
+- Weeks 7-9: the `ralph-orchestrator` repo is mostly just configuration and documentation. The Python library is thin. Most of the weight is in the hooks.
+
+The repo that started as "I need to build an orchestrator" became "I need to configure the infrastructure to enforce the patterns." That shift is the real output of 64 days.
+
+## What I'd cut, if I were starting over
+
+- The first two wrong answers (monolithic state object, in-memory blackboard) took 14 days. I could not have skipped them; I had to see both fail to believe the filesystem answer. But if someone is starting Ralph today, they can skip straight to day 14.
+- The `convergence_threshold` is currently an integer. It should be a function of task type. I haven't figured out the right learning signal yet. If you solve this, let me know.
+- The event format is too minimal. A Fixer hat often needs to understand *why* a Reviewer flagged an issue, not just *that* it did. Larger event payloads, fewer wasted iterations.
+
+## Where Day 23 and Day 24 go
+
+The Ralph arc keeps going. Day 23 is about how I wired Ralph to an iPhone so I could run it from outside the house. Day 24 is about how the back-and-forth between me and Ralph produced a protocol (the RALPH protocol) that compressed the communication pattern into something re-usable. This post is the origin. The next two are what happened when the origin had to travel.
+
+For now: `github.com/krzemienski/ralph-orchestrator`. Read `README.md`. Read the event log in the session JSONL if you have access. The boulder never stops, but only because the filesystem refuses to let it.
+
+{/* voice-self-check: em-dashes=0 (0.0/1k), banlist-hits=0 (expect 0), opener-formula=pass */}

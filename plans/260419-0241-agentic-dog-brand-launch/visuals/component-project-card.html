@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>project-card — agentic.dog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --bg-void: #0a0a0a;
+    --bg-alt: #111827;
+    --bg-elev: #1a1f2e;
+    --border-faint: #1f2937;
+    --border-glow: #374151;
+    --accent-pink: #ff006e;
+    --accent-green: #39ff14;
+    --accent-yellow: #faff00;
+    --text-cool: #e5e7eb;
+    --text-muted: #9ca3af;
+    --text-faint: #6b7280;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    --font-sans: 'Inter', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg-void);
+    color: var(--text-cool);
+    font-family: var(--font-sans);
+    background-image: repeating-linear-gradient(
+      180deg,
+      rgba(255,255,255,0.012) 0px,
+      rgba(255,255,255,0.012) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  }
+  .stage {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+  }
+
+  .project-card {
+    width: 420px;
+    background: var(--bg-alt);
+    border: 1px solid var(--border-faint);
+    border-radius: 8px;
+    overflow: hidden;
+    font-family: var(--font-mono);
+    transition: border-color .2s, box-shadow .2s, transform .2s;
+  }
+  .project-card:hover {
+    border-color: var(--accent-pink);
+    box-shadow: 0 0 18px rgba(255, 0, 110, 0.25);
+    transform: translateY(-2px);
+  }
+
+  .card-chrome {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: #0c1220;
+    border-bottom: 1px solid var(--border-faint);
+    font-size: 11px;
+    color: var(--text-faint);
+  }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #ff5f56; }
+  .dot-y { background: #ffbd2e; }
+  .dot-g { background: #27c93f; }
+  .chrome-path {
+    margin-left: 10px;
+    color: var(--text-muted);
+  }
+
+  .card-body { padding: 20px 18px 18px; }
+
+  .prompt-line {
+    color: var(--accent-green);
+    font-size: 12px;
+    margin-bottom: 10px;
+    letter-spacing: 0.02em;
+  }
+  .prompt-line .cmd { color: var(--text-muted); }
+
+  .title {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.01em;
+    color: var(--text-cool);
+    margin: 0 0 4px;
+  }
+  .title a { color: inherit; text-decoration: none; }
+  .title a:hover { color: var(--accent-pink); text-shadow: 0 0 8px rgba(255,0,110,0.5); }
+
+  .subtitle {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin: 0 0 16px;
+  }
+
+  .status-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 500;
+    padding: 4px 9px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .pill-active {
+    background: rgba(57, 255, 20, 0.08);
+    color: var(--accent-green);
+    border: 1px solid rgba(57, 255, 20, 0.3);
+  }
+  .pill-active::before {
+    content: '';
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--accent-green);
+    box-shadow: 0 0 6px var(--accent-green);
+  }
+  .pill-flagship {
+    background: rgba(255, 0, 110, 0.08);
+    color: var(--accent-pink);
+    border: 1px solid rgba(255, 0, 110, 0.3);
+  }
+
+  .ascii-divider {
+    font-family: var(--font-mono);
+    color: var(--border-glow);
+    font-size: 11px;
+    letter-spacing: -1px;
+    margin: 14px 0 12px;
+    user-select: none;
+  }
+
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .badge {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    background: #0c1220;
+    color: var(--accent-yellow);
+    border: 1px solid var(--border-faint);
+  }
+
+  .meta-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-faint);
+  }
+  .meta-item { display: inline-flex; align-items: center; gap: 5px; }
+  .meta-item .k { color: var(--text-muted); }
+  .meta-item .v { color: var(--text-cool); }
+  .stars { color: var(--accent-yellow); }
+</style>
+</head>
+<body>
+<div class="stage">
+  <article class="project-card">
+    <div class="card-chrome">
+      <span class="dot dot-r"></span>
+      <span class="dot dot-y"></span>
+      <span class="dot dot-g"></span>
+      <span class="chrome-path">~/products/validationforge</span>
+    </div>
+    <div class="card-body">
+      <div class="prompt-line">❯ <span class="cmd">cat PRODUCT.md</span></div>
+      <h2 class="title"><a href="#">validationforge</a></h2>
+      <p class="subtitle">No-mock functional validation for Claude Code. Agents kept reporting "build passed / task complete" without running the real system — so we stopped trusting them.</p>
+
+      <div class="status-row">
+        <span class="pill pill-active">active</span>
+        <span class="pill pill-flagship">flagship</span>
+      </div>
+
+      <div class="ascii-divider">├───────────────────────────────────────┤</div>
+
+      <div class="badges">
+        <span class="badge">claude-code</span>
+        <span class="badge">plugin</span>
+        <span class="badge">playwright</span>
+        <span class="badge">validation</span>
+        <span class="badge">beta</span>
+      </div>
+
+      <div class="meta-row">
+        <span class="meta-item"><span class="k">updated</span><span class="v">2d ago</span></span>
+        <span class="meta-item"><span class="k">sessions</span><span class="v">257</span></span>
+        <span class="meta-item stars">★ 12</span>
+      </div>
+    </div>
+  </article>
+</div>
+</body>
+</html>

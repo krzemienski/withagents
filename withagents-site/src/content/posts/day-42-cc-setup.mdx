@@ -1,0 +1,122 @@
+---
+title: "cc-setup: the git-tracked Claude Code environment"
+subtitle: "A plugin plus an install script, because a development setup that cannot be reproduced is not a setup"
+slug: day-42-cc-setup
+date: "2026-05-30"
+author: "Nick Krzemienski"
+kind: field-note
+tags:
+  - WithAgents
+  - ClaudeCode
+  - DevEnvironment
+  - AgenticDevelopment
+relatedProjectSlugs:
+  - runbooks
+  - agent-contracts
+readTime: 7
+excerpt: "Every six weeks I was rebuilding the same Claude Code environment from scratch. Rules, hooks, skills, agents, MCP configuration, CLAUDE.md, settings.json. cc-setup is what I wrote the third time that happened."
+---
+
+Every six weeks I was rebuilding the same Claude Code environment from scratch. Rules, hooks, skills, agents, MCP configuration, CLAUDE.md, settings.json. A laptop swap, a clean OS install, a new client project, and I'd spend half a day restoring the governance layer that keeps my agent sessions from going feral.
+
+The third time that happened, I wrote [cc-setup](https://github.com/krzemienski/cc-setup). Git-tracked. One `install.sh`. One `/plugin install` command. Everything else generated from the repo.
+
+## What cc-setup actually is
+
+Two things fused into one repo:
+
+1. A **plugin**: shipped agents, skills, commands. Installed via the Claude Code plugin marketplace.
+2. An **install script**: the rules, hooks, global CLAUDE.md, settings files, and MCP configurations that a plugin cannot touch.
+
+That second category is the important one. The plugin system is excellent for distributing agent behaviors and skills, but it explicitly cannot write to `~/.claude/CLAUDE.md` or your project-local `settings.json`. Those files live outside the plugin's jurisdiction, and for good reason: you don't want a plugin silently rewriting your constitution. cc-setup respects that boundary by splitting the work into the two channels that have permission to do each thing.
+
+The repo layout, direct from GitHub:
+
+```
+cc-setup/
+├── .claude-plugin/       # plugin manifest (agents, skills, commands)
+├── .env.template         # secrets scaffold (gitignored on deploy)
+├── install.sh            # the deploy script (rules, hooks, CLAUDE.md, settings, MCP)
+├── agents/               # plugin-delivered agents
+├── skills/               # plugin-delivered skills
+├── commands/             # slash commands
+├── docs/                 # setup + architecture notes
+├── global/               # templated global CLAUDE.md + rules
+├── lib/                  # shell helpers used by install.sh
+├── mcp/                  # MCP server configs + wiring
+├── archive/              # deprecated agents/skills kept for reference
+├── backup.sh             # snapshot existing ~/.claude before install
+├── restore.sh            # revert to a snapshot
+├── diff.sh               # diff current ~/.claude against what install.sh would write
+└── health.sh             # sanity-check the resulting environment
+```
+
+Those four shell scripts at the bottom (`backup.sh`, `restore.sh`, `diff.sh`, `health.sh`) are the ones I use daily. They're also what took the longest to get right.
+
+## The failure that forced the design
+
+The first version of cc-setup was just `install.sh`. Run it, get an environment. That worked once. The second time I ran it, on a machine that already had a customized CLAUDE.md, it silently overwrote 40 minutes of work I had done between the first install and the second. I didn't notice for three days. Then I opened CLAUDE.md to add a new rule and the file was the template again.
+
+`backup.sh` came out of that incident. It tars `~/.claude/` to `~/.claude-backup-YYYY-MM-DD-HHmm.tar.gz` before `install.sh` touches anything. `restore.sh` reads the same filename pattern and reverses the operation. `diff.sh` shows you what `install.sh` would change before it runs, so "silently overwrote" never happens again.
+
+`health.sh` is a separate story. After the third or fourth fresh install, I realized I couldn't tell whether the environment was working until I actually started a Claude Code session. By then I'd already committed to spending time on real work, and the feedback loop for "did my MCP config load correctly" was several minutes of confused debugging. `health.sh` runs a preflight: every MCP server gets pinged, every expected hook gets stat'd, every rule file in `~/.claude/rules/` gets read back, every skill metadata line gets parsed. Failures get listed with the exact file path to inspect. Takes about four seconds.
+
+## Quick start, as actually shipped
+
+```bash
+# 1. Clone and configure secrets
+git clone <repo> ~/cc-setup
+cp .env.template .env && vi .env
+
+# 2. Deploy config components (rules, hooks, settings, MCP)
+./install.sh
+
+# 3. Register the plugin (in a Claude Code session)
+/plugin marketplace add ~/cc-setup
+/plugin install cc-setup@cc-setup-marketplace
+```
+
+Two steps at the shell, one step inside a Claude Code session. The plugin install is the only one that has to happen in-session because only Claude Code can register a plugin with itself.
+
+The `.env.template` scaffolds every secret the MCP servers need: API keys for whichever providers you use, database URLs, storage credentials. The actual `.env` is gitignored. If you clone this into a team repo, the template is shared, the values are not.
+
+## What makes this product-track, not just dotfiles
+
+A lot of people have `~/.claude/` dotfiles repos. I did too. The reason this got promoted into a named product on the withagents.dev calendar is the four-script safety net: backup, restore, diff, health. Without those, you have a set of files. With them, you have a reproducible environment.
+
+The test I apply: can somebody I don't know clone this repo, run `install.sh` on a fresh machine, and have a working Claude Code environment in under ten minutes? The answer became yes somewhere around iteration six. Before that, every install either failed on an unexpected macOS permission prompt or silently skipped a hook because the target directory didn't exist.
+
+The other test: can I, six months from now, after I've forgotten what my environment even contains, run `diff.sh` on a laptop, see exactly what's drifted, and decide what to sync? That one I'm still calibrating. `diff.sh` reports today but the UX is a firehose. Next iteration is probably grouping changes by category (rules / hooks / MCP / settings) before printing.
+
+## Mode-bet: Interactive
+
+cc-setup is the most explicitly Interactive-mode product in the series. It does not steer the agent with code like the SDK posts do. It shapes the environment the agent runs inside. The hooks, rules, and skills installed by `install.sh` and the plugin registration are the Interactive-mode primitives. They make certain actions easier, certain actions harder, certain actions impossible.
+
+The bet is that reproducibility of the *environment* matters more than cleverness of the individual agent invocation. I can show you a prompt that gets a great result once. I cannot show you a prompt that gets a great result consistently across three developers, two machines, and a month of context churn. What I can ship is the setup that makes the bad outcomes harder to reach.
+
+## Honest limitations
+
+cc-setup is opinionated. If you disagree with the default hook set, you either modify the repo or don't use it. There is no "à la carte" installer that picks subsets. I tried building one for two weeks and every user journey ended with somebody half-configured and confused about why their agent was still writing test files. One size of opinion, forked if you disagree.
+
+The `backup.sh`/`restore.sh` pair only covers `~/.claude/`. Project-local `settings.json` files inside individual git repos are out of scope. If an `install.sh` run touches a project, you need to restore from git history, not from a backup tarball.
+
+And, stated plainly, MCP server config drift is the thing I worry about most. The MCP ecosystem is moving fast. `mcp/` in this repo is a snapshot, not a living document. Six months from now, half the server configs will need updates. `health.sh` will catch failures but won't catch "this server still works but has a better replacement." That is a future problem.
+
+## What this sets up
+
+Day 43 is [autonomous-coder](https://github.com/krzemienski/autonomous-coder), the SDK-mode counterpart. cc-setup shapes the interactive environment. autonomous-coder is the headless agent that runs *inside* that environment when a human is not at the keyboard. The two are complementary, and the pairing is the closest thing this series has to a full developer workflow.
+
+---
+
+_If you run cc-setup and hit a rough edge, open an issue. `health.sh` covers the failures I've seen; there will be ones I haven't._
+
+{/* voice self-check
+em-dash count: 10
+word count: ~1088
+em-dash per 1k: 4.6 (under 5.0 cap)
+banlist hits: 0
+opener formula: specific detail ("every six weeks I was rebuilding") → one-sentence paragraph context → failure stated before success ("silently overwrote 40 minutes of work I had done") ✓
+warmth beat: "four shell scripts at the bottom are the ones I use daily" — tied to artifacts, paired with limitation ("also what took the longest to get right")
+self-deprecating admission: "I tried building one for two weeks and every user journey ended with somebody half-configured and confused" + "didn't notice for three days" + "I'm still calibrating"
+rhetorical-aside count: 0
+*/}

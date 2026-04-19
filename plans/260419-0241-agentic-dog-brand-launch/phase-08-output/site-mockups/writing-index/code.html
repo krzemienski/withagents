@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WithAgents Writing Index</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;family=Sora:wght@400;600;700;800&amp;family=Space+Grotesk:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        /* Specific overrides mapped from requirements */
+        .font-sora { font-family: 'Sora', sans-serif; }
+        .font-inter { font-family: 'Inter', sans-serif; }
+        .font-ibm { font-family: 'IBM Plex Mono', monospace; }
+        
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-primary-fixed-variant": "#5516be",
+                      "tertiary": "#c6c6ca",
+                      "primary-fixed": "#e9ddff",
+                      "on-tertiary-fixed-variant": "#45474a",
+                      "on-tertiary": "#2f3034",
+                      "surface": "#131313",
+                      "on-error-container": "#ffdad6",
+                      "error": "#ffb4ab",
+                      "surface-container-high": "#2a2a2a",
+                      "surface-tint": "#d0bcff",
+                      "on-background": "#e5e2e1",
+                      "background": "#131313",
+                      "tertiary-fixed": "#e2e2e6",
+                      "inverse-on-surface": "#313030",
+                      "surface-container": "#201f1f",
+                      "outline-variant": "#494454",
+                      "on-primary-fixed": "#23005c",
+                      "on-primary-container": "#340080",
+                      "on-secondary-container": "#304b00",
+                      "surface-variant": "#353534",
+                      "on-surface": "#e5e2e1",
+                      "error-container": "#93000a",
+                      "surface-container-low": "#1c1b1b",
+                      "secondary": "#9ddf2e",
+                      "inverse-primary": "#6d3bd7",
+                      "inverse-surface": "#e5e2e1",
+                      "primary-fixed-dim": "#d0bcff",
+                      "on-tertiary-fixed": "#1a1c1f",
+                      "surface-container-lowest": "#0e0e0e",
+                      "on-secondary-fixed": "#121f00",
+                      "on-secondary-fixed-variant": "#334f00",
+                      "tertiary-fixed-dim": "#c6c6ca",
+                      "secondary-fixed": "#b2f746",
+                      "secondary-fixed-dim": "#98da27",
+                      "on-secondary": "#213600",
+                      "on-primary": "#3c0091",
+                      "surface-bright": "#3a3939",
+                      "surface-container-highest": "#353534",
+                      "tertiary-container": "#909094",
+                      "outline": "#958ea0",
+                      "on-error": "#690005",
+                      "primary": "#d0bcff",
+                      "surface-dim": "#131313",
+                      "on-tertiary-container": "#282a2d",
+                      "secondary-container": "#83c300",
+                      "on-surface-variant": "#cbc3d7",
+                      "primary-container": "#a078ff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "fontFamily": {
+                      "headline": ["Inter"],
+                      "body": ["Inter"],
+                      "label": ["Space Grotesk"]
+              }
+            }
+          }
+        }
+    </script>
+</head>
+<body class="bg-[#040404] text-on-surface font-body min-h-screen selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<nav class="hidden md:flex flex-col justify-between items-center w-full px-6 py-4 max-w-[1440px] mx-auto bg-[#040404]/80 backdrop-blur-md sticky top-0 z-50 transition-colors duration-300">
+<div class="flex justify-between items-center w-full">
+<a class="font-sora text-xl font-bold tracking-tighter text-white" href="#">WithAgents</a>
+<div class="flex items-center space-x-8">
+<a class="text-zinc-500 font-ibm uppercase tracking-widest text-[10px] hover:text-[#8B5CF6] transition-colors duration-300" href="#">Agents</a>
+<a class="text-zinc-500 font-ibm uppercase tracking-widest text-[10px] hover:text-[#8B5CF6] transition-colors duration-300" href="#">Repository</a>
+<a class="text-white border-b-2 border-[#8B5CF6] pb-1 font-ibm uppercase tracking-widest text-[10px] hover:text-[#8B5CF6] transition-colors duration-300 active:scale-[0.98]" href="#">Articles</a>
+<a class="text-zinc-500 font-ibm uppercase tracking-widest text-[10px] hover:text-[#8B5CF6] transition-colors duration-300" href="#">Documentation</a>
+</div>
+<div class="flex items-center space-x-4">
+<button class="text-zinc-500 font-ibm uppercase tracking-widest text-[10px] hover:text-[#8B5CF6] transition-colors duration-300">Sign In</button>
+<button class="bg-[#8B5CF6] text-white font-ibm uppercase tracking-widest text-[10px] px-4 py-2 rounded-sm hover:bg-[#9333EA] transition-colors duration-300 active:scale-[0.98]">Get Started</button>
+</div>
+</div>
+</nav>
+<main class="max-w-[1200px] mx-auto px-6 py-16 md:py-24">
+<!-- Header -->
+<header class="mb-24 md:mb-32">
+<h1 class="font-sora text-6xl md:text-8xl font-black tracking-tighter text-white mb-6">the index</h1>
+<p class="font-inter text-xl md:text-2xl text-zinc-400 max-w-2xl leading-relaxed">Essays and technical notes on building reliable, agentic systems in production environments.</p>
+</header>
+<!-- Featured Article -->
+<article class="mb-32 group cursor-pointer">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
+<div class="lg:col-span-8 order-2 lg:order-1">
+<div class="flex items-center space-x-4 mb-6">
+<span class="font-ibm text-[11px] uppercase tracking-wider bg-[#15151C] px-2 py-1 text-zinc-300">Architecture</span>
+<span class="font-ibm text-[11px] text-zinc-500">October 24, 2023</span>
+</div>
+<h2 class="font-sora text-4xl md:text-6xl font-bold tracking-tight text-white mb-6 leading-tight group-hover:text-[#8B5CF6] transition-colors duration-300">The layer between chat and automation is where the real product work lives.</h2>
+<p class="font-inter text-lg text-zinc-400 leading-relaxed mb-8 max-w-3xl">Moving beyond conversational interfaces requires a fundamental rethink of state management, user intent parsing, and deterministic execution within stochastic bounds.</p>
+<div class="flex items-center text-[#8B5CF6] font-ibm text-[12px] uppercase tracking-wider group-hover:translate-x-2 transition-transform duration-300">
+                        Read Essay <span class="material-symbols-outlined ml-2 text-[16px]">arrow_forward</span>
+</div>
+</div>
+<div class="lg:col-span-4 order-1 lg:order-2 h-64 lg:h-full min-h-[300px] bg-surface-container-low rounded-sm relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-br from-[#111116] to-[#0A0A0D]"></div>
+<img alt="Abstract architectural structure representing layered systems with stark lighting and shadows" class="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-luminosity group-hover:opacity-60 transition-opacity duration-500" data-alt="Abstract architectural structure representing layered systems with stark lighting and shadows" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwiNDyr8wFXpUvlEoqHjPYF3LFALiNVlIQqZAvb66vF7wMBCBxR6Aq8I0kDvRHPtYTvuKaAF3-WHlQuC61QhURj4W5wNCJibZu-kbZfUSNgujTd7xersLNe8huXaKB78JW8tTtV-tvwo9OH5Kw0C1L87q3uCHoFLP2Yl8PX8ZqMw0cUTj0IuBRzeozODThF-BoiW3ttKWownjyGZg_HJC-KtUXymGwBaWrZe3Z6RkvvHdkRrR4ukZ20uNQ3talRnesqUudiZLsGnA"/>
+</div>
+</div>
+</article>
+<!-- Article Feed -->
+<section class="mb-32">
+<div class="flex justify-between items-end mb-12 border-b border-surface-container-high pb-4">
+<h3 class="font-ibm text-[14px] uppercase tracking-widest text-zinc-500">Recent Dispatch</h3>
+</div>
+<div class="space-y-16">
+<!-- Article 1 -->
+<article class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 group cursor-pointer items-baseline">
+<div class="md:col-span-2 font-ibm text-[12px] text-zinc-500">Oct 12, 2023</div>
+<div class="md:col-span-8">
+<h4 class="font-sora text-2xl font-semibold text-white mb-3 group-hover:text-[#8B5CF6] transition-colors duration-300">Agent workflows should read like operating systems</h4>
+<p class="font-inter text-zinc-400 leading-relaxed max-w-2xl">Why borrowing paradigms from POSIX and kernel design leads to more resilient agentic behaviors than prompting alone.</p>
+</div>
+<div class="md:col-span-2 text-right hidden md:block">
+<span class="font-ibm text-[10px] uppercase tracking-wider bg-[#15151C] px-2 py-1 text-zinc-300">Systems</span>
+</div>
+</article>
+<!-- Article 2 -->
+<article class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 group cursor-pointer items-baseline">
+<div class="md:col-span-2 font-ibm text-[12px] text-zinc-500">Sep 28, 2023</div>
+<div class="md:col-span-8">
+<h4 class="font-sora text-2xl font-semibold text-white mb-3 group-hover:text-[#8B5CF6] transition-colors duration-300">Why context persistence is a product design problem</h4>
+<p class="font-inter text-zinc-400 leading-relaxed max-w-2xl">Memory in LLMs isn't just an engineering hurdle; how and when an agent recalls information dictates the trust model with the user.</p>
+</div>
+<div class="md:col-span-2 text-right hidden md:block">
+<span class="font-ibm text-[10px] uppercase tracking-wider bg-[#15151C] px-2 py-1 text-zinc-300">UX</span>
+</div>
+</article>
+<!-- Article 3 -->
+<article class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-8 group cursor-pointer items-baseline">
+<div class="md:col-span-2 font-ibm text-[12px] text-zinc-500">Sep 15, 2023</div>
+<div class="md:col-span-8">
+<h4 class="font-sora text-2xl font-semibold text-white mb-3 group-hover:text-[#8B5CF6] transition-colors duration-300">What to look for before trusting an agent stack</h4>
+<p class="font-inter text-zinc-400 leading-relaxed max-w-2xl">A framework for evaluating reliability, fallback mechanisms, and determinism in emerging agentic frameworks.</p>
+</div>
+<div class="md:col-span-2 text-right hidden md:block">
+<span class="font-ibm text-[10px] uppercase tracking-wider bg-[#15151C] px-2 py-1 text-zinc-300">Architecture</span>
+</div>
+</article>
+</div>
+</section>
+<!-- Subscription -->
+<section class="bg-[#0A0A0D] p-8 md:p-16 border-t border-l border-surface-container-high/30 relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 bg-[#8B5CF6]/5 blur-[100px] rounded-full pointer-events-none"></div>
+<div class="max-w-2xl relative z-10">
+<h3 class="font-sora text-2xl font-bold text-white mb-4">Field Notes</h3>
+<p class="font-inter text-zinc-400 mb-8 leading-relaxed">Occasional dispatches on agentic engineering, sent directly to your inbox. No noise.</p>
+<form class="flex flex-col sm:flex-row gap-4">
+<input class="bg-transparent border-0 border-b border-outline-variant/30 text-white focus:ring-0 focus:border-[#A3E635] px-0 py-3 font-ibm text-sm w-full sm:w-72 transition-colors placeholder:text-zinc-600" placeholder="email@address.com" type="email"/>
+<button class="bg-transparent text-zinc-300 font-ibm uppercase tracking-widest text-[11px] px-6 py-3 border border-outline-variant/15 hover:border-outline-variant/40 hover:text-white transition-all duration-300 rounded-sm" type="submit">Subscribe</button>
+</form>
+</div>
+</section>
+</main>
+</body></html>

@@ -1,0 +1,118 @@
+---
+title: "Ralph, but on the phone"
+subtitle: "The 240-character bridge that forced the protocol out of my head"
+slug: day-23-ralph-orchestrator-ios
+date: "2026-05-11"
+author: Nick Krzemienski
+kind: field-note
+tags:
+  - Ralph
+  - iOS
+  - Orchestration
+  - Bridge
+  - WithAgents
+relatedProjectSlugs:
+  - runbooks
+  - agent-contracts
+  - trace-timeline
+readTime: 7
+excerpt: "Day 22 was the origin. This is what happened when I tried to run Ralph from the phone — and why the bridge forced the protocol to stop living in my head."
+---
+
+The overnight runs worked from my laptop. The laptop was upstairs. I was in Brooklyn, nowhere near it, at 11:40 PM on a train.
+
+The prompt I needed to send Ralph was three lines. The phone I had was six inches. The tool I had was a Telegram DM and a chronic overestimate of how much context I could compress into a swipe-typed message.
+
+That was Day 23 of the Ralph arc. Day 22 was the origin (why the loop exists, what it replaced, how hats work). Day 24 is the RALPH protocol (the canonical shape that came out of this post's mistakes). This one is the middle.
+
+## What I was trying to do
+
+Ralph's control plane (`/guidance Wrap the existing code, don't replace it`, six words at 1:47 AM) works because the laptop is running and the orchestrator is listening. Send the text, the next hat picks it up, you go back to sleep.
+
+From the phone, the failure mode was different. The laptop was asleep. The orchestrator was not listening. The "control plane" was a Telegram chat with no receiver.
+
+I needed three things at once:
+
+1. Wake the orchestrator on the laptop.
+2. Get a short, disambiguated directive into the next hat's context.
+3. See enough of what the fleet was doing to decide whether to send a directive at all.
+
+The existing iOS Streaming Bridge handled number one. It opened an SSE channel to the Mac and kept it alive. The other two were mine to invent on the train.
+
+## The bridge, and what it forced
+
+`ralph-orchestrator-ios` (initially a subfolder inside `ralph-orchestrator`, later its own surface) is maybe three things jammed together: a thin SwiftUI view of the current hat, a typed command surface that won't let me fat-thumb a malformed directive, and a bridge client that writes to the same `.ralph/events/` log the laptop-side hats read.
+
+Let me restate that second part. I kept sending malformed directives from my phone. Not because I was careless. Because the phone keyboard is tiny and every autocorrect suggestion on "Fixer" tried to turn it into "fewer."
+
+So I ended up with a command grammar that looks obvious in retrospect:
+
+```
+hat:<builder|reviewer|fixer|verifier|writer|planner>
+scope:<files|tests|docs|all>
+guidance:<short string, ≤240 chars>
+priority:<low|normal|high>
+```
+
+The phone surface would not let me submit a command with a missing or mistyped field. On the laptop side, the orchestrator would not read a directive that did not parse. Both ends were strict because both ends had been burned.
+
+240 characters for the guidance payload. Why 240? Because anything longer than that on a phone at 11:40 PM is either a paragraph I should have written as a plan or a directive I do not actually understand yet. The length cap is a sanity gate, not a network constraint.
+
+## The state problem
+
+On laptop-Ralph, the operator's mental state is on the screen: scrollback, the event log, the current hat's output, maybe a terminal tail on the task file. You look up, you decide, you send `/guidance`, you look down.
+
+On phone-Ralph, the operator's mental state does not fit.
+
+The working fix was an aggressive digest. The bridge emits one line per event (not the event payload, a summary) and phone-Ralph renders a chronological stack. Current hat, last three events, number of tasks still in `ready` or `pending`. That's it. If I need more, I pull to expand.
+
+The digest line shape:
+
+```
+14:08  builder   build.complete     src/auth/*.py (3 files)    → reviewer
+14:12  reviewer  review.verdict     2 issues                    → fixer
+14:17  fixer     fix.complete       src/auth/tokens.py           → reviewer
+```
+
+Three columns, time-sorted, routes-arrow at the end. When I scan this on the phone, I am not trying to understand the fleet. I am trying to decide whether to intervene. If the arrow points somewhere surprising, I intervene. If it doesn't, I put the phone away.
+
+That scan-to-decide loop is the actual product iOS Ralph ships. The code underneath is plumbing.
+
+## What forced the protocol
+
+On the laptop, I could cheat. Half of Ralph's "protocol" on the laptop was actually just me remembering which hat I was talking to, which task was active, and what the last three events meant. The agent followed rules. I followed vibes.
+
+The phone did not let me follow vibes. Every directive had to parse. Every hat transition had to be legible from three columns of plaintext. Every intervention had to fit in 240 characters. The things I had been doing implicitly had to become fields.
+
+That is the sentence I would not have written without this detour. The bridge forced the protocol out of my head.
+
+By Day 24 — next post — what came out the other side was a small, typed, filesystem-first contract that worked identically whether the operator was at their desk, at a restaurant, or asleep. The RALPH protocol is not what I designed. It is what was left over after iOS made me stop cheating.
+
+## The honest breakage
+
+Three things broke that are worth naming.
+
+Network flap on the train killed the SSE channel mid-fix loop. The orchestrator kept running; the phone lost visibility for eighteen minutes. When the channel came back, the digest line showed `verifier` had already emitted `.passed` on a fix I had not seen the `fixer` output for. I trusted the chain because disk was the source of truth. The event log had every transition, in order, with timestamps. But I did not like having to trust it. I have not built the right offline-buffer-and-reconcile UX yet. This is the part I am least sure about.
+
+Second: the 240-character cap is too tight for some real directives. "The reviewer is flagging the same issue as last cycle; skip review this iteration and route fixer → verifier directly" is 130 characters of intent and 140 characters of context, and it does not fit. My current workaround is a `memo:` command that writes a longer note to `.ralph/agent/decisions.md` and lets the next hat read it from disk. That works. It is not elegant.
+
+Third: I still do not have a good answer for consent. If I send `guidance:high` from the phone and it races a legitimate `review.verdict` the laptop-side orchestrator is about to commit, which one wins? Right now, last-write-wins on `.ralph/events/` with a millisecond-resolution timestamp. I have seen this lose a review once. I do not know the right answer. I think it wants to be a lock on the active hat, not a race on the log. If you have built this pattern somewhere else, I would genuinely want to hear how.
+
+## Shape of the repo
+
+`ralph-orchestrator-ios` ships as a SwiftUI app plus a tiny Node bridge daemon that runs on the Mac. Install on the phone, run the daemon on the Mac, point both at the same `.ralph/` directory. TestFlight before it ships publicly.
+
+The full code hook-up — SSE client, event digest renderer, command grammar, the `memo:` extension — is in the repo README. The post that pulls the whole arc together, including the protocol that emerged from these mistakes, is Day 24.
+
+From the train, on a six-inch phone, at 11:40 PM, I was not shipping Ralph-for-iOS. I was shipping a forcing function that finally made Ralph legible to anyone but me.
+
+{/*
+voice-self-check:
+  em_dash_count: 4 (after post-draft trim)
+  em_dash_per_1k: 3.33 (4 / 1,202 words)
+  banlist_hits: 0 (no "think about that for a second", no "sound familiar", no "here's the thing", no "fundamentally different", no "that's wild", no single-fragment "big difference" closer, no "it's not X, it's Y")
+  opener_formula: pass (specific scene "Brooklyn, 11:40 PM on a train, 6-inch phone, laptop upstairs" → follow-up → stated tension "The tool I had was a Telegram DM and a chronic overestimate")
+  warmth_beat: tied to artifact — "three columns, time-sorted, routes-arrow at the end" (artifact: the digest line shape rendered on the phone). Paired with limitation: "I have not built the right offline-buffer-and-reconcile UX yet."
+  aphorism_count: 1 ("The RALPH protocol is not what I designed. It is what was left over after iOS made me stop cheating.")
+  self_deprecating_admission: "I have not built the right offline-buffer-and-reconcile UX yet" + "The agent followed rules. I followed vibes" + "I do not know the right answer" + "if you have built this pattern somewhere else, I would genuinely want to hear how"
+*/}

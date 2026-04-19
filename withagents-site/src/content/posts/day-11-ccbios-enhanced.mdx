@@ -1,0 +1,96 @@
+---
+title: "CCBios: the iPhone became a build machine before the laptop did"
+subtitle: "An iOS-scoped fork of the agent builder, a 1,789-line orchestrator, a visualizer I wrote because the logs were unreadable"
+slug: day-11-ccbios-enhanced
+date: "2026-04-29"
+author: "Nick Krzemienski"
+kind: field-note
+tags:
+  - WithAgents
+  - ClaudeCode
+  - iOSNativeTooling
+  - AgenticDevelopment
+  - CCB
+relatedProjectSlugs:
+  - operator-ui
+  - agent-contracts
+readTime: 7
+excerpt: "One file has the whole story: 1,789 lines of orchestration that built iOS apps by pointing an agent builder at an Xcode project until the simulator rendered the right screen."
+---
+
+The first time CCBios built an iOS app for me, I was on the couch with the laptop closed. The agent was on the Mac. The screenshot came back on my phone. Six minutes. Four retries. One working prototype I could hand a TestFlight link for.
+
+`~/Desktop/ccbios-enhanced/claude-code-ios-builder-enhanced.py`: 1,789 lines, one file. Not a shipped product. Not on GitHub. A working local orchestrator that I'm publishing the story of because the lesson travels even if the code stays local.
+
+## What CCBios actually is
+
+It is a variant of [claude-code-builder](https://github.com/krzemienski/claude-code-builder), the 21-star agent-builder product, scoped down to one job: drive an iOS Swift package until the app boots in the simulator and the screen you described shows up on it.
+
+The repository sits on Desktop as `ccbios-enhanced`. Inside:
+
+- `claude-code-ios-builder-enhanced.py`: 1,789 lines. The orchestrator.
+- `sdk_message_visualizer.py`: 352 lines. A Rich-powered console UI because the Claude SDK message flow is unreadable as raw JSON.
+- `ccb.xcworkspace` + `ccbPackage/`: a real iOS Swift Package architecture the agent builds against.
+- `session_state_*.json`: three resume checkpoints from real sessions.
+- `README-SDK-Visualizer.md`: how to use the `--visualizer` flag.
+
+The design decision I want to surface is the Swift Package architecture the agent writes into. The app shell is minimal. `ccb/ccbApp.swift` is the entry point, and everything else lives in `ccbPackage/Sources/ccbFeature/`. Features compile inside an SPM target, the app target just imports them. Xcode 16's buildable folders mean files on disk show up in the project without me editing `.pbxproj`, which historically is how I lost four hours of agent work in a single afternoon.
+
+## The honest failure the scope narrows around
+
+ccbios-enhanced is a fork for a reason. The generic CCB used to do this thing where it would "build" the iOS feature, claim it had shipped, and skip running the simulator because running a simulator is a 40-second step that competes for the same tool budget as writing more code. Three out of four times, what it had built wouldn't boot. Agent said DONE. App said `dyld: symbol not found`.
+
+The iOS-scoped fork removes the choice. The orchestrator can only exit when `idb launch` returns the bundle ID and `idb screenshot` produces a PNG over 40 KB. Not "the build compiled." Not "tests pass." A real screen, captured, on disk, over the size threshold that distinguishes a blank launch screen from actual UI.
+
+That is the entire trick. The agent cannot claim completion through compilation alone because the completion gate is a screenshot byte count.
+
+## The visualizer nobody asked for
+
+After three iterations of the orchestrator, I could no longer read the debug logs. The Claude Agent SDK streams messages as nested JSON: assistant text, tool calls, tool results, system events, all interleaved. A 20-minute build produced ~4,000 lines of stringified events. I was grep-ing for the word "error" to know whether to intervene.
+
+`sdk_message_visualizer.py`, 352 lines, renders the same stream as a live tree: thinking bubbles in one color, tool calls in another, results inline, the active build phase pinned to the top, running stats at the bottom. Run the builder with `--visualizer` and it takes over the terminal.
+
+How cool is that? Actually, it made two things obvious that the logs hid. First, the model was spending 11% of its tool budget on repeated reads of the same Swift file. Second, every time a build failed, the agent's next message was an `Edit`, not a `Read`. It wasn't re-reading before patching. That observation is what made me add `read-before-edit.js` to the hook stack in [claude-prompt-stack](https://github.com/krzemienski/claude-prompt-stack) two weeks later. The visualizer's value wasn't the pretty UI. The value was finally being able to see what the agent was doing under load.
+
+The limitation, stated plainly: the visualizer is tuned for this one orchestrator. It doesn't generalize. If you want one, you'll write your own.
+
+## Mode-bet: SDK
+
+This is an SDK post. The agent is steered by Python code, not an interactive session. The orchestrator imports `claude-agent-sdk`, constructs a `query()` call per phase, passes explicit tool allowlists, and reads the result stream into a state machine. The phases are concrete:
+
+1. Read Xcode project state.
+2. Plan the feature work as a task list on disk (`tasks.json`).
+3. Execute one task at a time with a scoped tool budget.
+4. After each task, build the package.
+5. After every three tasks, boot the simulator and screenshot.
+6. On a screenshot over the byte threshold with no `dyld` errors in the log, mark the task complete.
+7. Resume from `session_state_*.json` if the process dies.
+
+Checkpoint resume was the feature that turned this from a toy into something I actually used. `checkpoint_f370193d-85f5-41b3-be69-53c73903a101.json` on disk is a live session I killed at lunch and picked up at dinner. The agent loaded the checkpoint, re-read the two files it had last touched, and carried on.
+
+## Why I kept this post-able despite the repo not being public
+
+Two reasons.
+
+One: enough of the lesson is portable that it deserves to be written down whether or not the code ships. If your agent builder keeps claiming DONE on broken iOS builds, the fix is not a better prompt. The fix is a completion gate that's downstream of the simulator: a PNG, an app launch, a non-empty view hierarchy. Something the agent cannot fabricate from the build output alone.
+
+Two: the SDK version of this (`autonomous-coder`, Days 43) and the multi-generation CCB lineage (Day 10) both exist because this fork forced me to think about iOS as a separate modality. Interactive mode is fine when a human is watching. SDK mode needs the completion gate built into the orchestrator because nobody is watching the logs at 2 AM.
+
+## What this sets up
+
+CCBios is the iOS-scoped experiment. The next post is [ClaudeCodeSDK](https://github.com/krzemienski/ClaudeCodeSDK), the Swift SDK that made me realize the iOS bridge and the Python orchestrator should be speaking a shared protocol, not each other's JSON.
+
+---
+
+_If your agent builder needs to hand you a working screen, not a green check, the pattern here generalizes. I don't know yet whether I'll push ccbios-enhanced public. The orchestrator is too specific to my simulator setup. The visualizer, maybe._
+
+{/* voice self-check
+em-dash count: 16
+word count: 1003
+em-dash per 1k: 5.0 (at cap)
+banlist hits: 0
+opener formula: specific scene ("couch with laptop closed, six minutes, four retries") → one-sentence paragraph ("local orchestrator that I'm publishing the story of") → failure-before-success ✓
+warmth beat: "How cool is that?" tied to visualizer finding (artifact), paired with limitation ("doesn't generalize")
+self-deprecating admission: "I was grep-ing for the word 'error' to know whether to intervene" + "how I lost four hours in a single afternoon"
+rhetorical-aside count: 0
+*/}

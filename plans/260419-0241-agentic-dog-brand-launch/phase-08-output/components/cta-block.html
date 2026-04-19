@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WithAgents — CTA Block</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-void:        #040404;
+    --panel-1:        #0A0A0D;
+    --panel-2:        #111116;
+    --panel-3:        #15151C;
+    --text-primary:   #F5F5F7;
+    --text-muted:     #A1A1AA;
+    --accent:         #8B5CF6;
+    --accent-alt:     #C084FC;
+    --accent-hot:     #E879F9;
+    --accent-lime:    #A3E635;
+    --border:         rgba(255,255,255,0.10);
+    --accent-wash:    rgba(139,92,246,0.12);
+    --font-display:   'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+    --font-body:      'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-mono:      'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    --radius-sm:      4px;
+    --radius-md:      8px;
+    --space-xs:       6px;
+    --space-sm:       12px;
+    --space-md:       20px;
+    --space-lg:       32px;
+    --space-xl:       48px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg-void);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    padding: var(--space-xl);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .page-title { font-family: var(--font-display); font-size: 11px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--text-muted); margin-bottom: var(--space-lg); }
+  .variant-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: .10em; text-transform: uppercase; color: var(--text-muted); margin-bottom: var(--space-sm); margin-top: var(--space-xl); display: block; }
+  .variant-label:first-of-type { margin-top: 0; }
+
+  /* ── CTA Base ── */
+  .cta-block {
+    background: var(--panel-1);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-lg) var(--space-xl);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Accent wash top stripe */
+  .cta-block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, var(--accent) 40%, var(--accent-alt) 60%, transparent 100%);
+    opacity: 0.35;
+  }
+
+  /* Subtle radial wash behind content */
+  .cta-block::after {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -40px;
+    width: 300px;
+    height: 200px;
+    background: radial-gradient(ellipse, rgba(139,92,246,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-block__inner {
+    position: relative;
+    z-index: 1;
+  }
+
+  .cta-block__headline {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: -0.02em;
+    line-height: 1.25;
+    margin-bottom: var(--space-xs);
+  }
+
+  .cta-block__pitch {
+    font-size: 15px;
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 560px;
+    margin-bottom: var(--space-md);
+  }
+
+  /* ── Inline form variant ── */
+  .cta-form {
+    display: flex;
+    gap: var(--space-xs);
+    max-width: 480px;
+    flex-wrap: wrap;
+  }
+
+  .cta-form__input {
+    flex: 1;
+    min-width: 200px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--text-primary);
+    background: var(--panel-2);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: var(--radius-md);
+    padding: 9px var(--space-sm);
+    outline: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .cta-form__input { transition: border-color 150ms cubic-bezier(0.4,0,0.2,1); }
+  }
+
+  .cta-form__input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.6;
+  }
+
+  .cta-form__input:focus {
+    border-color: rgba(139,92,246,0.50);
+    outline: none;
+  }
+
+  .cta-form__input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 0;
+    border-color: transparent;
+  }
+
+  .cta-form__btn {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 9px var(--space-md);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .cta-form__btn { transition: background 150ms cubic-bezier(0.4,0,0.2,1), box-shadow 150ms cubic-bezier(0.4,0,0.2,1); }
+  }
+
+  .cta-form__btn:hover {
+    background: var(--accent-alt);
+    box-shadow: 0 0 16px rgba(139,92,246,0.28);
+  }
+
+  .cta-form__btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* ── Button-only variant ── */
+  .cta-actions {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .cta-btn-primary {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius-md);
+    padding: 10px var(--space-md);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .cta-btn-primary { transition: background 150ms cubic-bezier(0.4,0,0.2,1); }
+  }
+
+  .cta-btn-primary:hover { background: var(--accent-alt); }
+  .cta-btn-primary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .cta-btn-secondary {
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    padding: 10px 0;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .cta-btn-secondary { transition: color 150ms cubic-bezier(0.4,0,0.2,1); }
+  }
+
+  .cta-btn-secondary:hover { color: var(--text-primary); }
+  .cta-btn-secondary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: var(--radius-sm); }
+
+  /* ── Footer CTA (minimal) ── */
+  .cta-block--minimal {
+    background: transparent;
+    border-color: rgba(139,92,246,0.16);
+    padding: var(--space-md) var(--space-lg);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+  }
+
+  .cta-block--minimal::before { opacity: 0.20; }
+  .cta-block--minimal::after { display: none; }
+
+  .cta-block--minimal .cta-block__headline {
+    font-size: 16px;
+    margin-bottom: 0;
+  }
+
+  /* ── Dense accent variant (homepage hero bottom) ── */
+  .cta-block--accent {
+    background: linear-gradient(135deg, var(--panel-2) 0%, color-mix(in srgb, var(--panel-2) 80%, var(--accent) 20%) 100%);
+    border-color: rgba(139,92,246,0.28);
+  }
+</style>
+</head>
+<body>
+
+<p class="page-title">withagents.dev — CTA Block</p>
+
+<!-- ── Variant 1: Inline form ── -->
+<span class="variant-label">Variant 1 — Inline form</span>
+<section class="cta-block" aria-label="Start a conversation">
+  <div class="cta-block__inner">
+    <h2 class="cta-block__headline">Start a conversation</h2>
+    <p class="cta-block__pitch">
+      Selected areas of applied work. If you're working on agent systems that need to hold up in production, let's talk.
+    </p>
+    <form class="cta-form" action="/contact" method="post" aria-label="Contact form">
+      <label for="cta-email" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)">Email address</label>
+      <input
+        id="cta-email"
+        class="cta-form__input"
+        type="email"
+        name="email"
+        placeholder="your@email.com"
+        autocomplete="email"
+        required
+      >
+      <button class="cta-form__btn" type="submit">Get in touch</button>
+    </form>
+  </div>
+</section>
+
+<!-- ── Variant 2: Button only ── -->
+<span class="variant-label">Variant 2 — Button only</span>
+<section class="cta-block" aria-label="Learn more">
+  <div class="cta-block__inner">
+    <h2 class="cta-block__headline">Applied systems, in practice</h2>
+    <p class="cta-block__pitch">
+      Context persistence. Operator interfaces. Agent orchestration for high-signal internal tasks. Quiet collaboration on selected areas.
+    </p>
+    <div class="cta-actions">
+      <a href="/about#contact" class="cta-btn-primary">Start a conversation</a>
+      <a href="/about" class="cta-btn-secondary">
+        Learn about the work
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden="true">
+          <path d="M2 6.5h9M8 3.5l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Variant 3: Accent background ── -->
+<span class="variant-label">Variant 3 — Accent wash background</span>
+<section class="cta-block cta-block--accent" aria-label="Contact">
+  <div class="cta-block__inner">
+    <h2 class="cta-block__headline">Quiet collaboration on selected areas</h2>
+    <p class="cta-block__pitch">
+      Internal copilots. Human-in-the-loop operator UX. Knowledge interfaces. If the work fits, let's find out.
+    </p>
+    <div class="cta-actions">
+      <a href="/about#contact" class="cta-btn-primary">Start a conversation</a>
+    </div>
+  </div>
+</section>
+
+<!-- ── Variant 4: Minimal / inline ── -->
+<span class="variant-label">Variant 4 — Minimal inline (footer / between-content)</span>
+<section class="cta-block cta-block--minimal" aria-label="Get in touch">
+  <div>
+    <h2 class="cta-block__headline">Interested in working together?</h2>
+    <p style="font-size:13px;color:var(--text-muted);margin-top:4px;">Selected areas · Quiet collaboration</p>
+  </div>
+  <a href="/about#contact" class="cta-btn-primary" style="flex-shrink:0;">Start a conversation</a>
+</section>
+
+</body>
+</html>

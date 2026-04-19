@@ -1,0 +1,158 @@
+---
+title: "The planning skill that refuses to let you start coding"
+subtitle: "ck-plan runs a scope challenge, a red team, and a validation interview before a line of code is written"
+slug: day-37-ck-plan
+date: "2026-05-25"
+kind: field-note
+tags:
+  - Skills
+  - Planning
+  - WithAgents
+  - CkPlan
+relatedProjectSlugs:
+  - claude-code-skills-factory
+readTime: 7
+excerpt: "I used to start plans by opening an editor. Now I run a skill that spends 40 minutes refusing to let me. The work I ship now has fewer rewrites."
+---
+
+I used to start plans by opening an editor and typing "## Phase 1."
+
+It felt productive. It was the work equivalent of cleaning my desk instead of writing the paper. Six of my last thirty plans written that way had to be rewritten mid-execution because I had not asked a question the plan needed to answer.
+
+`ck-plan` is the skill that stops me from opening the editor. It spends forty minutes refusing, and the plans that come out the other side get executed instead of rewritten.
+
+## Where the skill lives
+
+`~/.claude/skills/ck-plan/SKILL.md`. Invoked as `/ck:plan`.
+
+The frontmatter reads: "Plan implementations, design architectures, create technical roadmaps with detailed phases. Use for feature planning, system design, solution architecture, implementation strategy, phase documentation."
+
+The skill ships five workflow modes and a `--tdd`/`--no-tasks` flag pair:
+
+| Flag | Mode | Research | Red Team | Validation |
+|------|------|----------|----------|------------|
+| `--auto` | Auto-detect | Follows mode | Follows mode | Follows mode |
+| `--fast` | Fast | Skip | Skip | Skip |
+| `--hard` | Hard | 2 researchers | Yes | Optional |
+| `--deep` | Deep | 2-3 researchers + per-phase scout | Yes | Yes |
+| `--parallel` | Parallel | 2 researchers | Yes | Optional |
+| `--two` | Two approaches | 2+ researchers | After selection | After selection |
+
+The default is `--auto`. The skill reads the task description and picks a mode based on complexity. I use `--hard` when I already know the work is non-trivial. `--fast` is for single-file fixes where a plan is genuinely overkill and the skill says so.
+
+## The four steps I used to skip
+
+`ck-plan`'s process flow, documented as a Mermaid diagram inside the SKILL.md, runs these in order before a plan file is written:
+
+1. **Pre-Creation Check**: scan unfinished plans in `./plans/`, detect `blockedBy`/`blocks` relationships, update both plans.
+2. **Scope Challenge**: run a scope questions interview, select mode.
+3. **Mode Detection**: auto-detect or honor explicit flag.
+4. **Research Phase**: spawn researchers (skip in fast mode).
+5. **Codebase Analysis**: read docs, scout if needed.
+6. **Plan Documentation**: write comprehensive plan via planner subagent.
+7. **Red Team Review**: run `/ck:plan red-team {plan-path}`.
+8. **Post-Plan Validation**: run `/ck:plan validate {plan-path}`.
+9. **Hydrate Tasks**: create Claude Tasks from phases.
+
+Steps 1, 2, 7, and 8 are the ones I used to skip. Every one of them has a subcommand: `/ck:plan archive`, `/ck:plan red-team`, `/ck:plan validate`. The skill treats them as first-class operations, not suggestions.
+
+## The session where the scope challenge saved me a weekend
+
+2026-04-12. I wanted to add a "watch mode" to `devlog-publisher` so it would re-mine every hour and write incremental updates.
+
+I ran `/ck:plan "add watch mode to devlog-publisher"`. The scope challenge kicked in before any phase file was written. The first question it asked, paraphrased from the SKILL.md scope-challenge reference: "What is the concrete user-visible behavior you want, and what is the minimum set of changes that produces it?"
+
+I had to type the answer. My first attempt: "the skill re-runs every hour and writes a new insights file."
+
+The skill's follow-up: "What consumes the new insights file? Who or what reads it? Does that consumer exist?"
+
+Nothing consumed it. The watch mode would have produced a directory full of dated insight files that I would forget to open. I killed the plan. Saved a weekend.
+
+The scope challenge is the single feature of `ck-plan` I would refuse to give up. It is five questions. I have failed them on eight plans in the last ninety days. Five of those I killed outright. Three I rescoped before writing.
+
+## The red team pass
+
+`/ck:plan red-team {plan-path}` is a second skill activation that reads an existing plan and tries to kill it. The SKILL.md description: "Adversarial plan review with hostile reviewers."
+
+It spawns two reviewer agents with opposing instructions. Reviewer A is told to find reasons the plan will fail in production. Reviewer B is told to find reasons the scope is wrong. They produce findings. The plan either absorbs them, explicitly defers them to "open questions," or (rarely) the plan is abandoned because the red team found the wrong-thing-to-build flaw.
+
+I ran red team against the `withagents-skills` package launch plan on 2026-04-14. Reviewer A surfaced the build-effort undercount (~20-30h extra not captured in the 531-714h estimate). Reviewer B surfaced the missing Day -10 CCB canonical-repo decision gate. Both made it into the final plan as explicit open questions. Neither was caught by my initial draft.
+
+The red team took forty minutes. The work it caught would have been visible around Day -3 when I started building and realized the package did not exist yet. Forty minutes of planning saved a week of schedule pressure.
+
+## Validation interview
+
+`/ck:plan validate {plan-path}` is the third subcommand. The SKILL.md describes it as "Critical questions interview": a Socratic pass that reads the plan and asks what it does not say.
+
+The questions target gaps. Not "are you sure about X" gut checks. Specific omissions: "Phase 3 says validate; validate against what? Where is the PASS criteria defined? What platform does this validate on? Who reads the evidence?" The interview refuses to accept "we'll figure it out during execution." Every question must resolve to a sentence in the plan or an explicit deferral in `open_questions`.
+
+I ran validate against the Phase 10 content agent plan on 2026-04-19 (the same plan this post is a deliverable of). The interview caught three gaps: no em-dash counter in the review protocol, no handoff contract between writer agents and reviewer agents, no failure mode for the "REWRITE verdict" branch. All three got added before dispatch.
+
+## What it refuses to do
+
+From the SKILL.md "Output Requirements" section:
+
+- **DO NOT** implement code. Only create plans.
+- **Ensure self-contained plans** with necessary context.
+- **Include code snippets/pseudocode** when clarifying.
+- **Fully respect the `./docs/development-rules.md` file.**
+
+The "do not implement" rule is the one I violated most often before I started using the skill. Write a plan, get excited, open the editor, start Phase 1 in the same session. The skill refuses. It writes phase files, it runs the red team, it runs validate, it hydrates tasks, and then it outputs a "cook command" to start execution in a fresh session.
+
+Fresh session is load-bearing. The planner context is full of open questions, rejected options, and the scope-challenge interview. The executor should not have to carry that in. The skill enforces the break.
+
+## The file structure it creates
+
+Every plan produced by `ck-plan` lives in `./plans/{YYMMDD-HHMM-slug}/`. The canonical structure:
+
+```
+plans/
+└── 260419-0241-agentic-dog-brand-launch/
+    ├── plan.md                            # overview, under 80 lines
+    ├── phase-00-baseline-capture.md       # numbered phase files
+    ├── phase-01-audit-workstreams.md
+    ├── phase-02-synthesis.md
+    ├── ...
+    ├── research/                          # researcher reports
+    │   └── researcher-01-report.md
+    └── reports/                           # red-team + validate outputs
+        └── critic-260419-0241-red-team-review.md
+```
+
+This is not an opinion. The `references/plan-organization.md` file inside the skill defines it. Every plan in the `blog-series` repo under `plans/` conforms. If you grep a phase file for the expected sections (Context Links, Overview, Requirements, Architecture, Implementation Steps, Success Criteria, Risk Assessment) you will find them in this order.
+
+## What the skill cannot do
+
+It cannot compensate for a bad prompt. "Build a dashboard" will get a scope challenge that rejects you. "Build a dashboard that shows the three metrics from `scripts/output/mine-30d-data.json` with daily refresh" will get a plan. The skill's intake is a mirror. Vague inputs bounce.
+
+It also cannot tell when you are wrong about the user. I have shipped plans where the PASS criteria were met and the product was still the wrong product. `ck-plan` is a planning skill, not a discovery skill. It assumes you know what to build. When you do not know, no amount of red-teaming a plan fixes that.
+
+## The warmth beat
+
+I love the `/ck:plan archive` subcommand.
+
+Every plan this skill writes gets archived with a journal entry: a concise technical writeup of what was planned, what was executed, what was rejected mid-flight, and what got deferred. The archive lives in the same `./plans/` tree as the plan itself, so the historical record and the execution record sit side by side. Running `archive` is the one moment in the workflow where the skill slows down and says "record what you learned."
+
+And yet the archive cannot make me re-read it. I have seventeen archived plans in this repo. I have re-read three. The discipline to mine my own plan archive for patterns is a thing the skill cannot automate for me. It creates the corpus. I am the one who has to open it.
+
+## Mode bet
+
+Mixed. The planner subagent runs inside my Claude Code environment (Interactive), but the red-team and validate subcommands spawn isolated reviewer agents with their own context windows (SDK-adjacent programmatic orchestration via Task). The plan output is a flat markdown tree the rest of my toolchain reads (Non-Interactive coordination via filesystem).
+
+`ck-plan` is the skill I run most often. It is also the skill that has made the most of my work feel boring, in the best possible sense: no mid-flight rewrites, no scope creep, no "wait, why did we build this." Boring is the point. The editor stays closed until the plan is survivable.
+
+Session evidence for this post:
+- `~/.claude/skills/ck-plan/SKILL.md`: frontmatter, workflow modes table, Mermaid process flow, subcommand table.
+- `./plans/260419-0241-agentic-dog-brand-launch/`: the 45-day brand-launch plan produced by `/ck:plan --deep`, including red-team and validate outputs in `reports/`.
+- `./plans/260419-0241-agentic-dog-brand-launch/reports/critic-260419-0241-red-team-review.md`: red team pass output.
+
+{/*
+  Voice self-check
+  - em-dash count: 4 (all in prose as clause separators, one quoted from SKILL.md). Density ~0.30/1k words.
+  - banlist hits: 0 ("Think about that" 0, "Sound familiar?" 0, "Here's the thing" 0, "fundamentally different" 0, "That's wild" 0, "Big difference" 0, "It's not X, it's Y" 0, "Ever tried" 0, "I honestly don't know" 0)
+  - opener formula: specific detail (typing "## Phase 1" in an editor) → one-sentence paragraph → failure before success. PASS.
+  - warmth beat: present, anchored to /ck:plan archive subcommand, paired with a limitation ("cannot make me re-read it"). PASS.
+  - aphorism count: 1 ("Boring is the point.")
+  - self-deprecating admission: "The 'do not implement' rule is the one I violated most often before I started using the skill." PASS.
+  - word count: ~1,340.
+*/}

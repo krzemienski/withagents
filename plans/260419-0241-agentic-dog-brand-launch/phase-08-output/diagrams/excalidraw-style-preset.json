@@ -1,0 +1,161 @@
+{
+  "_readme": [
+    "WithAgents Excalidraw Style Preset — Hyper-black + Ultraviolet accent.",
+    "",
+    "HOW TO APPLY:",
+    "1. Open Excalidraw (excalidraw.com or desktop app).",
+    "2. Create or open a drawing.",
+    "3. Open the browser console (F12 → Console).",
+    "4. Paste and run: excalidrawAPI.updateScene({ appState: PRESET.appState })",
+    "   replacing PRESET with the parsed JSON of this file.",
+    "5. Alternatively: paste the appState values manually via the Excalidraw",
+    "   'Load scene' flow if you export a full .excalidraw file using the",
+    "   'elements' array below as your starting canvas.",
+    "",
+    "For the desktop app (Obsidian Excalidraw plugin, Notion, etc.):",
+    "- Create a new .excalidraw file and replace its JSON content with this file.",
+    "- The appState block controls background, theme, and default stroke preferences.",
+    "",
+    "ACCENT SWAP:",
+    "- Replace all '#8B5CF6' with your chosen accent hex to switch palette.",
+    "- See _accentSwap block at the bottom for ready-made replacements."
+  ],
+
+  "type": "excalidraw",
+  "version": 2,
+  "source": "withagents.dev",
+
+  "appState": {
+    "viewBackgroundColor": "#040404",
+    "theme": "dark",
+    "gridSize": null,
+    "gridColor": {
+      "Bold": "rgba(255,255,255,0.06)",
+      "Regular": "rgba(255,255,255,0.03)"
+    },
+    "scrollX": 0,
+    "scrollY": 0,
+    "zoom": { "value": 1 },
+    "currentItemStrokeColor": "#8B5CF6",
+    "currentItemBackgroundColor": "#0A0A0D",
+    "currentItemFillStyle": "solid",
+    "currentItemStrokeWidth": 1,
+    "currentItemStrokeStyle": "solid",
+    "currentItemRoughness": 0,
+    "currentItemOpacity": 100,
+    "currentItemFontFamily": 3,
+    "currentItemFontSize": 16,
+    "currentItemTextAlign": "left",
+    "currentItemStartArrowhead": null,
+    "currentItemEndArrowhead": "arrow",
+    "currentItemArrowType": "elbow",
+    "currentItemRoundness": "round",
+    "exportBackground": true,
+    "exportEmbedScene": false,
+    "exportScale": 2,
+    "openSidebar": null,
+    "defaultSidebarDockedPreference": false,
+    "showWelcomeScreen": false,
+    "objectsSnapModeEnabled": true,
+    "snapToGridEnabled": false
+  },
+
+  "elements": [],
+
+  "files": {},
+
+  "_defaultElementStyles": {
+    "_note": "These are the recommended per-element styles to use when drawing on the WithAgents hyper-black canvas.",
+    "primaryNode": {
+      "strokeColor": "#8B5CF6",
+      "backgroundColor": "#0A0A0D",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "roughness": 0,
+      "roundness": { "type": 3 },
+      "fontFamily": 3,
+      "fontSize": 16,
+      "textColor": "#F5F5F7"
+    },
+    "secondaryNode": {
+      "strokeColor": "rgba(255,255,255,0.10)",
+      "backgroundColor": "#111116",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "roughness": 0,
+      "roundness": { "type": 3 },
+      "fontFamily": 3,
+      "fontSize": 16,
+      "textColor": "#F5F5F7"
+    },
+    "tertiaryNode": {
+      "strokeColor": "rgba(255,255,255,0.10)",
+      "backgroundColor": "#15151C",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "roughness": 0,
+      "roundness": { "type": 3 },
+      "fontFamily": 3,
+      "fontSize": 14,
+      "textColor": "#A1A1AA"
+    },
+    "primaryArrow": {
+      "strokeColor": "#8B5CF6",
+      "strokeWidth": 1.5,
+      "strokeStyle": "solid",
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "roughness": 0
+    },
+    "secondaryArrow": {
+      "strokeColor": "rgba(255,255,255,0.30)",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "roughness": 0
+    },
+    "deviationArrow": {
+      "_note": "Magenta hot — contrast/deviation paths only, sparingly",
+      "strokeColor": "#E879F9",
+      "strokeWidth": 1,
+      "strokeStyle": "dashed",
+      "startArrowhead": null,
+      "endArrowhead": "arrow",
+      "roughness": 0
+    },
+    "successState": {
+      "_note": "Lime — reserved for hit/success/true states only, never decorative",
+      "strokeColor": "#A3E635",
+      "backgroundColor": "#0A0A0D",
+      "fillStyle": "solid",
+      "strokeWidth": 1.5,
+      "roughness": 0
+    },
+    "label": {
+      "fontFamily": 3,
+      "fontSize": 13,
+      "textColor": "#A1A1AA",
+      "strokeColor": "transparent",
+      "backgroundColor": "transparent"
+    },
+    "groupFrame": {
+      "strokeColor": "rgba(139,92,246,0.25)",
+      "backgroundColor": "#111116",
+      "fillStyle": "solid",
+      "strokeWidth": 1,
+      "strokeStyle": "solid",
+      "roughness": 0,
+      "roundness": { "type": 3 }
+    }
+  },
+
+  "_accentSwap": {
+    "_note": "Replace currentItemStrokeColor and all '#8B5CF6' references with these values to switch accent palette.",
+    "Magenta":    { "primary": "#A855F7", "hot": "#FB7185", "border": "rgba(244,114,182,0.14)" },
+    "LimeSignal": { "primary": "#7C3AED", "hot": "#D946EF", "border": "rgba(163,230,53,0.14)" },
+    "Orchid":     { "primary": "#9333EA", "hot": "#E879F9", "border": "rgba(255,255,255,0.08)" },
+    "Plasma":     { "primary": "#9333EA", "hot": "#F472B6", "border": "rgba(236,72,153,0.12)" },
+    "MonoHyper":  { "primary": "#7C3AED", "hot": "#C084FC", "border": "rgba(255,255,255,0.08)" }
+  }
+}

@@ -1,0 +1,24 @@
+---
+interface Props {
+  href?: string;
+  class?: string;
+}
+const { href, class: cls = '' } = Astro.props;
+const Tag = href ? 'a' : 'div';
+---
+
+<Tag
+  href={href}
+  class={`block group transition-colors duration-300 ${cls}`}
+  style="background:var(--color-panel-1);border:1px solid var(--color-hair);"
+  data-card
+>
+  <slot />
+</Tag>
+
+<style>
+  [data-card]:hover {
+    background: var(--color-panel-2);
+    border-color: var(--color-border);
+  }
+</style>
