@@ -26,6 +26,7 @@ DESIGN.md                 — Visual design system ("Midnight Observatory")
 |------|--------|-------|
 | Homepage | Deployed | `/` |
 | About | Deployed | `/about` |
+| Schedule | Deployed | `/schedule` |
 | Post 01–11 | Deployed | `/posts/post-01-*` through `/posts/post-11-*` |
 | Post 12–21 | Deployed | `/posts/post-12-*` through `/posts/post-21-*` |
 | Post 22–31 | Deployed | `/posts/post-22-*` through `/posts/post-31-*` |
@@ -42,20 +43,30 @@ DESIGN.md                 — Visual design system ("Midnight Observatory")
 - [x] Vercel Analytics + Speed Insights
 - [x] JSON-LD structured data on posts
 - [x] OG meta tags
-- [x] Deploy to Vercel (SSO-protected; disable in dashboard for public access)
+- [x] Deploy to Vercel
 - [x] Write posts 22-61 from session mining (40 new posts)
 - [x] Social media content for all posts (twitter, linkedin, newsletter)
-- [ ] Generate hero images for posts 12-61 via Stitch MCP
-- [ ] Generate visual assets (social cards) for posts 12-61
+- [x] Hero card images for all 61 posts
+- [x] Publishing schedule page (`/schedule`)
+- [x] Companion repos for all 61 posts (61/61 validated — see plans/reports/functional-validation-260306-all-repos.md)
+- [x] Push all repos to GitHub (61/61 — 11 existed + 50 created)
+- [ ] Post-repo integration (inline code links in posts)
+- [ ] Post-specific social content rewrite
+- [ ] SEO internal cross-links between related posts
 - [ ] Custom domain assignment
-- [ ] Package pipeline as reusable skill
 
 ## Stats
 - **61** published posts
-- **425,000+** words across all posts
-- **21** companion repositories
-- **8,481** AI coding sessions analyzed
+- **429,000+** words across all posts
+- **61** companion repositories (all validated — 44 Python, 6 Swift, 6 TypeScript, 5 meta)
+- **4,500** AI coding sessions analyzed
 - **90** days of production development
+
+## Publishing Schedule
+- **Cadence:** Tue & Thu at 9 AM ET
+- **Waves:** 6 thematic waves (see `/schedule` page)
+- **Start:** March 10, 2026
+- **End:** July 10, 2026
 
 ## Creative Freedom
 - Hero images: gradient dark backgrounds with dot grid overlays, category pills

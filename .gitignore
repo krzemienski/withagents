@@ -7,3 +7,16 @@ out/
 .playwright-mcp/
 *.png
 *.pdf
+
+# Credentials — belt-and-suspenders even though .env* covers these
+linkedin-tokens.json
+*-tokens.json
+*.secrets.json
+
+# Working scratchpads
+.planning/
+.prompts/
+.remember/
+.vf/
+e2e-evidence/
+queue/

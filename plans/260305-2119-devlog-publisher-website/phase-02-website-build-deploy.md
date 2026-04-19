@@ -94,7 +94,7 @@ site/
    - Post grid with cards (hero thumbnail, title, excerpt, reading time, tags)
    - Sort by post number (series order)
    - 4 reading paths from INDEX.md (Practitioner, Builder, Architect, Experience-level)
-   - Series statistics (22,489 words, 33 diagrams, 8,481 sessions)
+   - Series statistics (22,489 words, 33 diagrams, 4,500 sessions)
 
 4. **Build post pages**
    - MDX rendering with custom components

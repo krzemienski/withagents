@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  blog-series-ai social scheduler — runs publish-scheduled.js every 5 minutes
+  while logged in. Reads pending rows from Supabase, posts them to X/LinkedIn.
+
+  Install:
+    1. Copy to ~/Library/LaunchAgents/
+       cp scripts/launchd/com.nick.blog-social-scheduler.plist ~/Library/LaunchAgents/
+    2. Edit the plist: replace /Users/nick/Desktop/blog-series with the actual repo path
+       (already correct if you keep the repo there)
+    3. Set env vars in your shell profile (~/.zshrc) so launchd inherits them:
+       export SUPABASE_URL=...
+       export SUPABASE_SERVICE_ROLE_KEY=...
+       export X_API_KEY=...
+       export X_API_SECRET=...
+    4. Load:
+       launchctl load -w ~/Library/LaunchAgents/com.nick.blog-social-scheduler.plist
+    5. Verify:
+       launchctl list | grep blog-social
+       tail -f /tmp/blog-social-scheduler.log
+
+  Disable:
+       launchctl unload -w ~/Library/LaunchAgents/com.nick.blog-social-scheduler.plist
+
+  Note: launchd does NOT inherit shell env by default. The EnvironmentVariables
+  block below can be set explicitly, OR the script can read from a .env file.
+  This plist runs `node` via /opt/homebrew/bin/node (Apple Silicon Homebrew); change
+  to /usr/local/bin/node on Intel Macs.
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.nick.blog-social-scheduler</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/opt/homebrew/bin/node</string>
+    <string>/Users/nick/Desktop/blog-series/scripts/publish-scheduled.js</string>
+    <string>--limit</string>
+    <string>5</string>
+  </array>
+
+  <key>WorkingDirectory</key>
+  <string>/Users/nick/Desktop/blog-series</string>
+
+  <key>StartInterval</key>
+  <integer>300</integer>
+
+  <key>RunAtLoad</key>
+  <false/>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/blog-social-scheduler.log</string>
+
+  <key>StandardErrorPath</key>
+  <string>/tmp/blog-social-scheduler.err</string>
+
+  <!-- Set these here OR in your shell profile so launchd picks them up -->
+  <!--
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>SUPABASE_URL</key>
+    <string>https://YOUR_PROJECT.supabase.co</string>
+    <key>SUPABASE_SERVICE_ROLE_KEY</key>
+    <string>YOUR_SERVICE_ROLE_KEY</string>
+    <key>X_API_KEY</key>
+    <string>YOUR_X_API_KEY</string>
+    <key>X_API_SECRET</key>
+    <string>YOUR_X_API_SECRET</string>
+  </dict>
+  -->
+</dict>
+</plist>

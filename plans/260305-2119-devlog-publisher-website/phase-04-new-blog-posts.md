@@ -11,7 +11,7 @@ Generate 10 new blog posts with companion example repositories from the insights
 
 ## Context
 
-- Existing series: "Agentic Development: 10 Lessons from 8,481 AI Coding Sessions"
+- Existing series: "Agentic Development: 10 Lessons from 4,500 AI Coding Sessions"
 - Post format: 1,500-2,500 words, Mermaid diagrams, code snippets from real sessions
 - Each post has a companion repo with working, installable code
 - Visual assets: HTML hero images (1200x630), SVG charts, social cards

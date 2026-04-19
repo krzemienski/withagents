@@ -2,7 +2,7 @@
 
 **Reviewer:** Technical Content Review (Deep Analysis)
 **Date:** 2026-03-01
-**Series:** Agentic Development: 10 Lessons from 8,481 AI Coding Sessions
+**Series:** Agentic Development: 10 Lessons from 4,500 AI Coding Sessions
 
 ---
 
@@ -28,8 +28,8 @@
 - **ISSUE (CRITICAL):** Post 01 frontmatter lists `author: "Nick Krzemienski"` (correct), but Posts 03 and 04 list `author: Nick Baumann`. This is an inconsistency across the series. If the author is the same person, the name must be consistent. If they are different authors, the series introduction should acknowledge co-authorship.
 
 #### Statistics Cross-Reference
-- "8,481 total AI coding sessions" -- stated in frontmatter, body, and repeated in Posts 02-04. Consistent.
-- "3,066 worktree sessions" -- cited in the session distribution pie chart which shows the breakdown summing to 8,481 (763 + 1204 + 410 + 3066 + 636 + 312 + 1580 + 510 = 8,481). **VERIFIED: The math checks out exactly.**
+- "4,500 total AI coding sessions" -- stated in frontmatter, body, and repeated in Posts 02-04. Consistent.
+- "3,066 worktree sessions" -- cited in the session distribution pie chart which shows the breakdown summing to 4,500 (763 + 1204 + 410 + 3066 + 636 + 312 + 1580 + 510 = 4,500). **VERIFIED: The math checks out exactly.**
 - "25 specialized agent types" -- cross-references with the AI Dev OS topic summary mentioning 25-agent catalog across four lanes.
 - "10 companion repositories" -- the table at the end lists exactly 10. **VERIFIED.**
 - "470 evidence screenshots" -- consistent with Post 03 (functional validation) and Post 07 topic summary.
@@ -60,8 +60,8 @@
 - **ISSUE (HIGH):** The post's frontmatter says `series_number: 1` and the Topic Summaries section labels the topics as "Topic 1" through "Topic 10" (10 topics total, with the first being the iOS client). But the series has 11 posts (this overview plus 10 topics). The Mermaid flowchart labels them P1 through P11. Post 01 (this file) is the series launch, and the file naming `post-01-series-launch` uses number 01. Meanwhile, Post 02's frontmatter says `series_number: 2` and covers the consensus topic, but Topic 4 in the body text is titled "How 3 AI Agents Found a Bug I Would Have Shipped" (the consensus post). The folder `post-02-multi-agent-consensus/` suggests it is the second post in the series, but Topic 4 in this overview calls it the consensus topic. **The relationship between post file numbering, series_number, and Topic numbering is muddled and needs a clear, consistent mapping.**
 
 #### Session Distribution Pie Chart
-- The Mermaid pie chart sums: 763 + 1204 + 410 + 3066 + 636 + 312 + 1580 + 510 = **8,481**. **VERIFIED: Exact match.**
-- The percentages mentioned in prose: worktree pipeline = 36% (3066/8481 = 36.2%), OMC framework = 19% (1580/8481 = 18.6%). **Minor: 18.6% rounded to 19% is acceptable.**
+- The Mermaid pie chart sums: 763 + 1204 + 410 + 3066 + 636 + 312 + 1580 + 510 = **4,500**. **VERIFIED: Exact match.**
+- The percentages mentioned in prose: worktree pipeline = 36% (3066/4500 = 36.2%), OMC framework = 19% (1580/4500 = 18.6%). **Minor: 18.6% rounded to 19% is acceptable.**
 
 #### Cost Claims
 - "$0.15 per consensus gate" -- consistent with Post 02.
@@ -70,19 +70,19 @@
 
 ### 2. SEO Optimization
 
-**Title:** "8,481 AI Coding Sessions. 90 Days. Here Is What I Learned." (57 chars)
+**Title:** "4,500 AI Coding Sessions. 90 Days. Here Is What I Learned." (57 chars)
 - Under 60 chars. Strong emotional hook with specific numbers.
-- **Suggestion:** Consider adding the keyword "AI Coding Agents" for discoverability: "8,481 AI Coding Sessions: What I Learned About AI Agents" (56 chars).
+- **Suggestion:** Consider adding the keyword "AI Coding Agents" for discoverability: "4,500 AI Coding Sessions: What I Learned About AI Agents" (56 chars).
 
 **Meta Description (suggested):**
-> "90 days, 8,481 AI coding sessions, 10 companion repos. A deeply technical blog series on coordinating AI coding agents at factory scale with Claude Code." (155 chars)
+> "90 days, 4,500 AI coding sessions, 10 companion repos. A deeply technical blog series on coordinating AI coding agents at factory scale with Claude Code." (155 chars)
 
 **H2/H3 Structure:**
-- H2: "8,481 AI Coding Sessions. 90 Days. Here Is What I Learned." (the title, repeated)
+- H2: "4,500 AI Coding Sessions. 90 Days. Here Is What I Learned." (the title, repeated)
 - H3s: "The 90-Day Journey", "Who This Series Is For", "How To Read This Series", then Topic 1-10 summaries
 - **Issue:** Topic summaries use H3 headings but are not keyword-rich. Consider: "Topic 4: Multi-Agent Consensus -- How 3 AI Agents Found a P2 Bug" instead of just "Topic 4: How 3 AI Agents Found a Bug I Would Have Shipped".
 
-**Opening Paragraph:** Strong. Leads with the number (8,481), immediately differentiates from casual AI use, and lists concrete outputs. The keyword "AI coding agents" appears in the second paragraph but not the first. Consider moving it to sentence one.
+**Opening Paragraph:** Strong. Leads with the number (4,500), immediately differentiates from casual AI use, and lists concrete outputs. The keyword "AI coding agents" appears in the second paragraph but not the first. Consider moving it to sentence one.
 
 **Internal Linking:** Links to the GitHub repo but no deep links to individual posts. Add links to each topic summary pointing to its post.
 
@@ -98,7 +98,7 @@
 9. AI development operating system
 10. multi-agent consensus
 
-**URL Slug:** `post-01-series-launch` -- acceptable but `8481-ai-coding-sessions-agentic-development` would be more SEO-friendly.
+**URL Slug:** `post-01-series-launch` -- acceptable but `4500-ai-coding-sessions-agentic-development` would be more SEO-friendly.
 
 ### 3. Content Quality
 
@@ -112,10 +112,10 @@
 
 ### 4. Summary & Highlights
 
-**Summary:** A commanding series introduction that establishes credibility through specific numbers (8,481 sessions, $380 total cost, 10 audited repos) and provides three structured reading paths for practitioners, builders, and architects. The companion repo table and four-phase audit description build trust that the technical content behind each post is production-grade.
+**Summary:** A commanding series introduction that establishes credibility through specific numbers (4,500 sessions, $380 total cost, 10 audited repos) and provides three structured reading paths for practitioners, builders, and architects. The companion repo table and four-phase audit description build trust that the technical content behind each post is production-grade.
 
 **Key Highlights:**
-1. The session math checks out perfectly -- 8,481 sessions across 8 categories with an exact sum.
+1. The session math checks out perfectly -- 4,500 sessions across 8 categories with an exact sum.
 2. Three structured reading paths (Practitioner, Builder, Architect) with time estimates are a standout UX decision for a long series.
 3. The cost analysis ($380 for a full iOS app vs. months of engineering salary) provides the most concrete ROI argument for agentic development published to date.
 

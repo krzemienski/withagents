@@ -6,7 +6,7 @@
 
 ## Overview
 
-Transform the existing 11-post blog series ("Agentic Development: 10 Lessons from 8,481 AI Coding Sessions") into a production Vercel-deployed website with analytics, generate 10 new posts from 180 days of session history, and package the entire pipeline into a reusable skill.
+Transform the existing 11-post blog series ("Agentic Development: 10 Lessons from 4,500 AI Coding Sessions") into a production Vercel-deployed website with analytics, generate 10 new posts from 180 days of session history, and package the entire pipeline into a reusable skill.
 
 ## Current State
 

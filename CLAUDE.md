@@ -1,6 +1,6 @@
 # Agentic Development Blog Series
 
-Technical blog series: "Agentic Development: 21 Lessons from 8,481 AI Coding Sessions" by Nick Krzemienski.
+Technical blog series: "Agentic Development: 18 Lessons from 4,500 AI Coding Sessions" by Nick Krzemienski.
 
 ## Project Structure
 
@@ -19,30 +19,28 @@ blog-series/
 └── docs/                  # Project documentation
 ```
 
-## Companion Repos (20)
+## Companion Repos (18 posts, 14 unique repos)
 
-Each post has a working companion repo in the project root:
-- `multi-agent-consensus/` — Python, 3-agent unanimous gate voting
-- `functional-validation-framework/` — Python, evidence-based validation
-- `claude-ios-streaming-bridge/` — Swift, 5-layer SSE bridge
-- `claude-sdk-bridge/` — Reference impl, 4 failed + 1 working approach
-- `auto-claude-worktrees/` — Python, 194 parallel worktree factory
-- `claude-prompt-stack/` — Template, 7-layer prompt engineering
-- `ralph-orchestrator-guide/` — Rust, hat-based agent coordination
-- `code-tales/` — Python, GitHub-to-audio pipeline
-- `stitch-design-to-code/` — Node.js, design tokens + Stitch MCP
-- `ai-dev-operating-system/` — Python, meta-system combining all subsystems
-- `agentic-development-guide/` — Meta-repo organizing all 10 topics
-- `ui-validation-at-scale/` — Python, 321-screenshot idb_tap automation
-- `kaizen-algorithm-tuning/` — Python, PDCA precision improvement loops
-- `spec-driven-implementation/` — Rust/Python, YAML spec → multi-agent build
-- `claude-mem-architecture/` — Python + SQLite, cross-session observation store
-- `multi-agent-merge-orchestrator/` — Python, 35-worktree conflict-free merging
-- `sequential-thinking-debugging/` — Python, 84-step root cause analysis
-- `full-stack-orchestrator/` — Python + Swift + TypeScript, 3-platform coordination
-- `github-to-audio-pipeline/` — Python, 5-stage content transformation pipeline
-- `design-token-automation/` — Python + Stitch MCP, cross-platform token propagation
-- `session-observability/` — Python, telemetry framework + analytics dashboard
+| Post | Repo | Description |
+|------|------|-------------|
+| 01 | `agentic-development-guide/` | Meta-repo, series overview |
+| 02 | `multi-agent-consensus/` | Python, 3-agent unanimous gate voting |
+| 03 | `claude-code-skills-factory/` | Skills + validation framework |
+| 04 | `claude-ios-streaming-bridge/` | Swift, 5-layer SSE bridge |
+| 05 | `claude-code-ios/` | Swift, iOS patterns compendium |
+| 06 | `auto-claude-worktrees/` | Python, parallel worktree factory |
+| 07 | `shannon-framework/` | Claude Code plugin, 4-layer enforcement |
+| 08 | `ralph-loop-patterns/` | Python, hat-based execution loops |
+| 09 | `session-insight-miner/` | Python, session log mining pipeline |
+| 10 | `stitch-design-to-code/` | Node.js, design tokens + Stitch MCP |
+| 11 | `reponexus/` | Spec execution framework |
+| 12 | `claude-mem-architecture/` | Python + SQLite, observation store |
+| 13 | `sequential-thinking-debugging/` | Python, 84-step root cause analysis |
+| 14 | `multi-agent-merge-orchestrator/` | Python, 35-worktree conflict-free merge |
+| 15 | `claude-code-skills-factory/` | Skills anatomy + devlog-pipeline |
+| 16 | `shannon-framework/` | Plugin hooks + enforcement |
+| 17 | `claude-code-monorepo/` | TypeScript SDK examples + CLI scripts |
+| 18 | `claude-code-monorepo/` | SDK vs CLI decision framework |
 
 ## Commands
 
@@ -62,7 +60,7 @@ subtitle: "Brief description"
 author: "Nick Krzemienski"
 date: "YYYY-MM-DD"
 series_number: N
-series_total: 21
+series_total: 18
 github_repo: "https://github.com/krzemienski/repo-name"
 tags:
   - AgenticDevelopment

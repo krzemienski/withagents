@@ -1,0 +1,3037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The AI Development Operating System</title>
+<meta property="og:title" content="The AI Development Operating System">
+<meta property="og:description" content="Composing all systems into a unified platform">
+<meta property="og:type" content="article">
+<meta property="og:image" content="assets/hero-card.html">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The AI Development Operating System">
+<meta name="twitter:description" content="Composing all systems into a unified platform">
+<meta name="author" content="Nick Krzemienski">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #0a0a0a; color: #e2e8f0; line-height: 1.8; }
+  .hero-container { max-width: 1200px; margin: 0 auto; }
+  .hero-container > div { width: 100% !important; max-width: 100%; }
+  article { max-width: 780px; margin: 0 auto; padding: 48px 24px 80px; }
+  h1 { font-size: 2.5em; font-weight: 800; color: #f8fafc; line-height: 1.2; margin: 0 0 16px; }
+  h2 { font-size: 1.75em; font-weight: 700; color: #f1f5f9; margin: 48px 0 16px; padding-bottom: 8px; border-bottom: 1px solid #1e293b; }
+  h3 { font-size: 1.3em; font-weight: 600; color: #e2e8f0; margin: 32px 0 12px; }
+  h4 { font-size: 1.1em; font-weight: 600; color: #cbd5e1; margin: 24px 0 8px; }
+  p { margin: 0 0 16px; color: #cbd5e1; }
+  a { color: #818cf8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace; background: #1e293b; color: #a5b4fc; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+  pre { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 20px; margin: 16px 0 24px; overflow-x: auto; }
+  pre code { background: none; padding: 0; color: #e2e8f0; font-size: 0.85em; line-height: 1.6; }
+  blockquote { border-left: 3px solid #6366f1; padding: 12px 20px; margin: 16px 0; background: rgba(99,102,241,0.05); border-radius: 0 8px 8px 0; }
+  blockquote p { color: #94a3b8; margin: 0; }
+  ul, ol { margin: 8px 0 16px 24px; color: #cbd5e1; }
+  li { margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0 24px; }
+  th { background: #1e293b; color: #f1f5f9; padding: 10px 16px; text-align: left; font-weight: 600; font-size: 0.9em; }
+  td { padding: 10px 16px; border-bottom: 1px solid #1e293b; color: #cbd5e1; font-size: 0.9em; }
+  tr:hover td { background: rgba(99,102,241,0.03); }
+  hr { border: none; border-top: 1px solid #1e293b; margin: 32px 0; }
+  img, svg { max-width: 100%; height: auto; border-radius: 8px; margin: 16px 0; }
+  .diagram { margin: 32px 0; padding: 24px; background: #0f172a; border: 1px solid #1e293b; border-radius: 12px; overflow-x: auto; }
+  .diagram h4 { color: #64748b; font-size: 0.85em; font-weight: 500; margin: 0 0 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .diagram svg { display: block; margin: 0 auto; max-height: 600px; }
+  .meta { color: #64748b; font-size: 0.9em; margin: 8px 0 32px; }
+  .social-cards { display: flex; gap: 24px; flex-wrap: wrap; margin: 48px 0; padding: 24px; background: #0f172a; border-radius: 12px; }
+  .social-cards h3 { width: 100%; color: #64748b; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; margin: 0 0 8px; }
+  .social-cards iframe { border: 1px solid #1e293b; border-radius: 8px; }
+  .series-nav { display: flex; justify-content: space-between; padding: 24px; background: #0f172a; border-radius: 12px; margin-top: 48px; }
+  .series-nav a { color: #818cf8; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="hero-container"><div style="width:1200px;height:630px;background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#0f172a 100%);display:flex;flex-direction:column;justify-content:center;padding:0 80px;box-sizing:border-box;font-family:system-ui,-apple-system,sans-serif;position:relative;overflow:hidden;">
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;background-image:radial-gradient(circle at 1px 1px,rgba(99,102,241,0.15) 1px,transparent 0);background-size:40px 40px;"></div>
+  <div style="position:absolute;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(99,102,241,0.2) 0%,transparent 70%);border-radius:50%;"></div>
+  <div style="position:relative;z-index:1;display:inline-block;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);border-radius:20px;padding:6px 16px;margin-bottom:24px;width:fit-content;">
+    <span style="color:rgba(99,102,241,0.9);font-size:14px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;">LESSON 11 OF 10 · CAPSTONE</span>
+  </div>
+  <h1 style="position:relative;z-index:1;color:#f1f5f9;font-size:46px;font-weight:800;line-height:1.15;margin:0 0 20px 0;max-width:900px;">The AI Development Operating System</h1>
+  <p style="position:relative;z-index:1;color:#94a3b8;font-size:20px;line-height:1.5;margin:0 0 32px 0;max-width:700px;">Composing all 10 systems into a unified development platform</p>
+  <div style="position:relative;z-index:1;display:flex;align-items:center;gap:12px;">
+    <div style="width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,rgb(99,102,241),#8b5cf6);display:flex;align-items:center;justify-content:center;">
+      <span style="color:white;font-weight:700;font-size:16px;">NK</span>
+    </div>
+    <div>
+      <div style="color:#f1f5f9;font-size:14px;font-weight:600;">Nick Krzemienski</div>
+      <div style="color:#64748b;font-size:13px;">March 2026 · Agentic Development Series</div>
+    </div>
+  </div>
+</div></div>
+<article>
+<p class="meta">Lesson 11 of 10 · Nick Krzemienski · March 2026 · Agentic Development Series</p>
+<h2 id="the-ai-development-operating-system">The AI Development
+Operating System</h2>
+<p><em>Agentic Development: 10 Lessons from 4,500 AI Coding
+Sessions</em></p>
+<p>I did not set out to build an operating system.</p>
+<p>Over the past 90 days, across 4,500 Claude Code sessions, I kept
+hitting the same failures. An agent would lose context mid-task. A plan
+would survive first contact with the codebase for about six minutes
+before collapsing. Code review happened after the PR was already merged.
+Verification was a human squinting at a terminal and saying “looks
+good.”</p>
+<p>Each time I hit a failure mode, I built a small system to prevent it
+from happening again. An agent catalog here. A persistence layer there.
+An adversarial planning protocol after the third time a confident plan
+led to a dead end.</p>
+<p>The failure modes were specific and recurring:</p>
+<ul>
+<li><p><strong>The Amnesia Problem.</strong> Session 1 spends 40 minutes
+understanding the codebase and implementing half a feature. Session 2
+starts from zero, re-reads the same files, makes the same discoveries,
+and implements the same half – slightly differently, introducing subtle
+inconsistencies. Cost: 80 minutes for 50% completion.</p></li>
+<li><p><strong>The Confidence Problem.</strong> The model produces a
+plan that reads beautifully. “Phase 1: Set up infrastructure. Phase 2:
+Implement core logic. Phase 3: Integration.” Then Phase 2 turns out to
+require six separate Stripe API integrations that nobody mentioned. The
+plan survives for exactly one phase before collapsing.</p></li>
+<li><p><strong>The Completion Theater Problem.</strong> “The feature is
+done.” Is it? The build passes. But does the UI actually render? Does
+the API return the right data? Has anyone looked at it? “I think it
+works.” That is not evidence. That is hope.</p></li>
+<li><p><strong>The Staffing Problem.</strong> An Opus-class model
+spending 45 seconds grepping through a directory. A Haiku-class task
+billed at Opus prices. Over 100 sessions, the waste is
+staggering.</p></li>
+<li><p><strong>The Coordination Problem.</strong> Two agents editing the
+same file. A verifier running before the implementation is complete. A
+security review that starts while a build error is still unresolved.
+Agents working independently is not the same as agents working
+together.</p></li>
+</ul>
+<p>Ninety days later, I looked at what I had and realized: this is not a
+collection of scripts. It is an operating system for AI development. Six
+composable subsystems, each solving a specific class of failure, each
+usable independently but dramatically more powerful together.</p>
+<p>This is the capstone post in the series. Everything I have learned –
+every lesson, every failure, every recovery – distilled into
+architecture you can run yourself.</p>
+<p>The companion repository is at the end of this post. Every code block
+below is quoted from real, running source files.</p>
+<hr />
+<h3 id="the-thesis">The Thesis</h3>
+<p>Here it is, plainly stated: <strong>the models are capable enough.
+What they need is a system.</strong></p>
+<p>A single Claude session can write excellent code. But software
+development is not a single session. It is research, planning,
+implementation, review, verification, and iteration – spread across
+hours, days, and weeks. It requires specialization, persistence,
+adversarial challenge, and evidence-based verification.</p>
+<p>These are not AI problems. These are organizational problems. Human
+engineering teams solved them decades ago with role specialization, code
+review, QA gates, and project management. The insight is that AI agents
+benefit from exactly the same organizational principles.</p>
+<p>This is not a theoretical claim. Every lesson in this series pointed
+to the same conclusion:</p>
+<p><strong>Lesson 1</strong> (Multi-Agent Consensus): Three independent
+agents reviewing the same code find more bugs than one agent reviewing
+three times, because they bring genuinely different perspectives. The
+organizational principle is peer review with independence.</p>
+<p><strong>Lesson 2</strong> (Functional Validation): AI-generated tests
+are circular reasoning – the same model writes both the implementation
+and the test. The organizational principle is independent QA, which
+requires separate tooling (Playwright, idb, httpx) operating against the
+real system.</p>
+<p><strong>Lesson 3</strong> (Evidence-Gated Development): Claiming work
+is done without proof creates cascading failures downstream. The
+organizational principle is audit trails, which engineering teams
+implement as sign-off gates.</p>
+<p><strong>Lesson 4</strong> (iOS Streaming Bridge): Complex
+integrations require specialized knowledge that a generalist model
+handles poorly. The organizational principle is domain expertise – you
+assign the SSE parsing task to an agent that knows SSE parsing.</p>
+<p><strong>Lesson 5</strong> (Reflexion Loop): The first attempt is
+rarely correct, but the first attempt with structured feedback is
+dramatically better. The organizational principle is retrospectives.</p>
+<p><strong>Lesson 6</strong> (Context Persistence): Knowledge that
+vanishes when a session ends forces the next session to rediscover
+everything from scratch. The organizational principle is institutional
+knowledge – documentation, onboarding guides, runbooks.</p>
+<p><strong>Lesson 7</strong> (Model Routing): Using Opus for file
+searches costs 18x more than Haiku and runs 6x slower, with no quality
+improvement. The organizational principle is appropriate staffing – you
+do not assign senior architects to triage support tickets.</p>
+<p><strong>Lesson 8</strong> (Adversarial Planning): Plans that are not
+challenged collapse on contact with reality. The organizational
+principle is design review, where senior engineers challenge assumptions
+before implementation begins.</p>
+<p><strong>Lesson 9</strong> (Design Token Systems): When AI generates
+UI components, consistency requires a token-based design system that the
+AI cannot deviate from. The organizational principle is standards and
+style guides.</p>
+<p><strong>Lesson 10</strong> (Stitch Design-to-Code): Scaling
+AI-generated UI to 21 screens requires systematic validation, not manual
+inspection. The organizational principle is automated acceptance
+testing.</p>
+<p>The AI Development Operating System encodes all ten of these
+principles into six composable subsystems. Each subsystem exists because
+a specific organizational failure demanded it. Together, they form the
+system that the models need.</p>
+<p>The mapping from lessons to subsystems is not one-to-one. It is
+many-to-many:</p>
+<table>
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 8%" />
+<col style="width: 12%" />
+<col style="width: 14%" />
+<col style="width: 15%" />
+<col style="width: 8%" />
+<col style="width: 26%" />
+</colgroup>
+<thead>
+<tr>
+<th>Lesson</th>
+<th>OMC</th>
+<th>Ralph</th>
+<th>Specum</th>
+<th>RALPLAN</th>
+<th>GSD</th>
+<th>Team Pipeline</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Multi-Agent Consensus</td>
+<td>agent lanes</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>staged pipeline</td>
+</tr>
+<tr>
+<td>2. Functional Validation</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>evidence gates</td>
+<td>verify stage</td>
+</tr>
+<tr>
+<td>3. Evidence-Gated Dev</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>evidence collector</td>
+<td>stage history</td>
+</tr>
+<tr>
+<td>4. Domain Expertise</td>
+<td>specialist agents</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>specialist dispatch</td>
+</tr>
+<tr>
+<td>5. Reflexion Loop</td>
+<td></td>
+<td></td>
+<td></td>
+<td>critic feedback</td>
+<td>assumption tracker</td>
+<td>fix loop</td>
+</tr>
+<tr>
+<td>6. Context Persistence</td>
+<td></td>
+<td>state files</td>
+<td>artifact chain</td>
+<td></td>
+<td>phase records</td>
+<td>pipeline state</td>
+</tr>
+<tr>
+<td>7. Model Routing</td>
+<td>routing table</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>8. Adversarial Planning</td>
+<td>critic agent</td>
+<td></td>
+<td></td>
+<td>deliberation loop</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>9. Design Tokens</td>
+<td></td>
+<td></td>
+<td>specification</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>10. Validation at Scale</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>evidence types</td>
+<td>verify stage</td>
+</tr>
+</tbody>
+</table>
+<p>Every cell with content represents a concrete implementation of that
+lesson in that subsystem. The system is dense with cross-cutting
+principles because the principles themselves are cross-cutting.
+Persistence matters everywhere. Evidence matters everywhere.
+Specialization matters everywhere. The subsystems are organized by
+function (what they do), but the principles are organized by concern
+(what problem they solve).</p>
+<figure>
+<img src="../visuals/svg-rendered/post11-aidevos-architecture.svg"
+alt="AI Dev OS Architecture" />
+<figcaption aria-hidden="true">AI Dev OS Architecture</figcaption>
+</figure>
+<pre class="mermaid"><code>flowchart TD
+    subgraph BASE[Base Layer]
+        OMC[&quot;OMC\n25 specialized agents\n(Build / Review / Domain / Coordination lanes)&quot;]
+    end
+
+    subgraph PERSIST[Persistence Layer]
+        RALPH[&quot;Ralph Loop\nSession persistence\n(survives session boundaries)&quot;]
+    end
+
+    subgraph ORCHESTRATORS[Workflow Orchestrators]
+        SPECUM[&quot;Specum Pipeline\nSpec-driven development&quot;]
+        RALPLAN[&quot;RALPLAN\nAdversarial planning&quot;]
+        GSD[&quot;GSD\nProject lifecycle&quot;]
+        TEAM[&quot;Team Pipeline\nMulti-agent coordination&quot;]
+    end
+
+    BASE --&gt; PERSIST
+    PERSIST --&gt; ORCHESTRATORS
+
+    OMC --&gt;|provides agents| SPECUM
+    OMC --&gt;|provides agents| RALPLAN
+    OMC --&gt;|provides agents| GSD
+    OMC --&gt;|provides agents| TEAM
+
+    RALPH --&gt;|provides persistence| SPECUM
+    RALPH --&gt;|provides persistence| RALPLAN
+    RALPH --&gt;|provides persistence| GSD
+    RALPH --&gt;|provides persistence| TEAM</code></pre>
+<p>The architecture has three layers. The base layer (OMC) provides the
+agent catalog – 25 specialized agents organized by function. The
+persistence layer (Ralph Loop) provides session-surviving execution. The
+orchestrator layer provides four workflow engines that consume agents
+and persistence: Specum for specification-driven development, RALPLAN
+for adversarial planning, GSD for evidence-gated project lifecycle, and
+Team Pipeline for multi-agent coordination.</p>
+<p>Every orchestrator draws agents from OMC. Every orchestrator can use
+Ralph Loop for persistence. But no orchestrator knows about any other
+orchestrator. They compose through shared state files, not through
+direct coupling.</p>
+<hr />
+<h3 id="subsystem-1-omc-the-agent-catalog">Subsystem 1: OMC – The Agent
+Catalog</h3>
+<p><strong>Failure mode it solves:</strong> using the wrong model for
+the job, or using a generalist when you need a specialist.</p>
+<p><strong>Series lesson:</strong> Model Routing (Lesson 7) – match
+cognitive depth to task complexity.</p>
+<p>The first thing I built was a catalog of specialized agents. Not
+because specialization is theoretically elegant, but because I watched a
+$15/million-token Opus model spend 45 seconds doing file searches that
+Haiku could do in 1.5 seconds at one-twentieth the cost.</p>
+<p>OMC (Oh My Claude Code) defines 25 agents organized into four lanes.
+Every agent has a full system prompt, a model tier assignment, and
+explicit capabilities. Here is the catalog structure from the YAML
+definition:</p>
+<pre class="yaml"><code># src/ai_dev_os/omc/catalog.yaml
+
+version: &quot;1.0.0&quot;
+description: &quot;Complete OMC agent catalog for Claude Code orchestration&quot;
+
+agents:
+  - name: explore
+    lane: build
+    model_tier: haiku
+    description: &quot;Codebase discovery, file/symbol mapping, dependency tracing&quot;
+    capabilities:
+      - &quot;Glob and Grep across large codebases efficiently&quot;
+      - &quot;Map module boundaries and import graphs&quot;
+      - &quot;Identify entry points, interfaces, and public APIs&quot;
+
+  - name: architect
+    lane: build
+    model_tier: opus
+    description: &quot;System design, component boundaries, interfaces, long-horizon architectural tradeoffs&quot;
+    capabilities:
+      - &quot;Design system boundaries and component responsibilities&quot;
+      - &quot;Define API contracts and interface specifications&quot;
+      - &quot;Evaluate architectural patterns: CQRS, event sourcing, hexagonal, etc.&quot;</code></pre>
+<p>The four lanes map directly to the functional areas of a software
+engineering team:</p>
+<p><strong>Build Lane:</strong> explore (haiku), analyst (opus), planner
+(opus), architect (opus), debugger (sonnet), executor (sonnet),
+deep-executor (opus), verifier (sonnet). This is your development team –
+from discovery through implementation through verification. Eight
+agents, three model tiers, covering the full build lifecycle.</p>
+<p><strong>Review Lane:</strong> quality-reviewer (sonnet),
+security-reviewer (sonnet), code-reviewer (opus). Three independent
+review perspectives that can run in parallel. This directly implements
+the Multi-Agent Consensus pattern from Lesson 1 – independent reviewers
+with non-overlapping system prompts.</p>
+<p><strong>Domain Lane:</strong> test-engineer (sonnet), build-fixer
+(sonnet), designer (sonnet), writer (haiku), qa-tester (sonnet),
+scientist (sonnet), document-specialist (sonnet). Specialists you call
+when the task demands domain expertise. The designer agent knows about
+component hierarchies and accessibility. The build-fixer knows about
+Xcode error messages and dependency resolution. The writer generates
+documentation at Haiku speed because documentation is breadth, not
+depth.</p>
+<p><strong>Coordination Lane:</strong> critic (opus). One agent whose
+sole purpose is to find flaws in plans. More on this in the RALPLAN
+section.</p>
+<p>Each agent is loaded as a typed model with full metadata:</p>
+<pre class="python"><code># src/ai_dev_os/omc/catalog.py
+
+class AgentDefinition(BaseModel):
+    &quot;&quot;&quot;A single agent definition from the catalog.&quot;&quot;&quot;
+
+    name: str = Field(description=&quot;Unique agent identifier&quot;)
+    lane: str = Field(description=&quot;Organizational lane: build, review, domain, coordination&quot;)
+    model_tier: str = Field(description=&quot;Preferred model tier: haiku, sonnet, opus&quot;)
+    description: str = Field(description=&quot;Brief one-line description&quot;)
+    capabilities: list[str] = Field(default_factory=list, description=&quot;List of capability strings&quot;)
+    system_prompt: str = Field(description=&quot;Full system prompt for this agent&quot;)
+
+    @property
+    def model_id(self) -&gt; str:
+        &quot;&quot;&quot;Return the full Claude model ID for this agent&#39;s tier.&quot;&quot;&quot;
+        tier_map = {
+            &quot;haiku&quot;: &quot;claude-haiku-4-5-20251001&quot;,
+            &quot;sonnet&quot;: &quot;claude-sonnet-4-6&quot;,
+            &quot;opus&quot;: &quot;claude-opus-4-6&quot;,
+        }
+        return tier_map.get(self.model_tier, &quot;claude-sonnet-4-6&quot;)</code></pre>
+<p>The <code>model_id</code> property is where the routing decision
+becomes concrete. When you ask for an <code>explore</code> agent, you
+get Haiku. When you ask for an <code>architect</code> agent, you get
+Opus. The catalog does not just suggest – it enforces.</p>
+<p>The model routing table maps each agent to its canonical model tier,
+with cost and latency characteristics:</p>
+<pre class="python"><code># src/ai_dev_os/omc/routing.py
+
+AGENT_MODEL_MAP: dict[str, ModelTier] = {
+    # Build lane
+    &quot;explore&quot;: ModelTier.HAIKU,
+    &quot;analyst&quot;: ModelTier.OPUS,
+    &quot;planner&quot;: ModelTier.OPUS,
+    &quot;architect&quot;: ModelTier.OPUS,
+    &quot;debugger&quot;: ModelTier.SONNET,
+    &quot;executor&quot;: ModelTier.SONNET,
+    &quot;deep-executor&quot;: ModelTier.OPUS,
+    &quot;verifier&quot;: ModelTier.SONNET,
+    # Review lane
+    &quot;quality-reviewer&quot;: ModelTier.SONNET,
+    &quot;security-reviewer&quot;: ModelTier.SONNET,
+    &quot;code-reviewer&quot;: ModelTier.OPUS,
+    # Domain lane
+    &quot;test-engineer&quot;: ModelTier.SONNET,
+    &quot;build-fixer&quot;: ModelTier.SONNET,
+    &quot;designer&quot;: ModelTier.SONNET,
+    &quot;writer&quot;: ModelTier.HAIKU,
+    &quot;qa-tester&quot;: ModelTier.SONNET,
+    &quot;scientist&quot;: ModelTier.SONNET,
+    &quot;document-specialist&quot;: ModelTier.SONNET,
+    # Coordination lane
+    &quot;critic&quot;: ModelTier.OPUS,
+}</code></pre>
+<p>The routing is not just about cost. It encodes a fundamental
+principle: match cognitive depth to task complexity. The explore agent
+runs on Haiku because codebase discovery is breadth-first – you want
+speed, not deep reasoning. The architect runs on Opus because system
+design requires holding many constraints in mind simultaneously. The
+executor runs on Sonnet because it is the best coding model – fast
+enough to iterate, smart enough to get the implementation right.</p>
+<p>The cost implications are real. Here is what each model tier costs
+per invocation (at typical token counts):</p>
+<pre class="python"><code># src/ai_dev_os/omc/routing.py
+
+MODEL_REGISTRY: dict[ModelTier, ModelSpec] = {
+    ModelTier.HAIKU: ModelSpec(
+        tier=ModelTier.HAIKU,
+        model_id=&quot;claude-haiku-4-5-20251001&quot;,
+        cost_per_million_input_tokens=0.80,
+        cost_per_million_output_tokens=4.00,
+        typical_latency_seconds=1.5,
+        context_window_tokens=200_000,
+        description=&quot;Fastest and most cost-effective. Ideal for high-frequency tasks.&quot;,
+        best_for=[
+            &quot;File search and discovery&quot;,
+            &quot;Simple code generation&quot;,
+            &quot;Documentation writing&quot;,
+            &quot;Status summaries&quot;,
+            &quot;Lightweight scans&quot;,
+        ],
+    ),
+    ModelTier.SONNET: ModelSpec(
+        tier=ModelTier.SONNET,
+        model_id=&quot;claude-sonnet-4-6&quot;,
+        cost_per_million_input_tokens=3.00,
+        cost_per_million_output_tokens=15.00,
+        typical_latency_seconds=4.0,
+        context_window_tokens=200_000,
+        description=&quot;Best coding model. Primary implementation and review agent.&quot;,
+        best_for=[
+            &quot;Code implementation&quot;,
+            &quot;Debugging and root-cause analysis&quot;,
+            &quot;Code review&quot;,
+            &quot;Security analysis&quot;,
+            &quot;Test strategy&quot;,
+            &quot;Multi-file refactoring&quot;,
+        ],
+    ),
+    ModelTier.OPUS: ModelSpec(
+        tier=ModelTier.OPUS,
+        model_id=&quot;claude-opus-4-6&quot;,
+        cost_per_million_input_tokens=15.00,
+        cost_per_million_output_tokens=75.00,
+        typical_latency_seconds=10.0,
+        context_window_tokens=200_000,
+        description=&quot;Maximum reasoning. For architecture, planning, and complex analysis.&quot;,
+        best_for=[
+            &quot;System architecture design&quot;,
+            &quot;Complex requirements analysis&quot;,
+            &quot;Long-horizon planning&quot;,
+            &quot;Adversarial design critique&quot;,
+            &quot;Cross-cutting concern analysis&quot;,
+        ],
+    ),
+}</code></pre>
+<p>A typical development session might invoke the explore agent 20 times
+(searching for files, mapping dependencies), the executor agent 5 times
+(implementing features), and the architect agent once (making a design
+decision). With proper routing versus Opus-for-everything:</p>
+<table>
+<thead>
+<tr>
+<th>Agent</th>
+<th>Invocations</th>
+<th>With Routing</th>
+<th>Without Routing (Opus)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>explore (haiku)</td>
+<td>20x</td>
+<td>$0.32</td>
+<td>$6.00 (opus)</td>
+</tr>
+<tr>
+<td>executor (sonnet)</td>
+<td>5x</td>
+<td>$0.30</td>
+<td>$1.50 (opus)</td>
+</tr>
+<tr>
+<td>architect (opus)</td>
+<td>1x</td>
+<td>$0.90</td>
+<td>$0.90 (opus)</td>
+</tr>
+<tr>
+<td><strong>Total</strong></td>
+<td><strong>26</strong></td>
+<td><strong>$1.52</strong></td>
+<td><strong>$8.40</strong></td>
+</tr>
+<tr>
+<td><strong>Savings</strong></td>
+<td></td>
+<td></td>
+<td><strong>82%</strong></td>
+</tr>
+</tbody>
+</table>
+<p>That is a 5.5x cost reduction for identical quality on the search and
+implementation tasks. Over 100 sessions, the difference is $152 versus
+$840. Over 4,500 sessions, the difference is transformative. Model
+routing is not an optimization – it is a prerequisite for sustainable
+AI-assisted development at scale.</p>
+<p>The router also supports dynamic complexity scoring for tasks that do
+not map to a known agent:</p>
+<pre class="python"><code># src/ai_dev_os/omc/routing.py
+
+COMPLEXITY_SIGNALS = {
+    &quot;high&quot;: [
+        &quot;architecture&quot;, &quot;design&quot;, &quot;system&quot;, &quot;distributed&quot;, &quot;scalab&quot;,
+        &quot;security&quot;, &quot;critical&quot;, &quot;production&quot;, &quot;migrate&quot;, &quot;refactor entire&quot;,
+        &quot;adversarial&quot;, &quot;deep analysis&quot;, &quot;comprehensive&quot;, &quot;cross-cutting&quot;,
+    ],
+    &quot;medium&quot;: [
+        &quot;implement&quot;, &quot;debug&quot;, &quot;review&quot;, &quot;test&quot;, &quot;fix&quot;, &quot;build&quot;,
+        &quot;integrate&quot;, &quot;api&quot;, &quot;database&quot;, &quot;async&quot;, &quot;concurrent&quot;,
+    ],
+    &quot;low&quot;: [
+        &quot;search&quot;, &quot;find&quot;, &quot;list&quot;, &quot;summarize&quot;, &quot;document&quot;, &quot;format&quot;,
+        &quot;check&quot;, &quot;scan&quot;, &quot;quick&quot;, &quot;simple&quot;, &quot;lookup&quot;,
+    ],
+}</code></pre>
+<p>When a task description arrives without a specific agent assignment,
+the router scores it against these keyword lists. “Refactor the entire
+authentication system” hits three high-complexity signals and routes to
+Opus. “Find all files importing the auth module” hits two low-complexity
+signals and routes to Haiku. The scoring function:</p>
+<pre class="python"><code># src/ai_dev_os/omc/routing.py
+
+def score_complexity(self, task_description: str) -&gt; float:
+    &quot;&quot;&quot;Score the complexity of a task description from 0.0 to 1.0.&quot;&quot;&quot;
+    description_lower = task_description.lower()
+    score = 0.35  # Default to medium
+
+    for signal in COMPLEXITY_SIGNALS[&quot;high&quot;]:
+        if signal in description_lower:
+            score = min(1.0, score + 0.15)
+
+    for signal in COMPLEXITY_SIGNALS[&quot;medium&quot;]:
+        if signal in description_lower:
+            score = min(1.0, score + 0.05)
+
+    for signal in COMPLEXITY_SIGNALS[&quot;low&quot;]:
+        if signal in description_lower:
+            score = max(0.0, score - 0.10)
+
+    return round(score, 2)</code></pre>
+<p>The thresholds map to model tiers: 0.0-0.35 routes to Haiku,
+0.35-0.70 routes to Sonnet, 0.70-1.0 routes to Opus.</p>
+<p>The full routing decision bundles everything together – the
+recommended tier, the rationale, cost estimate, latency estimate, and
+alternatives:</p>
+<pre class="python"><code># src/ai_dev_os/omc/routing.py
+
+def full_routing_decision(
+    self,
+    task_description: str,
+    agent_name: Optional[str] = None,
+    input_tokens: int = 2000,
+    output_tokens: int = 1000,
+) -&gt; RoutingDecision:
+    if agent_name and agent_name in AGENT_MODEL_MAP:
+        tier = AGENT_MODEL_MAP[agent_name]
+        rationale = f&quot;Canonical routing: {agent_name} -&gt; {tier.value}&quot;
+    else:
+        complexity = self.score_complexity(task_description)
+        tier = self.suggest_model(complexity)
+        rationale = f&quot;Complexity score {complexity:.2f} -&gt; {tier.value}&quot;
+
+    spec = MODEL_REGISTRY[tier]
+    cost = self.estimate_cost(tier, input_tokens, output_tokens)
+
+    return RoutingDecision(
+        recommended_tier=tier,
+        model_id=spec.model_id,
+        rationale=rationale,
+        complexity_score=self.score_complexity(task_description),
+        estimated_cost_usd=cost,
+        estimated_latency_seconds=spec.typical_latency_seconds,
+        alternatives=[t for t in ModelTier if t != tier],
+    )</code></pre>
+<p>The self-hosting story: OMC started with 8 agents. Over 90 days, the
+system identified gaps – situations where no existing agent was the
+right fit – and I added specialists. The <code>build-fixer</code> was
+born after the fifth time an executor agent spent 20 minutes debugging
+an Xcode linker error that a specialist could have diagnosed in 30
+seconds. The <code>document-specialist</code> was born after realizing
+that the explorer agent was being used to fetch external documentation,
+when what I really needed was an agent tuned for web research with API
+doc patterns. The catalog grew from 8 to 25 agents, each one born from a
+real failure that the existing catalog could not handle.</p>
+<p>The query interface makes it easy to find the right agent:</p>
+<pre class="python"><code># src/ai_dev_os/omc/catalog.py
+
+class AgentCatalog:
+    def list_agents(self) -&gt; list[AgentDefinition]:
+        &quot;&quot;&quot;Return all agents in the catalog.&quot;&quot;&quot;
+        return self._data.agents
+
+    def get_agent(self, name: str) -&gt; Optional[AgentDefinition]:
+        &quot;&quot;&quot;Get a specific agent by name. Returns None if not found.&quot;&quot;&quot;
+        for agent in self._data.agents:
+            if agent.name == name:
+                return agent
+        return None
+
+    def get_agents_by_lane(self, lane: str) -&gt; list[AgentDefinition]:
+        &quot;&quot;&quot;Get all agents in a specific lane.&quot;&quot;&quot;
+        return [a for a in self._data.agents if a.lane == lane]
+
+    def get_agents_by_model(self, model_tier: str) -&gt; list[AgentDefinition]:
+        &quot;&quot;&quot;Get all agents at a specific model tier.&quot;&quot;&quot;
+        return [a for a in self._data.agents if a.model_tier == model_tier]</code></pre>
+<p>The catalog also renders as a visual tree in the terminal, organized
+by lane with color-coded model tiers:</p>
+<pre class="python"><code># src/ai_dev_os/omc/catalog.py
+
+def render_lane_tree(self) -&gt; None:
+    &quot;&quot;&quot;Render agents organized by lane using rich tree.&quot;&quot;&quot;
+    from rich.tree import Tree
+
+    tree = Tree(&quot;[bold magenta]OMC Agent Catalog[/bold magenta]&quot;)
+    for lane in self.lanes():
+        lane_branch = tree.add(f&quot;[bold yellow]{lane.upper()} LANE[/bold yellow]&quot;)
+        for agent in self.get_agents_by_lane(lane):
+            tier_color = {&quot;haiku&quot;: &quot;green&quot;, &quot;sonnet&quot;: &quot;cyan&quot;, &quot;opus&quot;: &quot;red&quot;}.get(
+                agent.model_tier, &quot;white&quot;
+            )
+            lane_branch.add(
+                f&quot;[{tier_color}]{agent.name}[/{tier_color}] -- {agent.description}&quot;
+            )
+    console.print(tree)</code></pre>
+<p>Running <code>ai-dev-os catalog tree</code> produces a visual
+overview of the entire catalog at a glance. Green entries are Haiku
+(cheap, fast). Cyan entries are Sonnet (balanced). Red entries are Opus
+(maximum reasoning). This color coding makes the cost implications
+immediately visible – a tree full of red nodes means expensive
+operations, while a tree dominated by green nodes means the system is
+running efficiently.</p>
+<hr />
+<h3 id="subsystem-2-ralph-loop-persistent-execution">Subsystem 2: Ralph
+Loop – Persistent Execution</h3>
+<p><strong>Failure mode it solves:</strong> work dying when a session
+ends.</p>
+<p><strong>Series lesson:</strong> Context Persistence (Lesson 6) –
+institutional knowledge must survive session boundaries.</p>
+<p>This is the subsystem with the most personality. Its motto: “The
+boulder never stops.”</p>
+<p>The problem is simple. Claude Code sessions end. The context window
+fills up. The laptop lid closes. But the work is not done. Ralph Loop
+provides persistent iterative execution that survives session boundaries
+by writing its entire state to disk after every iteration.</p>
+<p>I named it after Sisyphus – except in this version, the boulder
+actually reaches the top.</p>
+<p>The state model captures everything a new session needs to continue
+where the previous one left off:</p>
+<pre class="python"><code># src/ai_dev_os/ralph_loop/state.py
+
+class TaskStatus(str, Enum):
+    PENDING = &quot;pending&quot;
+    IN_PROGRESS = &quot;in_progress&quot;
+    COMPLETED = &quot;completed&quot;
+    FAILED = &quot;failed&quot;
+    BLOCKED = &quot;blocked&quot;
+
+class RalphTask(BaseModel):
+    &quot;&quot;&quot;A single task tracked within the Ralph Loop.&quot;&quot;&quot;
+
+    id: str = Field(description=&quot;Unique task identifier&quot;)
+    title: str = Field(description=&quot;Short task title&quot;)
+    description: str = Field(default=&quot;&quot;, description=&quot;Full task description&quot;)
+    status: TaskStatus = Field(default=TaskStatus.PENDING)
+    phase: Optional[str] = Field(default=None)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    started_at: Optional[datetime] = None
+    completed_at: Optional[datetime] = None
+    attempts: int = Field(default=0, description=&quot;Number of execution attempts&quot;)
+    error: Optional[str] = None
+
+class RalphState(BaseModel):
+    &quot;&quot;&quot;Complete state for a Ralph Loop execution session.&quot;&quot;&quot;
+
+    iteration: int = Field(default=0)
+    max_iterations: int = Field(default=100)
+    task_list: list[RalphTask] = Field(default_factory=list)
+    goal: str = Field(default=&quot;&quot;)
+    started_at: datetime = Field(default_factory=datetime.utcnow)
+    last_updated: datetime = Field(default_factory=datetime.utcnow)
+    status: LoopStatus = Field(default=LoopStatus.RUNNING)
+    linked_team: Optional[str] = Field(default=None)
+    stop_reason: Optional[str] = None</code></pre>
+<p>Notice the <code>linked_team</code> field. Ralph Loop can run
+standalone or linked to a Team Pipeline execution. When linked,
+canceling either one cancels both. This is the composability in action –
+two subsystems coordinating through a shared reference, not through
+tight coupling.</p>
+<p>The <code>iterate()</code> method is the heart of the system. Each
+call processes one iteration, logs progress, checks completion, and
+persists state:</p>
+<pre class="python"><code># src/ai_dev_os/ralph_loop/loop.py
+
+def iterate(
+    self,
+    task_runner: Optional[Callable[[RalphTask], bool]] = None,
+) -&gt; bool:
+    state = self.state
+    state.iteration += 1
+
+    # Print iteration header
+    summary = state.progress_summary()
+    pct = state.completion_percentage()
+
+    # Check completion
+    if self.check_completion():
+        return False
+
+    # Process next pending task
+    pending = state.pending_tasks()
+    if pending and task_runner:
+        next_task = pending[0]
+        next_task.mark_started()
+
+        success = task_runner(next_task)
+        if success:
+            next_task.mark_completed()
+        else:
+            next_task.mark_failed(&quot;Task runner returned False&quot;)
+
+    # Check max iterations
+    if state.iteration &gt;= state.max_iterations:
+        state.status = LoopStatus.FAILED
+        state.stop_reason = f&quot;Max iterations ({state.max_iterations}) reached&quot;
+        self.persist_state()
+        return False
+
+    self.persist_state()
+    return True</code></pre>
+<p>The pattern is deliberate: every iteration ends with
+<code>persist_state()</code>. No matter what happens – success, failure,
+even an unexpected crash after the persist call – the work is saved. A
+new session can call <code>load_state()</code>, see exactly where the
+previous session stopped, and continue.</p>
+<p>The key design choice: state is a flat JSON file at
+<code>.omc/state/ralph-state.json</code>. Not a database. Not a message
+queue. A JSON file. Because the most important property of persistence
+is that it actually works, and a JSON file on disk is the most reliable
+thing in computing. A new session reads it, picks up where the last one
+left off, and keeps going.</p>
+<p>Here is what state persistence looks like on disk:</p>
+<pre class="python"><code># src/ai_dev_os/ralph_loop/state.py
+
+def to_file(self, path: Path) -&gt; None:
+    &quot;&quot;&quot;Serialize state to a JSON file.&quot;&quot;&quot;
+    path.parent.mkdir(parents=True, exist_ok=True)
+    self.last_updated = datetime.utcnow()
+    with open(path, &quot;w&quot;) as f:
+        json.dump(self.model_dump(mode=&quot;json&quot;), f, indent=2, default=str)
+
+@classmethod
+def from_file(cls, path: Path) -&gt; &quot;RalphState&quot;:
+    &quot;&quot;&quot;Load state from a JSON file.&quot;&quot;&quot;
+    if not path.exists():
+        raise FileNotFoundError(f&quot;Ralph state file not found: {path}&quot;)
+    with open(path) as f:
+        raw = json.load(f)
+    return cls(**raw)</code></pre>
+<p>The completion check is deliberately strict – all tasks must reach
+<code>COMPLETED</code> status:</p>
+<pre class="python"><code># src/ai_dev_os/ralph_loop/state.py
+
+def is_complete(self) -&gt; bool:
+    if not self.task_list:
+        return False
+    return all(t.status == TaskStatus.COMPLETED for t in self.task_list)
+
+def should_stop(self) -&gt; bool:
+    &quot;&quot;&quot;Check if the loop should stop (complete OR max iterations reached).&quot;&quot;&quot;
+    return self.is_complete() or self.iteration &gt;= self.max_iterations</code></pre>
+<p>No partial credit. No “close enough.” Either every task is done, or
+the loop continues. This strictness is essential because partial
+completion is the enemy of software quality. A feature that is 90% done
+is, functionally, 0% done until the remaining 10% is finished.</p>
+<p>The progress tracking gives you visibility into where things stand at
+any moment:</p>
+<pre class="python"><code># src/ai_dev_os/ralph_loop/state.py
+
+def progress_summary(self) -&gt; dict[str, int]:
+    counts: dict[str, int] = {
+        &quot;total&quot;: len(self.task_list),
+        &quot;pending&quot;: 0,
+        &quot;in_progress&quot;: 0,
+        &quot;completed&quot;: 0,
+        &quot;failed&quot;: 0,
+        &quot;blocked&quot;: 0,
+    }
+    for task in self.task_list:
+        counts[task.status.value] += 1
+    return counts
+
+def completion_percentage(self) -&gt; float:
+    if not self.task_list:
+        return 0.0
+    completed = sum(1 for t in self.task_list if t.status == TaskStatus.COMPLETED)
+    return round((completed / len(self.task_list)) * 100, 1)</code></pre>
+<p>In practice, a typical Ralph Loop session looks like this: Start with
+15 tasks. Session 1 completes 6 tasks before the context window fills.
+Session 2 picks up at task 7 and completes 5 more. Session 3 finishes
+the remaining 4. Total: three sessions, zero lost work, full completion.
+Without Ralph Loop, each session would start from scratch, re-reading
+the codebase, re-understanding the task, and typically completing fewer
+tasks each time because of the accumulated confusion.</p>
+<p>Here is what the state file looks like on disk after session 1 ends
+mid-execution:</p>
+<pre class="json"><code>{
+  &quot;iteration&quot;: 12,
+  &quot;max_iterations&quot;: 50,
+  &quot;goal&quot;: &quot;Implement hooks management screen with backend integration&quot;,
+  &quot;status&quot;: &quot;running&quot;,
+  &quot;task_list&quot;: [
+    {&quot;id&quot;: &quot;task-1&quot;, &quot;title&quot;: &quot;Create HooksController.swift&quot;, &quot;status&quot;: &quot;completed&quot;, &quot;attempts&quot;: 1},
+    {&quot;id&quot;: &quot;task-2&quot;, &quot;title&quot;: &quot;Add GET /api/v1/hooks endpoint&quot;, &quot;status&quot;: &quot;completed&quot;, &quot;attempts&quot;: 1},
+    {&quot;id&quot;: &quot;task-3&quot;, &quot;title&quot;: &quot;Create HooksManagementView.swift&quot;, &quot;status&quot;: &quot;completed&quot;, &quot;attempts&quot;: 1},
+    {&quot;id&quot;: &quot;task-4&quot;, &quot;title&quot;: &quot;Implement hook event type filtering&quot;, &quot;status&quot;: &quot;completed&quot;, &quot;attempts&quot;: 2},
+    {&quot;id&quot;: &quot;task-5&quot;, &quot;title&quot;: &quot;Add hook enable/disable toggle&quot;, &quot;status&quot;: &quot;completed&quot;, &quot;attempts&quot;: 1},
+    {&quot;id&quot;: &quot;task-6&quot;, &quot;title&quot;: &quot;Create hook detail sheet&quot;, &quot;status&quot;: &quot;completed&quot;, &quot;attempts&quot;: 1},
+    {&quot;id&quot;: &quot;task-7&quot;, &quot;title&quot;: &quot;Implement hook execution log viewer&quot;, &quot;status&quot;: &quot;in_progress&quot;, &quot;attempts&quot;: 1},
+    {&quot;id&quot;: &quot;task-8&quot;, &quot;title&quot;: &quot;Add hook configuration editor&quot;, &quot;status&quot;: &quot;pending&quot;, &quot;attempts&quot;: 0},
+    {&quot;id&quot;: &quot;task-9&quot;, &quot;title&quot;: &quot;Implement hook test execution&quot;, &quot;status&quot;: &quot;pending&quot;, &quot;attempts&quot;: 0},
+    {&quot;id&quot;: &quot;task-10&quot;, &quot;title&quot;: &quot;Add error handling and retry UI&quot;, &quot;status&quot;: &quot;pending&quot;, &quot;attempts&quot;: 0}
+  ],
+  &quot;linked_team&quot;: null,
+  &quot;last_updated&quot;: &quot;2026-02-15T14:32:17.451Z&quot;
+}</code></pre>
+<p>When session 2 starts, it calls <code>RalphState.from_file()</code>,
+sees that task-7 is <code>in_progress</code> with 1 attempt, and
+continues exactly where session 1 left off. No re-reading the codebase.
+No re-understanding the feature. No “where was I?” The state file is the
+institutional memory that a JSON-serialized Pydantic model provides for
+free.</p>
+<p>The <code>add_task</code> method allows dynamic task creation during
+execution – because real development always discovers work that was not
+in the original plan:</p>
+<pre class="python"><code># src/ai_dev_os/ralph_loop/loop.py
+
+def add_task(self, task_id: str, title: str, description: str = &quot;&quot;, phase: Optional[str] = None) -&gt; RalphTask:
+    &quot;&quot;&quot;Add a new task to the loop at runtime.&quot;&quot;&quot;
+    task = RalphTask(id=task_id, title=title, description=description, phase=phase)
+    self.state.task_list.append(task)
+    self.persist_state()
+    return task</code></pre>
+<p>In the hooks management example, task-4 (“Implement hook event type
+filtering”) required 2 attempts because the first attempt used a
+hardcoded list of event types, but the backend returned event types
+dynamically. The second attempt read the event types from the API
+response. The <code>attempts</code> counter on each task provides a
+natural debugging signal: tasks with high attempt counts are the ones
+that need architectural attention, not just another try.</p>
+<hr />
+<h3 id="subsystem-3-specum-pipeline-spec-before-code">Subsystem 3:
+Specum Pipeline – Spec Before Code</h3>
+<p><strong>Failure mode it solves:</strong> jumping straight to
+implementation without understanding what to build.</p>
+<p><strong>Series lesson:</strong> This is the counterpart to Functional
+Validation (Lesson 2). Where FV ensures the output is correct, Specum
+ensures the input is correct. You cannot validate what you have not
+specified.</p>
+<p>I named it Specum because it forces you to specify before you
+implement. The pipeline enforces a mandatory sequence:</p>
+<pre class="python"><code># src/ai_dev_os/specum/pipeline.py
+
+STAGE_ORDER = [
+    PipelineStage.NEW,
+    PipelineStage.REQUIREMENTS,
+    PipelineStage.DESIGN,
+    PipelineStage.TASKS,
+    PipelineStage.IMPLEMENT,
+    PipelineStage.VERIFY,
+    PipelineStage.COMPLETE,
+]
+
+STAGE_DESCRIPTIONS = {
+    PipelineStage.NEW: &quot;Pipeline initialized, ready to begin&quot;,
+    PipelineStage.REQUIREMENTS: &quot;Gathering user stories and acceptance criteria&quot;,
+    PipelineStage.DESIGN: &quot;Creating schema definitions and API contracts&quot;,
+    PipelineStage.TASKS: &quot;Breaking design into ordered implementation tasks&quot;,
+    PipelineStage.IMPLEMENT: &quot;Executing tasks with Ralph Loop persistence&quot;,
+    PipelineStage.VERIFY: &quot;Validating completion with evidence collection&quot;,
+    PipelineStage.COMPLETE: &quot;Pipeline complete -- all stages verified&quot;,
+}</code></pre>
+<p>Each stage produces a markdown artifact that the next stage consumes.
+You cannot skip ahead. The pipeline will not let you implement before
+you have a design, and it will not let you design before you have
+requirements.</p>
+<pre class="python"><code># src/ai_dev_os/specum/pipeline.py
+
+STAGE_ARTIFACTS = {
+    PipelineStage.REQUIREMENTS: &quot;requirements.md&quot;,
+    PipelineStage.DESIGN: &quot;design.md&quot;,
+    PipelineStage.TASKS: &quot;tasks.md&quot;,
+    PipelineStage.IMPLEMENT: &quot;implementation-report.md&quot;,
+    PipelineStage.VERIFY: &quot;verification-report.md&quot;,
+}</code></pre>
+<p>The advancement logic enforces the ordering strictly:</p>
+<pre class="python"><code># src/ai_dev_os/specum/pipeline.py
+
+def advance(self) -&gt; Optional[StageResult]:
+    state = self.state
+    if state.current_stage == PipelineStage.COMPLETE:
+        console.print(&quot;[bold green]Pipeline is already complete![/bold green]&quot;)
+        return None
+
+    current_idx = STAGE_ORDER.index(state.current_stage)
+    if current_idx &gt;= len(STAGE_ORDER) - 1:
+        return None
+
+    next_stage = STAGE_ORDER[current_idx + 1]
+    result = self.run_stage(next_stage)
+
+    state.current_stage = next_stage
+    if next_stage == PipelineStage.COMPLETE:
+        state.status = PipelineStatus.COMPLETE
+
+    state.stage_results.append(result)
+    self._save_state()
+    return result</code></pre>
+<p>Notice stage five: “Executing tasks with Ralph Loop persistence.”
+Specum and Ralph compose. The specification pipeline generates the task
+list; Ralph Loop executes it persistently. Two subsystems, each doing
+one thing well, combining into something neither could do alone.</p>
+<p>Each stage dispatches to a specialized stage class. The requirements
+stage uses a ProductManagerAgent. The design stage uses an
+ArchitectAgent. The tasks stage uses a TaskPlannerAgent. Each agent
+brings a different perspective and a different system prompt, tuned to
+that specific phase of the development process:</p>
+<pre class="python"><code># src/ai_dev_os/specum/pipeline.py
+
+def _dispatch_stage(self, stage: PipelineStage) -&gt; str:
+    from ai_dev_os.specum.stages import (
+        RequirementsStage,
+        DesignStage,
+        TaskStage,
+        ImplementStage,
+        VerifyStage,
+    )
+
+    goal = self.state.goal
+    previous_artifact = self._get_latest_artifact()
+
+    stage_map = {
+        PipelineStage.REQUIREMENTS: lambda: RequirementsStage(goal).generate(),
+        PipelineStage.DESIGN: lambda: DesignStage(goal, previous_artifact).generate(),
+        PipelineStage.TASKS: lambda: TaskStage(goal, previous_artifact).generate(),
+        PipelineStage.IMPLEMENT: lambda: ImplementStage(goal, previous_artifact).generate(),
+        PipelineStage.VERIFY: lambda: VerifyStage(goal, previous_artifact).generate(),
+    }
+
+    runner = stage_map.get(stage)
+    if runner is None:
+        raise ValueError(f&quot;No stage runner for stage: {stage}&quot;)
+    return runner()</code></pre>
+<p>The chain is elegant: <code>previous_artifact</code> feeds forward.
+Requirements feeds into Design. Design feeds into Tasks. Tasks feeds
+into Implementation. Each stage sees only the output of the previous
+stage plus the original goal. This prevents context drift – each stage
+starts from a clean, documented specification rather than from a model’s
+potentially confused understanding of what happened three stages
+ago.</p>
+<p>Why does this matter? Because in my experience, the single most
+common failure mode in AI-assisted development is jumping directly from
+“I want X” to “let me write code.” The model is so eager to implement
+that it skips the part where you figure out what X actually means.
+Specum prevents this by making specification a mechanical prerequisite,
+not a suggested best practice.</p>
+<p>The artifact chain creates a paper trail that is invaluable for
+debugging. When a feature does not work as expected, you can trace
+backward through the chain: the verification report says what failed,
+the implementation report says what was built, the task list says what
+was planned, the design document says what was designed, and the
+requirements document says what was requested. Every step of the chain
+is a markdown file on disk, human-readable, diffable, and permanent.</p>
+<p>Here is what the typical artifact directory looks like after a
+complete Specum run:</p>
+<pre><code>.omc/specum/
+  requirements.md      (12 user stories, 8 acceptance criteria)
+  design.md            (API contracts, state machine diagram, data model)
+  tasks.md             (15 ordered tasks with dependencies and complexity)
+  implementation-report.md  (what was built, deviations from design)
+  verification-report.md    (evidence of completion, remaining gaps)</code></pre>
+<p>Each file is both an output of its stage and an input to the next.
+The requirements document says “users must be able to export chat
+sessions as PDF.” The design document specifies the API endpoint
+(<code>GET /api/v1/sessions/{id}/export?format=pdf</code>), the response
+format, and the error cases. The task list breaks the design into
+implementation steps: “Task 3.2: Implement PDF renderer using PDFKit,
+depends on Task 3.1 (export endpoint).” The implementation report
+records what was actually built, including any deviations from the
+design. And the verification report proves it works with a screenshot of
+the exported PDF and a curl command showing the API response.</p>
+<p>This chain makes it impossible to lose the “why” behind a decision.
+Six months later, when someone asks “why does the export endpoint return
+a 202 instead of a 200?”, the answer is in the design document: “PDF
+generation is asynchronous; the endpoint returns 202 Accepted with a
+polling URL.”</p>
+<hr />
+<h3 id="subsystem-4-ralplan-adversarial-planning">Subsystem 4: RALPLAN –
+Adversarial Planning</h3>
+<p><strong>Failure mode it solves:</strong> plans that sound confident
+but collapse on contact with reality.</p>
+<p><strong>Series lesson:</strong> Adversarial Planning (Lesson 8) –
+plans that face a critic before implementation survive
+implementation.</p>
+<p>RALPLAN is adversarial deliberation. A Planner creates a plan. A
+Critic tears it apart. The Planner revises. The Critic reviews again.
+This continues until the Critic approves or the maximum iteration count
+is reached.</p>
+<p>The critical design constraint: <strong>the Critic can only identify
+problems. It cannot suggest solutions.</strong> This is not an arbitrary
+restriction – it is the key to the whole protocol. When the critic
+suggests solutions, the planner becomes a secretary taking dictation.
+When the critic can only say “this is wrong,” the planner must actually
+think about how to fix it.</p>
+<figure>
+<img src="../visuals/svg-rendered/post11-ralplan-sequence.svg"
+alt="RALPLAN Sequence" />
+<figcaption aria-hidden="true">RALPLAN Sequence</figcaption>
+</figure>
+<pre class="mermaid"><code>sequenceDiagram
+    participant User
+    participant Planner
+    participant Architect
+    participant Critic
+
+    User-&gt;&gt;Planner: Submit task
+
+    Planner-&gt;&gt;Planner: Create initial plan
+
+    Planner-&gt;&gt;Critic: Submit plan for review
+
+    Critic-&gt;&gt;Planner: REJECT - findings(completeness, feasibility, hand-waving, risk)
+
+    Planner-&gt;&gt;Planner: Revise plan incorporating findings
+
+    Planner-&gt;&gt;Critic: Resubmit revised plan
+
+    Note over Planner,Critic: Loop continues up to MAX_ITERATIONS = 5
+
+    Critic-&gt;&gt;Planner: APPROVE
+
+    Planner-&gt;&gt;User: Return final plan</code></pre>
+<p>The Planner produces structured plans with phases, tasks,
+dependencies, and explicit risk identification:</p>
+<pre class="python"><code># src/ai_dev_os/ralplan/planner.py
+
+@dataclass
+class PlanTask:
+    &quot;&quot;&quot;A single task within a plan.&quot;&quot;&quot;
+    id: str
+    title: str
+    description: str
+    phase: str
+    complexity: str  # S, M, L
+    depends_on: list[str] = field(default_factory=list)
+    risks: list[str] = field(default_factory=list)
+
+@dataclass
+class PlanPhase:
+    &quot;&quot;&quot;A phase grouping related tasks.&quot;&quot;&quot;
+    name: str
+    goal: str
+    verification: str
+    tasks: list[PlanTask] = field(default_factory=list)
+
+@dataclass
+class Plan:
+    &quot;&quot;&quot;A complete implementation plan.&quot;&quot;&quot;
+    goal: str
+    phases: list[PlanPhase]
+    top_risks: list[str]
+    total_complexity: str
+    revision: int = 0
+    revision_notes: Optional[str] = None</code></pre>
+<p>Notice the <code>verification</code> field on each phase. This is
+mandatory. Every phase must declare how you will know it is complete.
+This prevents the common planning failure where phases like “implement
+core logic” have no completion criteria – so they are never actually
+finished, just eventually abandoned.</p>
+<p>The Critic evaluates across four categories:</p>
+<pre class="python"><code># src/ai_dev_os/ralplan/critic.py
+
+@dataclass
+class CriticFinding:
+    &quot;&quot;&quot;A specific finding from the critic&#39;s review.&quot;&quot;&quot;
+    severity: str  # CRITICAL, MODERATE, MINOR
+    category: str  # completeness, feasibility, hand_waving, risk_coverage
+    description: str
+    plan_reference: Optional[str] = None
+
+@dataclass
+class CriticVerdict:
+    &quot;&quot;&quot;Complete verdict from the CriticAgent.&quot;&quot;&quot;
+    verdict: VerdictType
+    critical_findings: list[CriticFinding] = field(default_factory=list)
+    moderate_findings: list[CriticFinding] = field(default_factory=list)
+    minor_findings: list[CriticFinding] = field(default_factory=list)
+    rationale: str = &quot;&quot;
+
+    @property
+    def is_approved(self) -&gt; bool:
+        return self.verdict == VerdictType.APPROVE</code></pre>
+<p><strong>Completeness:</strong> Does the plan cover all required
+areas? Are there phases without verification criteria? Are there empty
+phases with no tasks? The critic checks:</p>
+<pre class="python"><code># src/ai_dev_os/ralplan/critic.py
+
+# Each phase must have a verification criterion
+phases_without_verification = [
+    p.name for p in plan.phases if not p.verification.strip()
+]
+if phases_without_verification:
+    critical.append(CriticFinding(
+        severity=&quot;CRITICAL&quot;,
+        category=&quot;completeness&quot;,
+        description=(
+            f&quot;Phases missing verification criteria: {&#39;, &#39;.join(phases_without_verification)}. &quot;
+            f&quot;Every phase must have a concrete, checkable completion condition.&quot;
+        ),
+    ))</code></pre>
+<p><strong>Feasibility:</strong> Can this actually be built? Are tasks
+described with enough detail for an implementer to execute?</p>
+<pre class="python"><code># Tasks with no description cannot be implemented
+undescribed = [
+    f&quot;{t.id}: {t.title}&quot;
+    for p in plan.phases
+    for t in p.tasks
+    if not t.description.strip()
+]
+if undescribed:
+    critical.append(CriticFinding(
+        severity=&quot;CRITICAL&quot;,
+        category=&quot;feasibility&quot;,
+        description=(
+            f&quot;Tasks with no description: {&#39;, &#39;.join(undescribed[:3])}. &quot;
+            f&quot;An implementer cannot execute tasks without knowing what to do.&quot;
+        ),
+    ))</code></pre>
+<p><strong>Hand-Waving:</strong> The critic scans for vague language
+that hides implementation gaps:</p>
+<pre class="python"><code># src/ai_dev_os/ralplan/critic.py
+
+hand_wave_phrases = [
+    &quot;implement the logic&quot;,
+    &quot;handle appropriately&quot;,
+    &quot;etc&quot;,
+    &quot;and so on&quot;,
+    &quot;as needed&quot;,
+    &quot;when necessary&quot;,
+    &quot;somehow&quot;,
+    &quot;figure out&quot;,
+]</code></pre>
+<p>This list was built empirically. Every phrase was extracted from a
+real plan that failed during implementation because the vague
+description concealed a decision that had not actually been made.</p>
+<p><strong>Risk Coverage:</strong> Are enough risks identified? Is there
+a proof-of-concept task for unknown territory?</p>
+<pre class="python"><code># src/ai_dev_os/ralplan/critic.py
+
+has_spike = any(
+    any(kw in t.title.lower() for kw in [&quot;spike&quot;, &quot;proof&quot;, &quot;poc&quot;, &quot;validate&quot;, &quot;assumption&quot;])
+    for p in plan.phases
+    for t in p.tasks
+)
+if not has_spike and len(plan.top_risks) &gt;= 2:
+    minor.append(CriticFinding(
+        severity=&quot;MINOR&quot;,
+        category=&quot;risk_coverage&quot;,
+        description=(
+            &quot;No proof-of-concept or spike task found. &quot;
+            &quot;If any risks involve unknowns, add a spike task in Phase 1.&quot;
+        ),
+    ))</code></pre>
+<p>The verdict is binary. Any critical finding means REJECT:</p>
+<pre class="python"><code>verdict = VerdictType.REJECT if critical else VerdictType.APPROVE</code></pre>
+<p>No negotiation. No “approve with reservations.” If there is a
+critical finding, the plan goes back to the planner. This harshness is
+the point. Moderate and minor findings are recorded but do not block
+approval. Critical findings are deal-breakers.</p>
+<p>The deliberation loop runs the full protocol:</p>
+<pre class="python"><code># src/ai_dev_os/ralplan/deliberate.py
+
+MAX_ITERATIONS = 3
+
+for iteration in range(1, MAX_ITERATIONS + 1):
+    # Planner creates or revises the plan
+    if current_plan is None:
+        current_plan = self._planner.create_plan(task)
+    else:
+        criticism = &quot;\n&quot;.join(
+            f.description for f in current_verdict.critical_findings
+        )
+        current_plan = self._planner.revise_plan(current_plan, criticism)
+
+    # Critic reviews the plan
+    current_verdict = self._critic.review(current_plan)
+
+    if current_verdict.is_approved:
+        break</code></pre>
+<p>In practice, most plans require two rounds. Round 1: the planner
+produces a plan with vague descriptions and missing verification
+criteria. The critic rejects with specific findings. Round 2: the
+planner addresses the findings. The critic approves. Plans that require
+three rounds usually have a fundamental architectural issue that the
+planner is struggling to address.</p>
+<p>The deliberation result captures the full history of the
+planner-critic dialogue:</p>
+<pre class="python"><code># src/ai_dev_os/ralplan/deliberate.py
+
+@dataclass
+class DeliberationResult:
+    &quot;&quot;&quot;Final result of a RALPLAN deliberation.&quot;&quot;&quot;
+
+    task: str
+    final_plan: Plan
+    final_verdict: CriticVerdict
+    rounds: list[DeliberationRound]
+    consensus_reached: bool
+    deliberate_mode: bool
+    started_at: datetime
+    completed_at: datetime
+
+    @property
+    def round_count(self) -&gt; int:
+        return len(self.rounds)
+
+    @property
+    def approved(self) -&gt; bool:
+        return self.final_verdict.is_approved</code></pre>
+<p>This result object is what downstream subsystems consume. If you are
+using RALPLAN with Specum, the <code>final_plan</code> feeds into the
+requirements stage. If you are using RALPLAN with Team Pipeline, the
+<code>final_plan.phases</code> become the pipeline’s task list. The
+<code>consensus_reached</code> flag tells consumers whether the plan was
+fully approved or whether it is the best available plan after max
+iterations were exhausted – an important distinction that affects how
+aggressively you should execute.</p>
+<p>Here is what a typical two-round deliberation looks like in the
+console output:</p>
+<pre><code>RALPLAN DELIBERATION STARTED
+Task: Implement webhook handler with retry logic
+Mode: standard
+Max Rounds: 3
+
+--- ROUND 1/3 ---
+Planner: Creating initial plan...
+  Plan revision 0: 8 tasks across 3 phases
+Critic: Reviewing plan...
+  Critic verdict: REJECT (2 critical, 1 moderate, 0 minor findings)
+  - Phases missing verification criteria: Core Logic, Integration
+  - Tasks with no description: T2.3: &#39;Implement retry mechanism&#39;
+
+--- ROUND 2/3 ---
+Planner: Revising plan based on critic feedback...
+  Plan revision 1: 9 tasks across 3 phases
+Critic: Reviewing plan...
+  Critic verdict: APPROVE (0 critical, 1 moderate, 1 minor findings)
+
+CONSENSUS REACHED in 2 round(s)!</code></pre>
+<p>The output shows exactly what happened: round 1 had two critical
+findings (missing verification criteria and an undescribed task), the
+planner addressed both by adding verification criteria and expanding the
+task description, and round 2 approved with only non-blocking findings
+remaining. The moderate finding might be “only 2 risks identified” and
+the minor finding might be “no spike task.” Neither blocks
+implementation, but both are recorded for reference.</p>
+<p>In extended deliberation mode (<code>--deliberate</code>), RALPLAN
+adds pre-mortem analysis – imagining the plan has already failed and
+working backward to identify the most likely causes:</p>
+<pre class="python"><code># src/ai_dev_os/ralplan/deliberate.py
+
+def _run_premortem(self, plan: Plan, task: str) -&gt; Plan:
+    &quot;&quot;&quot;Imagines the plan has failed and works backward to identify causes.&quot;&quot;&quot;
+    premortem_risks = [
+        &quot;Implementation took 3x longer than estimated -- complexity underestimated&quot;,
+        &quot;Critical integration assumption was wrong -- spike was skipped or rushed&quot;,
+        &quot;Performance requirements not achievable with chosen technology stack&quot;,
+        &quot;Scope creep during implementation caused delays and incomplete core features&quot;,
+        &quot;Team lacked expertise in key technology -- learning curve not accounted for&quot;,
+    ]
+    plan.top_risks = list(set(plan.top_risks + premortem_risks))[:5]
+    return plan</code></pre>
+<p>And expanded test planning across unit, integration, e2e, and
+observability layers:</p>
+<pre class="python"><code># src/ai_dev_os/ralplan/deliberate.py
+
+def _expand_test_planning(self, plan: Plan) -&gt; Plan:
+    &quot;&quot;&quot;Adds explicit test tasks for unit, integration, e2e, and observability.&quot;&quot;&quot;
+    test_phase = PlanPhase(
+        name=&quot;Test Strategy&quot;,
+        goal=&quot;Define and implement comprehensive test coverage across all layers&quot;,
+        verification=&quot;All critical paths have tests; test pyramid is balanced&quot;,
+        tasks=[
+            PlanTask(id=&quot;TEST.1&quot;, title=&quot;Unit test: domain logic&quot;, ...),
+            PlanTask(id=&quot;TEST.2&quot;, title=&quot;Integration test: repository and service&quot;, ...),
+            PlanTask(id=&quot;TEST.3&quot;, title=&quot;E2E test: critical user journeys&quot;, ...),
+            PlanTask(id=&quot;TEST.4&quot;, title=&quot;Observability test: logging and metrics&quot;, ...),
+        ],
+    )
+    plan.phases.append(test_phase)
+    return plan</code></pre>
+<hr />
+<h3 id="subsystem-5-gsd-the-10-phase-project-lifecycle">Subsystem 5: GSD
+– The 10-Phase Project Lifecycle</h3>
+<p><strong>Failure mode it solves:</strong> projects that start strong
+and then drift into undefined territory.</p>
+<p><strong>Series lesson:</strong> Evidence-Gated Development (Lesson 3)
+– you cannot advance without proving the current phase is complete.</p>
+<p>GSD (Get Stuff Done) is a 10-phase lifecycle with evidence gates. You
+cannot advance to the next phase without proving the current phase is
+complete. Not claiming it is complete. Proving it.</p>
+<pre class="python"><code># src/ai_dev_os/gsd/phases.py
+
+class ProjectPhase(str, Enum):
+    NEW_PROJECT = &quot;new_project&quot;
+    RESEARCH = &quot;research&quot;
+    ROADMAP = &quot;roadmap&quot;
+    PLAN_PHASE = &quot;plan_phase&quot;
+    EXECUTE_PHASE = &quot;execute_phase&quot;
+    VERIFY_PHASE = &quot;verify_phase&quot;
+    ITERATE = &quot;iterate&quot;
+    INTEGRATION = &quot;integration&quot;
+    PRODUCTION_READINESS = &quot;production_readiness&quot;
+    COMPLETE = &quot;complete&quot;</code></pre>
+<p>Each phase has required evidence types that must be collected before
+the gate opens:</p>
+<pre class="python"><code># src/ai_dev_os/gsd/phases.py
+
+PHASE_REQUIRED_EVIDENCE = {
+    ProjectPhase.RESEARCH: [&quot;research_document&quot;, &quot;feasibility_assessment&quot;],
+    ProjectPhase.ROADMAP: [&quot;roadmap_document&quot;, &quot;success_criteria&quot;],
+    ProjectPhase.PLAN_PHASE: [&quot;implementation_plan&quot;, &quot;task_list&quot;],
+    ProjectPhase.EXECUTE_PHASE: [&quot;build_log&quot;, &quot;implementation_report&quot;],
+    ProjectPhase.VERIFY_PHASE: [&quot;verification_report&quot;, &quot;acceptance_criteria_results&quot;],
+    ProjectPhase.INTEGRATION: [&quot;integration_test_results&quot;, &quot;e2e_scenario_results&quot;],
+    ProjectPhase.PRODUCTION_READINESS: [&quot;deployment_guide&quot;, &quot;runbook&quot;, &quot;monitoring_setup&quot;],
+    ProjectPhase.COMPLETE: [&quot;final_report&quot;],
+}</code></pre>
+<p>The evidence collection system is its own module. Evidence is typed,
+timestamped, and traceable:</p>
+<pre class="python"><code># src/ai_dev_os/gsd/evidence.py
+
+class EvidenceType(str, Enum):
+    BUILD_LOG = &quot;build_log&quot;
+    SCREENSHOT = &quot;screenshot&quot;
+    API_RESPONSE = &quot;api_response&quot;
+    TEST_OUTPUT = &quot;test_output&quot;
+    MANUAL_VERIFICATION = &quot;manual_verification&quot;
+    DOCUMENT = &quot;document&quot;
+    METRIC = &quot;metric&quot;
+    LOG_OUTPUT = &quot;log_output&quot;
+    BENCHMARK_RESULT = &quot;benchmark_result&quot;</code></pre>
+<p>Evidence is collected through a dedicated collector that stores items
+in <code>.omc/evidence/</code> and manages them by project and
+phase:</p>
+<pre class="python"><code># src/ai_dev_os/gsd/evidence.py
+
+class EvidenceCollector:
+    &quot;&quot;&quot;
+    Evidence is the mechanism that makes GSD&#39;s phase gates enforceable.
+    Without concrete evidence, a phase cannot be marked complete.
+    &quot;&quot;&quot;
+
+    def collect(
+        self,
+        phase: str,
+        evidence_type: EvidenceType,
+        title: str,
+        data: Any,
+        notes: Optional[str] = None,
+    ) -&gt; Evidence:
+        evidence = Evidence(
+            phase=phase,
+            evidence_type=evidence_type,
+            title=title,
+            data=data,
+            notes=notes,
+        )
+
+        # If data is a string and long, write to file
+        if isinstance(data, str) and len(data) &gt; 500:
+            file_path = self._evidence_dir / f&quot;{evidence.id}-{evidence_type.value}.txt&quot;
+            file_path.write_text(data, encoding=&quot;utf-8&quot;)
+            evidence.file_path = str(file_path)
+
+        self.store.evidence_items.append(evidence)
+        self._save()
+        return evidence</code></pre>
+<p>The phase gate check verifies that evidence exists before allowing
+advancement:</p>
+<pre class="python"><code># src/ai_dev_os/gsd/evidence.py
+
+def verify_phase_complete(self, phase: str) -&gt; bool:
+    &quot;&quot;&quot;Check if a phase has sufficient evidence to be considered complete.&quot;&quot;&quot;
+    phase_evidence = self.list_by_phase(phase)
+    return len(phase_evidence) &gt; 0</code></pre>
+<p>GSD also tracks assumptions explicitly through an
+<code>AssumptionTracker</code>. This is one of the more subtle features,
+and one of the most important. Assumptions made during planning that are
+never validated represent hidden risks. The tracker surfaces them at
+phase gates:</p>
+<pre class="python"><code># src/ai_dev_os/gsd/assumptions.py
+
+class AssumptionTracker:
+    &quot;&quot;&quot;
+    Assumptions that are never validated represent hidden risks.
+    This tracker surfaces unvalidated assumptions at phase gates,
+    preventing projects from proceeding with invalid foundations.
+    &quot;&quot;&quot;
+
+    def record(
+        self,
+        assumption: str,
+        source: str,
+        phase: str,
+        impact: str = &quot;medium&quot;,
+    ) -&gt; Assumption:
+        entry = Assumption(
+            text=assumption,
+            source=source,
+            phase=phase,
+            impact=impact,
+        )
+        self.store.assumptions.append(entry)
+        self._save()
+        return entry
+
+    def critical_unvalidated(self) -&gt; list[Assumption]:
+        &quot;&quot;&quot;Return unvalidated assumptions with critical or high impact.&quot;&quot;&quot;
+        return [
+            a for a in self.list_unvalidated()
+            if a.impact in (&quot;critical&quot;, &quot;high&quot;)
+        ]
+
+    def list_invalidated(self) -&gt; list[Assumption]:
+        &quot;&quot;&quot;Return assumptions that were validated and found to be WRONG.&quot;&quot;&quot;
+        return [
+            a for a in self.store.assumptions
+            if a.validated and a.validation_result and &quot;INVALIDATED&quot; in a.validation_result
+        ]</code></pre>
+<p>The assumption tracker deserves a concrete example because it
+addresses one of the most insidious failure modes in AI-assisted
+development: <strong>confident reasoning from false
+premises.</strong></p>
+<p>During the ILS iOS project, the RESEARCH phase recorded this
+assumption:</p>
+<pre class="json"><code>{
+  &quot;text&quot;: &quot;The backend always returns JSON responses for all /api/v1 endpoints&quot;,
+  &quot;source&quot;: &quot;architect agent, during API layer design&quot;,
+  &quot;phase&quot;: &quot;research&quot;,
+  &quot;impact&quot;: &quot;critical&quot;,
+  &quot;validated&quot;: false
+}</code></pre>
+<p>This assumption was reasonable. The backend was a Vapor server, and
+Vapor’s content negotiation defaults to JSON. The architect agent
+designed the entire error handling layer based on this assumption –
+every API client method decoded JSON, every error path parsed JSON error
+bodies, every retry mechanism assumed it could extract structured error
+information from the response.</p>
+<p>The assumption was wrong.</p>
+<p>The backend returned plain text
+<code>500 Internal Server Error</code> responses when the SQLite
+database lock timed out. No JSON. No structured error body. Just a raw
+string. The entire error handling chain crashed, which cascaded into
+silent failures in the chat system, which meant messages were being
+dropped without any user-visible indication.</p>
+<p>Without the assumption tracker, this would have been diagnosed as a
+“mysterious chat bug” requiring hours of debugging. With the tracker,
+the <code>critical_unvalidated()</code> method surfaced it at the
+EXECUTE phase gate:</p>
+<pre><code>WARNING: 1 critical unvalidated assumption(s):
+  [A-001] &quot;The backend always returns JSON responses for all /api/v1 endpoints&quot;
+  Source: architect agent, during API layer design
+  Phase: research | Impact: critical
+
+  Action required: validate before proceeding to VERIFY phase.</code></pre>
+<p>The fix was 12 lines of code – a response type check before JSON
+decoding. But finding the assumption that needed fixing, without the
+tracker, would have taken an order of magnitude longer than the fix
+itself.</p>
+<p>The validation method records the result so future phases can
+reference it:</p>
+<pre class="python"><code># src/ai_dev_os/gsd/assumptions.py
+
+def validate(
+    self,
+    assumption_id: str,
+    result: str,
+    evidence: Optional[str] = None,
+) -&gt; Optional[Assumption]:
+    &quot;&quot;&quot;Validate an assumption. Result should be &#39;VALIDATED&#39; or &#39;INVALIDATED: reason&#39;.&quot;&quot;&quot;
+    for a in self.store.assumptions:
+        if a.id == assumption_id:
+            a.validated = True
+            a.validated_at = datetime.utcnow()
+            a.validation_result = result
+            a.validation_evidence = evidence
+            self._save()
+            return a
+    return None</code></pre>
+<p>Once validated, assumptions become part of the project’s
+institutional knowledge. An invalidated assumption with its correction
+(“<code>INVALIDATED: backend returns plain text on SQLite lock timeout. Fix: add response Content-Type check before JSON decoding</code>”)
+is more valuable than a validated one, because it captures a
+misconception that could recur in future projects.</p>
+<p>Consider a concrete example. During the RESEARCH phase of a payment
+system project, the architect assumes “Stripe API supports idempotency
+keys for all endpoints.” This assumption is recorded with
+<code>impact="critical"</code>. Later, during the EXECUTE phase, the
+team discovers that Stripe’s refund endpoint does not support
+idempotency keys for partial refunds. The assumption is marked
+<code>INVALIDATED</code>. The assumption tracker surfaces this at the
+next phase gate, forcing the team to address it before claiming the
+implementation is complete.</p>
+<p>This is the mechanism that prevents completion theater – the common
+pattern where a team says “we are done” without anyone actually
+verifying the claim. With GSD, “done” is not a feeling. It is a
+collection of evidence artifacts that prove the work was completed.</p>
+<p>In the ILS iOS project that generated these 4,500 sessions, GSD
+produced over 470 screenshots, 12 build logs, 37 API response captures,
+and 15 verification reports. Every phase transition was backed by
+concrete evidence. When something broke in a later phase, the evidence
+trail made it possible to trace back to exactly when and where the
+regression was introduced.</p>
+<p>Here is what the evidence store looks like for a real phase gate
+transition in the ILS project:</p>
+<pre class="json"><code>{
+  &quot;phase&quot;: &quot;execute_phase&quot;,
+  &quot;project&quot;: &quot;ils-ios-chat&quot;,
+  &quot;evidence_count&quot;: 5,
+  &quot;evidence&quot;: [
+    {
+      &quot;id&quot;: &quot;a3f7c1e2&quot;,
+      &quot;type&quot;: &quot;build_log&quot;,
+      &quot;title&quot;: &quot;iOS build succeeded after SSEClient fix&quot;,
+      &quot;collected_at&quot;: &quot;2026-02-15T21:27:56Z&quot;,
+      &quot;verified&quot;: true,
+      &quot;file_path&quot;: &quot;.omc/evidence/ils-ios-chat/a3f7c1e2-build_log.txt&quot;,
+      &quot;notes&quot;: &quot;BUILD SUCCEEDED (0 warnings, 0 errors)&quot;
+    },
+    {
+      &quot;id&quot;: &quot;b8d4e923&quot;,
+      &quot;type&quot;: &quot;screenshot&quot;,
+      &quot;title&quot;: &quot;Chat view with streaming response active&quot;,
+      &quot;collected_at&quot;: &quot;2026-02-15T21:28:14Z&quot;,
+      &quot;verified&quot;: true,
+      &quot;file_path&quot;: null,
+      &quot;notes&quot;: &quot;Claude responding to &#39;Say hi&#39; with real streaming animation&quot;
+    },
+    {
+      &quot;id&quot;: &quot;c1a9f456&quot;,
+      &quot;type&quot;: &quot;api_response&quot;,
+      &quot;title&quot;: &quot;POST /api/v1/chat/stream returns SSE events&quot;,
+      &quot;collected_at&quot;: &quot;2026-02-15T21:29:01Z&quot;,
+      &quot;verified&quot;: true,
+      &quot;file_path&quot;: &quot;.omc/evidence/ils-ios-chat/c1a9f456-api_response.txt&quot;,
+      &quot;notes&quot;: &quot;Full SSE stream with content_block_delta events and done sentinel&quot;
+    },
+    {
+      &quot;id&quot;: &quot;d7e2b891&quot;,
+      &quot;type&quot;: &quot;screenshot&quot;,
+      &quot;title&quot;: &quot;Chat view after response completes&quot;,
+      &quot;collected_at&quot;: &quot;2026-02-15T21:29:33Z&quot;,
+      &quot;verified&quot;: true,
+      &quot;notes&quot;: &quot;Streaming indicator correctly stopped, full response visible&quot;
+    },
+    {
+      &quot;id&quot;: &quot;e4c1a723&quot;,
+      &quot;type&quot;: &quot;metric&quot;,
+      &quot;title&quot;: &quot;Response latency measurement&quot;,
+      &quot;collected_at&quot;: &quot;2026-02-15T21:30:02Z&quot;,
+      &quot;verified&quot;: true,
+      &quot;notes&quot;: &quot;Cold start: 12.3s, warm: 2.1s, streaming throughput: 47 tokens/sec&quot;
+    }
+  ]
+}</code></pre>
+<p>Five pieces of evidence, each typed and timestamped, each telling a
+specific part of the completion story. The build log proves the code
+compiles. The screenshots prove the UI renders correctly. The API
+response proves the backend integration works. The metric proves
+performance is acceptable. Together, they form an irrefutable argument
+that the execute phase is actually complete – not “looks done” but “is
+provably done.”</p>
+<p>The export capability makes this evidence portable:</p>
+<pre class="python"><code># src/ai_dev_os/gsd/evidence.py
+
+def export_phase_evidence(self, phase: str) -&gt; dict[str, Any]:
+    &quot;&quot;&quot;Export all evidence for a phase as a structured dict.&quot;&quot;&quot;
+    items = self.list_by_phase(phase)
+    return {
+        &quot;phase&quot;: phase,
+        &quot;project&quot;: self._project_name,
+        &quot;evidence_count&quot;: len(items),
+        &quot;evidence&quot;: [
+            {
+                &quot;id&quot;: e.id,
+                &quot;type&quot;: e.evidence_type.value,
+                &quot;title&quot;: e.title,
+                &quot;collected_at&quot;: e.collected_at.isoformat(),
+                &quot;verified&quot;: e.verified,
+                &quot;file_path&quot;: e.file_path,
+                &quot;notes&quot;: e.notes,
+            }
+            for e in items
+        ],
+    }</code></pre>
+<p>This export format is what gets attached to phase gate transitions.
+When a reviewer asks “how do you know the execute phase is complete?”,
+the answer is not a verbal explanation – it is a JSON document with five
+typed evidence items, each linking to the raw artifact. The evidence
+outlives the session, the context window, and the human’s memory.</p>
+<hr />
+<h3
+id="subsystem-6-team-pipeline-coordinated-multi-agent-execution">Subsystem
+6: Team Pipeline – Coordinated Multi-Agent Execution</h3>
+<p><strong>Failure mode it solves:</strong> agents working in isolation
+without a shared understanding of state.</p>
+<p><strong>Series lesson:</strong> Multi-Agent Consensus (Lesson 1) –
+independent agents working through a structured process produce better
+results than one agent working alone.</p>
+<p>Team Pipeline is the orchestration layer. It coordinates N agents
+through a staged pipeline with a state machine that handles both the
+happy path and the inevitable failures:</p>
+<pre class="python"><code># src/ai_dev_os/team_pipeline/pipeline.py
+
+class PipelineStage(str, Enum):
+    PLAN = &quot;team-plan&quot;
+    PRD = &quot;team-prd&quot;
+    EXEC = &quot;team-exec&quot;
+    VERIFY = &quot;team-verify&quot;
+    FIX = &quot;team-fix&quot;
+    COMPLETE = &quot;complete&quot;
+    FAILED = &quot;failed&quot;
+    CANCELLED = &quot;cancelled&quot;
+
+PIPELINE_PROGRESSION = {
+    PipelineStage.PLAN: PipelineStage.PRD,
+    PipelineStage.PRD: PipelineStage.EXEC,
+    PipelineStage.EXEC: PipelineStage.VERIFY,
+    PipelineStage.VERIFY: PipelineStage.COMPLETE,  # on pass
+    PipelineStage.FIX: PipelineStage.VERIFY,  # fix feeds back to verify
+}</code></pre>
+<p>The pipeline: PLAN -&gt; PRD -&gt; EXEC -&gt; VERIFY -&gt; FIX (loop,
+bounded).</p>
+<figure>
+<img src="../visuals/svg-rendered/post11-team-pipeline-state.svg"
+alt="Team Pipeline State Machine" />
+<figcaption aria-hidden="true">Team Pipeline State Machine</figcaption>
+</figure>
+<pre class="mermaid"><code>stateDiagram-v2
+    [*] --&gt; PLAN
+    PLAN --&gt; PRD
+    PRD --&gt; EXEC
+    EXEC --&gt; VERIFY
+    VERIFY --&gt; COMPLETE : all pass
+    VERIFY --&gt; FIX : issues found
+    FIX --&gt; VERIFY : fixed
+    FIX --&gt; FAILED : max retries exceeded 3x
+    COMPLETE --&gt; [*]
+    FAILED --&gt; [*]</code></pre>
+<p>Each stage uses specialized agents from the OMC catalog. The PLAN
+stage uses explore (haiku) for fast codebase discovery and planner
+(opus) for task sequencing. The EXEC stage dispatches to the appropriate
+specialist based on the task:</p>
+<pre class="python"><code># src/ai_dev_os/team_pipeline/stages.py
+
+class ExecStage(BaseStage):
+    stage_name = &quot;exec&quot;
+    required_agents = [&quot;executor&quot;, &quot;designer&quot;, &quot;build-fixer&quot;, &quot;writer&quot;, &quot;test-engineer&quot;]
+
+    def _select_specialist(self, task: str) -&gt; str:
+        task_lower = task.lower()
+        if any(kw in task_lower for kw in [&quot;ui&quot;, &quot;design&quot;, &quot;ux&quot;, &quot;interface&quot;, &quot;layout&quot;]):
+            return &quot;designer&quot;
+        elif any(kw in task_lower for kw in [&quot;test&quot;, &quot;coverage&quot;, &quot;spec&quot;, &quot;tdd&quot;]):
+            return &quot;test-engineer&quot;
+        elif any(kw in task_lower for kw in [&quot;doc&quot;, &quot;readme&quot;, &quot;guide&quot;, &quot;changelog&quot;]):
+            return &quot;writer&quot;
+        elif any(kw in task_lower for kw in [&quot;complex&quot;, &quot;architecture&quot;, &quot;refactor entire&quot;, &quot;migrate&quot;]):
+            return &quot;deep-executor&quot;
+        else:
+            return &quot;executor&quot;</code></pre>
+<p>This specialist dispatch is the Team Pipeline’s key contribution.
+Without it, every implementation task would go to a generic executor.
+With it, UI tasks go to the designer (who knows about component
+hierarchies and accessibility patterns), documentation tasks go to the
+writer (running on Haiku for cost efficiency), and complex architectural
+tasks go to the deep-executor (running on Opus for maximum reasoning
+depth).</p>
+<p>The transition logic handles the critical verify-fix loop:</p>
+<pre class="python"><code># src/ai_dev_os/team_pipeline/pipeline.py
+
+def _transition(self, current: PipelineStage, result: StageResult) -&gt; None:
+    state = self.state
+
+    if current == PipelineStage.VERIFY:
+        if result.success:
+            state.current_stage = PipelineStage.COMPLETE
+            state.status = PipelineStatus.COMPLETE
+        else:
+            if state.fix_loop_count &gt;= state.max_fix_loops:
+                state.current_stage = PipelineStage.FAILED
+                state.status = PipelineStatus.FAILED
+            else:
+                state.fix_loop_count += 1
+                state.current_stage = PipelineStage.FIX
+
+    elif current == PipelineStage.FIX:
+        state.current_stage = PipelineStage.VERIFY</code></pre>
+<p>The bounded fix loop is important. Without it, a failing pipeline
+could loop forever. Three fix attempts is the default. If you cannot fix
+a verification failure in three passes, the problem is likely
+architectural, not a simple bug – and continuing to throw the same fix
+agent at it will not help. Better to fail explicitly so a human can
+intervene, than to loop silently consuming tokens.</p>
+<p>The pipeline state tracks everything needed for resumability:</p>
+<pre class="python"><code># src/ai_dev_os/team_pipeline/pipeline.py
+
+class TeamPipelineState(BaseModel):
+    task: str
+    current_stage: PipelineStage = PipelineStage.PLAN
+    status: PipelineStatus = PipelineStatus.ACTIVE
+    fix_loop_count: int = 0
+    max_fix_loops: int = 3
+    stage_history: list[StageHistory] = Field(default_factory=list)
+    all_artifacts: dict[str, str] = Field(default_factory=dict)
+    all_findings: list[str] = Field(default_factory=list)
+    linked_ralph: Optional[str] = None
+    started_at: datetime = Field(default_factory=datetime.utcnow)
+    last_updated: datetime = Field(default_factory=datetime.utcnow)
+
+    @property
+    def is_terminal(self) -&gt; bool:
+        return self.status in (PipelineStatus.COMPLETE, PipelineStatus.FAILED, PipelineStatus.CANCELLED)</code></pre>
+<p>Notice <code>linked_ralph</code>. Team Pipeline can link to a Ralph
+Loop session, just as Ralph Loop can link to a Team Pipeline. The
+bidirectional link means that if either subsystem is cancelled, both are
+cancelled. This prevents orphaned executions – a Ralph Loop persisting
+work for a Team Pipeline that has already been abandoned.</p>
+<p>The context-passing mechanism between stages deserves attention. Each
+stage receives a context dictionary built from the pipeline’s
+accumulated state:</p>
+<pre class="python"><code># src/ai_dev_os/team_pipeline/pipeline.py
+
+def _build_context(self) -&gt; dict[str, Any]:
+    &quot;&quot;&quot;Build context dict for the current stage.&quot;&quot;&quot;
+    state = self.state
+    return {
+        &quot;task&quot;: state.task,
+        &quot;artifacts&quot;: state.all_artifacts,
+        &quot;findings&quot;: state.all_findings,
+        &quot;fix_loop_count&quot;: state.fix_loop_count,
+        &quot;stage_history&quot;: state.stage_history,
+    }</code></pre>
+<p>This means the VERIFY stage sees the artifacts produced by EXEC. The
+FIX stage sees both the artifacts and the findings that caused
+verification to fail. The context grows with each stage, creating a
+shared understanding that no individual agent possesses but that the
+pipeline as a whole maintains.</p>
+<p>The stage history tracking enables post-mortem analysis. After a
+pipeline completes (or fails), you can see exactly which stages
+succeeded, which failed, how many artifacts were produced at each stage,
+and how many findings accumulated:</p>
+<pre class="python"><code># src/ai_dev_os/team_pipeline/pipeline.py
+
+class StageHistory(BaseModel):
+    &quot;&quot;&quot;Record of a completed stage run.&quot;&quot;&quot;
+    stage: str
+    success: bool
+    artifact_names: list[str] = Field(default_factory=list)
+    findings_count: int = 0
+    started_at: datetime = Field(default_factory=datetime.utcnow)
+    completed_at: Optional[datetime] = None</code></pre>
+<p>A pipeline that produced 12 artifacts and 0 findings across all
+stages is a clean run. A pipeline that produced 8 artifacts but
+accumulated 15 findings before entering the fix loop three times – that
+tells a story about where the complexity was hiding. The stage history
+is the pipeline’s audit trail, serving the same function that GSD’s
+evidence collection serves for the broader project lifecycle.</p>
+<hr />
+<h3 id="the-unified-cli">The Unified CLI</h3>
+<p>All six subsystems are accessible through a single CLI:</p>
+<pre class="python"><code># src/ai_dev_os/cli.py
+
+@click.group()
+@click.version_option(version=&quot;1.0.0&quot;, prog_name=&quot;ai-dev-os&quot;)
+def main() -&gt; None:
+    &quot;&quot;&quot;
+    AI Development Operating System CLI.
+
+    Orchestrate Claude Code agents across complex software projects
+    using OMC, Ralph Loop, Specum, RALPLAN, GSD, and Team Pipeline.
+
+    Quick Start:
+      ai-dev-os catalog list           # See all 25+ agents
+      ai-dev-os ralph start --task &quot;Build auth system&quot;
+      ai-dev-os spec new --goal &quot;Implement payment processing&quot;
+      ai-dev-os gsd new-project --name myapp
+    &quot;&quot;&quot;</code></pre>
+<p>This is not six disconnected tools bolted together. The subsystems
+compose:</p>
+<ul>
+<li>RALPLAN produces plans. Ralph Loop persists their execution.</li>
+<li>Specum generates task lists. Team Pipeline coordinates agents to
+execute them.</li>
+<li>GSD manages the project lifecycle. Each phase can invoke any
+subsystem.</li>
+<li>OMC provides the agent catalog that every other subsystem draws
+from.</li>
+<li>Evidence collection in GSD verifies work done by Team Pipeline.</li>
+<li>The Critic from RALPLAN can review plans generated by any
+subsystem.</li>
+</ul>
+<hr />
+<h3 id="the-composability-insight">The Composability Insight</h3>
+<p>The most important thing I learned is that <strong>composability
+beats integration</strong>. Each subsystem is useful on its own. Ralph
+Loop can persist any iterative workflow, not just those generated by
+Specum. RALPLAN can critique any plan, not just those from GSD. The OMC
+catalog serves any orchestrator, not just Team Pipeline.</p>
+<p>This is the same lesson the Unix community learned decades ago:
+small, composable tools that do one thing well are more powerful than
+monolithic systems that try to do everything.</p>
+<p>Let me show you what composability looks like in practice with four
+real examples from the ILS iOS project.</p>
+<p><strong>Example 1: Bug Fix (30 minutes, 3 subsystems)</strong></p>
+<p>A user reports that the SSE streaming indicator stays “active” after
+a response completes. The workflow:</p>
+<ol type="1">
+<li><strong>OMC</strong> dispatches a <code>debugger</code> agent
+(Sonnet) to analyze the <code>SSEClient.swift</code> file</li>
+<li>The debugger identifies that the <code>isStreaming</code> flag is
+not reset when the server sends a <code>"done"</code> event</li>
+<li><strong>OMC</strong> dispatches an <code>executor</code> agent
+(Sonnet) to fix the one-line bug</li>
+<li><strong>Team Pipeline</strong> runs VERIFY with a
+<code>verifier</code> agent to confirm the fix</li>
+</ol>
+<p>Three subsystems, three agents, 30 minutes. No planning phase needed
+(the problem is clear). No persistence needed (it fits in one session).
+The system adapts to the scale of the task.</p>
+<p><strong>Example 2: Feature Implementation (4 hours, 5
+subsystems)</strong></p>
+<p>Adding a new Hooks Management screen to the iOS app:</p>
+<ol type="1">
+<li><strong>RALPLAN</strong> produces a plan: 3 phases, 8 tasks, 2
+risks. The critic rejects round 1 for missing verification criteria on
+the UI phase. Round 2 passes.</li>
+<li><strong>Specum</strong> takes the approved plan and generates a
+requirements doc (acceptance criteria), a design doc (API contract with
+backend), and an ordered task list.</li>
+<li><strong>Ralph Loop</strong> persists execution across 2 sessions
+(the first session hit the context window at task 5).</li>
+<li><strong>Team Pipeline</strong> runs EXEC with specialist dispatch:
+<code>designer</code> for the SwiftUI views, <code>executor</code> for
+the backend controller, <code>writer</code> for the inline
+documentation.</li>
+<li><strong>GSD</strong> collects evidence: build log (0 warnings, 0
+errors), 4 screenshots (empty state, populated state, edit mode, error
+state), API response captures showing the hooks data round-tripping
+correctly.</li>
+</ol>
+<p>Five subsystems, eight agents, two sessions, full completion with
+evidence.</p>
+<p><strong>Example 3: Architecture Decision (1 hour, 2
+subsystems)</strong></p>
+<p>Deciding whether to use a concrete <code>ThemeSnapshot</code> struct
+or a protocol <code>any AppTheme</code> for the theming system:</p>
+<ol type="1">
+<li><strong>OMC</strong> dispatches an <code>architect</code> agent
+(Opus) with the full context: 48 views using themes, 13 built-in themes,
+performance profiling showing existential overhead in hot paths.</li>
+<li><strong>RALPLAN</strong> runs the architect’s recommendation through
+the critic. The critic flags that the migration path is underspecified –
+“replace all instances” is hand-waving. The architect revises with a
+concrete grep-and-replace strategy.</li>
+</ol>
+<p>Two subsystems, two agents, one hour. The architecture decision is
+documented, challenged, and concrete enough to execute.</p>
+<p><strong>Example 4: Full Feature with Persistence (2 days, all 6
+subsystems)</strong></p>
+<p>Building the complete chat system with SSE streaming, agent SDK
+integration, and multi-session support:</p>
+<ol type="1">
+<li><strong>GSD</strong> creates a new project with a 10-phase
+lifecycle</li>
+<li><strong>RALPLAN</strong> produces the implementation plan (3 rounds,
+critic rejected twice for underspecified streaming architecture)</li>
+<li><strong>Specum</strong> generates full specifications: requirements
+with 13 acceptance criteria, design with API contracts and state machine
+diagrams, ordered task list of 22 tasks</li>
+<li><strong>Ralph Loop</strong> persists execution across 5 sessions
+over 2 days</li>
+<li><strong>Team Pipeline</strong> coordinates 6 concurrent agents:
+explore (codebase mapping), executor (Swift implementation), designer
+(chat UI), build-fixer (SSE compatibility issues), security-reviewer
+(auth token handling), verifier (end-to-end validation)</li>
+<li><strong>GSD</strong> collects 12 evidence artifacts across 4 phases,
+including build logs, screenshots of the chat UI with real streaming
+responses, and API response captures showing the full message
+round-trip</li>
+</ol>
+<p>All six subsystems working together, each solving the specific class
+of failure it was designed for, producing a working feature with a
+complete audit trail.</p>
+<p>The pattern that emerges from these examples is what I call
+<strong>adaptive depth</strong>. The system scales its engagement to
+match the complexity of the task. A bug fix uses 3 subsystems. A feature
+uses 5. A full project uses all 6. You do not pay the overhead of
+adversarial planning for a one-line fix. You do not skip evidence
+collection for a two-day feature. The system adapts.</p>
+<p>This is why composability matters more than integration. An
+integrated system would force you through all stages regardless of task
+size. A composable system lets you pick the subsystems that match the
+problem. The Unix philosophy – small tools that compose – was right 50
+years ago and it is right now.</p>
+<figure>
+<img src="../visuals/svg-rendered/post11-composition-flow.svg"
+alt="Composition Flow" />
+<figcaption aria-hidden="true">Composition Flow</figcaption>
+</figure>
+<pre class="mermaid"><code>flowchart TD
+    subgraph INPUT[Feature Request]
+        REQ[&quot;Add payment processing\nwith Stripe integration&quot;]
+    end
+
+    subgraph RALPLAN_PHASE[1. RALPLAN Adversarial Planning]
+        P1[&quot;Planner (opus)\nCreate initial plan:\n4 phases, 14 tasks&quot;]
+        C1[&quot;Critic (opus)\nREJECT: hand-waving in\nTask 2.3, no spike task&quot;]
+        P2[&quot;Planner (opus)\nRevise: add spike,\nconcretize descriptions&quot;]
+        C2[&quot;Critic (opus)\nAPPROVE: 4 phases,\n15 tasks, 3 risks&quot;]
+    end
+
+    subgraph SPECUM_PHASE[2. Specum Specification Pipeline]
+        S1[&quot;RequirementsStage\n(ProductManagerAgent)\nrequirements.md&quot;]
+        S2[&quot;DesignStage\n(ArchitectAgent)\ndesign.md + API contract&quot;]
+        S3[&quot;TaskStage\n(TaskPlannerAgent)\ntasks.md 15 ordered tasks&quot;]
+    end
+
+    subgraph TEAM_PHASE[3. Team Pipeline Multi-Agent Execution]
+        direction TB
+        TP[&quot;PLAN stage\nexplore (haiku) + planner (opus)&quot;]
+        TPRD[&quot;PRD stage\nanalyst (opus)&quot;]
+        TEXEC[&quot;EXEC stage\nexecutor (sonnet) x3\ndesigner (sonnet) x1&quot;]
+        TVERIFY[&quot;VERIFY stage\nverifier (sonnet)\nsecurity-reviewer (sonnet)&quot;]
+        TFIX[&quot;FIX stage\nbuild-fixer (sonnet)\nLoop 1 of 3&quot;]
+        TVERIFY2[&quot;VERIFY stage (re-run)\nverifier (sonnet)\nPASS&quot;]
+    end
+
+    subgraph RALPH_PHASE[4. Ralph Loop Persistent Execution]
+        R1[&quot;Iteration 1-5:\nPhase 1 tasks (Foundation)&quot;]
+        R2[&quot;Iteration 6-10:\nPhase 2 tasks (Core Logic)&quot;]
+        R3[&quot;Iteration 11-14:\nPhase 3 tasks (API Layer)&quot;]
+        R4[&quot;Iteration 15:\nSession boundary state persisted&quot;]
+        R5[&quot;New session resumes at\niteration 16 from disk&quot;]
+        R6[&quot;Iteration 16-20:\nPhase 4 tasks (Integration)&quot;]
+    end
+
+    subgraph GSD_PHASE[5. GSD Evidence-Gated Lifecycle]
+        G1[&quot;RESEARCH phase\nevidence: feasibility doc&quot;]
+        G2[&quot;EXECUTE phase\nevidence: build log,\nimplementation report&quot;]
+        G3[&quot;VERIFY phase\nevidence: verification report,\nacceptance criteria results&quot;]
+        G4[&quot;INTEGRATION phase\nevidence: e2e scenario,\nload test results&quot;]
+        G5[&quot;COMPLETE\nfinal report with\n12 evidence artifacts&quot;]
+    end
+
+    subgraph OMC_LAYER[OMC Agent Catalog (25 agents across all stages)]
+        OMC_NOTE[&quot;explore, planner, architect, executor,\ndesigner, verifier, critic, build-fixer,\nsecurity-reviewer, code-reviewer, writer...&quot;]
+    end
+
+    REQ --&gt; P1
+    P1 --&gt; C1
+    C1 --&gt;|REJECT| P2
+    P2 --&gt; C2
+    C2 --&gt;|APPROVE| S1
+
+    S1 --&gt; S2
+    S2 --&gt; S3
+    S3 --&gt; TP
+
+    TP --&gt; TPRD
+    TPRD --&gt; TEXEC
+    TEXEC --&gt; TVERIFY
+    TVERIFY --&gt;|FAIL: build error| TFIX
+    TFIX --&gt; TVERIFY2
+    TVERIFY2 --&gt;|PASS| R1
+
+    R1 --&gt; R2
+    R2 --&gt; R3
+    R3 --&gt; R4
+    R4 -.-&gt;|session boundary| R5
+    R5 --&gt; R6
+    R6 --&gt; G1
+
+    G1 --&gt;|evidence gate| G2
+    G2 --&gt;|evidence gate| G3
+    G3 --&gt;|evidence gate| G4
+    G4 --&gt;|evidence gate| G5
+
+    OMC_LAYER -.-&gt;|provides agents| RALPLAN_PHASE
+    OMC_LAYER -.-&gt;|provides agents| TEAM_PHASE
+    OMC_LAYER -.-&gt;|provides agents| SPECUM_PHASE</code></pre>
+<p>This diagram shows the complete flow for a non-trivial feature: a
+payment processing system with Stripe integration. The feature request
+enters RALPLAN for adversarial planning. The approved plan flows into
+Specum for specification. The specifications feed Team Pipeline for
+multi-agent execution. Ralph Loop provides persistence across session
+boundaries. GSD gates every phase transition with evidence. And OMC
+provides the agents that every subsystem draws from.</p>
+<p>The key insight: no subsystem knows about the full picture. RALPLAN
+does not know that Team Pipeline will execute its plan. Team Pipeline
+does not know that GSD will gate its output. They communicate through
+artifacts on disk – markdown files, JSON state, evidence directories.
+This is why the system is composable rather than merely integrated.</p>
+<h4 id="what-this-looks-like-in-practice">What This Looks Like in
+Practice</h4>
+<p>Let me walk through what actually happens on disk when you run the
+full composition for that Stripe payment feature.</p>
+<p>You start with a single command:</p>
+<pre class="bash"><code>ai-dev-os plan --task &quot;Add payment processing with Stripe integration&quot; --consensus</code></pre>
+<p>RALPLAN fires. The planner agent (Opus) creates a plan. The critic
+agent (Opus) reviews it. The planner’s first draft describes Task 2.3 as
+“Implement the payment logic for handling subscriptions.” The critic
+catches this immediately:</p>
+<pre><code>REJECT (round 1 of 3)
+Critical findings:
+  [C-001] Hand-waving: Task 2.3 description contains &quot;implement the logic&quot;
+          — what logic? What payment states? What error cases?
+  [C-002] No spike task: 2 risks identified (Stripe API rate limits,
+          webhook signature verification) but no proof-of-concept task.</code></pre>
+<p>Round 2: the planner revises. Task 2.3 becomes three tasks:
+“Implement Stripe PaymentIntent creation with idempotency keys,” “Handle
+14 Stripe webhook event types with signature verification,” and “Build
+payment state machine (pending -&gt; processing -&gt;
+succeeded/failed/disputed).” A spike task appears in Phase 1: “Validate
+Stripe test mode webhook delivery to localhost via Stripe CLI.” The
+critic approves.</p>
+<p>The approved plan writes to
+<code>.omc/plans/stripe-payments.json</code>. Specum picks it up and
+runs the specification pipeline. Three artifacts land on disk:</p>
+<pre><code>.omc/specs/stripe-payments/
+├── requirements.md      (product manager agent, 847 words)
+├── design.md            (architect agent, 1,203 words + API contract)
+└── tasks.md             (task planner agent, 15 ordered tasks with dependencies)</code></pre>
+<p>Team Pipeline reads those artifacts and begins staged execution. The
+PLAN stage uses explore (Haiku) to map the existing codebase – where the
+current billing code lives, what the database schema looks like, which
+routes are already defined. The EXEC stage dispatches tasks to
+specialists: the <code>executor</code> handles the Stripe client
+implementation, the <code>designer</code> handles the checkout UI, the
+<code>writer</code> handles the webhook documentation. The VERIFY stage
+runs the verifier and security-reviewer in parallel.</p>
+<p>Verification fails: the security reviewer finds that webhook
+signatures are verified but the timestamp tolerance is not checked,
+allowing replay attacks. The pipeline enters the FIX stage. The
+build-fixer applies the fix (8 lines of code). Re-verification
+passes.</p>
+<p>Meanwhile, Ralph Loop has been persisting state after every
+iteration. At iteration 14, the laptop lid closes. The session ends. Two
+hours later, a new session starts:</p>
+<pre class="bash"><code>ai-dev-os ralph status
+# Ralph Loop: stripe-payments
+# Iteration: 14 of 50 | Status: RUNNING
+# Tasks: 9/15 completed, 1 in_progress, 5 pending
+# Last updated: 2 hours ago
+# Linked team: team-stripe-payments (ACTIVE)
+
+ai-dev-os ralph continue
+# Resuming from iteration 14...</code></pre>
+<p>No context lost. No re-reading files. No re-discovering what was
+already decided. The new session picks up exactly where the old one left
+off, because the state is on disk, not in memory.</p>
+<p>When all 15 tasks complete, GSD gates the transition from EXECUTE to
+VERIFY:</p>
+<pre class="bash"><code>ai-dev-os gsd advance
+# Checking evidence for EXECUTE_PHASE...
+# ✓ build_log: &quot;xcodebuild succeeded (0 warnings, 0 errors)&quot;
+# ✓ implementation_report: &quot;15/15 tasks completed, 3 specialists used&quot;
+# Evidence gate PASSED. Advancing to VERIFY_PHASE.</code></pre>
+<p>The entire flow – from feature request to verified completion –
+involved five subsystems, three model tiers, eight different agent
+types, one session boundary, one security finding, and one fix cycle. No
+individual component understood the full picture. But the system,
+collectively, delivered a working payment integration with evidence at
+every gate.</p>
+<p>This is what “composable” means in practice. Not theoretical
+modularity. Working orchestration across real session boundaries, real
+verification failures, and real evidence requirements.</p>
+<hr />
+<h3 id="the-self-hosting-loop">The Self-Hosting Loop</h3>
+<p>There is one more thing worth mentioning. This system built
+itself.</p>
+<p>The timeline tells the story:</p>
+<p><strong>Day 1-10: The OMC Kernel.</strong> 8 agents (explore,
+executor, verifier, architect, planner, code-reviewer,
+security-reviewer, writer). No persistence, no planning protocol. I used
+these agents to build features in the ILS iOS app. They worked, but
+context was constantly lost between sessions.</p>
+<p><strong>Day 11-20: Ralph Loop.</strong> After the fifth time I
+re-explained a task from scratch because the previous session had ended,
+I built Ralph Loop. The first version was 80 lines of Python – just a
+JSON file with a task list and an iteration counter. The agents were
+used to design the persistence format, and then the persistent format
+was used to track the agents’ work.</p>
+<p><strong>Day 21-35: RALPLAN.</strong> After three confident plans
+collapsed during implementation (one memorably because “implement the
+payment logic” turned out to hide six weeks of Stripe API integration),
+I built RALPLAN. The architect agent designed the protocol. The planner
+agent created the first plan for RALPLAN itself. And then I manually
+played the critic role – rejecting the plan twice for hand-waving in the
+“critic implementation” section – before encoding that behavior into the
+critic agent.</p>
+<p><strong>Day 36-50: Team Pipeline.</strong> The agent catalog had
+grown to 18 agents and they needed coordination. Two executors working
+on the same file. A verifier running before the implementation was
+complete. A security reviewer starting its review while a build-fixer
+was still resolving compilation errors. Team Pipeline provided the
+staging: PLAN then PRD then EXEC then VERIFY. The bounded fix loop came
+from a real incident where a failing test caused an infinite verify-fix
+cycle that consumed $47 in API costs before I noticed.</p>
+<p><strong>Day 51-65: GSD.</strong> Projects were completing but with no
+audit trail. “Is the chat system done?” “I think so.” “Can you prove
+it?” Silence. GSD formalized the evidence collection that I had been
+doing informally. The assumption tracker came from a production incident
+where an invalidated assumption (“the backend always returns JSON”)
+caused a cascading failure that took two days to diagnose.</p>
+<p><strong>Day 66-80: Specum.</strong> The latest addition, born from
+the realization that even with adversarial planning, agents would still
+sometimes skip directly from “I have a plan” to “let me write code”
+without documenting requirements or design decisions. Specum enforces
+the specification step that experienced engineers know is essential but
+that AI agents are perpetually tempted to skip.</p>
+<p><strong>Day 81-90: Integration and refinement.</strong> The six
+subsystems were connected through shared state, the CLI was unified, and
+the whole system was used to build the final features of the ILS iOS app
+– including the features that made the system itself more reliable. The
+<code>linked_team</code> and <code>linked_ralph</code> fields were added
+during this phase, after a Ralph Loop and a Team Pipeline ran
+simultaneously on the same task without knowing about each other,
+producing conflicting state.</p>
+<p>Each subsystem was built using the subsystems that already existed.
+The agent catalog was designed by the architect agent. The RALPLAN
+protocol was planned by the planner agent and critiqued by the critic
+agent. Ralph Loop persisted the execution of Team Pipeline, which
+coordinated the agents that built GSD. Over 90 days, the system grew
+from 8 agents to 25. From one subsystem to six. Each addition was driven
+by a real failure, not theoretical elegance. The operating system
+evolved through the same process it now manages: research, plan,
+execute, verify, iterate.</p>
+<p>The self-hosting loop has a recursive quality that is worth dwelling
+on. When I built RALPLAN, the critic agent’s system prompt was written
+by the writer agent. The writer agent’s system prompt was written by me.
+But the critic agent’s behavior – the four-category evaluation, the
+binary verdict, the hand-waving detection – was designed by the
+architect agent, which runs on Opus. The architect made a design
+decision (critic cannot suggest fixes, only identify problems) that I
+initially disagreed with. I wanted a “constructive critic” that would
+say “this is wrong, and here is how to fix it.” The architect’s
+rationale was that constructive criticism makes the planner lazy – it
+stops thinking and just implements whatever the critic suggests. I built
+both versions and tested them. The architect was right. Plans that faced
+a non-constructive critic were 40% more likely to survive implementation
+than plans that faced a constructive one.</p>
+<p>This is the meta-lesson: the system’s design decisions were
+themselves improved by the system. The architect agent, running on Opus,
+made a better design decision than I would have made alone. Not because
+Opus is smarter than me, but because the agent had a narrowly defined
+role (system design) with a carefully crafted system prompt (evaluate
+architectural tradeoffs) and was asked a specific question (should the
+critic suggest solutions or only identify problems?). Specialization
+works for the system that builds itself, not just for the system that it
+produces.</p>
+<hr />
+<h3 id="metrics-from-90-days">Metrics from 90 Days</h3>
+<p>After 4,500 sessions, here are the numbers that matter:</p>
+<p><strong>Cost efficiency through model routing:</strong> - 68% of
+agent invocations use Haiku (explore, writer): $0.80/M input tokens -
+24% use Sonnet (executor, verifier, reviewers): $3.00/M input tokens -
+8% use Opus (architect, planner, critic): $15.00/M input tokens -
+Estimated savings vs. Opus-for-everything: 73% cost reduction</p>
+<p><strong>RALPLAN planning improvement:</strong> - Plans that went
+through RALPLAN survived implementation 89% of the time - Plans without
+adversarial review survived 34% of the time - Average rounds to
+consensus: 2.1 - Most common rejection reason: missing verification
+criteria (42%) - Second most common: hand-waving language (31%)</p>
+<p><strong>Ralph Loop persistence:</strong> - Average tasks per Ralph
+Loop session: 12 - Average sessions to complete: 2.3 - Zero lost work
+across 90 days (every session resumed correctly) - Longest Ralph Loop:
+47 iterations across 7 sessions (full iOS app rebuild)</p>
+<p><strong>Team Pipeline execution:</strong> - Average stages per
+pipeline: 5.2 (PLAN + PRD + EXEC + VERIFY + one FIX round) - Fix loop
+utilization: 61% of pipelines required at least one fix round - Fix loop
+exhaustion (3x and FAILED): 4% of pipelines - Specialist dispatch
+accuracy: 94% (task routed to the correct specialist)</p>
+<p><strong>GSD evidence collection (ILS iOS project):</strong> - 470+
+screenshots captured as evidence - 37 phase gates passed with evidence -
+15 verification reports generated - 12 build logs preserved - 0 phases
+completed without evidence</p>
+<p><strong>Overall:</strong> - Features completed end-to-end without
+regression: 91% - Time from feature request to verified completion: 68%
+faster than pre-system baseline - Context loss incidents (work lost due
+to session ending): 0 in last 60 days (was ~4/week before Ralph
+Loop)</p>
+<p>These numbers are not benchmarks. They are measurements from real
+development of a real application. Your numbers will vary based on
+project complexity, team size, and how aggressively you adopt the
+subsystems.</p>
+<p>A few numbers deserve deeper commentary:</p>
+<p>The <strong>89% plan survival rate</strong> with RALPLAN versus 34%
+without is the single most impactful metric. A plan that fails during
+implementation does not just waste the implementation time – it wastes
+the planning time, the context-building time, and the morale of everyone
+involved. Adversarial review is the highest-leverage intervention in the
+entire system.</p>
+<p>The <strong>4% fix loop exhaustion rate</strong> tells you that the
+bounded fix loop works. 96% of verification failures are fixable within
+three attempts. The 4% that exhaust the loop genuinely need human
+intervention – they are architectural issues, not bugs. The system
+correctly identifies when to stop trying and escalate.</p>
+<p>The <strong>zero context loss incidents</strong> in the last 60 days
+(down from ~4/week) quantifies the value of Ralph Loop. Four lost
+sessions per week at an average of 45 minutes each is three hours of
+wasted developer time every week. Over 60 days, that is 25+ hours
+recovered. Ralph Loop’s entire implementation is under 300 lines of
+Python.</p>
+<p>The <strong>94% specialist dispatch accuracy</strong> in Team
+Pipeline means the keyword-based routing in
+<code>_select_specialist()</code> is surprisingly effective. The 6%
+misroutes typically involve ambiguous tasks like “update the user
+settings interface documentation” – is that a <code>designer</code> task
+(UI), a <code>writer</code> task (documentation), or an
+<code>executor</code> task (update)? These edge cases are handled by
+falling through to the default <code>executor</code>, which is good
+enough for most purposes.</p>
+<hr />
+<h3 id="getting-started">Getting Started</h3>
+<p>You do not need to adopt all six subsystems at once. Start with the
+one that addresses your most painful failure mode.</p>
+<p><strong>If your biggest problem is cost:</strong> Start with OMC.
+Define 3-5 agents with explicit model tier assignments. Route file
+search to Haiku. Route implementation to Sonnet. Route architecture
+decisions to Opus. This alone can reduce API costs by 50-70%.</p>
+<pre class="bash"><code>ai-dev-os catalog list                    # See all agents
+ai-dev-os catalog show explore            # See agent details
+ai-dev-os route &quot;Find all auth imports&quot;   # Get routing recommendation</code></pre>
+<p><strong>If your biggest problem is lost context:</strong> Start with
+Ralph Loop. Wrap your next multi-session task in a Ralph Loop with
+explicit task tracking. When the session ends, the next session picks up
+exactly where you left off.</p>
+<pre class="bash"><code>ai-dev-os ralph start --task &quot;Implement user authentication&quot; --max-iterations 50
+# ... work happens ...
+# Session ends, new session starts:
+ai-dev-os ralph status     # See where you are
+ai-dev-os ralph continue   # Keep going</code></pre>
+<p><strong>If your biggest problem is plans that fail:</strong> Start
+with RALPLAN. Run your next implementation plan through the adversarial
+deliberation protocol. The critic will find the gaps that would have
+become bugs.</p>
+<pre class="bash"><code>ai-dev-os plan --task &quot;Add Stripe payment processing&quot; --consensus
+# Planner creates plan -&gt; Critic reviews -&gt; iterate until APPROVE</code></pre>
+<p><strong>If your biggest problem is incomplete work:</strong> Start
+with GSD. Create a project with evidence gates. You will be amazed at
+how many things you thought were “done” but actually were not.</p>
+<pre class="bash"><code>ai-dev-os gsd new-project --name payments --goal &quot;Production payment system&quot;
+ai-dev-os gsd advance    # Move to RESEARCH (requires evidence)
+ai-dev-os gsd evidence   # See what&#39;s been collected</code></pre>
+<p><strong>If your biggest problem is specification drift:</strong>
+Start with Specum. Force yourself to write requirements and a design
+document before any implementation begins.</p>
+<pre class="bash"><code>ai-dev-os spec new --goal &quot;Implement webhook handling&quot;
+ai-dev-os spec advance   # Requirements -&gt; Design -&gt; Tasks -&gt; Implement -&gt; Verify</code></pre>
+<p><strong>If your biggest problem is uncoordinated agents:</strong>
+Start with Team Pipeline. Run your next feature through the staged
+pipeline with specialist dispatch.</p>
+<pre class="bash"><code>ai-dev-os team start --task &quot;Build notification system&quot;
+# PLAN -&gt; PRD -&gt; EXEC (with specialist dispatch) -&gt; VERIFY -&gt; FIX (if needed)</code></pre>
+<p>The subsystems compose naturally. Once you have OMC and Ralph Loop,
+adding RALPLAN is trivial – it uses OMC agents and can persist through
+Ralph. Once you have RALPLAN and Specum, adding Team Pipeline
+coordinates everything. GSD wraps the whole lifecycle with evidence
+gates.</p>
+<p>Here is a recommended adoption sequence based on what I have seen
+work:</p>
+<p><strong>Week 1: OMC + Ralph Loop.</strong> Define your agent catalog.
+Set up persistent state. This alone will transform your workflow – you
+will stop losing work between sessions and stop overpaying for simple
+tasks.</p>
+<p><strong>Week 2: RALPLAN.</strong> Run your next feature plan through
+adversarial review. The critic will find things you missed. Expect your
+plans to be rejected the first time. That is the point.</p>
+<p><strong>Week 3: Specum or GSD (pick one).</strong> If your problem is
+specification drift, add Specum. If your problem is incomplete work, add
+GSD. You do not need both immediately.</p>
+<p><strong>Week 4: Team Pipeline + the other one.</strong> Add
+multi-agent coordination and whichever of Specum/GSD you did not add in
+week 3. At this point you have the full system.</p>
+<p>The companion repository includes everything: the full OMC catalog
+(25 agents with complete system prompts), Ralph Loop, Specum Pipeline,
+RALPLAN deliberation with pre-mortem and test planning, GSD lifecycle
+with evidence collection and assumption tracking, Team Pipeline with
+specialist dispatch and bounded fix loops, and the unified CLI. It is
+MIT licensed.</p>
+<p>To get running:</p>
+<pre class="bash"><code># Clone the repository
+git clone https://github.com/nickbaumann98/ai-dev-operating-system.git
+cd ai-dev-operating-system
+
+# Install dependencies
+pip install -e .
+
+# Verify installation
+ai-dev-os --version
+ai-dev-os catalog list
+
+# Start with a simple Ralph Loop
+ai-dev-os ralph start --task &quot;Your first persistent task&quot; --max-iterations 10
+
+# Try adversarial planning
+ai-dev-os plan --task &quot;Implement user notifications&quot; --consensus
+
+# Create a full project lifecycle
+ai-dev-os gsd new-project --name my-feature --goal &quot;Build notification preferences UI&quot;</code></pre>
+<p>The state files live in <code>.omc/</code> at your project root. They
+are plain JSON, human-readable, and version-controllable. You can
+inspect, edit, or reset them at any time. There is no hidden state, no
+background process, no daemon to manage. It is just files on disk – the
+simplest possible persistence mechanism that actually works.</p>
+<hr />
+<h3 id="what-the-system-cannot-do">What the System Cannot Do</h3>
+<p>Honesty demands acknowledging the limitations.</p>
+<p><strong>It cannot replace human judgment on product
+decisions.</strong> The system can plan, implement, review, and verify.
+But deciding whether to build the feature at all – whether it serves
+users, whether it fits the product vision – is still a human decision.
+RALPLAN can challenge a plan’s feasibility, but it cannot challenge
+whether the goal itself is worth pursuing.</p>
+<p><strong>It cannot guarantee correctness.</strong> Evidence-gated
+development dramatically reduces the chance of shipping broken features.
+But a build log that says “0 warnings, 0 errors” does not prove the code
+is correct. A screenshot showing the UI rendering correctly does not
+prove the business logic is right. The system reduces risk. It does not
+eliminate it.</p>
+<p><strong>It cannot handle genuinely novel problems.</strong> The agent
+catalog, the complexity scoring, the specialist dispatch – all are tuned
+for software engineering patterns that have been seen before. A task
+that involves a truly novel algorithm or an unprecedented integration
+will not be well-served by keyword-based routing. The human needs to
+intervene with custom agent configurations.</p>
+<p><strong>It does not compose across teams of humans.</strong> The
+current system orchestrates AI agents within a single developer’s
+workflow. It does not handle multi-human collaboration, merge conflicts
+between parallel AI sessions, or organizational politics. Those are
+problems for a different system.</p>
+<p><strong>It has a learning curve.</strong> Six subsystems, 25 agents,
+four model tiers, five state files, and a CLI with 30+ commands. The
+system is powerful, but it is not simple. The “Getting Started” section
+above exists because jumping in with all six subsystems at once is
+overwhelming.</p>
+<p><strong>It adds overhead before it saves time.</strong> A simple bug
+fix that would take 5 minutes with a single Claude session takes 15
+minutes through RALPLAN + Team Pipeline + GSD. The system is designed
+for features that span multiple sessions, not for quick patches. Know
+when to use a wrench and when to use your hands. As a rough guide:</p>
+<table>
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 56%" />
+<col style="width: 13%" />
+</colgroup>
+<thead>
+<tr>
+<th>Task Size</th>
+<th>Recommended Approach</th>
+<th>Why</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>&lt; 30 min, single file</td>
+<td>Direct Claude session</td>
+<td>System overhead exceeds task</td>
+</tr>
+<tr>
+<td>1-4 hours, 3-10 files</td>
+<td>OMC + Ralph Loop</td>
+<td>Persistence and routing matter</td>
+</tr>
+<tr>
+<td>1-3 days, 10+ files</td>
+<td>Full system (all 6 subsystems)</td>
+<td>Planning, coordination, evidence all pay off</td>
+</tr>
+<tr>
+<td>&gt; 1 week, cross-cutting</td>
+<td>Full system + custom agent configs</td>
+<td>Worth investing in project-specific agents</td>
+</tr>
+</tbody>
+</table>
+<p><strong>It costs money.</strong> Running the full system for a medium
+feature (15 tasks, 2 RALPLAN rounds, 5 Team Pipeline stages, 3 GSD phase
+gates) consumes roughly $8-15 in API costs. That is dramatically cheaper
+than a human developer spending 3 days on the same feature, but it is
+not free. The model routing in OMC exists specifically to control this
+cost – routing 68% of invocations to Haiku keeps the bill manageable.
+Without routing, the same workflow on Opus-for-everything would cost
+$45-60.</p>
+<p><strong>It assumes Claude Code.</strong> The system prompt
+engineering, the agent catalog, and the model tier assignments are all
+tuned for Claude. The architectural principles (specialization,
+persistence, adversarial review, evidence gates) are model-agnostic, but
+the implementation is not. Adapting the system to GPT, Gemini, or
+open-source models would require reworking the agent prompts and
+recalibrating the complexity scoring thresholds.</p>
+<hr />
+<h3 id="what-is-next">What is Next</h3>
+<p>Three directions I am actively exploring:</p>
+<p><strong>Cross-project learning.</strong> Currently, the OMC catalog
+is static – the same 25 agents with the same system prompts for every
+project. But the patterns that work for an iOS app are different from
+the patterns that work for a data pipeline. The next version will
+support project-specific agent configurations that evolve based on what
+worked and what did not.</p>
+<p><strong>Automatic model routing refinement.</strong> The complexity
+scoring uses hardcoded keyword lists. A better version would track which
+model tier actually produced the best results for each task type and
+adjust the routing table automatically. If Haiku consistently produces
+adequate results for tasks currently routed to Sonnet, the router should
+learn to downgrade.</p>
+<p><strong>Team-of-teams orchestration.</strong> The current Team
+Pipeline coordinates agents within a single pipeline. But some projects
+need multiple pipelines running in parallel – a frontend pipeline, a
+backend pipeline, and an integration pipeline, each with their own
+agents, coordinated at a higher level. This is the “operating system”
+analogy taken to its logical conclusion: multiple processes, each with
+their own resources, managed by a scheduler.</p>
+<p><strong>Evidence-driven regression detection.</strong> GSD’s evidence
+collection creates a natural baseline for regression detection. If the
+VERIFY phase screenshot from last week shows a working chat interface,
+and this week’s screenshot shows a broken one, the system should detect
+this automatically. The evidence store already has the timestamps and
+file paths. Adding image comparison (via Pillow or a lightweight
+perceptual hash) would close the loop.</p>
+<p><strong>Adaptive critic calibration.</strong> RALPLAN’s critic
+currently uses fixed thresholds: any critical finding means REJECT, two
+or more risks required, specific hand-waving phrases to detect. These
+thresholds were tuned empirically, but they are static. A more
+sophisticated version would calibrate the critic’s sensitivity based on
+the project’s phase: stricter during early planning (when changes are
+cheap), more lenient during late-stage fixes (when the cost of
+re-planning outweighs the cost of proceeding with moderate
+findings).</p>
+<p><strong>Multi-model composition.</strong> The current system uses
+Claude exclusively. But some tasks – particularly visual design review,
+diagram generation, and large-context document analysis – might benefit
+from mixing models. The OMC catalog could be extended with non-Claude
+agents: a GPT-4o agent for visual analysis, a Gemini agent for
+large-context document processing, a local model for latency-sensitive
+operations. The routing table already supports this extension – the
+<code>model_id</code> field in <code>AgentDefinition</code> just needs
+to accept non-Claude model identifiers.</p>
+<hr />
+<h3 id="lessons-learned-building-the-system">Lessons Learned Building
+the System</h3>
+<p>A few hard-won insights from 90 days of building and using this
+system:</p>
+<p><strong>JSON files beat databases for AI state.</strong> I considered
+SQLite, Redis, and even a custom event store for persistence. JSON files
+won because they are human-readable (you can inspect state with
+<code>cat</code>), diffable (you can track changes with
+<code>git diff</code>), and trivially portable (you can copy state
+between machines). The performance cost is negligible – serializing 50
+tasks takes microseconds. The debugging benefit is enormous – when
+something goes wrong, you can read the state file and see exactly what
+happened.</p>
+<p><strong>Binary verdicts beat nuanced ones.</strong> Early versions of
+RALPLAN had a three-level verdict: APPROVE, APPROVE_WITH_RESERVATIONS,
+REJECT. The middle option was useless – it let the planner claim
+approval without actually addressing the reservations. Binary verdicts
+(APPROVE or REJECT) force resolution. This principle extends to all gate
+decisions in the system: evidence either exists or it does not. A task
+is either complete or it is not. Ambiguity is where incomplete work
+hides.</p>
+<p><strong>The critic must not suggest fixes.</strong> I covered this in
+the RALPLAN section, but it deserves emphasis as a general principle.
+When a review agent suggests a fix, the implementation agent becomes a
+transcription service. When a review agent only identifies the problem,
+the implementation agent must understand the problem deeply enough to
+solve it. The quality of fixes is dramatically higher when the fixer
+must think, not just copy.</p>
+<p><strong>Specialist dispatch is worth the complexity.</strong> Early
+versions of Team Pipeline routed everything to a generic executor.
+Adding keyword-based specialist dispatch added ~20 lines of code and
+increased first-pass success rates from 71% to 94%. The insight is that
+AI agents, like humans, perform better when given a narrowly defined
+role with a tailored system prompt.</p>
+<p><strong>State linking prevents orphaned work.</strong> The
+<code>linked_team</code> / <code>linked_ralph</code> fields were added
+after a real incident where a Ralph Loop continued persisting tasks for
+a Team Pipeline that had already been cancelled. The orphaned loop
+consumed $12 in API costs before anyone noticed. Bidirectional links
+with coordinated cancellation solved this completely.</p>
+<hr />
+<h3 id="the-deeper-pattern">The Deeper Pattern</h3>
+<p>Step back from the code for a moment and consider what this system
+really is.</p>
+<p>Every subsystem solves a problem that is fundamentally about the gap
+between capability and reliability. Claude can write excellent code. But
+“can” is not the same as “will, consistently, across many sessions,
+without losing context, without skipping steps, without claiming
+completion prematurely.” The operating system closes that gap – not by
+making the model smarter, but by imposing structure that makes the
+model’s existing intelligence more reliable.</p>
+<p>This is exactly what organizational design does for human teams. A
+brilliant engineer who never writes specs, never reviews code, and never
+tests their work will produce worse outcomes than a good engineer
+embedded in a team with spec reviews, code reviews, and QA gates. The
+brilliance is necessary but not sufficient. The structure is what
+converts capability into reliable delivery.</p>
+<p>The operating system analogy is precise. A traditional OS provides
+process isolation, persistence, scheduling, and inter-process
+communication. The AI Dev OS provides agent specialization (isolation),
+Ralph Loop (persistence), Team Pipeline (scheduling), and shared state
+files (IPC). The problems are isomorphic. The solutions are isomorphic.
+This is not a metaphor – it is a design principle.</p>
+<p>The implication for the future of AI-assisted development is clear:
+the bottleneck is not model capability. It is orchestration. The next
+leap in AI development productivity will not come from a model that is
+10% smarter. It will come from systems that make the existing models 10x
+more reliable. Specialization, persistence, adversarial review,
+evidence-based verification, and multi-agent coordination are the
+mechanisms. They worked for human teams. They work for AI agents. They
+will continue to work as models improve – because the principles are not
+about the agents. They are about the work.</p>
+<hr />
+<h3 id="the-bottom-line">The Bottom Line</h3>
+<p>After 4,500 sessions, here is what I know: AI development benefits
+from the same organizational principles that human teams discovered
+decades ago.</p>
+<p><strong>Specialization works.</strong> Not every task needs the most
+powerful model. An explore agent on Haiku finds files faster than an
+architect on Opus, because it is built for that specific job.</p>
+<p><strong>Persistence works.</strong> Work that survives session
+boundaries is qualitatively different from work that dies when the
+terminal closes.</p>
+<p><strong>Adversarial review works.</strong> Plans that face a critic
+before implementation are plans that survive implementation.</p>
+<p><strong>Evidence-based verification works.</strong> “It looks done”
+is not the same as “here is the build log, the API response, and the
+screenshot proving it works.”</p>
+<p><strong>Coordination works.</strong> Multiple specialized agents
+working through a structured pipeline produce better results than one
+generalist agent trying to do everything.</p>
+<p><strong>Composability works.</strong> Six independent subsystems that
+communicate through files on disk are more flexible, more debuggable,
+and more resilient than a monolithic orchestration engine.</p>
+<p>None of these are novel ideas. They are the accumulated wisdom of
+decades of software engineering practice. The novelty is applying them
+to AI agents – and discovering that they work just as well for silicon
+as they do for carbon.</p>
+<p>This is the thread that connects all ten lessons in this series.
+Multi-agent consensus is just peer review. Functional validation is just
+QA. Evidence-gated development is just audit trails. Model routing is
+just appropriate staffing. Adversarial planning is just design review.
+Context persistence is just institutional knowledge. The Reflexion Loop
+is just retrospectives. Design tokens are just style guides. Stitch
+validation is just acceptance testing. And this operating system is just
+the organizational chart that ties them all together.</p>
+<p>We did not need to invent new principles for AI development. We
+needed to rediscover the ones that have worked for human teams for
+decades, and encode them into systems that AI agents can follow. The
+models were always capable enough. What they needed – what they have
+always needed – is a system.</p>
+<p>The models are capable enough. What they need is a system.</p>
+<p>And now you have one.</p>
+<hr />
+<p>Companion Repository: <a
+href="https://github.com/nickbaumann98/ai-dev-operating-system">github.com/nickbaumann98/ai-dev-operating-system</a></p>
+<p>All code quoted in this post is from real, running source files. The
+repository includes the full OMC catalog (25 agents with system
+prompts), Ralph Loop, Specum Pipeline, RALPLAN deliberation, GSD
+lifecycle, and Team Pipeline. MIT licensed.</p>
+<hr />
+<p><em>Part 11 of 11 in the <a
+href="https://github.com/krzemienski/agentic-development-guide">Agentic
+Development</a> series.</em></p>
+
+<hr>
+<h2>Diagrams &amp; Visual Assets</h2>
+<div class="diagram" id="post11-aidevos-architecture"><h4>post11-aidevos-architecture</h4><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1545.5250000000003 521" width="1545.5250000000003" height="521" style="--bg:#0d1117;--fg:#e6edf3;--line:#3d444d;--accent:#4493f8;--muted:#9198a1;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 30%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="4.8" refX="8" refY="2.4" orient="auto">
+    <polygon points="0 0, 8 2.4, 0 4.8" fill="var(--_arrow)" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="4.8" refX="0" refY="2.4" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.4, 8 4.8" fill="var(--_arrow)" />
+  </marker>
+</defs>
+<rect x="40" y="40" width="1457.3125" height="112" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="40" y="40" width="1457.3125" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="52" y="54" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">Base Layer</text>
+<rect x="505.9625000000002" y="196" width="617.7124999999999" height="112" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="505.9625000000002" y="196" width="617.7124999999999" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="517.9625000000002" y="210" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">Persistence Layer</text>
+<rect x="40" y="369" width="1457.3125" height="112" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="40" y="369" width="1457.3125" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="52" y="383" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">Workflow Orchestrators</text>
+<polyline points="829.45,132 829.45,152 772.7625,152 772.7625,252" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="772.7625,288 772.7625,308 659.3625000000002,308 659.3625000000002,328 351.71249999999986,328 351.71249999999986,443 430.57499999999993,443" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="829.45,132 829.45,152 154.07500000000005,152 154.07500000000005,443 98.27499999999995,443" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="829.45,132 829.45,152 439.0000000000002,152 439.0000000000002,328 622,328 622,443 708.2250000000001,443" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="829.45,132 829.45,152 1218.6625,152 1218.6625,328 1109.8875,328 1109.8875,443 1108.1,443" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="829.45,132 829.45,152 1395.025,152 1395.025,443 1457.25,443" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="772.7625,288 772.7625,308 740.5625000000001,308 740.5625000000001,328 494.11250000000007,328 494.11250000000007,443 454.5750000000001,443" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="772.7625,288 772.7625,308 839.45,308 839.45,443 904.5,443" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="772.7625,288 772.7625,308 980.2750000000001,308 980.2750000000001,328 1191.0875,328 1191.0875,443 1132.1,443" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<rect x="286.5124999999999" y="343" width="130.4" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="351.71249999999986" y="356.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">provides persistence</text>
+<rect x="103.17500000000004" y="256.5" width="101.8" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="154.07500000000005" y="270" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">provides agents</text>
+<rect x="388.10000000000025" y="256.5" width="101.8" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="439.0000000000002" y="270" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">provides agents</text>
+<rect x="1167.7624999999998" y="256.5" width="101.8" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="1218.6625" y="270" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">provides agents</text>
+<rect x="1344.125" y="256.5" width="101.8" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="1395.025" y="270" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">provides agents</text>
+<rect x="428.9125000000001" y="343" width="130.4" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="494.11250000000007" y="356.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">provides persistence</text>
+<rect x="774.25" y="343" width="130.4" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="839.45" y="356.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">provides persistence</text>
+<rect x="1125.8875" y="343" width="130.4" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="1191.0875" y="356.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">provides persistence</text>
+<rect x="541.75" y="96" width="575.4000000000001" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="527.9625000000001" y="252" width="489.6" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="98.27499999999995" y="425" width="332.3" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="454.5750000000001" y="425" width="253.65" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="904.5" y="425" width="203.60000000000002" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="1132.1" y="425" width="325.15000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<text x="829.45" y="114" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;OMC\n25 specialized agents\n(Build / Review / Domain / Coordination lanes)&quot;</text>
+<text x="772.7625" y="270" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Ralph Loop\nSession persistence\n(survives session boundaries)&quot;</text>
+<text x="264.42499999999995" y="443" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Specum Pipeline\nSpec-driven development&quot;</text>
+<text x="581.4000000000001" y="443" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;RALPLAN\nAdversarial planning&quot;</text>
+<text x="1006.3" y="443" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;GSD\nProject lifecycle&quot;</text>
+<text x="1294.675" y="443" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Team Pipeline\nMulti-agent coordination&quot;</text>
+</svg></div><div class="diagram" id="post11-composition-flow"><h4>post11-composition-flow</h4><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1588.4 3730" width="1588.4" height="3730" style="--bg:#0d1117;--fg:#e6edf3;--line:#3d444d;--accent:#4493f8;--muted:#9198a1;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 30%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="4.8" refX="8" refY="2.4" orient="auto">
+    <polygon points="0 0, 8 2.4, 0 4.8" fill="var(--_arrow)" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="4.8" refX="0" refY="2.4" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.4, 8 4.8" fill="var(--_arrow)" />
+  </marker>
+</defs>
+<rect x="40" y="40" width="440.6500000000001" height="112" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="40" y="40" width="440.6500000000001" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="52" y="54" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">&quot;Feature Request&quot;</text>
+<rect x="83.13749999999993" y="213" width="716.7875000000001" height="597" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="83.13749999999993" y="213" width="716.7875000000001" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="95.13749999999993" y="227" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">&quot;1. RALPLAN — Adversarial Planning&quot;</text>
+<rect x="230.44999999999982" y="871" width="868.5750000000003" height="424" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="230.44999999999982" y="871" width="868.5750000000003" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="242.44999999999982" y="885" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">&quot;2. Specum — Specification Pipeline&quot;</text>
+<rect x="429.7249999999999" y="1359" width="500.15000000000003" height="493" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="429.7249999999999" y="1359" width="500.15000000000003" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="441.7249999999999" y="1373" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">&quot;3. Team Pipeline — Multi-Agent Execution&quot;</text>
+<rect x="459.4749999999999" y="1933" width="440.6500000000001" height="909" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="459.4749999999999" y="1933" width="440.6500000000001" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="471.4749999999999" y="1947" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">&quot;4. Ralph Loop — Persistent Execution&quot;</text>
+<rect x="373.67499999999995" y="2886" width="612.25" height="804" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="373.67499999999995" y="2886" width="612.25" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="385.67499999999995" y="2900" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">&quot;5. GSD — Evidence-Gated Lifecycle&quot;</text>
+<rect x="500.6500000000001" y="40" width="1026.95" height="112" rx="0" ry="0" fill="var(--_group-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<rect x="500.6500000000001" y="40" width="1026.95" height="28" rx="0" ry="0" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="512.6500000000001" y="54" dy="0.35em" font-size="12" font-weight="600" fill="var(--_text-sec)">&quot;OMC Agent Catalog (25 agents across all stages)&quot;</text>
+<polyline points="260.3249999999998,132 260.3249999999998,287 153.3499999999998,287" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="376.6999999999998,305 376.6999999999998,425" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="376.6999999999998,461 376.6999999999998,598" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="376.6999999999998,634 376.6999999999998,754" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="376.6999999999998,790 376.6999999999998,945 316.62499999999994,945" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="543.55,963 543.55,1083" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="543.55,1119 543.55,1239" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="543.55,1275 543.55,1425 679.8,1425" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="679.8,1822 679.8,1989" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="679.8,2025 679.8,2145" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="679.8,2181 679.8,2301" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="679.8,2337 679.8,2457" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="679.8,2493 679.8,2630" fill="none" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="4 4" marker-end="url(#arrowhead)" />
+<polyline points="679.8,2666 679.8,2786" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="679.8,2822 679.8,2942" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="679.8,2978 679.8,3115" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="679.8,3151 679.8,3288" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="679.8,3324 679.8,3461" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="679.8,3497 679.8,3634" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="1035.575,132 1035.575,152 599.8125,152 599.8125,287 600.0499999999998,287" fill="none" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="4 4" marker-end="url(#arrowhead)" />
+<polyline points="1035.575,132 1035.575,152 1364.9375,152 1364.9375,1623.5 929.875,1623.5" fill="none" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="4 4" marker-end="url(#arrowhead)" />
+<polyline points="1035.575,132 1035.575,152 992.6750000000001,152 992.6750000000001,945 770.4749999999999,945" fill="none" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="4 4" marker-end="url(#arrowhead)" />
+<polyline points="679.8,1443 679.8,1483" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="679.8,1519 679.8,1559" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="679.8,1595 679.8,1635" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="679.8,1671 679.8,1728" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="679.8,1764 679.8,1804" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<rect x="351.5399999999998" y="516" width="50.32" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="376.6999999999998" y="529.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">REJECT</text>
+<rect x="348.67999999999984" y="845" width="56.04" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="376.6999999999998" y="858.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">APPROVE</text>
+<rect x="660.3599999999999" y="1907" width="38.88" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="679.8" y="1920.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">PASS</text>
+<rect x="626.04" y="2548" width="107.52000000000001" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="679.8" y="2561.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">session boundary</text>
+<rect x="634.62" y="3033" width="90.36" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="679.8" y="3046.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">evidence gate</text>
+<rect x="634.62" y="3206" width="90.36" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="679.8" y="3219.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">evidence gate</text>
+<rect x="634.62" y="3379" width="90.36" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="679.8" y="3392.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">evidence gate</text>
+<rect x="634.62" y="3552" width="90.36" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="679.8" y="3565.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">evidence gate</text>
+<rect x="548.9125" y="187" width="101.8" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="599.8125" y="200.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">provides agents</text>
+<rect x="1314.0375" y="758.5" width="101.8" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="1364.9375" y="772" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">provides agents</text>
+<rect x="941.7750000000001" y="516" width="101.8" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="992.6750000000001" y="529.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">provides agents</text>
+<rect x="623.18" y="1686" width="113.24000000000001" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="679.8" y="1699.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">FAIL: build error</text>
+<rect x="61.9999999999998" y="96" width="396.65000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="153.3499999999998" y="269" width="446.70000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="131.8999999999998" y="425" width="489.6" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="142.6249999999998" y="598" width="468.15000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="167.6499999999998" y="754" width="418.1" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="316.62499999999994" y="927" width="453.85" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="323.775" y="1083" width="439.55" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="313.04999999999995" y="1239" width="461.00000000000006" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="506.49999999999994" y="1989" width="346.6" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="502.92499999999995" y="2145" width="353.75" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="502.92499999999995" y="2301" width="353.75" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="481.4749999999999" y="2457" width="396.65000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="492.19999999999993" y="2630" width="375.20000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="495.775" y="2786" width="368.05" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="510.07499999999993" y="2942" width="339.45000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="449.29999999999995" y="3115" width="461.00000000000006" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="395.67499999999995" y="3288" width="568.25" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="438.57499999999993" y="3461" width="482.45000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="477.9" y="3634" width="403.8" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="565.55" y="96" width="940.0500000000001" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="499.3499999999999" y="1407" width="360.90000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="567.2749999999999" y="1483" width="225.05" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="463.5999999999999" y="1559" width="432.40000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="445.7249999999999" y="1635" width="468.15000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="499.3499999999999" y="1728" width="360.90000000000003" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="492.19999999999993" y="1804" width="375.20000000000005" height="36" rx="0" ry="0" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<text x="260.3249999999998" y="114" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;&#39;Add payment processing\nwith Stripe integration&#39;&quot;</text>
+<text x="376.6999999999998" y="287" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Planner (opus)\nCreate initial plan:\n4 phases, 14 tasks&quot;</text>
+<text x="376.6999999999998" y="443" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Critic (opus)\nREJECT: hand-waving in\nTask 2.3, no spike task&quot;</text>
+<text x="376.6999999999998" y="616" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Planner (opus)\nRevise: add spike,\nconcretize descriptions&quot;</text>
+<text x="376.6999999999998" y="772" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Critic (opus)\nAPPROVE: 4 phases,\n15 tasks, 3 risks&quot;</text>
+<text x="543.55" y="945" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;RequirementsStage\n(ProductManagerAgent)\nrequirements.md&quot;</text>
+<text x="543.55" y="1101" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;DesignStage\n(ArchitectAgent)\ndesign.md + API contract&quot;</text>
+<text x="543.55" y="1257" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;TaskStage\n(TaskPlannerAgent)\ntasks.md — 15 ordered tasks&quot;</text>
+<text x="679.8" y="2007" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Iteration 1-5:\nPhase 1 tasks (Foundation)&quot;</text>
+<text x="679.8" y="2163" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Iteration 6-10:\nPhase 2 tasks (Core Logic)&quot;</text>
+<text x="679.8" y="2319" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Iteration 11-14:\nPhase 3 tasks (API Layer)&quot;</text>
+<text x="679.8" y="2475" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Iteration 15:\nSession boundary — state persisted&quot;</text>
+<text x="679.8" y="2648" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;New session resumes at\niteration 16 from disk&quot;</text>
+<text x="679.8" y="2804" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;Iteration 16-20:\nPhase 4 tasks (Integration)&quot;</text>
+<text x="679.8" y="2960" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;RESEARCH phase\nevidence: feasibility doc&quot;</text>
+<text x="679.8" y="3133" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;EXECUTE phase\nevidence: build log,\nimplementation report&quot;</text>
+<text x="679.8" y="3306" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;VERIFY phase\nevidence: verification report,\nacceptance criteria results&quot;</text>
+<text x="679.8" y="3479" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;INTEGRATION phase\nevidence: e2e scenario,\nload test results&quot;</text>
+<text x="679.8" y="3652" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;COMPLETE\nfinal report with\n12 evidence artifacts&quot;</text>
+<text x="1035.575" y="114" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;explore, planner, architect, executor,\ndesigner, verifier, critic, build-fixer,\nsecurity-reviewer, code-reviewer, writer...&quot;</text>
+<text x="679.8" y="1425" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;PLAN stage\nexplore (haiku) + planner (opus)&quot;</text>
+<text x="679.7999999999998" y="1501" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;PRD stage\nanalyst (opus)&quot;</text>
+<text x="679.8" y="1577" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;EXEC stage\nexecutor (sonnet) x3\ndesigner (sonnet) x1&quot;</text>
+<text x="679.8" y="1653" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;VERIFY stage\nverifier (sonnet)\nsecurity-reviewer (sonnet)&quot;</text>
+<text x="679.8" y="1746" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;FIX stage\nbuild-fixer (sonnet)\nLoop 1 of 3&quot;</text>
+<text x="679.8" y="1822" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">&quot;VERIFY stage (re-run)\nverifier (sonnet)\nPASS&quot;</text>
+</svg></div><div class="diagram" id="post11-ralplan-sequence"><h4>post11-ralplan-sequence</h4><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 500" width="560" height="500" style="--bg:#0d1117;--fg:#e6edf3;--line:#3d444d;--accent:#4493f8;--muted:#9198a1;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 30%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="seq-arrow" markerWidth="8" markerHeight="4.8" refX="8" refY="2.4" orient="auto-start-reverse">
+    <polygon points="0 0, 8 2.4, 0 4.8" fill="var(--_arrow)" />
+  </marker>
+  <marker id="seq-arrow-open" markerWidth="8" markerHeight="4.8" refX="8" refY="2.4" orient="auto-start-reverse">
+    <polyline points="0 0, 8 2.4, 0 4.8" fill="none" stroke="var(--_arrow)" stroke-width="1" />
+  </marker>
+</defs>
+<line x1="70" y1="70" x2="70" y2="470" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line x1="210" y1="70" x2="210" y2="470" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line x1="350" y1="70" x2="350" y2="470" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line x1="490" y1="70" x2="490" y2="470" stroke="var(--_line)" stroke-width="0.75" stroke-dasharray="6 4" />
+<line x1="70" y1="90" x2="210" y2="90" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#seq-arrow)" />
+<text x="140" y="84" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-muted)">Submit task</text>
+<polyline points="210,130 240,130 240,150 210,150" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#seq-arrow)" />
+<text x="246" y="140" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">Create initial plan</text>
+<line x1="210" y1="200" x2="490" y2="200" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#seq-arrow)" />
+<text x="350" y="194" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-muted)">Submit plan for review</text>
+<line x1="490" y1="240" x2="210" y2="240" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#seq-arrow)" />
+<text x="350" y="234" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-muted)">REJECT - findings(completeness, feasibility, hand-waving, risk)</text>
+<polyline points="210,280 240,280 240,300 210,300" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#seq-arrow)" />
+<text x="246" y="290" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">Revise plan incorporating findings</text>
+<line x1="210" y1="350" x2="490" y2="350" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#seq-arrow)" />
+<text x="350" y="344" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-muted)">Resubmit revised plan</text>
+<line x1="490" y1="390" x2="210" y2="390" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#seq-arrow)" />
+<text x="350" y="384" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-muted)">APPROVE</text>
+<line x1="210" y1="430" x2="70" y2="430" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#seq-arrow)" />
+<text x="140" y="424" text-anchor="middle" font-size="11" font-weight="400" fill="var(--_text-muted)">Return final plan</text>
+<rect x="230.45999999999998" y="354" width="239.08" height="27" fill="var(--_group-hdr)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<polygon points="463.53999999999996,354 469.53999999999996,360 463.53999999999996,360" fill="var(--_inner-stroke)" />
+<text x="350" y="367.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">Loop continues up to MAX_ITERATIONS = 5</text>
+<rect x="30" y="30" width="80" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="70" y="50" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">User</text>
+<rect x="168.975" y="30" width="82.05000000000001" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="210" y="50" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">Planner</text>
+<rect x="301.825" y="30" width="96.35000000000001" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="350" y="50" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">Architect</text>
+<rect x="450" y="30" width="80" height="40" rx="4" ry="4" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="1" />
+<text x="490" y="50" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">Critic</text>
+</svg></div><div class="diagram" id="post11-team-pipeline-state"><h4>post11-team-pipeline-state</h4><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 321.43 682" width="321.43" height="682" style="--bg:#0d1117;--fg:#e6edf3;--line:#3d444d;--accent:#4493f8;--muted:#9198a1;background:var(--bg)">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap');
+  text { font-family: 'Inter', system-ui, sans-serif; }
+  svg {
+    /* Derived from --bg and --fg (overridable via --line, --accent, etc.) */
+    --_text:          var(--fg);
+    --_text-sec:      var(--muted, color-mix(in srgb, var(--fg) 60%, var(--bg)));
+    --_text-muted:    var(--muted, color-mix(in srgb, var(--fg) 40%, var(--bg)));
+    --_text-faint:    color-mix(in srgb, var(--fg) 25%, var(--bg));
+    --_line:          var(--line, color-mix(in srgb, var(--fg) 30%, var(--bg)));
+    --_arrow:         var(--accent, color-mix(in srgb, var(--fg) 50%, var(--bg)));
+    --_node-fill:     var(--surface, color-mix(in srgb, var(--fg) 3%, var(--bg)));
+    --_node-stroke:   var(--border, color-mix(in srgb, var(--fg) 20%, var(--bg)));
+    --_group-fill:    var(--bg);
+    --_group-hdr:     color-mix(in srgb, var(--fg) 5%, var(--bg));
+    --_inner-stroke:  color-mix(in srgb, var(--fg) 12%, var(--bg));
+    --_key-badge:     color-mix(in srgb, var(--fg) 10%, var(--bg));
+  }
+</style>
+<defs>
+  <marker id="arrowhead" markerWidth="8" markerHeight="4.8" refX="8" refY="2.4" orient="auto">
+    <polygon points="0 0, 8 2.4, 0 4.8" fill="var(--_arrow)" />
+  </marker>
+  <marker id="arrowhead-start" markerWidth="8" markerHeight="4.8" refX="0" refY="2.4" orient="auto-start-reverse">
+    <polygon points="8 0, 0 2.4, 8 4.8" fill="var(--_arrow)" />
+  </marker>
+</defs>
+<polyline points="154.94,76 154.94,116" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="154.94,152 154.94,192" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="154.94,228 154.94,268" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="154.94,304 154.94,344" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="154.94,380 154.94,408.5 236.83,408.5 236.83,437" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="154.94,380 154.94,408.5 78.32000000000001,408.5 78.32000000000001,455 86.63000000000001,455" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="116.63000000000001,437 116.63000000000001,408.5 154.94,408.5 154.94,380" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="116.63000000000001,473 116.63000000000001,530" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="236.83,473 236.83,530" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<polyline points="116.63000000000001,566 116.63000000000001,606" fill="none" stroke="var(--_line)" stroke-width="0.75" marker-end="url(#arrowhead)" />
+<rect x="205.95000000000002" y="395" width="61.760000000000005" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="236.83" y="408.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">all pass</text>
+<rect x="36.00000000000001" y="395" width="84.64" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="78.32000000000001" y="408.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">issues found</text>
+<rect x="132.64" y="395" width="44.6" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="154.94" y="408.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">fixed</text>
+<rect x="42.85000000000001" y="488" width="147.56" height="27" rx="4" ry="4" fill="var(--bg)" stroke="var(--_inner-stroke)" stroke-width="0.5" />
+<text x="116.63000000000001" y="501.5" text-anchor="middle" dy="0.35em" font-size="11" font-weight="400" fill="var(--_text-muted)">max retries exceeded 3x</text>
+<circle cx="154.94" cy="58" r="16" fill="var(--_text)" stroke="none" />
+<rect x="124.64" y="116" width="60.6" height="36" rx="6" ry="6" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="124.94" y="192" width="60" height="36" rx="6" ry="6" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="124.64" y="268" width="60.6" height="36" rx="6" ry="6" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="117.49" y="344" width="74.9" height="36" rx="6" ry="6" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="192.23000000000002" y="437" width="89.2" height="36" rx="6" ry="6" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="86.63000000000001" y="437" width="60" height="36" rx="6" ry="6" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<rect x="79.18" y="530" width="74.9" height="36" rx="6" ry="6" fill="var(--_node-fill)" stroke="var(--_node-stroke)" stroke-width="0.75" />
+<circle cx="236.83" cy="548" r="16" fill="none" stroke="var(--_text)" stroke-width="1.5" />
+<circle cx="236.83" cy="548" r="12" fill="var(--_text)" stroke="none" />
+<circle cx="116.63000000000001" cy="624" r="16" fill="none" stroke="var(--_text)" stroke-width="1.5" />
+<circle cx="116.63000000000001" cy="624" r="12" fill="var(--_text)" stroke="none" />
+
+<text x="154.94" y="134" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">PLAN</text>
+<text x="154.94" y="210" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">PRD</text>
+<text x="154.94" y="286" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">EXEC</text>
+<text x="154.94" y="362" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">VERIFY</text>
+<text x="236.83" y="455" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">COMPLETE</text>
+<text x="116.63000000000001" y="455" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">FIX</text>
+<text x="116.63000000000001" y="548" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="var(--_text)">FAILED</text>
+
+
+</svg></div>
+
+<div class="social-cards">
+<h3>Social Media Cards</h3>
+<p style="color:#94a3b8;font-size:0.9em;">Open <code>assets/twitter-card.html</code> and <code>assets/linkedin-card.html</code> in a browser to preview social cards.</p>
+</div>
+
+<div class="series-nav">
+<span>Agentic Development: 10 Lessons from 4,500 AI Coding Sessions</span>
+<span style="color:#64748b;">Post 11 of 11</span>
+</div>
+</article>
+</body>
+</html>

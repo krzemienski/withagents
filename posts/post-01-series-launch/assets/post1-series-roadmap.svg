@@ -87,7 +87,7 @@
 <rect x="1413.0974999999999" y="505" width="360.90000000000003" height="36" rx="0" ry="0" fill="#0f3460" stroke="#533483" stroke-width="2px" />
 <rect x="560.7349999999999" y="598" width="360.90000000000003" height="36" rx="0" ry="0" fill="#0f3460" stroke="#533483" stroke-width="2px" />
 <rect x="133.9974999999999" y="505" width="346.6" height="36" rx="0" ry="0" fill="#533483" stroke="#e94560" stroke-width="3px" />
-<text x="648.2500000000002" y="58" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#fff">&quot;Post 1: Series Launch\n8,481 Sessions Overview&quot;</text>
+<text x="648.2500000000002" y="58" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#fff">&quot;Post 1: Series Launch\n4,500 Sessions Overview&quot;</text>
 <text x="287.2974999999999" y="151" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#fff">&quot;Post 3: iOS Client\n763 Sessions, SwiftUI&quot;</text>
 <text x="810.2350000000001" y="244" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#fff">&quot;Post 4: 5-Layer Bridge\n4 Failures, 1 Architecture&quot;</text>
 <text x="856.0625000000002" y="337" text-anchor="middle" dy="0.35em" font-size="13" font-weight="500" fill="#fff">&quot;Post 2: Multi-Agent Consensus\n3 Agents, Hard Gates&quot;</text>

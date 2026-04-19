@@ -1,5 +1,5 @@
 # Deep Technical Review: Posts 05-08
-## "Agentic Development: 10 Lessons from 8,481 AI Coding Sessions"
+## "Agentic Development: 10 Lessons from 4,500 AI Coding Sessions"
 
 **Review Date:** 2026-03-01
 **Reviewer:** Claude Opus 4.6 (automated deep review)
@@ -745,7 +745,7 @@ Ralph introduces genuinely novel concepts (hats, persistence loops, file-based o
 ### Series Numbering Inconsistency (HIGH)
 
 All four posts contain a numbering contradiction:
-- **Series title:** "10 Lessons from 8,481 AI Coding Sessions"
+- **Series title:** "10 Lessons from 4,500 AI Coding Sessions"
 - **Post numbering:** "Part X of **11**" in each post's frontmatter
 - Post 05 says "Part 5 of 11", Post 06 says "Part 6 of 11", etc.
 
