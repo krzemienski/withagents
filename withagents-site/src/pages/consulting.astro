@@ -1,0 +1,118 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Nav from '@/components/Nav.astro';
+import Footer from '@/components/Footer.astro';
+
+const calendlyUrl = import.meta.env.PUBLIC_CALENDLY_URL ?? 'https://calendly.com/nick-krzemienski/consulting';
+const inquiryEmail = import.meta.env.PUBLIC_NICK_INQUIRY_EMAIL ?? 'nick@withagents.dev';
+
+const modes = [
+  {
+    tag: 'Short audit',
+    body:
+      'One- to two-week engagement. I read your codebase, sit with your team, and write a concrete remediation plan with evidence. You get a document, a working repro, and a roadmap.',
+  },
+  {
+    tag: 'Embedded pair-week',
+    body:
+      "I pair with one of your senior engineers on a specific agentic system — orchestration, validation, or operator UX. We ship a real feature to prod. No slides.",
+  },
+];
+
+const flagshipPosts = [
+  { slug: 'day-01-validationforge-ga', title: 'ValidationForge goes GA' },
+  { slug: 'day-22-ralph-orchestrator', title: 'Ralph: self-referential agent loops in production' },
+  { slug: 'day-50-agentic-manifesto', title: 'The agentic development manifesto' },
+];
+
+const pageTitle = 'Consulting — embedded agentic-development work for engineering teams';
+const ogImage = `/api/og.png?title=${encodeURIComponent('Consulting')}&kind=essay`;
+---
+
+<BaseLayout
+  title={pageTitle}
+  description="Embedded agentic-development consulting: short audits and pair-weeks for teams shipping multi-agent systems to production."
+  kind="about"
+>
+  <Nav />
+
+  <main class="mx-auto max-w-3xl px-6 py-16 md:py-24 text-slate-200">
+    <header class="mb-16">
+      <p class="text-sm uppercase tracking-[0.2em] text-indigo-400 mb-4">Consulting</p>
+      <h1 class="text-4xl md:text-5xl font-semibold leading-tight">
+        Embedded agentic-development consulting for engineering teams
+      </h1>
+      <p class="mt-6 text-lg text-slate-300">
+        I help small engineering teams design, validate, and ship multi-agent systems that hold up under real production load. Not demos. Not slides. Deployed systems with evidence.
+      </p>
+      <div class="mt-8 flex flex-wrap gap-3">
+        <a
+          href={calendlyUrl}
+          class="inline-block rounded bg-indigo-500 px-5 py-3 text-sm font-medium text-white hover:bg-indigo-400"
+        >
+          Book a call
+        </a>
+        <a
+          href={`mailto:${inquiryEmail}`}
+          class="inline-block rounded border border-slate-700 px-5 py-3 text-sm text-slate-200 hover:border-slate-500"
+        >
+          Email {inquiryEmail}
+        </a>
+      </div>
+    </header>
+
+    <section class="mb-16">
+      <h2 class="text-xl font-semibold mb-6">What I do</h2>
+      <ul class="space-y-3 text-slate-300">
+        <li><span class="text-slate-100 font-medium">Audit.</span> Read your system, find the load-bearing gaps, write a remediation plan with ordered actions.</li>
+        <li><span class="text-slate-100 font-medium">Pair.</span> Sit with your senior engineers, ship a real agentic feature to production.</li>
+        <li><span class="text-slate-100 font-medium">Enable.</span> Leave behind patterns, runbooks, and validation infra that your team keeps using after I'm gone.</li>
+      </ul>
+    </section>
+
+    <section class="mb-16">
+      <h2 class="text-xl font-semibold mb-6">Recent writing</h2>
+      <ul class="space-y-3">
+        {flagshipPosts.map((p) => (
+          <li>
+            <a href={`/writing/${p.slug}/`} class="text-indigo-400 underline underline-offset-4 hover:text-indigo-300">
+              {p.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="mb-16">
+      <h2 class="text-xl font-semibold mb-6">How we work together</h2>
+      <div class="grid gap-6 md:grid-cols-2">
+        {modes.map((m) => (
+          <div class="rounded border border-slate-800 p-6 bg-slate-900/40">
+            <p class="text-xs uppercase tracking-[0.15em] text-indigo-400 mb-2">{m.tag}</p>
+            <p class="text-slate-300">{m.body}</p>
+          </div>
+        ))}
+      </div>
+      <p class="mt-6 text-sm text-slate-400">Pricing: by scope. Book a call and we'll talk shape and timeline.</p>
+    </section>
+
+    <section class="mb-16 rounded border border-indigo-500/40 bg-indigo-500/5 p-8">
+      <h2 class="text-2xl font-semibold mb-3">Book a call</h2>
+      <p class="text-slate-300 mb-5">30-minute discovery call. If we fit, we talk scope. If not, I'll point you somewhere better.</p>
+      <a
+        href={calendlyUrl}
+        class="inline-block rounded bg-indigo-500 px-5 py-3 text-sm font-medium text-white hover:bg-indigo-400"
+      >
+        Schedule on Calendly
+      </a>
+    </section>
+
+    <footer class="mt-16 pt-8 border-t border-slate-800 text-sm text-slate-400">
+      <p>Direct: <a class="underline" href={`mailto:${inquiryEmail}`}>{inquiryEmail}</a></p>
+    </footer>
+  </main>
+
+  <Footer />
+
+  <meta slot="head" property="og:image" content={ogImage} />
+</BaseLayout>

@@ -6,10 +6,13 @@ import react from '@astrojs/react';
 import keystatic from '@keystatic/astro';
 import tailwindcss from '@tailwindcss/vite';
 
+const keystaticEnabled =
+  process.env.KEYSTATIC_ENABLED === 'true' || process.env.NODE_ENV !== 'production';
+
 export default defineConfig({
   site: 'https://withagents.dev',
-  output: 'static', // static pages + Edge OG (hybrid merged into static in Astro v5)
-  adapter: vercel({ imageService: true, webAnalytics: { enabled: false } }), // Plausible replaces Vercel analytics
-  integrations: [mdx(), sitemap(), react(), keystatic()],
+  output: 'static',
+  adapter: vercel({ imageService: true, webAnalytics: { enabled: false } }),
+  integrations: [mdx(), sitemap(), react(), ...(keystaticEnabled ? [keystatic()] : [])],
   vite: { plugins: [tailwindcss()] },
 });

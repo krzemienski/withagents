@@ -1,7 +1,8 @@
 import type { APIRoute } from 'astro';
 import { getCollection } from 'astro:content';
 
-// Simple RSS 2.0 generator for /writing. No external deps.
+export const prerender = true;
+
 export const GET: APIRoute = async ({ site }) => {
   const siteBase = (site ?? new URL('https://withagents.dev')).toString().replace(/\/$/, '');
   const posts = await getCollection('posts');

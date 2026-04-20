@@ -5,15 +5,12 @@ import { ImageResponse } from '@vercel/og';
 import type { APIRoute } from 'astro';
 import OGTemplate from '@/lib/og-template';
 import type { OGKind } from '@/lib/og-template';
-
-// Font fetch is hoisted so it runs once at Edge cold-start, not per request.
-// Using absolute public URLs so Vercel Edge can resolve them at runtime.
-const fontPromises = [
-  fetch(new URL('/fonts/SpaceGrotesk-Bold-subset.ttf', 'https://withagents.dev')).then(r => r.arrayBuffer()),
-  fetch(new URL('/fonts/Inter-Regular-subset.ttf', 'https://withagents.dev')).then(r => r.arrayBuffer()),
-  fetch(new URL('/fonts/Inter-Medium-subset.ttf', 'https://withagents.dev')).then(r => r.arrayBuffer()),
-  fetch(new URL('/fonts/IBMPlexMono-Regular-subset.ttf', 'https://withagents.dev')).then(r => r.arrayBuffer()),
-];
+import {
+  SPACE_GROTESK_BOLD,
+  INTER_REGULAR,
+  INTER_MEDIUM,
+  IBM_PLEX_MONO,
+} from '@/lib/og-fonts';
 
 export const GET: APIRoute = async ({ url }) => {
   const { searchParams } = url;
@@ -23,18 +20,16 @@ export const GET: APIRoute = async ({ url }) => {
   const tag      = searchParams.get('tag')      ?? undefined;
   const byline   = searchParams.get('byline')   ?? undefined;
 
-  const [sgBold, interRegular, interMedium, ibmMono] = await Promise.all(fontPromises);
-
   return new ImageResponse(
     OGTemplate({ title, subtitle, kind, tag, byline }),
     {
       width: 1200,
       height: 630,
       fonts: [
-        { name: 'Space Grotesk', data: sgBold,       weight: 700, style: 'normal' },
-        { name: 'Inter',         data: interRegular, weight: 400, style: 'normal' },
-        { name: 'Inter',         data: interMedium,  weight: 500, style: 'normal' },
-        { name: 'IBM Plex Mono', data: ibmMono,      weight: 400, style: 'normal' },
+        { name: 'Space Grotesk', data: SPACE_GROTESK_BOLD, weight: 700, style: 'normal' },
+        { name: 'Inter',         data: INTER_REGULAR,      weight: 400, style: 'normal' },
+        { name: 'Inter',         data: INTER_MEDIUM,       weight: 500, style: 'normal' },
+        { name: 'IBM Plex Mono', data: IBM_PLEX_MONO,      weight: 400, style: 'normal' },
       ],
     }
   );

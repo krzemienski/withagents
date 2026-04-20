@@ -19,6 +19,11 @@ const {
   type = 'space',
 } = Astro.props;
 
+const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN;
+const vercelEnv = import.meta.env.VERCEL_ENV ?? 'development';
+const enablePlausible =
+  import.meta.env.PROD && vercelEnv === 'production' && Boolean(plausibleDomain);
+
 const siteBase = Astro.site ?? new URL('https://withagents.dev');
 const ogParams = new URLSearchParams({ title, kind });
 const ogImageUrl = new URL(`/api/og.png?${ogParams.toString()}`, siteBase).toString();
@@ -67,7 +72,6 @@ const ogImageUrl = new URL(`/api/og.png?${ogParams.toString()}`, siteBase).toStr
   <body>
     <slot />
 
-    <!-- Plausible Analytics: swap to withagents.dev domain when A5 lands -->
-    {import.meta.env.PROD && <script is:inline defer data-domain="withagents.dev" src="https://plausible.io/js/script.js"></script>}
+    {enablePlausible && <script is:inline defer data-domain={plausibleDomain} src="https://plausible.io/js/script.js"></script>}
   </body>
 </html>
