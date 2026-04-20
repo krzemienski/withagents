@@ -35,8 +35,11 @@
  * Env vars:
  *   SUPABASE_URL             Required for Supabase logging
  *   SUPABASE_SERVICE_KEY     Required for Supabase logging
- *   X_API_KEY / X_API_SECRET Required for X thread dispatch
  *   GH_OWNER                 GitHub owner (same as --owner)
+ *
+ * X threads are posted manually (see phase-A1-code-blockers.md B1.1) — runner
+ * records a "skipped / manual_channel" row; scripts/syndication/capture-x-url.sh
+ * upserts the real URL post-hoc.
  *
  * Exit codes:
  *   0  All channels dispatched (or already done)
@@ -85,6 +88,21 @@ interface RunOptions {
   owner: string;
   patchDir: string;
 }
+
+// Supabase syndication_log CHECK constraints require these exact enum values.
+// See phase-A1-code-blockers.md B1.2 for the schema mismatch this fixes.
+const CHANNEL_DB_NAME: Record<ChannelName, string> = {
+  linkedin: "linkedin_article",
+  x: "x_thread",
+  readme: "readme_patch",
+};
+
+const STATUS_DB_NAME: Record<ChannelStatus, string> = {
+  ok: "posted",
+  error: "error",
+  skipped: "skipped",
+  "dry-run": "skipped",
+};
 
 // ---------------------------------------------------------------------------
 // CLI arg helpers
@@ -248,58 +266,27 @@ async function dispatchLinkedIn(
 }
 
 // ---------------------------------------------------------------------------
-// X thread dispatch (delegates to existing publish-scheduled.js pattern)
+// X thread dispatch — MANUAL CHANNEL (see phase-A1-code-blockers.md B1.1)
+// Per locked decision #1: X API Basic tier ($200/mo) not viable for post-only
+// use. X threads are posted manually or via Typefully. Runner's only job is
+// to record a skipped row so referential integrity holds for metrics and the
+// post-hoc capture-x-url.sh helper can UPSERT the real URL later.
 // ---------------------------------------------------------------------------
 
 async function dispatchX(
   calDay: CalendarDay,
   dryRun: boolean
 ): Promise<ChannelRecord> {
-  // The X adapter (x/parser.ts, owned by A3) handles actual posting.
-  // Runner's job: locate the .x.md file and confirm it's ready for dispatch.
-  // Actual posting is done via the existing publish-scheduled.js infrastructure
-  // (Supabase queue) — runner queues the row if not already queued.
-
-  const postsDir = path.resolve(
-    __dirname,
-    "../../../withagents-site/src/content/posts"
-  );
-
-  const dayPrefix = `day-${String(calDay.day).padStart(2, "0")}-`;
-
   if (dryRun) {
-    console.log(`  [x] DRY-RUN: would queue X thread for day ${calDay.day}: ${calDay.topic}`);
-    return { status: "dry-run", message: "dry-run" };
+    console.log(`  [x] DRY-RUN: manual channel — would record skipped row for day ${calDay.day}`);
+    return { status: "skipped", message: "manual_channel" };
   }
 
-  if (!fs.existsSync(postsDir)) {
-    return {
-      status: "skipped",
-      message: `posts dir not found: ${postsDir}`,
-    };
-  }
-
-  const allFiles = fs.readdirSync(postsDir);
-  const xFile = allFiles.find(
-    (f) => f.startsWith(dayPrefix) && f.endsWith(".x.md")
-  );
-
-  if (!xFile) {
-    return {
-      status: "skipped",
-      message: `no .x.md content file found for day ${calDay.day}`,
-    };
-  }
-
-  // Log confirmation that the content is ready
-  console.log(`  [x] content ready: ${xFile}`);
-  console.log(`  [x] NOTE: actual posting handled by publish-scheduled.js queue`);
-  console.log(`  [x] Ensure a scheduled_posts row exists for this day/platform=x`);
-
+  // Always return skipped with reason "manual_channel". The capture-x-url.sh
+  // hook will UPSERT the row later with the real posted URL.
   return {
-    status: "ok",
-    message: `x thread content confirmed: ${xFile}`,
-    completedAt: new Date().toISOString(),
+    status: "skipped",
+    message: "manual_channel",
   };
 }
 
@@ -386,8 +373,8 @@ async function logToSupabase(
 
     await supabase.from("syndication_log").insert({
       slug: `day-${String(day).padStart(2, "0")}`,
-      channel,
-      status: record.status === "dry-run" ? "skipped" : record.status,
+      channel: CHANNEL_DB_NAME[channel],
+      status: STATUS_DB_NAME[record.status],
       posted_at: record.completedAt ?? null,
       response_url: null,
       error_message: record.message ?? null,
