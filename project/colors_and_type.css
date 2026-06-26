@@ -1,0 +1,207 @@
+/* ============================================================
+   WithAgents · Design Tokens
+   Colors, type, spacing, radii, motion.
+   Pair with the WAMark logo + JetBrains Mono / Inter / Fraunces.
+   ============================================================ */
+
+:root {
+  /* ===== Color · base ===== */
+  --wa-bg:           #08080a;   /* page */
+  --wa-surface:      #0c0c0e;   /* cards, rails */
+  --wa-surface-2:    #101013;   /* nested cards */
+  --wa-fg:           #f4f3ee;   /* primary text — warm off-white */
+  --wa-fg-2:         rgba(244, 243, 238, 0.72);  /* secondary */
+  --wa-fg-3:         rgba(244, 243, 238, 0.4);   /* tertiary / mono labels */
+  --wa-fg-4:         rgba(244, 243, 238, 0.3);   /* footnotes */
+
+  /* ===== Color · accent (canonical = Crimson). Swap one variable to retheme. */
+  --wa-accent:       #FF3D52;
+  --wa-accent-violet:#7A3DFF;   /* secondary accent — used in page glow only */
+
+  --wa-accent-magenta: #EC4899;
+  --wa-accent-emerald: #34D08C;
+  --wa-accent-cyan:    #5EE6F2;
+  --wa-accent-amber:   #FFB84D;
+
+  /* ===== Color · semantic ===== */
+  --wa-pass:    #34D08C;
+  --wa-fail:    #FF3D52;
+  --wa-warn:    #FFB84D;
+  --wa-info:    #5EE6F2;
+
+  /* ===== Lines ===== */
+  --wa-line:        rgba(255, 255, 255, 0.06);
+  --wa-line-strong: rgba(255, 255, 255, 0.08);
+  --wa-line-emph:   rgba(255, 255, 255, 0.12);
+
+  /* ===== Translucent surfaces (for layering over the page glow) ===== */
+  --wa-fill-1: rgba(255, 255, 255, 0.02);
+  --wa-fill-2: rgba(255, 255, 255, 0.04);
+  --wa-fill-3: rgba(255, 255, 255, 0.05);
+  --wa-fill-4: rgba(255, 255, 255, 0.08);
+
+  /* ===== Type · families ===== */
+  --wa-font-ui:      Inter, system-ui, -apple-system, sans-serif;
+  --wa-font-display: Fraunces, Georgia, serif;     /* italic only */
+  --wa-font-mono:    "JetBrains Mono", ui-monospace, Menlo, monospace;
+
+  /* ===== Type · scale ===== */
+  --wa-text-hero:    120px;
+  --wa-text-page:    72px;
+  --wa-text-section: 48px;
+  --wa-text-h2:      36px;
+  --wa-text-h3:      22px;
+  --wa-text-body:    17px;
+  --wa-text-small:   14px;
+  --wa-text-mono:    11px;
+  --wa-text-mono-sm: 10.5px;
+
+  /* ===== Type · letter-spacing ===== */
+  --wa-track-hero:    -3px;
+  --wa-track-page:    -2px;
+  --wa-track-section: -1.5px;
+  --wa-track-h2:      -0.8px;
+  --wa-track-mono:    1.8px;
+  --wa-track-mono-tight: 1.4px;
+  --wa-track-mono-wide:  2.4px;
+
+  /* ===== Spacing ===== */
+  --wa-space-1: 4px;
+  --wa-space-2: 8px;
+  --wa-space-3: 12px;
+  --wa-space-4: 16px;
+  --wa-space-5: 24px;
+  --wa-space-6: 32px;
+  --wa-space-7: 48px;
+  --wa-space-8: 72px;
+  --wa-space-9: 120px;
+
+  /* ===== Radii ===== */
+  --wa-radius-sm:  6px;
+  --wa-radius-md:  8px;
+  --wa-radius-lg:  12px;
+  --wa-radius-xl:  16px;
+  --wa-radius-pill: 999px;
+
+  /* ===== Motion ===== */
+  --wa-ease:           cubic-bezier(0.2, 0.6, 0.2, 1);
+  --wa-dur-hover:      120ms;
+  --wa-dur-focus:      160ms;
+  --wa-dur-reveal:     280ms;
+  --wa-dur-grain:      1800ms;
+  --wa-dur-ambient:    22000ms;
+
+  /* ===== Effects ===== */
+  --wa-blur-nav: blur(14px);
+  --wa-glow-accent: 0 0 10px var(--wa-accent);
+
+  /* ===== Page glow (use as background-image on the page root) ===== */
+  --wa-page-glow:
+    radial-gradient(ellipse 1000px 600px at 90% -10%, rgba(255,61,82,0.08), transparent 60%),
+    radial-gradient(ellipse 900px  500px at -10% 120%, rgba(122,61,255,0.08), transparent 60%);
+}
+
+/* ===== Semantic helpers ===== */
+.wa-page {
+  background: var(--wa-page-glow), var(--wa-bg);
+  color: var(--wa-fg);
+  font-family: var(--wa-font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+.wa-mono     { font-family: var(--wa-font-mono); }
+.wa-display  { font-family: var(--wa-font-display); font-style: italic; }
+
+/* Type roles */
+h1.wa-hero {
+  font-size: var(--wa-text-hero);
+  letter-spacing: var(--wa-track-hero);
+  font-weight: 800;
+  line-height: 0.96;
+  margin: 0;
+}
+h1.wa-page-title {
+  font-size: var(--wa-text-page);
+  letter-spacing: var(--wa-track-page);
+  font-weight: 800;
+  line-height: 1.02;
+  margin: 0;
+}
+h2.wa-section-title {
+  font-size: var(--wa-text-section);
+  letter-spacing: var(--wa-track-section);
+  font-weight: 700;
+  margin: 0;
+}
+.wa-h2 {
+  font-size: var(--wa-text-h2);
+  letter-spacing: var(--wa-track-h2);
+  font-weight: 700;
+}
+.wa-h3 {
+  font-size: var(--wa-text-h3);
+  font-weight: 600;
+}
+.wa-body {
+  font-size: var(--wa-text-body);
+  line-height: 1.6;
+  color: var(--wa-fg-2);
+}
+.wa-eyebrow {
+  font-family: var(--wa-font-mono);
+  font-size: var(--wa-text-mono);
+  letter-spacing: var(--wa-track-mono-wide);
+  font-weight: 600;
+  color: var(--wa-accent);
+  text-transform: uppercase;
+}
+.wa-label {
+  font-family: var(--wa-font-mono);
+  font-size: var(--wa-text-mono-sm);
+  letter-spacing: var(--wa-track-mono);
+  font-weight: 600;
+  color: var(--wa-fg-3);
+  text-transform: uppercase;
+}
+
+/* Card surface */
+.wa-card {
+  background: var(--wa-fill-2);
+  border: 1px solid var(--wa-line-strong);
+  border-radius: var(--wa-radius-lg);
+  padding: 20px;
+  transition: transform var(--wa-dur-hover) var(--wa-ease),
+              border-color var(--wa-dur-hover) var(--wa-ease),
+              background var(--wa-dur-hover) var(--wa-ease);
+}
+.wa-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--wa-line-emph);
+  background: var(--wa-fill-3);
+}
+
+/* Status pill */
+.wa-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: var(--wa-radius-pill);
+  background: var(--wa-fill-2);
+  border: 1px solid var(--wa-line-strong);
+  font-family: var(--wa-font-mono);
+  font-size: 10.5px;
+  letter-spacing: var(--wa-track-mono);
+  font-weight: 600;
+  color: var(--wa-fg-2);
+}
+.wa-pill::before {
+  content: '';
+  width: 7px; height: 7px;
+  border-radius: 4px;
+  background: var(--wa-accent);
+  box-shadow: var(--wa-glow-accent);
+}
+
+/* Selection */
+::selection { background: rgba(255, 61, 82, 0.3); }

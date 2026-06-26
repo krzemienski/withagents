@@ -1,0 +1,26 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Colors · Accent</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+  body{margin:0;background:#08080a;color:#f4f3ee;font-family:'JetBrains Mono',monospace;height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 28px}
+  .grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+  .sw{display:flex;flex-direction:column;gap:6px}
+  .chip{height:80px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);position:relative;overflow:hidden}
+  .chip::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 100%,rgba(0,0,0,0.4),transparent 60%)}
+  .name{font-size:10px;font-weight:700;letter-spacing:1.2px}
+  .hex{font-size:9px;letter-spacing:1px;color:rgba(244,243,238,0.4);text-transform:uppercase}
+  h3{font-size:10px;letter-spacing:2px;color:rgba(244,243,238,0.4);margin:0 0 12px;text-transform:uppercase;font-weight:700}
+</style></head>
+<body>
+<div>
+<h3>· Accent presets · pick one per surface</h3>
+<div class="grid">
+  <div class="sw"><div class="chip" style="background:#FF3D52;box-shadow:0 0 24px rgba(255,61,82,0.4)"></div><div class="name">Crimson</div><div class="hex">#FF3D52</div></div>
+  <div class="sw"><div class="chip" style="background:#EC4899"></div><div class="name">Magenta</div><div class="hex">#EC4899</div></div>
+  <div class="sw"><div class="chip" style="background:#B84DFF"></div><div class="name">Violet</div><div class="hex">#B84DFF</div></div>
+  <div class="sw"><div class="chip" style="background:#34D08C"></div><div class="name">Emerald</div><div class="hex">#34D08C</div></div>
+  <div class="sw"><div class="chip" style="background:#5EE6F2"></div><div class="name">Cyan</div><div class="hex">#5EE6F2</div></div>
+  <div class="sw"><div class="chip" style="background:#FFB84D"></div><div class="name">Amber</div><div class="hex">#FFB84D</div></div>
+</div>
+</div>
+</body></html>

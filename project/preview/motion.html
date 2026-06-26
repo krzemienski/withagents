@@ -1,0 +1,19 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Spacing · Motion</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;700&display=swap">
+<style>
+  body{margin:0;background:#08080a;color:#f4f3ee;font-family:'JetBrains Mono',monospace;height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 32px;gap:20px}
+  .row{display:flex;align-items:center;gap:18px}
+  .lbl{font-size:10px;letter-spacing:1.4px;color:rgba(244,243,238,0.5);width:180px;flex-shrink:0;font-weight:700}
+  .desc{font-size:9.5px;letter-spacing:1.2px;color:rgba(244,243,238,0.4);flex:1}
+  .acc{color:#FF3D52}
+  .ease{font-family:'JetBrains Mono',monospace;font-size:9px;color:rgba(244,243,238,0.55);letter-spacing:0.5px}
+</style></head>
+<body>
+  <div class="row"><div class="lbl">EASING · house</div><div class="ease">cubic-bezier(0.2, 0.6, 0.2, 1)</div><div class="desc">fast-out, gentle settle</div></div>
+  <div class="row"><div class="lbl">DUR · hover</div><div class="ease"><span class="acc">120ms</span></div><div class="desc">card lift · border brightening</div></div>
+  <div class="row"><div class="lbl">DUR · focus</div><div class="ease"><span class="acc">160ms</span></div><div class="desc">input ring · button focus</div></div>
+  <div class="row"><div class="lbl">DUR · reveal</div><div class="ease"><span class="acc">280ms</span></div><div class="desc">page route · post enter (8px translate Y)</div></div>
+  <div class="row"><div class="lbl">DUR · grain</div><div class="ease"><span class="acc">1.8s</span></div><div class="desc">5-step noise turbulence</div></div>
+  <div class="row"><div class="lbl">DUR · ambient</div><div class="ease"><span class="acc">16–28s</span></div><div class="desc">aurora drift · lane scroll</div></div>
+</body></html>

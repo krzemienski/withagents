@@ -1,0 +1,20 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Colors · Base</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+  body{margin:0;background:#08080a;color:#f4f3ee;font-family:'JetBrains Mono',monospace;height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 28px}
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .sw{display:flex;flex-direction:column;gap:8px}
+  .chip{height:96px;border-radius:10px;border:1px solid rgba(255,255,255,0.08)}
+  .name{font-size:10.5px;font-weight:700;letter-spacing:1.4px;color:#f4f3ee}
+  .hex{font-size:9.5px;letter-spacing:1.2px;color:rgba(244,243,238,0.4);text-transform:uppercase}
+  .role{font-size:9px;letter-spacing:1.2px;color:rgba(244,243,238,0.5);margin-top:2px}
+</style></head>
+<body>
+<div class="grid">
+  <div class="sw"><div class="chip" style="background:#08080a"></div><div class="name">--wa-bg</div><div class="hex">#08080A</div><div class="role">page</div></div>
+  <div class="sw"><div class="chip" style="background:#0c0c0e"></div><div class="name">--wa-surface</div><div class="hex">#0C0C0E</div><div class="role">cards · rails</div></div>
+  <div class="sw"><div class="chip" style="background:#101013"></div><div class="name">--wa-surface-2</div><div class="hex">#101013</div><div class="role">nested</div></div>
+  <div class="sw"><div class="chip" style="background:#f4f3ee"></div><div class="name" style="color:#f4f3ee">--wa-fg</div><div class="hex">#F4F3EE</div><div class="role">primary text</div></div>
+</div>
+</body></html>

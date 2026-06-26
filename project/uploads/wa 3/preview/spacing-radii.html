@@ -1,0 +1,17 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Spacing · Radii</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;700&display=swap">
+<style>
+  body{margin:0;background:#08080a;color:#f4f3ee;font-family:'JetBrains Mono',monospace;height:100vh;display:flex;align-items:center;gap:22px;padding:0 32px;justify-content:center}
+  .col{display:flex;flex-direction:column;align-items:center;gap:10px}
+  .box{width:80px;height:80px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12)}
+  .lbl{font-size:9.5px;letter-spacing:1.4px;color:rgba(244,243,238,0.5);text-align:center;font-weight:700}
+  .px{font-size:9px;letter-spacing:1px;color:rgba(244,243,238,0.3)}
+</style></head>
+<body>
+  <div class="col"><div class="box" style="border-radius:6px"></div><div class="lbl">SM</div><div class="px">6</div></div>
+  <div class="col"><div class="box" style="border-radius:8px"></div><div class="lbl">MD</div><div class="px">8</div></div>
+  <div class="col"><div class="box" style="border-radius:12px"></div><div class="lbl">LG</div><div class="px">12</div></div>
+  <div class="col"><div class="box" style="border-radius:16px"></div><div class="lbl">XL</div><div class="px">16</div></div>
+  <div class="col"><div class="box" style="border-radius:999px;width:120px;height:32px"></div><div class="lbl">PILL</div><div class="px">999</div></div>
+</body></html>

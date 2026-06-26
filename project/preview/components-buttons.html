@@ -1,0 +1,38 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Components · Buttons</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&family=JetBrains+Mono:wght@600;700&display=swap">
+<style>
+  body{margin:0;background:#08080a;color:#f4f3ee;font-family:Inter,sans-serif;height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 32px;gap:18px}
+  .row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .key{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.4px;color:rgba(244,243,238,0.4);text-transform:uppercase;margin-bottom:6px;font-weight:700}
+  .btn{height:40px;padding:0 18px;border-radius:8px;font-size:13.5px;font-weight:600;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+  .filled{background:#FF3D52;color:#0a0a0a}
+  .ghost{background:rgba(255,255,255,0.04);color:#f4f3ee;border:1px solid rgba(255,255,255,0.12)}
+  .quiet{background:transparent;color:rgba(244,243,238,0.6);border:1px solid rgba(255,255,255,0.08)}
+  .pill{height:32px;padding:0 14px;border-radius:999px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:rgba(244,243,238,0.7);font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:1.4px;font-weight:600;cursor:pointer}
+  .arrow{font-family:'JetBrains Mono',monospace;font-size:13px}
+</style></head>
+<body>
+  <div>
+    <div class="key">— Filled CTA · accent</div>
+    <div class="row">
+      <button class="btn filled">Read the series <span class="arrow">→</span></button>
+      <button class="btn filled">View on GitHub <span class="arrow">↗</span></button>
+    </div>
+  </div>
+  <div>
+    <div class="key">— Ghost · default</div>
+    <div class="row">
+      <button class="btn ghost">Browse all 19 posts</button>
+      <button class="btn ghost">Request access</button>
+    </div>
+  </div>
+  <div>
+    <div class="key">— Mono pill · nav / utility</div>
+    <div class="row">
+      <button class="pill">PREV · 02</button>
+      <button class="pill">NEXT · 04</button>
+      <button class="pill">SUBSCRIBE</button>
+    </div>
+  </div>
+</body></html>

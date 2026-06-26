@@ -1,0 +1,28 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Components · Inputs</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@600;700&display=swap">
+<style>
+  body{margin:0;background:#08080a;color:#f4f3ee;font-family:Inter,sans-serif;height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 32px;gap:14px}
+  .key{font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:1.4px;color:rgba(244,243,238,0.4);text-transform:uppercase;margin-bottom:6px;font-weight:700}
+  .input{height:40px;padding:0 14px;border-radius:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);color:#f4f3ee;font-size:14px;width:100%;box-sizing:border-box;font-family:Inter,sans-serif}
+  .input.focus{border-color:rgba(255,61,82,0.6);box-shadow:0 0 0 3px rgba(255,61,82,0.12)}
+  .row{display:flex;gap:10px}
+  .submit{height:40px;padding:0 18px;border-radius:8px;background:#FF3D52;color:#0a0a0a;border:none;font-weight:600;cursor:pointer;font-family:Inter,sans-serif;font-size:13.5px}
+</style></head>
+<body>
+  <div>
+    <div class="key">— Subscribe</div>
+    <div class="row">
+      <input class="input" placeholder="you@domain.com" value="lewis@withagents.dev"/>
+      <button class="submit">Subscribe</button>
+    </div>
+  </div>
+  <div>
+    <div class="key">— Focus state</div>
+    <input class="input focus" placeholder="search 19 posts…"/>
+  </div>
+  <div>
+    <div class="key">— Empty</div>
+    <input class="input" placeholder="search 19 posts…"/>
+  </div>
+</body></html>

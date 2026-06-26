@@ -1,0 +1,20 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Colors · Lines</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@600;700&display=swap">
+<style>
+  body{margin:0;background:#08080a;color:#f4f3ee;font-family:'JetBrains Mono',monospace;height:100vh;display:flex;flex-direction:column;justify-content:center;padding:0 32px;gap:18px}
+  .row{display:flex;align-items:center;gap:18px}
+  .lbl{font-size:10.5px;font-weight:700;letter-spacing:1.4px;width:160px;flex-shrink:0;color:rgba(244,243,238,0.5)}
+  .demo{flex:1;height:1px}
+  .strong{height:36px;width:100%;border-radius:8px;background:rgba(255,255,255,0.04)}
+  .strong.s1{border:1px solid rgba(255,255,255,0.06)}
+  .strong.s2{border:1px solid rgba(255,255,255,0.08)}
+  .strong.s3{border:1px solid rgba(255,255,255,0.12)}
+  .desc{font-size:9.5px;color:rgba(244,243,238,0.4);letter-spacing:1.2px;width:120px;text-align:right;flex-shrink:0}
+</style></head>
+<body>
+  <div class="row"><div class="lbl">--wa-line</div><div class="demo" style="background:rgba(255,255,255,0.06)"></div><div class="desc">0.06 · default</div></div>
+  <div class="row"><div class="lbl">--wa-line-strong</div><div class="demo" style="background:rgba(255,255,255,0.08)"></div><div class="desc">0.08 · cards</div></div>
+  <div class="row"><div class="lbl">--wa-line-emph</div><div class="demo" style="background:rgba(255,255,255,0.12)"></div><div class="desc">0.12 · emphasis</div></div>
+  <div class="row" style="gap:10px"><div class="strong s1" style="display:flex;align-items:center;justify-content:center;font-size:9.5px;color:rgba(244,243,238,0.5);letter-spacing:1.4px">DEFAULT</div><div class="strong s2" style="display:flex;align-items:center;justify-content:center;font-size:9.5px;color:rgba(244,243,238,0.6);letter-spacing:1.4px">CARD</div><div class="strong s3" style="display:flex;align-items:center;justify-content:center;font-size:9.5px;color:#f4f3ee;letter-spacing:1.4px">EMPHASIS</div></div>
+</body></html>
